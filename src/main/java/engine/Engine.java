@@ -12,6 +12,10 @@ import java.util.List;
 
 public interface Engine {
 
+    void registerObserver(EngineObserver observer);
+
+    void unregisterObserver(EngineObserver observer);
+
     Map getMap();
 
     TileStack getStack();
@@ -32,7 +36,7 @@ public interface Engine {
 
     void build(BuildingType buildingType, Coords coords);
 
-    boolean canExtendVillage(Village village, FieldType fieldType);
+    boolean canExpandVillage(Village village, FieldType fieldType);
 
-    void extendVillage(Village village, FieldType fieldType);
+    void expandVillage(Village village, FieldType fieldType);
 }

@@ -21,4 +21,8 @@ public class Turn {
     public PlayerColor getColor() {
         return color;
     }
+
+    public Buildings getBuildings() {
+        return buildings;
+    }
 }
