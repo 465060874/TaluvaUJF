@@ -19,6 +19,7 @@ public class Coords {
     }
 
     public Coords getNeighbor(Direction direction) {
+
         return new Coords(l + direction.getDl(), d + direction.getDd());
     }
 
@@ -31,11 +32,27 @@ public class Coords {
         return builder.build();
     }
 
-    public int getL() {
+    int getL() {
         return l;
     }
 
-    public int getD() {
+    int getD() {
         return d;
     }
+
+    @Override
+    public boolean equals (Object obj) {
+        if (!(obj instanceof Coords)) {
+            return false;
+        }
+
+        Coords other = (Coords) obj;
+        return (l == other.l && d == other.d);
+    }
+
+    @Override
+    public String toString() {
+        return "Coords(" + l + ", " + d + ")";
+    }
 }
+

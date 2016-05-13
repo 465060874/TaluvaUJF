@@ -15,5 +15,5 @@ public interface Map {
 
     Iterator<Coords> getVolcanos();
 
-    Iterator getVillages(PlayerColor color);
+    Iterator<Village> getVillages(PlayerColor color);
 }
