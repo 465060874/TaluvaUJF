@@ -2,9 +2,6 @@ package map;
 
 import data.BuildingType;
 import data.FieldType;
-import data.PlayerColor;
-
-import java.util.Optional;
 
 public class Field {
 
@@ -18,7 +15,7 @@ public class Field {
         this.level = level;
         this.orientation = orientation;
 
-        this.building = null;
+        this.building = new FieldBuilding(null, BuildingType.NONE, 0);
     }
 
     public FieldType getType() {
@@ -33,7 +30,7 @@ public class Field {
         return orientation;
     }
 
-    public Optional<FieldBuilding> getBuilding() {
-        return Optional.ofNullable(building);
+    public FieldBuilding getBuilding() {
+        return building;
     }
 }

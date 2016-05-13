@@ -3,16 +3,17 @@ package map;
 import data.PlayerColor;
 
 import java.util.Iterator;
+import java.util.Optional;
 
 public interface Map {
 
-    Field getField(Coords c);
+    Optional<Field> getField(Coords c);
 
-    Iterator<Coords> getEmptyFields();
+    Iterator<Coords> getSeaLevel();
 
     Iterator<Coords> getFields();
 
     Iterator<Coords> getVolcanos();
 
-    Iterator<Village> getVillages(PlayerColor color);
+    Iterator getVillages(PlayerColor color);
 }

@@ -2,6 +2,8 @@ package data;
 
 public enum BuildingType {
 
+    NONE(0),
+
     TEMPLE(3),
 
     TOWER(2),

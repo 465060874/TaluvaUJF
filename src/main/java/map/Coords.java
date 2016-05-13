@@ -30,4 +30,12 @@ public class Coords {
 
         return builder.build();
     }
+
+    public int getL() {
+        return l;
+    }
+
+    public int getD() {
+        return d;
+    }
 }
