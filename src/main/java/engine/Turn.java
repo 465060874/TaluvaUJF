@@ -1,4 +1,4 @@
-package moteur;
+package engine;
 
 import data.PlayerColor;
 

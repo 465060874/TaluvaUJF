@@ -6,10 +6,14 @@ import java.util.List;
 
 public class Coords {
 
+    public static Coords of(int l, int d) {
+        return new Coords(l, d);
+    }
+
     private final int l;
     private final int d;
 
-    public Coords(int l, int d) {
+    private Coords(int l, int d) {
         this.l = l;
         this.d = d;
     }

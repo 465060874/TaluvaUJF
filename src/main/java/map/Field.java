@@ -2,19 +2,23 @@ package map;
 
 import data.BuildingType;
 import data.FieldType;
+import data.PlayerColor;
+
+import java.util.Optional;
 
 public class Field {
 
     private final FieldType type;
     private final int level;
-    private final BuildingType buildingType;
-    private final int buildingCount;
+    private final Orientation orientation;
+    private final FieldBuilding building;
 
-    public Field(FieldType type, int level, BuildingType buildingType, int buildingCount) {
+    public Field(FieldType type, int level, Orientation orientation) {
         this.type = type;
         this.level = level;
-        this.buildingType = buildingType;
-        this.buildingCount = buildingCount;
+        this.orientation = orientation;
+
+        this.building = null;
     }
 
     public FieldType getType() {
@@ -25,11 +29,11 @@ public class Field {
         return level;
     }
 
-    public BuildingType getBuildingType() {
-        return buildingType;
+    public Orientation getOrientation() {
+        return orientation;
     }
 
-    public int getBuildingCount() {
-        return buildingCount;
+    public Optional<FieldBuilding> getBuilding() {
+        return Optional.ofNullable(building);
     }
 }

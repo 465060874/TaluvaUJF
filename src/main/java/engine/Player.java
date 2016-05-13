@@ -1,4 +1,4 @@
-package moteur;
+package engine;
 
 public interface Player {
 

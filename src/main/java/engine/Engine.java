@@ -1,4 +1,4 @@
-package moteur;
+package engine;
 
 import data.BuildingType;
 import data.FieldType;
@@ -10,7 +10,7 @@ import map.Village;
 
 import java.util.List;
 
-public interface Moteur {
+public interface Engine {
 
     Map getMap();
 
@@ -18,13 +18,21 @@ public interface Moteur {
 
     List<Turn> getTurnsFromFirst();
 
-    List<Turn> getTurnsFromCurrent();
+    Iterable<Turn> getTurnsFromCurrent();
 
     boolean canPlaceTileOnVolcano(VolcanoTile tile, Coords coords, Orientation orientation);
 
+    void placeTileOnVolcano(VolcanoTile tile, Coords coords, Orientation orientation);
+
     boolean canPlaceTileOnSea(VolcanoTile tile, Coords coords, Orientation orientation);
+
+    void placeTileOnSea(VolcanoTile tile, Coords coords, Orientation orientation);
 
     boolean canBuild(BuildingType buildingType, Coords coords);
 
+    void build(BuildingType buildingType, Coords coords);
+
     boolean canExtendVillage(Village village, FieldType fieldType);
+
+    void extendVillage(Village village, FieldType fieldType);
 }
