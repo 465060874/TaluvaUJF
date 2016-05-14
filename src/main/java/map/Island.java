@@ -1,8 +1,7 @@
 package map;
 
 import data.PlayerColor;
-
-import java.util.Optional;
+import data.VolcanoTile;
 
 public interface Island {
 
@@ -15,4 +14,6 @@ public interface Island {
     Iterable<Hex> getVolcanos();
 
     Iterable<Village> getVillages(PlayerColor color);
+
+    void putTile(VolcanoTile tile, Hex hex, Orientation orientation);
 }

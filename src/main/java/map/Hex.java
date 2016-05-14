@@ -6,7 +6,7 @@ import com.google.common.collect.Ordering;
 
 import java.util.Objects;
 
-public class Hex {
+public class Hex implements Comparable<Hex> {
 
     public static Hex at(int line, int diag) {
         return new Hex(line, diag);
@@ -71,5 +71,46 @@ public class Hex {
                     .result();
         }
     };
+
+    @Override
+    public int compareTo(Hex o) {
+        return (this.line != o.line) ? this.line - o.line : this.diag - o.diag;
+    }
+
+    public Hex getRightNeibor(Orientation orientation) {
+        if (orientation == Orientation.NORTH) {
+            return this.getNeighbor(Neighbor.SOUTH_EAST);
+        } else if (orientation == Orientation.NORTH_EAST) {
+            return this.getNeighbor(Neighbor.SOUTH_WEST);
+        } else if (orientation == Orientation.SOUTH_EAST) {
+            return this.getNeighbor(Neighbor.EAST);
+        } else if (orientation == Orientation.SOUTH) {
+            return this.getNeighbor(Neighbor.NORTH_WEST);
+        } else if (orientation == Orientation.SOUTH_WEST) {
+            return this.getNeighbor(Neighbor.NORTH_EAST);
+        } else if (orientation == Orientation.NORTH_WEST) {
+            return this.getNeighbor(Neighbor.WEST);
+        } else {
+            throw new RuntimeException();
+        }
+    }
+
+    public Hex getLeftNeibor(Orientation orientation) {
+        if (orientation == Orientation.NORTH) {
+            return this.getNeighbor(Neighbor.SOUTH_WEST);
+        } else if (orientation == Orientation.NORTH_EAST) {
+            return this.getNeighbor(Neighbor.EAST);
+        } else if (orientation == Orientation.SOUTH_EAST) {
+            return this.getNeighbor(Neighbor.NORTH_WEST);
+        } else if (orientation == Orientation.SOUTH) {
+            return this.getNeighbor(Neighbor.NORTH_EAST);
+        } else if (orientation == Orientation.SOUTH_WEST) {
+            return this.getNeighbor(Neighbor.WEST);
+        } else if (orientation == Orientation.NORTH_WEST) {
+            return this.getNeighbor(Neighbor.SOUTH_EAST);
+        } else {
+            throw new RuntimeException();
+        }
+    }
 }
 

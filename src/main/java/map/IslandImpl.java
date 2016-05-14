@@ -4,6 +4,7 @@ import com.google.common.collect.*;
 import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
+import data.VolcanoTile;
 
 import java.util.*;
 
@@ -97,4 +98,23 @@ public class IslandImpl implements Island {
 
         return builder.build();
     }
+
+    public void putTile(VolcanoTile tile, Hex hex, Orientation orientation) {
+
+        Hex rightHex = hex.getRightNeibor(orientation);
+        Hex leftHex = hex.getLeftNeibor(orientation);
+
+        int level = getField(hex).getLevel();
+
+        level++;
+
+        Field volcanoField = new Field(level, FieldType.VOLCANO, orientation);
+        Field leftField = new Field(level, tile.getLeft(), orientation);
+        Field rightField = new Field(level, tile.getRight(), orientation);
+
+        map.put(hex, volcanoField);
+        map.put(rightHex, rightField);
+        map.put(leftHex, leftField);
+    }
+
 }

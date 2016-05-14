@@ -11,6 +11,9 @@ public class VolcanoTile {
     public VolcanoTile(FieldType left, FieldType right) {
         this.left = left;
         this.right = right;
+        if (!(left.isBuildable() && right.isBuildable())) {
+            throw new IllegalArgumentException("VolcanoTile left and right FieldType must be buildable");
+        }
     }
 
     public FieldType getLeft() {

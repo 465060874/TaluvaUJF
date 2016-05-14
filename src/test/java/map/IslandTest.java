@@ -12,9 +12,12 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 public class IslandTest {
+    private static int ORIGIN = 100;
 
     @Test
     public void testGetField() {
+
+
         Island island = new IslandImpl();
         /*
          *   L
@@ -140,4 +143,5 @@ public class IslandTest {
         */
 
     }
+
 }
