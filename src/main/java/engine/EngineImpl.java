@@ -3,8 +3,8 @@ package engine;
 import data.BuildingType;
 import data.FieldType;
 import data.VolcanoTile;
-import map.Coords;
-import map.Map;
+import map.Hex;
+import map.Island;
 import map.Orientation;
 import map.Village;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class EngineImpl implements Engine {
 
-    Map map;
+    Island island;
     TileStack stack;
 
     @Override
@@ -25,8 +25,7 @@ public class EngineImpl implements Engine {
 
     }
 
-    @Override
-    public Map getMap() {
+    public Island getIsland() {
         return null;
     }
 
@@ -46,32 +45,32 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public boolean canPlaceTileOnVolcano(VolcanoTile tile, Coords coords, Orientation orientation) {
+    public boolean canPlaceTileOnVolcano(VolcanoTile tile, Hex hex, Orientation orientation) {
         return false;
     }
 
     @Override
-    public void placeTileOnVolcano(VolcanoTile tile, Coords coords, Orientation orientation) {
+    public void placeTileOnVolcano(VolcanoTile tile, Hex hex, Orientation orientation) {
 
     }
 
     @Override
-    public boolean canPlaceTileOnSea(VolcanoTile tile, Coords coords, Orientation orientation) {
+    public boolean canPlaceTileOnSea(VolcanoTile tile, Hex hex, Orientation orientation) {
         return false;
     }
 
     @Override
-    public void placeTileOnSea(VolcanoTile tile, Coords coords, Orientation orientation) {
+    public void placeTileOnSea(VolcanoTile tile, Hex hex, Orientation orientation) {
 
     }
 
     @Override
-    public boolean canBuild(BuildingType buildingType, Coords coords) {
+    public boolean canBuild(BuildingType buildingType, Hex hex) {
         return false;
     }
 
     @Override
-    public void build(BuildingType buildingType, Coords coords) {
+    public void build(BuildingType buildingType, Hex hex) {
 
     }
 

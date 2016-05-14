@@ -1,10 +1,10 @@
 package map;
 
-import java.util.Iterator;
-
 public interface Village {
 
-    Iterator<Coords> getCoords();
+    int getFieldSize();
+
+    Iterable<Hex> getHexes();
 
     boolean hasTemple();
 

@@ -3,8 +3,8 @@ package engine;
 import data.BuildingType;
 import data.FieldType;
 import data.VolcanoTile;
-import map.Coords;
-import map.Map;
+import map.Hex;
+import map.Island;
 import map.Orientation;
 import map.Village;
 
@@ -16,7 +16,7 @@ public interface Engine {
 
     void unregisterObserver(EngineObserver observer);
 
-    Map getMap();
+    Island getIsland();
 
     TileStack getStack();
 
@@ -24,17 +24,17 @@ public interface Engine {
 
     Iterable<Turn> getTurnsFromCurrent();
 
-    boolean canPlaceTileOnVolcano(VolcanoTile tile, Coords coords, Orientation orientation);
+    boolean canPlaceTileOnVolcano(VolcanoTile tile, Hex hex, Orientation orientation);
 
-    void placeTileOnVolcano(VolcanoTile tile, Coords coords, Orientation orientation);
+    void placeTileOnVolcano(VolcanoTile tile, Hex hex, Orientation orientation);
 
-    boolean canPlaceTileOnSea(VolcanoTile tile, Coords coords, Orientation orientation);
+    boolean canPlaceTileOnSea(VolcanoTile tile, Hex hex, Orientation orientation);
 
-    void placeTileOnSea(VolcanoTile tile, Coords coords, Orientation orientation);
+    void placeTileOnSea(VolcanoTile tile, Hex hex, Orientation orientation);
 
-    boolean canBuild(BuildingType buildingType, Coords coords);
+    boolean canBuild(BuildingType buildingType, Hex hex);
 
-    void build(BuildingType buildingType, Coords coords);
+    void build(BuildingType buildingType, Hex hex);
 
     boolean canExpandVillage(Village village, FieldType fieldType);
 

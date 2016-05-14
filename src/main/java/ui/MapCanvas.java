@@ -9,7 +9,7 @@ import java.util.Random;
 
 class MapCanvas extends Canvas {
 
-    private static final Color BG_COLOR = Color.web("7FDBFF");
+    private static final Color BG_COLOR = Color.web("365373");
 
     private static final Paint BORDER_COLOR = Color.web("252525");
     private static final Color[] FIELD_TYPE_COLORS = new Color[] {
@@ -18,7 +18,7 @@ class MapCanvas extends Canvas {
             Color.web("01FF70"), // CLEARING
             Color.web("3D9970"), // JUNGLE
             Color.web("999999"), // ROCK
-            Color.web("DBD1B4"), // SAND
+            Color.web("F7CA88"), // SAND
     };
 
     private static final double HEX_SIZE_X = 60d;
@@ -47,9 +47,9 @@ class MapCanvas extends Canvas {
         double centerY = getHeight() / 2;
 
         Random random = new Random();
-        for (int l = -3; l <= 3; l++) {
-            for (int d = -3; d <= 3; d++) {
-                if (Math.abs(l + d) > 3) {
+        for (int l = -4; l <= 4; l++) {
+            for (int d = -4; d <= 4; d++) {
+                if (Math.abs(l + d) > 4) {
                     continue;
                 }
 
@@ -70,6 +70,7 @@ class MapCanvas extends Canvas {
                 gc.setFill(FIELD_TYPE_COLORS[random.nextInt(FIELD_TYPE_COLORS.length)]);
                 hexBuf.update(x, y, HEX_SIZE_X, HEX_SIZE_Y, level);
                 gc.fillPolygon(hexBuf.hexagonsX, hexBuf.hexagonsY, HexBuf.HEXAGON_POINTS);
+
                 gc.setFill(BORDER_COLOR);
                 gc.strokePolygon(hexBuf.hexagonsX, hexBuf.hexagonsY, HexBuf.HEXAGON_POINTS);
                 gc.fillPolygon(hexBuf.bottomX, hexBuf.bottomY, HexBuf.BOTTOM_POINTS);

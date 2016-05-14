@@ -5,25 +5,25 @@ import data.PlayerColor;
 
 public class FieldBuilding {
 
-    private final BuildingType buildingType;
-    private final PlayerColor buildingColor;
-    private final int buildingCount;
+    private final BuildingType type;
+    private final PlayerColor color;
+    private final int count;
 
-    public FieldBuilding(PlayerColor buildingColor, BuildingType buildingType, int buildingCount) {
-        this.buildingType = buildingType;
-        this.buildingColor = buildingColor;
-        this.buildingCount = buildingCount;
+    FieldBuilding(PlayerColor color, BuildingType type, int count) {
+        this.type = type;
+        this.color = color;
+        this.count = count;
     }
 
-    public PlayerColor getBuildingColor() {
-        return buildingColor;
+    public PlayerColor getColor() {
+        return color;
     }
 
-    public BuildingType getBuildingType() {
-        return buildingType;
+    public BuildingType getType() {
+        return type;
     }
 
-    public int getBuildingCount() {
-        return buildingCount;
+    public int getCount() {
+        return count;
     }
 }

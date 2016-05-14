@@ -4,20 +4,18 @@ package map;
 import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
-import engine.Player;
 import org.junit.Test;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class MapTest {
+public class IslandTest {
 
     @Test
-    public void getFieldTest() {
-        Map map = null;
+    public void testGetField() {
+        Island island = new IslandImpl();
         /*
          *   L
          * V     S/J
@@ -32,14 +30,14 @@ public class MapTest {
         Buildings: 2 Red Huts
          */
 
-        Field field1 = map.getField(Coords.of(0,0)).get();
+        Field field1 = island.getField(Hex.at(0, 0));
 
         assertEquals(2, field1.getLevel());
         assertEquals(FieldType.LAKE, field1.getType());
-        assertEquals(BuildingType.NONE, field1.getBuilding().getBuildingType());
-        assertEquals(2, field1.getBuilding().getBuildingCount());
-        assertEquals(PlayerColor.RED, field1.getBuilding().getBuildingColor());
-        assertEquals(BuildingType.HUT, field1.getBuilding().getBuildingType());
+        assertEquals(BuildingType.NONE, field1.getBuilding().getType());
+        assertEquals(2, field1.getBuilding().getCount());
+        assertEquals(PlayerColor.RED, field1.getBuilding().getColor());
+        assertEquals(BuildingType.HUT, field1.getBuilding().getType());
 
         /*
         Testing the tile (0,-1)
@@ -47,11 +45,11 @@ public class MapTest {
         Buildings: None
          */
 
-        Field field2 = map.getField(Coords.of(0,-1)).get();
+        Field field2 = island.getField(Hex.at(0, -1));
         assertEquals(1, field2.getLevel());
         assertEquals(FieldType.VOLCANO, field2.getType());
         assertEquals(Orientation.SOUTH_WEST, field2.getOrientation());
-        assertEquals(BuildingType.NONE, field1.getBuilding().getBuildingType());
+        assertEquals(BuildingType.NONE, field1.getBuilding().getType());
 
         /*
         Testing the tile (1,0)
@@ -59,11 +57,11 @@ public class MapTest {
         Buildings: None
          */
 
-        Field field3 = map.getField(Coords.of(1,0)).get();
+        Field field3 = island.getField(Hex.at(1, 0));
         assertEquals(2, field3.getLevel());
         assertEquals(FieldType.VOLCANO, field3.getType());
         assertEquals(Orientation.NORTH_EAST, field3.getOrientation());
-        assertEquals(BuildingType.NONE, field3.getBuilding().getBuildingType());
+        assertEquals(BuildingType.NONE, field3.getBuilding().getType());
 
         /*
         Testing the tile (0,1)
@@ -71,18 +69,18 @@ public class MapTest {
         Buildings: 1 White Hut
          */
 
-        Field field4 = map.getField(Coords.of(0,1)).get();
+        Field field4 = island.getField(Hex.at(0, 1));
         assertEquals(1, field4.getLevel());
         assertEquals(FieldType.ROCK, field4.getType());
         assertEquals(Orientation.NORTH_EAST, field4.getOrientation());
-        assertEquals(1, field4.getBuilding().getBuildingCount());
-        assertEquals(PlayerColor.WHITE, field4.getBuilding().getBuildingColor());
-        assertEquals(BuildingType.HUT, field4.getBuilding().getBuildingType());
+        assertEquals(1, field4.getBuilding().getCount());
+        assertEquals(PlayerColor.WHITE, field4.getBuilding().getColor());
+        assertEquals(BuildingType.HUT, field4.getBuilding().getType());
 
     }
 
     @Test
-    public void getEmptyFieldsTest(){
+    public void testGetCoast() {
         /*
          * Spaces:
          * (0,-2)
@@ -120,25 +118,16 @@ public class MapTest {
          *
          */
 
-        Map map = null;
-        Iterator<Coords> iterator = map.getSeaLevel();
-        Set<Coords> actual = new HashSet<>();
-
-        while(iterator.hasNext()){
-            if (!actual.add(iterator.next()))
-                fail("Duplicated elemenets in getEmptyFields()");
+        Island island = new IslandImpl();
+        Set<Hex> actual = new HashSet<>();
+        for (Hex hex : island.getCoast()) {
+            if (!actual.add(hex))
+                fail("Duplicated elements in getCoast(): " + hex);
         }
-
-
-
-
-
-
-
     }
 
     @Test
-    public void getVillagesTest(){
+    public void testGetVillages() {
         /*
         *
         * Empty Fields:
@@ -151,9 +140,4 @@ public class MapTest {
         */
 
     }
-
-
-
-
-
 }

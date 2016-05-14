@@ -5,12 +5,14 @@ import data.FieldType;
 
 public class Field {
 
-    private final FieldType type;
+    public static Field SEA = new Field(0, null, Orientation.NORTH);
+
     private final int level;
+    private final FieldType type;
     private final Orientation orientation;
     private final FieldBuilding building;
 
-    public Field(FieldType type, int level, Orientation orientation) {
+    Field(int level, FieldType type, Orientation orientation) {
         this.type = type;
         this.level = level;
         this.orientation = orientation;
