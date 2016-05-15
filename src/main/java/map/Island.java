@@ -5,6 +5,10 @@ import data.VolcanoTile;
 
 public interface Island {
 
+    static Island createEmpty() {
+        return new IslandImpl();
+    }
+
     Field getField(Hex hex);
 
     Iterable<Hex> getCoast();

@@ -9,11 +9,11 @@ import data.VolcanoTile;
 import java.util.List;
 import java.util.Map;
 
-public class IslandImpl implements Island {
+class IslandImpl implements Island {
 
     private final HexMap<Field> map;
 
-    public IslandImpl() {
+    IslandImpl() {
         this.map = HexMap.create();
     }
 

@@ -20,7 +20,7 @@ public class EngineImplTest {
 
     @Test
     public void isOnSameLevelRuleTest() {
-        IslandImpl island = new IslandImpl();
+        Island island = Island.createEmpty();
         EngineImpl engine = new EngineImpl(island);
         Hex[] hexes = new Hex[]{Hex.at(0, 1), Hex.at(1, 1), Hex.at(1, 0)};
 
@@ -38,7 +38,7 @@ public class EngineImplTest {
                 engine.isOnSameLevelRule(hexes[0], hexes[1], hexes[2], level));
     }
 
-    private String prettyPrintHexes(IslandImpl island, Hex[] hexes) {
+    private String prettyPrintHexes(Island island, Hex[] hexes) {
         return Arrays.toString(hexes)
                 + " [ " +
                 island.getField(hexes[0]).getLevel() + " " +

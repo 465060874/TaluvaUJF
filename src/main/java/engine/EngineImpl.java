@@ -9,12 +9,11 @@ import map.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EngineImpl implements Engine {
+class EngineImpl implements Engine {
 
-    Island island;
-    TileStack stack;
+    private final Island island;
 
-    public EngineImpl(Island island) {
+    EngineImpl(Island island) {
         this.island = island;
     }
 
