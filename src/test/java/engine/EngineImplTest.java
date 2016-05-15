@@ -53,12 +53,16 @@ public class EngineImplTest {
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         EngineImpl engine = new EngineImpl(island);
 
+        VolcanoTile tile = new VolcanoTile(FIELD, FIELD);
+
+        // 6 volcans sur cette map, chacun representant une orientation
+        // Pour tout i :
+        //    orientation(volcanoHexes[i]) = orientations[i]
+        Orientation[] orientations = Orientation.values();
         Hex[] volcanoHexes = new Hex[]{
                 Hex.at(0, 2), Hex.at(2, -2),
                 Hex.at(2, 2), Hex.at(1, 0),
                 Hex.at(4, -1), Hex.at(1, -1)};
-        VolcanoTile tile = new VolcanoTile(FIELD, FIELD);
-        Orientation[] orientations = Orientation.values();
 
         // Test de pose sur un volcan de même orientation
         for (int i = 0; i < orientations.length; i++) {

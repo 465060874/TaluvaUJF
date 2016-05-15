@@ -19,7 +19,7 @@ public class IslandVisu extends Application {
     public void start(Stage stage) throws Exception {
         URL rsc = EngineImplTest.class.getResource("canPlaceTileOnVolcanoWithoutBuildings.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
-        IslandCanvas canvas = new IslandCanvas(island);
+        IslandCanvas canvas = new IslandCanvas(island, true);
 
         BorderPane mainPane = new BorderPane();
         mainPane.setCenter(new IslandCanvasPane(canvas));

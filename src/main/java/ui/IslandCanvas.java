@@ -4,6 +4,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.TextAlignment;
 import map.Field;
 import map.Hex;
 import map.Island;
@@ -22,12 +23,13 @@ class IslandCanvas extends Canvas {
     private static final double WEIRD_RATIO = Math.cos(Math.toRadians(30d));
 
     private final Island island;
-
+    private final boolean debug;
     private final HexBuf hexBuf;
 
-    IslandCanvas(Island island) {
+    IslandCanvas(Island island, boolean debug) {
         super(0, 0);
         this.island = island;
+        this.debug = debug;
         this.hexBuf = new HexBuf();
 
         widthProperty().addListener(e -> redraw());
@@ -44,11 +46,24 @@ class IslandCanvas extends Canvas {
         double centerY = getHeight() / 2;
         double hexSizeY = HEX_SIZE_Y;
 
+        int minLine = Integer.MAX_VALUE;
+        int minDiag = Integer.MAX_VALUE;
+        int maxLine = Integer.MIN_VALUE;
+        int maxDiag = Integer.MIN_VALUE;
+
         for (Hex hex : Hex.lineThenDiagOrdering().sortedCopy(island.getFields())) {
-            int l = hex.getLine();
-            int d = hex.getDiag();
-            double x = centerX + d * 2 * WEIRD_RATIO * HEX_SIZE_X + l * WEIRD_RATIO * HEX_SIZE_X;
-            double y = centerY + l * hexSizeY + l * hexSizeY / 2;
+            int line = hex.getLine();
+            int diag = hex.getDiag();
+
+            if (debug) {
+                minLine = Math.min(minLine, line);
+                minDiag = Math.min(minDiag, diag);
+                maxLine = Math.max(maxLine, line);
+                maxDiag = Math.max(maxDiag, diag);
+            }
+
+            double x = centerX + diag * 2 * WEIRD_RATIO * HEX_SIZE_X + line * WEIRD_RATIO * HEX_SIZE_X;
+            double y = centerY + line * hexSizeY + line * hexSizeY / 2;
 
             Field field = island.getField(hex);
             hexBuf.update(x, y, HEX_SIZE_X, hexSizeY, field);
@@ -73,17 +88,41 @@ class IslandCanvas extends Canvas {
                 hexBuf.bottomBorderLevel(i);
                 gc.strokePolyline(hexBuf.bottomBorderX, hexBuf.bottomBorderY, HexBuf.BOTTOM_BORDER_POINTS);
             }
+
+        }
+
+        if (debug) {
+            minLine -= 1;
+            minDiag -= 1;
+            maxLine += 1;
+            maxDiag += 1;
+            for (int line = minLine; line <= maxLine; line++) {
+                for (int diag = minDiag; diag <= maxDiag; diag++) {
+                    double x = centerX + diag * 2 * WEIRD_RATIO * HEX_SIZE_X + line * WEIRD_RATIO * HEX_SIZE_X;
+                    double y = centerY + line * hexSizeY + line * hexSizeY / 2;
+                    String hexStr = line + "," + diag;
+                    gc.setTextAlign(TextAlignment.CENTER);
+                    gc.setFill(Color.WHITE);
+                    gc.fillText(hexStr, x, y);
+                }
+            }
         }
     }
 
     private static Paint fieldTypePaint(Field field) {
         switch (field.getType()) {
-            case VOLCANO: return Color.web("FF4136");
-            case JUNGLE: return Color.web("3D9970");
-            case CLEARING: return Color.web("01FF70");
-            case SAND: return Color.web("F7CA88");
-            case ROCK: return Color.web("999999");
-            case LAKE: return Color.web("0074D9");
+            case VOLCANO:
+                return Color.web("FF4136");
+            case JUNGLE:
+                return Color.web("3D9970");
+            case CLEARING:
+                return Color.web("01FF70");
+            case SAND:
+                return Color.web("F7CA88");
+            case ROCK:
+                return Color.web("999999");
+            case LAKE:
+                return Color.web("0074D9");
         }
 
         throw new IllegalStateException();
@@ -184,12 +223,18 @@ class IslandCanvas extends Canvas {
 
         private int orientationOffset(Field field) {
             switch (field.getOrientation()) {
-                case NORTH: return 2;
-                case NORTH_WEST: return 3;
-                case NORTH_EAST: return 1;
-                case SOUTH: return 5;
-                case SOUTH_WEST: return 4;
-                case SOUTH_EAST: return 0;
+                case NORTH:
+                    return 2;
+                case NORTH_WEST:
+                    return 3;
+                case NORTH_EAST:
+                    return 1;
+                case SOUTH:
+                    return 5;
+                case SOUTH_WEST:
+                    return 4;
+                case SOUTH_EAST:
+                    return 0;
             }
 
             throw new IllegalStateException();
