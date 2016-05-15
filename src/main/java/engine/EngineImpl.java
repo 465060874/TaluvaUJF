@@ -139,6 +139,7 @@ class EngineImpl implements Engine {
                     color = island.getField(hex).getBuilding().getColor();
                     colorSet = true;
                 }
+
                 final Iterable<Hex> neighborhood = hex.getNeighborhood();
                 for (Hex neighborHex : neighborhood) {
                     if (island.getField(neighborHex).getType() == fieldType
@@ -210,22 +211,36 @@ class EngineImpl implements Engine {
         FieldBuilding leftBuilding = island.getField(leftHex).getBuilding();
         FieldBuilding rightBuilding = island.getField(rightHex).getBuilding();
 
+        if (leftBuilding.getType() == BuildingType.NONE
+                && rightBuilding.getType() == BuildingType.NONE) {
+            return true;
+        }
+
         if (!leftBuilding.getType().isDestructible()
                 || !rightBuilding.getType().isDestructible()) {
             return false;
         }
 
-        if (leftBuilding.getType() != BuildingType.NONE
+        if (leftBuilding.getType() != BuildingType.NONE) {
+            Village rightVillage = island.getVillage(rightHex);
+            return rightVillage.getFieldSize() > 1;
+        }
+        else if (rightBuilding.getType() != BuildingType.NONE) {
+            Village leftVillage = island.getVillage(leftHex);
+            return leftVillage.getFieldSize() > 1;
+        }
+        else if (leftBuilding.getType() != BuildingType.NONE
                 && rightBuilding.getType() != BuildingType.NONE
                 && leftBuilding.getColor() == rightBuilding.getColor()) {
             Village village = island.getVillage(leftHex);
             return village.getFieldSize() > 2;
         }
-
-        Village leftVillage = island.getVillage(leftHex);
-        Village rightVillage = island.getVillage(rightHex);
-        return leftVillage.getFieldSize() > 1
-                && rightVillage.getFieldSize() > 1;
+        else {
+            Village leftVillage = island.getVillage(leftHex);
+            Village rightVillage = island.getVillage(rightHex);
+            return leftVillage.getFieldSize() > 1
+                    && rightVillage.getFieldSize() > 1;
+        }
     }
 
     private boolean isAdjacentToCoastRule(Hex hex, Hex rightHex, Hex leftHex) {
