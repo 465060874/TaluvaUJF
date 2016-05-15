@@ -221,11 +221,11 @@ class EngineImpl implements Engine {
             return false;
         }
 
-        if (leftBuilding.getType() != BuildingType.NONE) {
+        if (leftBuilding.getType() == BuildingType.NONE) {
             Village rightVillage = island.getVillage(rightHex);
             return rightVillage.getFieldSize() > 1;
         }
-        else if (rightBuilding.getType() != BuildingType.NONE) {
+        else if (rightBuilding.getType() == BuildingType.NONE) {
             Village leftVillage = island.getVillage(leftHex);
             return leftVillage.getFieldSize() > 1;
         }
