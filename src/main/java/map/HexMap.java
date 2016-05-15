@@ -13,4 +13,6 @@ public interface HexMap<E> extends Iterable<Hex> {
     E getOrDefault(Hex hex, E fallbackValue);
 
     void put(Hex hex, E element);
+
+    int size();
 }

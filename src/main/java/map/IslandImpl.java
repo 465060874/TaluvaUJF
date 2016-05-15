@@ -6,8 +6,13 @@ import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
 
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static map.Field.SEA;
 
 class IslandImpl implements Island {
 
@@ -19,7 +24,7 @@ class IslandImpl implements Island {
 
     @Override
     public Field getField(Hex hex) {
-        return map.getOrDefault(hex, Field.SEA);
+        return map.getOrDefault(hex, SEA);
     }
 
     @Override
@@ -48,19 +53,56 @@ class IslandImpl implements Island {
     }
 
     @Override
+    public Village getVillage(Hex from) {
+        Field fromField = map.getOrDefault(from, SEA);
+        checkArgument(fromField.getBuilding().getType() == BuildingType.NONE, "Village without a building");
+        PlayerColor fromColor = fromField.getBuilding().getColor();
+
+        HexMap<Boolean> queued = HexMap.create();
+        Queue<Hex> queue = new ArrayDeque<>(map.size());
+        queue.add(from);
+
+        ImmutableList.Builder<Hex> builder = ImmutableList.builder();
+        boolean hasTower = false;
+        boolean hasTemple = false;
+
+        while (!queue.isEmpty()) {
+            Hex hex = queue.remove();
+            FieldBuilding building = map.getOrDefault(hex, SEA).getBuilding();
+            if (building.getType() == BuildingType.NONE
+                    || building.getColor() != fromColor) {
+                continue;
+            }
+
+            hasTower = hasTower || building.getType() == BuildingType.TOWER;
+            hasTemple = hasTemple || building.getType() == BuildingType.TEMPLE;
+
+            builder.add(hex);
+            for (Hex neighbor : hex.getNeighborhood()) {
+                if (!queued.getOrDefault(neighbor, false)) {
+                    queued.put(neighbor, true);
+                    queue.add(neighbor);
+                }
+            }
+        }
+
+        return new VillageImpl(builder.build(), hasTemple, hasTower);
+    }
+
+    @Override
     public Iterable<Village> getVillages(PlayerColor color) {
         // On regroupe les batiments en village avec un union find
         HexUnionFind unionFind = new HexUnionFind();
 
         for (Hex hex : map) {
-            Field field = map.getOrDefault(hex, Field.SEA);
+            Field field = map.getOrDefault(hex, SEA);
             if (field.getBuilding().getCount() == 0
                     || field.getBuilding().getColor() != color) {
                 continue;
             }
 
             for (Hex neighbor : hex.getNeighborhood()) {
-                Field neighorField = map.getOrDefault(neighbor, Field.SEA);
+                Field neighorField = map.getOrDefault(neighbor, SEA);
 
                 // Exploration des couleurs voisines
                 if (neighorField.getBuilding().getCount() > 0
@@ -101,6 +143,10 @@ class IslandImpl implements Island {
     }
 
     void putHex(Hex hex, Field field) {
+        if (field == SEA) {
+            return;
+        }
+
         map.put(hex, field);
     }
 
@@ -114,8 +160,8 @@ class IslandImpl implements Island {
         Field leftField = new Field(level, tile.getLeft(), orientation.leftRotation());
         Field rightField = new Field(level, tile.getRight(), orientation.rightRotation());
 
-        map.put(hex, volcanoField);
-        map.put(rightHex, rightField);
-        map.put(leftHex, leftField);
+        putHex(hex, volcanoField);
+        putHex(rightHex, rightField);
+        putHex(leftHex, leftField);
     }
 }

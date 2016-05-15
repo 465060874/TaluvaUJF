@@ -2,7 +2,6 @@ package engine;
 
 import data.BuildingType;
 import data.FieldType;
-import data.PlayerColor;
 import data.VolcanoTile;
 import map.*;
 
@@ -130,53 +129,25 @@ class EngineImpl implements Engine {
     }
 
     boolean isFreeOfIndestructibleBuildingRule(Hex rightHex, Hex leftHex) {
-        FieldBuilding[] buildings = new FieldBuilding[]{
-                island.getField(rightHex).getBuilding(),
-                island.getField(leftHex).getBuilding()};
+        FieldBuilding leftBuilding = island.getField(leftHex).getBuilding();
+        FieldBuilding rightBuilding = island.getField(rightHex).getBuilding();
 
-        boolean noBuilding = true;
-        for (FieldBuilding building : buildings) {
-            noBuilding = noBuilding && (building.getType() == BuildingType.NONE);
+        if (!leftBuilding.getType().isDestructible()
+                || !rightBuilding.getType().isDestructible()) {
+            return false;
         }
 
-        if (noBuilding) return true;
-
-        for (FieldBuilding building : buildings) {
-            final BuildingType type = building.getType();
-            if (type == BuildingType.TEMPLE || type == BuildingType.TOWER) {
-                return false;
-            }
+        if (leftBuilding.getType() != BuildingType.NONE
+                && rightBuilding.getType() != BuildingType.NONE
+                && leftBuilding.getColor() == rightBuilding.getColor()) {
+            Village village = island.getVillage(leftHex);
+            return village.getFieldSize() > 2;
         }
 
-        // A optimiser de façon a comparer uniquement avec le village des constructions concernés
-        // et non tout les villages de la couleur des construcions consernés
-        for (FieldBuilding building : buildings) {
-            final PlayerColor color = building.getColor();
-            final Iterable<Village> villages = island.getVillages(color);
-            for (Village village : villages) {
-                int villageFieldSize = village.getFieldSize();
-                if (villageFieldSize > buildings.length) {
-                    continue;
-                }
-
-                final Iterable<Hex> hexes = village.getHexes();
-                if (villageFieldSize == 2) {
-                    for (Hex hex : hexes) {
-                        if (hex.equals(rightHex) && hex.equals(leftHex)) {
-                            return false;
-                        }
-                    }
-                }else {
-                    for (Hex hex : hexes) {
-                        if (hex.equals(rightHex) || hex.equals(leftHex)) {
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-
-        return true;
+        Village leftVillage = island.getVillage(leftHex);
+        Village rightVillage = island.getVillage(rightHex);
+        return leftVillage.getFieldSize() > 1
+                && rightVillage.getFieldSize() > 1;
     }
 
     boolean isAdjacentToCoastRule(Hex hex, Hex rightHex, Hex leftHex) {

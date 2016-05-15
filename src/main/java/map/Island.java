@@ -17,6 +17,8 @@ public interface Island {
 
     Iterable<Hex> getVolcanos();
 
+    Village getVillage(Hex hex);
+
     Iterable<Village> getVillages(PlayerColor color);
 
     void putTile(VolcanoTile tile, Hex hex, Orientation orientation);

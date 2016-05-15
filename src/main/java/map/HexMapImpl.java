@@ -12,7 +12,7 @@ class HexMapImpl<E> implements HexMap<E> {
 
     private final Map<Hex, E> map;
 
-    public HexMapImpl() {
+    HexMapImpl() {
         this.map = new HashMap<>();
     }
 
@@ -45,5 +45,10 @@ class HexMapImpl<E> implements HexMap<E> {
     @Override
     public Iterator<Hex> iterator() {
         return Iterators.unmodifiableIterator(map.keySet().iterator());
+    }
+
+    @Override
+    public int size() {
+        return map.size();
     }
 }
