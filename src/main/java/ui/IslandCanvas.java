@@ -1,5 +1,6 @@
 package ui;
 
+import javafx.beans.Observable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -11,7 +12,7 @@ import map.Island;
 
 class IslandCanvas extends Canvas {
 
-    private static final Color BG_COLOR = Color.web("365373");
+    static final Color BG_COLOR = Color.web("365373");
 
     private static final Paint BORDER_COLOR = Color.web("252525");
     private static final Paint BOTTOM_COLOR = Color.web("505050");
@@ -26,25 +27,37 @@ class IslandCanvas extends Canvas {
     private final boolean debug;
     private final HexBuf hexBuf;
 
+    double ox;
+    double oy;
+    double scale;
+
     IslandCanvas(Island island, boolean debug) {
         super(0, 0);
         this.island = island;
         this.debug = debug;
         this.hexBuf = new HexBuf();
 
-        widthProperty().addListener(e -> redraw());
-        heightProperty().addListener(e -> redraw());
+        this.ox = 0;
+        this.ox = 0;
+        this.scale = 1;
+
+        widthProperty().addListener(this::resize);
+        heightProperty().addListener(this::resize);
+    }
+
+    private void resize(Observable event) {
+        redraw();
     }
 
     void redraw() {
         GraphicsContext gc = getGraphicsContext2D();
 
-        gc.setFill(BG_COLOR);
-        gc.fillRect(0, 0, getWidth(), getHeight());
+        getGraphicsContext2D().clearRect(0, 0, getWidth(), getHeight());
 
-        double centerX = getWidth() / 2;
-        double centerY = getHeight() / 2;
-        double hexSizeY = HEX_SIZE_Y;
+        double centerX = getWidth() / 2 - ox;
+        double centerY = getHeight() / 2 - oy;
+        double hexSizeY = HEX_SIZE_Y * scale;
+        double hexSizeX = HEX_SIZE_X * scale;
 
         int minLine = Integer.MAX_VALUE;
         int minDiag = Integer.MAX_VALUE;
@@ -52,43 +65,14 @@ class IslandCanvas extends Canvas {
         int maxDiag = Integer.MIN_VALUE;
 
         for (Hex hex : Hex.lineThenDiagOrdering().sortedCopy(island.getFields())) {
-            int line = hex.getLine();
-            int diag = hex.getDiag();
-
             if (debug) {
-                minLine = Math.min(minLine, line);
-                minDiag = Math.min(minDiag, diag);
-                maxLine = Math.max(maxLine, line);
-                maxDiag = Math.max(maxDiag, diag);
+                minLine = Math.min(minLine, hex.getLine());
+                minDiag = Math.min(minDiag, hex.getDiag());
+                maxLine = Math.max(maxLine, hex.getLine());
+                maxDiag = Math.max(maxDiag, hex.getDiag());
             }
 
-            double x = centerX + diag * 2 * WEIRD_RATIO * HEX_SIZE_X + line * WEIRD_RATIO * HEX_SIZE_X;
-            double y = centerY + line * hexSizeY + line * hexSizeY / 2;
-
-            Field field = island.getField(hex);
-            hexBuf.update(x, y, HEX_SIZE_X, hexSizeY, field);
-
-            gc.setFill(fieldTypePaint(field));
-            gc.fillPolygon(
-                    hexBuf.hexagonX,
-                    hexBuf.hexagonY,
-                    HexBuf.HEXAGON_POINTS);
-
-            gc.setFill(BOTTOM_COLOR);
-            gc.fillPolygon(
-                    hexBuf.bottomX,
-                    hexBuf.bottomY,
-                    HexBuf.HEXAGON_POINTS);
-
-            gc.setStroke(BORDER_COLOR);
-            gc.strokePolyline(hexBuf.hexagonBorderX, hexBuf.hexagonBorderY, HexBuf.HEXAGON_BORDER_POINTS);
-
-            gc.setStroke(BORDER_COLOR);
-            for (int i = 1; i <= field.getLevel(); i++) {
-                hexBuf.bottomBorderLevel(i);
-                gc.strokePolyline(hexBuf.bottomBorderX, hexBuf.bottomBorderY, HexBuf.BOTTOM_BORDER_POINTS);
-            }
-
+            drawHex(gc, hex, centerX, centerY, hexSizeY, hexSizeX);
         }
 
         if (debug) {
@@ -98,7 +82,7 @@ class IslandCanvas extends Canvas {
             maxDiag += 1;
             for (int line = minLine; line <= maxLine; line++) {
                 for (int diag = minDiag; diag <= maxDiag; diag++) {
-                    double x = centerX + diag * 2 * WEIRD_RATIO * HEX_SIZE_X + line * WEIRD_RATIO * HEX_SIZE_X;
+                    double x = centerX + diag * 2 * WEIRD_RATIO * hexSizeX + line * WEIRD_RATIO * hexSizeX;
                     double y = centerY + line * hexSizeY + line * hexSizeY / 2;
                     String hexStr = line + "," + diag;
                     gc.setTextAlign(TextAlignment.CENTER);
@@ -106,6 +90,42 @@ class IslandCanvas extends Canvas {
                     gc.fillText(hexStr, x, y);
                 }
             }
+        }
+
+        setTranslateX(-getWidth() / 3);
+        setTranslateY(-getHeight() / 3);
+    }
+
+    private void drawHex(GraphicsContext gc, Hex hex,
+                         double centerX, double centerY, double hexSizeY, double hexSizeX) {
+        int line = hex.getLine();
+        int diag = hex.getDiag();
+
+        double x = centerX + diag * 2 * WEIRD_RATIO * hexSizeX + line * WEIRD_RATIO * hexSizeX;
+        double y = centerY + line * hexSizeY + line * hexSizeY / 2;
+
+        Field field = island.getField(hex);
+        hexBuf.update(x, y, hexSizeX, hexSizeY, field);
+
+        gc.setFill(fieldTypePaint(field));
+        gc.fillPolygon(
+                hexBuf.hexagonX,
+                hexBuf.hexagonY,
+                HexBuf.HEXAGON_POINTS);
+
+        gc.setFill(BOTTOM_COLOR);
+        gc.fillPolygon(
+                hexBuf.bottomX,
+                hexBuf.bottomY,
+                HexBuf.HEXAGON_POINTS);
+
+        gc.setStroke(BORDER_COLOR);
+        gc.strokePolyline(hexBuf.hexagonBorderX, hexBuf.hexagonBorderY, HexBuf.HEXAGON_BORDER_POINTS);
+
+        gc.setStroke(BORDER_COLOR);
+        for (int i = 1; i <= field.getLevel(); i++) {
+            hexBuf.bottomBorderLevel(i);
+            gc.strokePolyline(hexBuf.bottomBorderX, hexBuf.bottomBorderY, HexBuf.BOTTOM_BORDER_POINTS);
         }
     }
 
@@ -155,29 +175,30 @@ class IslandCanvas extends Canvas {
             this.bottomBorderY = new double[BOTTOM_BORDER_POINTS];
         }
 
-        void update(double centerX, double centerY, double sizeX, double sizeY, Field field) {
-            centerY -= (field.getLevel() - 1) * HEX_HEIGHT;
+        void update(double x, double y, double sizeX, double sizeY, Field field) {
+            double hexHeight = HEX_HEIGHT * scale;
+            y -= (field.getLevel() - 1) * hexHeight;
             double weirdX = sizeX * WEIRD_RATIO;
             double weirdY = sizeY / 2;
-            double bottomDepth = HEX_HEIGHT * field.getLevel();
+            double bottomDepth = hexHeight * field.getLevel();
 
-            hexagonX[0] = centerX - weirdX - 0.5;
-            hexagonY[0] = centerY + weirdY;
+            hexagonX[0] = x - weirdX - 0.5;
+            hexagonY[0] = y + weirdY;
 
-            hexagonX[1] = centerX;
-            hexagonY[1] = centerY + sizeY;
+            hexagonX[1] = x;
+            hexagonY[1] = y + sizeY;
 
-            hexagonX[2] = centerX + weirdX;
-            hexagonY[2] = centerY + weirdY;
+            hexagonX[2] = x + weirdX;
+            hexagonY[2] = y + weirdY;
 
-            hexagonX[3] = centerX + weirdX;
-            hexagonY[3] = centerY - weirdY - 0.5;
+            hexagonX[3] = x + weirdX;
+            hexagonY[3] = y - weirdY - 0.5;
 
-            hexagonX[4] = centerX;
-            hexagonY[4] = centerY - sizeY - 0.5;
+            hexagonX[4] = x;
+            hexagonY[4] = y - sizeY - 0.5;
 
-            hexagonX[5] = centerX - weirdX - 0.5;
-            hexagonY[5] = centerY - weirdY - 0.5;
+            hexagonX[5] = x - weirdX - 0.5;
+            hexagonY[5] = y - weirdY - 0.5;
 
             int orientationOffset = orientationOffset(field);
 
@@ -241,8 +262,9 @@ class IslandCanvas extends Canvas {
         }
 
         void bottomBorderLevel(int level) {
-            double bottomDepth2 = HEX_HEIGHT * level;
-            double bottomDepth1 = bottomDepth2 - HEX_HEIGHT;
+            double hexHeight = HEX_HEIGHT * scale;
+            double bottomDepth2 = hexHeight * level;
+            double bottomDepth1 = bottomDepth2 - hexHeight;
 
             bottomBorderY[0] = hexagonY[0] + bottomDepth1;
             bottomBorderY[1] = hexagonY[0] + bottomDepth2;
