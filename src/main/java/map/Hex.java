@@ -77,35 +77,35 @@ public class Hex implements Comparable<Hex> {
         return (this.line != o.line) ? this.line - o.line : this.diag - o.diag;
     }
 
-    public Hex getRightNeibor(Orientation orientation) {
+    public Hex getRightNeighbor(Orientation orientation) {
         if (orientation == Orientation.NORTH) {
             return this.getNeighbor(Neighbor.SOUTH_EAST);
         } else if (orientation == Orientation.NORTH_EAST) {
             return this.getNeighbor(Neighbor.SOUTH_WEST);
         } else if (orientation == Orientation.SOUTH_EAST) {
-            return this.getNeighbor(Neighbor.EAST);
+            return this.getNeighbor(Neighbor.WEST);
         } else if (orientation == Orientation.SOUTH) {
             return this.getNeighbor(Neighbor.NORTH_WEST);
         } else if (orientation == Orientation.SOUTH_WEST) {
             return this.getNeighbor(Neighbor.NORTH_EAST);
         } else if (orientation == Orientation.NORTH_WEST) {
-            return this.getNeighbor(Neighbor.WEST);
+            return this.getNeighbor(Neighbor.EAST);
         } else {
             throw new RuntimeException();
         }
     }
 
-    public Hex getLeftNeibor(Orientation orientation) {
+    public Hex getLeftNeighbor(Orientation orientation) {
         if (orientation == Orientation.NORTH) {
             return this.getNeighbor(Neighbor.SOUTH_WEST);
         } else if (orientation == Orientation.NORTH_EAST) {
-            return this.getNeighbor(Neighbor.EAST);
+            return this.getNeighbor(Neighbor.WEST);
         } else if (orientation == Orientation.SOUTH_EAST) {
             return this.getNeighbor(Neighbor.NORTH_WEST);
         } else if (orientation == Orientation.SOUTH) {
             return this.getNeighbor(Neighbor.NORTH_EAST);
         } else if (orientation == Orientation.SOUTH_WEST) {
-            return this.getNeighbor(Neighbor.WEST);
+            return this.getNeighbor(Neighbor.EAST);
         } else if (orientation == Orientation.NORTH_WEST) {
             return this.getNeighbor(Neighbor.SOUTH_EAST);
         } else {

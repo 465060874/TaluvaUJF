@@ -101,8 +101,8 @@ public class IslandImpl implements Island {
 
     public void putTile(VolcanoTile tile, Hex hex, Orientation orientation) {
 
-        Hex rightHex = hex.getRightNeibor(orientation);
-        Hex leftHex = hex.getLeftNeibor(orientation);
+        Hex rightHex = hex.getRightNeighbor(orientation);
+        Hex leftHex = hex.getLeftNeighbor(orientation);
 
         int level = getField(hex).getLevel();
 
