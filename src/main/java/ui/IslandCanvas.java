@@ -1,5 +1,6 @@
 package ui;
 
+import data.BuildingType;
 import javafx.beans.Observable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -7,6 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.TextAlignment;
 import map.Field;
+import map.FieldBuilding;
 import map.Hex;
 import map.Island;
 
@@ -127,12 +129,40 @@ class IslandCanvas extends Canvas {
             hexBuf.bottomBorderLevel(i);
             gc.strokePolyline(hexBuf.bottomBorderX, hexBuf.bottomBorderY, HexBuf.BOTTOM_BORDER_POINTS);
         }
+
+        y -= hexSizeY / 10;
+        FieldBuilding building = field.getBuilding();
+        if (building.getType() != BuildingType.NONE) {
+            switch (building.getType()) {
+                case HUT:
+                    if (building.getCount() == 1) {
+                        drawHut(gc, building, x, y, hexSizeX, hexSizeY);
+                    }
+                    else if (building.getCount() == 2) {
+                        drawHut(gc, building, x - hexSizeX / 3, y, hexSizeX, hexSizeY);
+                        drawHut(gc, building, x + hexSizeX / 3, y, hexSizeX, hexSizeY);
+                    }
+                    else {
+                        // TODO: More than 3
+                        drawHut(gc, building, x - hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
+                        drawHut(gc, building, x + hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
+                        drawHut(gc, building, x, y + hexSizeY / 3, hexSizeX, hexSizeY);
+                    }
+                    break;
+                case TEMPLE:
+                    drawTemple(gc, building, x, y, hexSizeX, hexSizeY);
+                    break;
+                case TOWER:
+                    drawTower(gc, building, x, y, hexSizeX, hexSizeY);
+                    break;
+            }
+        }
     }
 
     private static Paint fieldTypePaint(Field field) {
         switch (field.getType()) {
             case VOLCANO:
-                return Color.web("FF4136");
+                return Color.web("D52001");
             case JUNGLE:
                 return Color.web("3D9970");
             case CLEARING:
@@ -146,6 +176,130 @@ class IslandCanvas extends Canvas {
         }
 
         throw new IllegalStateException();
+    }
+
+    private static Paint buildingTypeFacePaint(FieldBuilding building) {
+        switch (building.getColor()) {
+            case RED:
+                return Color.web("991f00");
+            case WHITE:
+                return Color.web("e6e6e6");
+            case BROWN:
+                return Color.web("734d26");
+            case YELLOW:
+                return Color.DARKGOLDENROD;
+        }
+
+        throw new IllegalStateException();
+    }
+
+    private static Paint buildingTypeTopPaint(FieldBuilding building) {
+        switch (building.getColor()) {
+            case RED:
+                return Color.web("ff471a");
+            case WHITE:
+                return Color.web("f4f4f4");
+            case BROWN:
+                return Color.web("996633");
+            case YELLOW:
+                return Color.GOLDENROD;
+        }
+
+        throw new IllegalStateException();
+    }
+
+    private void drawHut(GraphicsContext gc, FieldBuilding building,
+             double x, double y, double hexSizeX, double hexSizeY) {
+        double x1 = x - hexSizeX / 7;
+        double x2 = x;
+        double x3 = x + hexSizeX / 7;
+        double y1 = y - hexSizeY / 4;
+        double y2 = y - hexSizeY / 10;
+        double y3 = y + hexSizeY / 10;
+        double y4 = y + hexSizeY / 4;
+
+        drawTentShape(gc, building, x1, x2, x3, y1, y2, y3, y4);
+    }
+
+    private void drawTemple(GraphicsContext gc, FieldBuilding building,
+            double x, double y, double hexSizeX, double hexSizeY) {
+        double x1 = x - hexSizeX / 4;
+        double x2 = x;
+        double x3 = x + hexSizeX / 4;
+        double y1 = y - hexSizeY * 0.80 - hexSizeY / 4;
+        double y2 = y - hexSizeY * 0.80 + hexSizeY / 4;
+        double y3 = y + hexSizeY / 1.6 - hexSizeY / 2;
+        double y4 = y + hexSizeY / 1.6;
+
+        drawTentShape(gc, building, x1, x2, x3, y1, y2, y3, y4);
+    }
+
+    private void drawTentShape(GraphicsContext gc, FieldBuilding building,
+           double x1, double x2, double x3, double y1, double y2, double y3, double y4) {
+        double[] xpoints = new double[4];
+        double[] ypoints = new double[4];
+        xpoints[0] = x1;
+        ypoints[0] = y4;
+        xpoints[1] = x2;
+        ypoints[1] = y3;
+        xpoints[2] = x3;
+        ypoints[2] = y4;
+        gc.setFill(buildingTypeFacePaint(building));
+        gc.fillPolygon(xpoints, ypoints, 3);
+        gc.setStroke(BORDER_COLOR);
+        gc.strokePolygon(xpoints, ypoints, 3);
+
+        xpoints[0] = x1;
+        ypoints[0] = y4;
+        xpoints[1] = x2;
+        ypoints[1] = y3;
+        xpoints[2] = x2;
+        ypoints[2] = y1;
+        xpoints[3] = x1;
+        ypoints[3] = y2;
+        gc.setFill(buildingTypeTopPaint(building));
+        gc.fillPolygon(xpoints, ypoints, 4);
+        gc.setStroke(BORDER_COLOR);
+        gc.strokePolygon(xpoints, ypoints, 4);
+
+        xpoints[0] = x3;
+        ypoints[0] = y4;
+        xpoints[1] = x2;
+        ypoints[1] = y3;
+        xpoints[2] = x2;
+        ypoints[2] = y1;
+        xpoints[3] = x3;
+        ypoints[3] = y2;
+        gc.setFill(buildingTypeTopPaint(building));
+        gc.fillPolygon(xpoints, ypoints, 4);
+        gc.setStroke(BORDER_COLOR);
+        gc.strokePolygon(xpoints, ypoints, 4);
+    }
+
+    private void drawTower(GraphicsContext gc, FieldBuilding building,
+           double x, double y, double hexSizeX, double hexSizeY) {
+        double width = hexSizeX / 2;
+        double xstart = x - width / 2;
+
+        double height = hexSizeY / 2;
+        double ytop = y - hexSizeY - hexSizeY / 3;
+        double ybottom = y - height / 2;
+
+        gc.setFill(buildingTypeFacePaint(building));
+        gc.fillOval(xstart, ybottom, width, height);
+        gc.setStroke(BORDER_COLOR);
+        gc.strokeOval(xstart, ybottom, width, height);
+
+        gc.setFill(buildingTypeFacePaint(building));
+        gc.fillRect(xstart, ytop + height/2, width, ybottom - ytop);
+        gc.setStroke(BORDER_COLOR);
+        gc.strokeLine(xstart, ytop + height/2, xstart, ybottom + height/2);
+        gc.strokeLine(xstart + width, ytop + height/2, xstart + width, ybottom + height/2);
+
+        gc.setFill(buildingTypeTopPaint(building));
+        gc.fillOval(xstart, ytop, width, height);
+        gc.setStroke(BORDER_COLOR);
+        gc.strokeOval(xstart, ytop, width, height);
     }
 
     private class HexBuf {
