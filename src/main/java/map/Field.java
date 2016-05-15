@@ -13,19 +13,22 @@ public class Field {
     private final FieldBuilding building;
 
     Field(int level, FieldType type, Orientation orientation) {
-        this.type = type;
-        this.level = level;
-        this.orientation = orientation;
-
-        this.building = new FieldBuilding(null, BuildingType.NONE, 0);
+        this(level, type, orientation, new FieldBuilding(BuildingType.NONE, null, 0));
     }
 
-    public FieldType getType() {
-        return type;
+    Field(int level, FieldType type, Orientation orientation, FieldBuilding building) {
+        this.level = level;
+        this.type = type;
+        this.orientation = orientation;
+        this.building = building;
     }
 
     public int getLevel() {
         return level;
+    }
+
+    public FieldType getType() {
+        return type;
     }
 
     public Orientation getOrientation() {

@@ -57,10 +57,8 @@ public class EngineImpl implements Engine {
         Hex rightHex = hex.getRightNeighbor(orientation);
         Hex leftHex = hex.getLeftNeighbor(orientation);
 
-        if (! isOnSameLevelRule(hex, rightHex, leftHex)) return false;
-        if (! isFreeOfIndestructibleBuildingRule(rightHex, leftHex)) return false;
-
-        return true;
+        return isOnSameLevelRule(hex, rightHex, leftHex)
+                && isFreeOfIndestructibleBuildingRule(rightHex, leftHex);
     }
 
     @Override
@@ -73,10 +71,8 @@ public class EngineImpl implements Engine {
         Hex rightHex = hex.getRightNeighbor(orientation);
         Hex leftHex = hex.getLeftNeighbor(orientation);
 
-        if (! isAdjacentToCoastRule(hex, rightHex, leftHex)) return false;
-        if (! isOnSameLevelRule(hex, rightHex, leftHex, 0)) return false;
-
-        return true;
+        return isAdjacentToCoastRule(hex, rightHex, leftHex)
+                && isOnSameLevelRule(hex, rightHex, leftHex, 0);
     }
 
     @Override
@@ -105,7 +101,8 @@ public class EngineImpl implements Engine {
     }
 
     boolean isOnSameLevelRule(Hex hex, Hex rightHex, Hex leftHex) {
-        int[] volcanoTileLevels = new int[]{island.getField(hex).getLevel(),
+        int[] volcanoTileLevels = new int[]{
+                island.getField(hex).getLevel(),
                 island.getField(rightHex).getLevel(),
                 island.getField(leftHex).getLevel()};
 
@@ -120,7 +117,8 @@ public class EngineImpl implements Engine {
     }
 
     boolean isOnSameLevelRule(Hex hex, Hex rightHex, Hex leftHex, int level) {
-        int[] volcanoTileLevels = new int[]{island.getField(hex).getLevel(),
+        int[] volcanoTileLevels = new int[]{
+                island.getField(hex).getLevel(),
                 island.getField(rightHex).getLevel(),
                 island.getField(leftHex).getLevel()};
 
@@ -137,12 +135,12 @@ public class EngineImpl implements Engine {
                 island.getField(rightHex).getBuilding(),
                 island.getField(leftHex).getBuilding()};
 
-        boolean anyBuilding = true;
+        boolean noBuilding = true;
         for (FieldBuilding building : buildings) {
-            anyBuilding = anyBuilding && (building.getType() == BuildingType.NONE);
+            noBuilding = noBuilding && (building.getType() == BuildingType.NONE);
         }
 
-        if (anyBuilding) return true;
+        if (noBuilding) return true;
 
         for (FieldBuilding building : buildings) {
             final BuildingType type = building.getType();
@@ -165,15 +163,13 @@ public class EngineImpl implements Engine {
                 final Iterable<Hex> hexes = village.getHexes();
                 if (villageFieldSize == 2) {
                     for (Hex hex : hexes) {
-                        if (hex.compareTo(rightHex) == 0
-                                && hex.compareTo(leftHex) == 0) {
+                        if (hex.equals(rightHex) && hex.equals(leftHex)) {
                             return false;
                         }
                     }
-                } else {
+                }else {
                     for (Hex hex : hexes) {
-                        if (hex.compareTo(rightHex) == 0
-                                || hex.compareTo(leftHex) == 0) {
+                        if (hex.equals(rightHex) || hex.equals(leftHex)) {
                             return false;
                         }
                     }
@@ -195,7 +191,7 @@ public class EngineImpl implements Engine {
         for (Hex hexCoast : coast) {
             for (Iterable<Hex> neighborhood : neighborhoods) {
                 for (Hex hexNeighbor : neighborhood) {
-                    if (hexCoast.compareTo(hexNeighbor) == 0) {
+                    if (hexCoast.equals(hexNeighbor)) {
                         return true;
                     }
                 }
@@ -204,5 +200,4 @@ public class EngineImpl implements Engine {
 
         return false;
     }
-
 }

@@ -1,6 +1,7 @@
 package ui;
 
 import com.google.common.io.Resources;
+import engine.EngineImplTest;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
@@ -12,11 +13,11 @@ import map.IslandIO;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public class FXUI extends Application {
+public class IslandVisu extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        URL rsc = FXUI.class.getResource("test.island");
+        URL rsc = EngineImplTest.class.getResource("canPlaceTileOnVolcanoWithoutBuildings.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         IslandCanvas canvas = new IslandCanvas(island);
 

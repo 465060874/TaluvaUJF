@@ -2,11 +2,11 @@ package ui;
 
 import javafx.scene.layout.Pane;
 
-class ResizeCanvasPane extends Pane {
+class IslandCanvasPane extends Pane {
 
-    private final MapCanvas canvas;
+    private final IslandCanvas canvas;
  
-    ResizeCanvasPane(MapCanvas canvas) {
+    IslandCanvasPane(IslandCanvas canvas) {
         this.canvas = canvas;
         getChildren().add(canvas);
     }

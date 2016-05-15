@@ -6,7 +6,7 @@ import com.google.common.collect.Ordering;
 
 import java.util.Objects;
 
-public class Hex implements Comparable<Hex> {
+public class Hex {
 
     public static Hex at(int line, int diag) {
         return new Hex(line, diag);
@@ -26,12 +26,20 @@ public class Hex implements Comparable<Hex> {
 
     public Hex getNeighbor(Neighbor neighbor) {
         return new Hex(
-                line + neighbor.diffLine,
-                diag + neighbor.diffDiag);
+                line + neighbor.lineOffset,
+                diag + neighbor.diagOffset);
     }
 
     public Iterable<Hex> getNeighborhood() {
         return Iterables.transform(Neighbor.list(), this::getNeighbor);
+    }
+
+    public Hex getLeftNeighbor(Orientation orientation) {
+        return getNeighbor(Neighbor.leftOf(orientation));
+    }
+
+    public Hex getRightNeighbor(Orientation orientation) {
+        return getNeighbor(Neighbor.rightOf(orientation));
     }
 
     public int getLine() {
@@ -71,46 +79,5 @@ public class Hex implements Comparable<Hex> {
                     .result();
         }
     };
-
-    @Override
-    public int compareTo(Hex o) {
-        return (this.line != o.line) ? this.line - o.line : this.diag - o.diag;
-    }
-
-    public Hex getRightNeighbor(Orientation orientation) {
-        if (orientation == Orientation.NORTH) {
-            return this.getNeighbor(Neighbor.SOUTH_EAST);
-        } else if (orientation == Orientation.NORTH_EAST) {
-            return this.getNeighbor(Neighbor.SOUTH_WEST);
-        } else if (orientation == Orientation.SOUTH_EAST) {
-            return this.getNeighbor(Neighbor.WEST);
-        } else if (orientation == Orientation.SOUTH) {
-            return this.getNeighbor(Neighbor.NORTH_WEST);
-        } else if (orientation == Orientation.SOUTH_WEST) {
-            return this.getNeighbor(Neighbor.NORTH_EAST);
-        } else if (orientation == Orientation.NORTH_WEST) {
-            return this.getNeighbor(Neighbor.EAST);
-        } else {
-            throw new RuntimeException();
-        }
-    }
-
-    public Hex getLeftNeighbor(Orientation orientation) {
-        if (orientation == Orientation.NORTH) {
-            return this.getNeighbor(Neighbor.SOUTH_WEST);
-        } else if (orientation == Orientation.NORTH_EAST) {
-            return this.getNeighbor(Neighbor.WEST);
-        } else if (orientation == Orientation.SOUTH_EAST) {
-            return this.getNeighbor(Neighbor.NORTH_WEST);
-        } else if (orientation == Orientation.SOUTH) {
-            return this.getNeighbor(Neighbor.NORTH_EAST);
-        } else if (orientation == Orientation.SOUTH_WEST) {
-            return this.getNeighbor(Neighbor.EAST);
-        } else if (orientation == Orientation.NORTH_WEST) {
-            return this.getNeighbor(Neighbor.SOUTH_EAST);
-        } else {
-            throw new RuntimeException();
-        }
-    }
 }
 

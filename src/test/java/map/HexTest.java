@@ -1,12 +1,14 @@
 package map;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 public class HexTest {
+
     private static final int ORIGIN = 100;
 
     /*
@@ -25,8 +27,8 @@ public class HexTest {
 
     @Test
     public void testGetNeighbor() {
-
         Hex origin = Hex.at(ORIGIN,ORIGIN);
+
         Hex hexWestExpected = Hex.at(ORIGIN, ORIGIN -1);
         Hex hexNorthWestExpected = Hex.at(ORIGIN -1, ORIGIN);
         Hex hexNorthEastExpected = Hex.at(ORIGIN -1, ORIGIN + 1);
@@ -41,19 +43,19 @@ public class HexTest {
         Hex hexSouthEast = origin.getNeighbor(Neighbor.SOUTH_EAST);
         Hex hexSouthWest = origin.getNeighbor(Neighbor.SOUTH_WEST);
 
-        Assert.assertEquals(hexWestExpected, hexWest);
-        Assert.assertEquals(hexNorthWestExpected, hexNorthWest);
-        Assert.assertEquals(hexNorthEastExpected, hexNorthEast);
-        Assert.assertEquals(hexEastExpected, hexEast);
-        Assert.assertEquals(hexSouthEastExpected, hexSouthEast);
-        Assert.assertEquals(hexSouthWestExpected, hexSouthWest);
+        assertEquals(hexWestExpected, hexWest);
+        assertEquals(hexNorthWestExpected, hexNorthWest);
+        assertEquals(hexNorthEastExpected, hexNorthEast);
+        assertEquals(hexEastExpected, hexEast);
+        assertEquals(hexSouthEastExpected, hexSouthEast);
+        assertEquals(hexSouthWestExpected, hexSouthWest);
 
     }
 
     @Test
     public void testGetNeighbors() {
-
         Hex origin = Hex.at(ORIGIN,ORIGIN);
+
         Hex hexWestExpected = Hex.at(ORIGIN, ORIGIN -1);
         Hex hexNorthWestExpected = Hex.at(ORIGIN -1, ORIGIN);
         Hex hexNorthEastExpected = Hex.at(ORIGIN -1, ORIGIN + 1);
@@ -61,7 +63,7 @@ public class HexTest {
         Hex hexSouthEastExpected = Hex.at(ORIGIN + 1, ORIGIN);
         Hex hexSouthWestExpected = Hex.at(ORIGIN + 1, ORIGIN - 1);
 
-        ArrayList<Hex> neighbors = new ArrayList<>();
+        List<Hex> neighbors = new ArrayList<>();
         neighbors.add(hexWestExpected);
         neighbors.add(hexNorthWestExpected);
         neighbors.add(hexNorthEastExpected);
@@ -69,53 +71,51 @@ public class HexTest {
         neighbors.add(hexSouthEastExpected);
         neighbors.add(hexSouthWestExpected);
 
-        Collections.sort(neighbors);
+        neighbors = Hex.lineThenDiagOrdering().sortedCopy(neighbors);
 
         Iterable<Hex> neighborsExpectedIt = origin.getNeighborhood();
         ArrayList<Hex> neighborsExpected = new ArrayList<>();
         for (Hex hex : neighborsExpectedIt) {
             neighborsExpected.add(hex);
         }
-        Assert.assertEquals(neighborsExpected, neighbors);
+        assertEquals(neighborsExpected, neighbors);
     }
 
     @Test
     public void getLeftNeighborTest() {
         Hex origin = Hex.at(ORIGIN,ORIGIN);
-        final Orientation[] orientations = Orientation.values();
 
-        Hex hexNorth = origin.getLeftNeighbor(orientations[0]);
-        Hex hexNorthWest = origin.getLeftNeighbor(orientations[1]);
-        Hex hexNorthEast = origin.getLeftNeighbor(orientations[2]);
-        Hex hexSouth = origin.getLeftNeighbor(orientations[3]);
-        Hex hexSouthWest = origin.getLeftNeighbor(orientations[4]);
-        Hex hexSouthEast = origin.getLeftNeighbor(orientations[5]);
+        Hex hexNorth = origin.getLeftNeighbor(Orientation.NORTH);
+        Hex hexNorthWest = origin.getLeftNeighbor(Orientation.NORTH_WEST);
+        Hex hexNorthEast = origin.getLeftNeighbor(Orientation.NORTH_EAST);
+        Hex hexSouth = origin.getLeftNeighbor(Orientation.SOUTH);
+        Hex hexSouthWest = origin.getLeftNeighbor(Orientation.SOUTH_WEST);
+        Hex hexSouthEast = origin.getLeftNeighbor(Orientation.SOUTH_EAST);
 
-        Assert.assertEquals(hexNorth, Hex.at(ORIGIN + 1, ORIGIN - 1));
-        Assert.assertEquals(hexNorthWest, Hex.at(ORIGIN + 1, ORIGIN));
-        Assert.assertEquals(hexNorthEast, Hex.at(ORIGIN, ORIGIN - 1));
-        Assert.assertEquals(hexSouth, Hex.at(ORIGIN - 1, ORIGIN + 1));
-        Assert.assertEquals(hexSouthWest, Hex.at(ORIGIN, ORIGIN + 1));
-        Assert.assertEquals(hexSouthEast, Hex.at(ORIGIN - 1, ORIGIN));
+        assertEquals(Hex.at(ORIGIN + 1, ORIGIN - 1), hexNorth);
+        assertEquals(Hex.at(ORIGIN + 1, ORIGIN),     hexNorthWest);
+        assertEquals(Hex.at(ORIGIN,     ORIGIN - 1), hexNorthEast);
+        assertEquals(Hex.at(ORIGIN - 1, ORIGIN + 1), hexSouth);
+        assertEquals(Hex.at(ORIGIN,     ORIGIN + 1), hexSouthWest);
+        assertEquals(Hex.at(ORIGIN - 1, ORIGIN),     hexSouthEast);
     }
 
     @Test
     public void getRightNeighborTest() {
         Hex origin = Hex.at(ORIGIN,ORIGIN);
-        final Orientation[] orientations = Orientation.values();
 
-        Hex hexNorth = origin.getRightNeighbor(orientations[0]);
-        Hex hexNorthWest = origin.getRightNeighbor(orientations[1]);
-        Hex hexNorthEast = origin.getRightNeighbor(orientations[2]);
-        Hex hexSouth = origin.getRightNeighbor(orientations[3]);
-        Hex hexSouthWest = origin.getRightNeighbor(orientations[4]);
-        Hex hexSouthEast = origin.getRightNeighbor(orientations[5]);
+        Hex hexNorth = origin.getRightNeighbor(Orientation.NORTH);
+        Hex hexNorthWest = origin.getRightNeighbor(Orientation.NORTH_WEST);
+        Hex hexNorthEast = origin.getRightNeighbor(Orientation.NORTH_EAST);
+        Hex hexSouth = origin.getRightNeighbor(Orientation.SOUTH);
+        Hex hexSouthWest = origin.getRightNeighbor(Orientation.SOUTH_WEST);
+        Hex hexSouthEast = origin.getRightNeighbor(Orientation.SOUTH_EAST);
 
-        Assert.assertEquals(hexNorth, Hex.at(ORIGIN + 1, ORIGIN));
-        Assert.assertEquals(hexNorthWest, Hex.at(ORIGIN, ORIGIN + 1));
-        Assert.assertEquals(hexNorthEast, Hex.at(ORIGIN + 1, ORIGIN - 1));
-        Assert.assertEquals(hexSouth, Hex.at(ORIGIN - 1, ORIGIN));
-        Assert.assertEquals(hexSouthWest, Hex.at(ORIGIN - 1, ORIGIN + 1));
-        Assert.assertEquals(hexSouthEast, Hex.at(ORIGIN, ORIGIN - 1));
+        assertEquals(Hex.at(ORIGIN + 1, ORIGIN),     hexNorth);
+        assertEquals(Hex.at(ORIGIN,     ORIGIN + 1), hexNorthWest);
+        assertEquals(Hex.at(ORIGIN + 1, ORIGIN - 1), hexNorthEast);
+        assertEquals(Hex.at(ORIGIN - 1, ORIGIN),     hexSouth);
+        assertEquals(Hex.at(ORIGIN - 1, ORIGIN + 1), hexSouthWest);
+        assertEquals(Hex.at(ORIGIN,     ORIGIN - 1), hexSouthEast);
     }
 }

@@ -1,14 +1,17 @@
 package engine;
 
+import com.google.common.io.Resources;
 import data.FieldType;
 import data.VolcanoTile;
-import map.Hex;
-import map.IslandImpl;
-import map.Orientation;
-import org.junit.Assert;
+import map.*;
 import org.junit.Test;
 
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 public class EngineImplTest {
@@ -22,15 +25,17 @@ public class EngineImplTest {
         Hex[] hexes = new Hex[]{Hex.at(0, 1), Hex.at(1, 1), Hex.at(1, 0)};
 
         int level = 0;
-        Assert.assertTrue("Pas tous au même niveau " + prettyPrintHexes(island, hexes),
+        assertTrue("Pas tous au même niveau " + prettyPrintHexes(island, hexes),
                 engine.isOnSameLevelRule(hexes[0], hexes[1], hexes[2]));
-        Assert.assertTrue("Pas tous au niveau " + level + " " + prettyPrintHexes(island, hexes), engine.isOnSameLevelRule(hexes[0], hexes[1], hexes[2], level));
+        assertTrue("Pas tous au niveau " + level + " " + prettyPrintHexes(island, hexes),
+                engine.isOnSameLevelRule(hexes[0], hexes[1], hexes[2], level));
 
         level ++;
         island.putTile(new VolcanoTile(FIELD, FIELD), hexes[0], Orientation.NORTH);
-        Assert.assertTrue("Pas tous au même niveau " + prettyPrintHexes(island, hexes),
+        assertTrue("Pas tous au même niveau " + prettyPrintHexes(island, hexes),
                 engine.isOnSameLevelRule(hexes[0], hexes[1], hexes[2]));
-        Assert.assertTrue("Pas tous au niveau " + level + " " + prettyPrintHexes(island, hexes), engine.isOnSameLevelRule(hexes[0], hexes[1], hexes[2], level));
+        assertTrue("Pas tous au niveau " + level + " " + prettyPrintHexes(island, hexes),
+                engine.isOnSameLevelRule(hexes[0], hexes[1], hexes[2], level));
     }
 
     private String prettyPrintHexes(IslandImpl island, Hex[] hexes) {
@@ -44,81 +49,60 @@ public class EngineImplTest {
 
     @Test
     public void canPlaceTileOnVolcanoWithoutBuildingsTest() {
-        /*
-
-        N......................E  N......................E
-        ............__..........  ............__..........
-        .........__/0 \__.......  .........__/04\__.......
-        ......__/  \     \__....  ......__/03\__/14\__....
-        ...__/     /   __/ 2\...  ...__/02\__/13\__/24\...
-        ../  \__  3\__/     /...  ../01\__/12\__/23\__/...
-        ..\    5\__/..\__   \...  ..\__/11\__/..\__/33\...
-        ../   __/  \../  \__/...  ../10\__/21\../32\__/...
-        ..\__/1    /..\     \...  ..\__/20\__/..\__/42\...
-        .....\__   \../4  __/...  .....\__/31\../41\__/...
-        ........\__/..\__/......  ........\__/..\__/......
-        W......................S  W......................S
-
-        */
-
-        IslandImpl island = new IslandImpl();
+        URL rsc = EngineImplTest.class.getResource("canPlaceTileOnVolcanoWithoutBuildings.island");
+        Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         EngineImpl engine = new EngineImpl(island);
 
         Hex[] volcanoHexes = new Hex[]{
-                Hex.at(0, 4), Hex.at(2, 0),
-                Hex.at(2, 4), Hex.at(1, 2),
-                Hex.at(4, 1), Hex.at(1, 1)};
-
+                Hex.at(0, 2), Hex.at(2, -2),
+                Hex.at(2, 2), Hex.at(1, 0),
+                Hex.at(4, -1), Hex.at(1, -1)};
+        VolcanoTile tile = new VolcanoTile(FIELD, FIELD);
         Orientation[] orientations = Orientation.values();
-
-        for (int i = 0; i < orientations.length; i++) {
-            island.putTile(new VolcanoTile(FIELD, FIELD), volcanoHexes[i], orientations[i]);
-        }
 
         // Test de pose sur un volcan de même orientation
         for (int i = 0; i < orientations.length; i++) {
-            Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[i], orientations[i]));
+            assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[i], orientations[i]));
         }
 
         // Toute les orientations sont valides
         for (int i = 0; i < orientations.length; i++) {
             if (i != orientations[5].ordinal()) {
-                Assert.assertTrue("Echec de pose de tuile d'orientation " + Orientation.values()[i].toString() + " " + i,
+                assertTrue("Echec de pose de tuile d'orientation " + Orientation.values()[i].toString() + " " + i,
                         engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[5], orientations[i]));
             }
         }
 
         // Test de pose sur vide
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[0], Orientation.SOUTH));
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[0], Orientation.SOUTH_EAST));
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[0], Orientation.SOUTH_WEST));
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[0], Orientation.NORTH_WEST));
-        Assert.assertTrue(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[0], Orientation.NORTH_EAST));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[0], Orientation.SOUTH));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[0], Orientation.SOUTH_EAST));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[0], Orientation.SOUTH_WEST));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[0], Orientation.NORTH_WEST));
+        assertTrue(engine.canPlaceTileOnVolcano(tile, volcanoHexes[0], Orientation.NORTH_EAST));
 
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[1], Orientation.NORTH));
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[1], Orientation.NORTH_EAST));
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[1], Orientation.SOUTH_EAST));
-        Assert.assertTrue(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[1], Orientation.SOUTH));
-        Assert.assertTrue(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[1], Orientation.SOUTH_WEST));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[1], Orientation.NORTH));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[1], Orientation.NORTH_EAST));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[1], Orientation.SOUTH_EAST));
+        assertTrue(engine.canPlaceTileOnVolcano(tile, volcanoHexes[1], Orientation.SOUTH));
+        assertTrue(engine.canPlaceTileOnVolcano(tile, volcanoHexes[1], Orientation.SOUTH_WEST));
 
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[2], Orientation.SOUTH));
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[2], Orientation.NORTH_EAST));
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[2], Orientation.SOUTH_WEST));
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[2], Orientation.NORTH_WEST));
-        Assert.assertTrue(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[2], Orientation.SOUTH_EAST));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[2], Orientation.SOUTH));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[2], Orientation.NORTH_EAST));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[2], Orientation.SOUTH_WEST));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[2], Orientation.NORTH_WEST));
+        assertTrue(engine.canPlaceTileOnVolcano(tile, volcanoHexes[2], Orientation.SOUTH_EAST));
 
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[3], Orientation.NORTH));
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[3], Orientation.NORTH_WEST));
-        Assert.assertTrue(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[3], Orientation.SOUTH_WEST));
-        Assert.assertTrue(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[3], Orientation.NORTH_EAST));
-        Assert.assertTrue(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[3], Orientation.SOUTH_EAST));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[3], Orientation.NORTH));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[3], Orientation.NORTH_WEST));
+        assertTrue(engine.canPlaceTileOnVolcano(tile, volcanoHexes[3], Orientation.SOUTH_WEST));
+        assertTrue(engine.canPlaceTileOnVolcano(tile, volcanoHexes[3], Orientation.NORTH_EAST));
+        assertTrue(engine.canPlaceTileOnVolcano(tile, volcanoHexes[3], Orientation.SOUTH_EAST));
 
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[4], Orientation.SOUTH));
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[4], Orientation.NORTH_EAST));
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[4], Orientation.NORTH));
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[4], Orientation.SOUTH_EAST));
-        Assert.assertFalse(engine.canPlaceTileOnVolcano(new VolcanoTile(FIELD, FIELD), volcanoHexes[4], Orientation.NORTH_WEST));
-
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[4], Orientation.SOUTH));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[4], Orientation.NORTH_EAST));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[4], Orientation.NORTH));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[4], Orientation.SOUTH_EAST));
+        assertFalse(engine.canPlaceTileOnVolcano(tile, volcanoHexes[4], Orientation.NORTH_WEST));
     }
 
     public void canPlaceTileOnSeaTest() {

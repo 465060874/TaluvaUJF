@@ -6,7 +6,8 @@ import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 public class IslandImpl implements Island {
 
@@ -17,8 +18,8 @@ public class IslandImpl implements Island {
     }
 
     @Override
-    public Field getField(Hex h) {
-        return map.getOrDefault(h, Field.SEA);
+    public Field getField(Hex hex) {
+        return map.getOrDefault(hex, Field.SEA);
     }
 
     @Override
@@ -99,22 +100,22 @@ public class IslandImpl implements Island {
         return builder.build();
     }
 
+    void putHex(Hex hex, Field field) {
+        map.put(hex, field);
+    }
+
     public void putTile(VolcanoTile tile, Hex hex, Orientation orientation) {
-
-        Hex rightHex = hex.getRightNeighbor(orientation);
         Hex leftHex = hex.getLeftNeighbor(orientation);
+        Hex rightHex = hex.getRightNeighbor(orientation);
 
-        int level = getField(hex).getLevel();
-
-        level++;
+        int level = getField(hex).getLevel() + 1;
 
         Field volcanoField = new Field(level, FieldType.VOLCANO, orientation);
-        Field leftField = new Field(level, tile.getLeft(), orientation);
-        Field rightField = new Field(level, tile.getRight(), orientation);
+        Field leftField = new Field(level, tile.getLeft(), orientation.leftRotation());
+        Field rightField = new Field(level, tile.getRight(), orientation.rightRotation());
 
         map.put(hex, volcanoField);
         map.put(rightHex, rightField);
         map.put(leftHex, leftField);
     }
-
 }
