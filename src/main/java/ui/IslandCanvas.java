@@ -61,23 +61,23 @@ class IslandCanvas extends Canvas {
         double hexSizeY = HEX_SIZE_Y * scale;
         double hexSizeX = HEX_SIZE_X * scale;
 
-        int minLine = Integer.MAX_VALUE;
-        int minDiag = Integer.MAX_VALUE;
-        int maxLine = Integer.MIN_VALUE;
-        int maxDiag = Integer.MIN_VALUE;
-
         for (Hex hex : Hex.lineThenDiagOrdering().sortedCopy(island.getFields())) {
-            if (debug) {
+            drawHex(gc, hex, centerX, centerY, hexSizeY, hexSizeX);
+        }
+
+        if (debug) {
+            int minLine = Integer.MAX_VALUE;
+            int minDiag = Integer.MAX_VALUE;
+            int maxLine = Integer.MIN_VALUE;
+            int maxDiag = Integer.MIN_VALUE;
+
+            for (Hex hex : island.getFields()) {
                 minLine = Math.min(minLine, hex.getLine());
                 minDiag = Math.min(minDiag, hex.getDiag());
                 maxLine = Math.max(maxLine, hex.getLine());
                 maxDiag = Math.max(maxDiag, hex.getDiag());
             }
 
-            drawHex(gc, hex, centerX, centerY, hexSizeY, hexSizeX);
-        }
-
-        if (debug) {
             minLine -= 1;
             minDiag -= 1;
             maxLine += 1;

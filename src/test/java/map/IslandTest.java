@@ -16,8 +16,6 @@ public class IslandTest {
 
     @Test
     public void testGetField() {
-
-
         Island island = new IslandImpl();
         /*
          *   L
