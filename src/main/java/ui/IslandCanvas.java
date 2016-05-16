@@ -4,6 +4,7 @@ import data.BuildingType;
 import javafx.beans.Observable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.TextAlignment;
@@ -33,6 +34,8 @@ class IslandCanvas extends Canvas {
     double oy;
     double scale;
 
+    private Hex selectedHex;
+
     IslandCanvas(Island island, boolean debug) {
         super(0, 0);
         this.island = island;
@@ -43,8 +46,32 @@ class IslandCanvas extends Canvas {
         this.ox = 0;
         this.scale = 1;
 
+        this.selectedHex = null;
+
         widthProperty().addListener(this::resize);
         heightProperty().addListener(this::resize);
+
+        setOnMouseMoved(this::mouseMoved);
+    }
+
+    private void mouseMoved(MouseEvent event) {
+        double x = event.getX() - (getWidth() / 2 - ox);
+        double y = event.getY() - (getHeight() / 2 - oy);
+        selectedHex = pointToHex(x, y);
+        redraw();
+    }
+
+    private Hex pointToHex(double x, double y) {
+        double hexWidth = HEX_SIZE_X * scale * WEIRD_RATIO;
+        double hexHeight = HEX_SIZE_Y * scale;
+
+        x = x / (hexWidth * 2);
+        double t1 = (y + hexHeight) / hexHeight;
+        double t2 = Math.floor(x + t1);
+        double line = Math.floor((Math.floor(t1 - x) + t2) / 3);
+        double diag = Math.floor((Math.floor(2 * x + 1) + t2) / 3) - line;
+
+        return Hex.at((int) line, (int) diag);
     }
 
     private void resize(Observable event) {
@@ -58,8 +85,8 @@ class IslandCanvas extends Canvas {
 
         double centerX = getWidth() / 2 - ox;
         double centerY = getHeight() / 2 - oy;
-        double hexSizeY = HEX_SIZE_Y * scale;
         double hexSizeX = HEX_SIZE_X * scale;
+        double hexSizeY = HEX_SIZE_Y * scale;
 
         for (Hex hex : Hex.lineThenDiagOrdering().sortedCopy(island.getFields())) {
             drawHex(gc, hex, centerX, centerY, hexSizeY, hexSizeX);
@@ -102,6 +129,7 @@ class IslandCanvas extends Canvas {
                          double centerX, double centerY, double hexSizeY, double hexSizeX) {
         int line = hex.getLine();
         int diag = hex.getDiag();
+        boolean selected = selectedHex != null && hex.equals(selectedHex);
 
         double x = centerX + diag * 2 * WEIRD_RATIO * hexSizeX + line * WEIRD_RATIO * hexSizeX;
         double y = centerY + line * hexSizeY + line * hexSizeY / 2;
@@ -109,7 +137,8 @@ class IslandCanvas extends Canvas {
         Field field = island.getField(hex);
         hexBuf.update(x, y, hexSizeX, hexSizeY, field);
 
-        gc.setFill(fieldTypePaint(field));
+        Color fieldColor = fieldTypeColor(field);
+        gc.setFill(selected ? fieldColor.darker() : fieldColor);
         gc.fillPolygon(
                 hexBuf.hexagonX,
                 hexBuf.hexagonY,
@@ -136,30 +165,30 @@ class IslandCanvas extends Canvas {
             switch (building.getType()) {
                 case HUT:
                     if (building.getCount() == 1) {
-                        drawHut(gc, building, x, y, hexSizeX, hexSizeY);
+                        drawHut(gc, building, selected, x, y, hexSizeX, hexSizeY);
                     }
                     else if (building.getCount() == 2) {
-                        drawHut(gc, building, x - hexSizeX / 3, y, hexSizeX, hexSizeY);
-                        drawHut(gc, building, x + hexSizeX / 3, y, hexSizeX, hexSizeY);
+                        drawHut(gc, building, selected, x - hexSizeX / 3, y, hexSizeX, hexSizeY);
+                        drawHut(gc, building, selected, x + hexSizeX / 3, y, hexSizeX, hexSizeY);
                     }
                     else {
                         // TODO: More than 3
-                        drawHut(gc, building, x - hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
-                        drawHut(gc, building, x + hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
-                        drawHut(gc, building, x, y + hexSizeY / 3, hexSizeX, hexSizeY);
+                        drawHut(gc, building, selected, x - hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
+                        drawHut(gc, building, selected, x + hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
+                        drawHut(gc, building, selected, x, y + hexSizeY / 3, hexSizeX, hexSizeY);
                     }
                     break;
                 case TEMPLE:
-                    drawTemple(gc, building, x, y, hexSizeX, hexSizeY);
+                    drawTemple(gc, building, selected, x, y, hexSizeX, hexSizeY);
                     break;
                 case TOWER:
-                    drawTower(gc, building, x, y, hexSizeX, hexSizeY);
+                    drawTower(gc, building, selected, x, y, hexSizeX, hexSizeY);
                     break;
             }
         }
     }
 
-    private static Paint fieldTypePaint(Field field) {
+    private static Color fieldTypeColor(Field field) {
         switch (field.getType()) {
             case VOLCANO:
                 return Color.web("D52001");
@@ -178,14 +207,14 @@ class IslandCanvas extends Canvas {
         throw new IllegalStateException();
     }
 
-    private static Paint buildingTypeFacePaint(FieldBuilding building) {
+    private static Color buildingTypeFaceColor(FieldBuilding building) {
         switch (building.getColor()) {
             case RED:
-                return Color.web("991f00");
+                return Color.web("BB3F20");
             case WHITE:
-                return Color.web("e6e6e6");
+                return Color.web("D8D8D8");
             case BROWN:
-                return Color.web("734d26");
+                return Color.web("734D26");
             case YELLOW:
                 return Color.DARKGOLDENROD;
         }
@@ -193,7 +222,7 @@ class IslandCanvas extends Canvas {
         throw new IllegalStateException();
     }
 
-    private static Paint buildingTypeTopPaint(FieldBuilding building) {
+    private static Color buildingTypeTopColor(FieldBuilding building) {
         switch (building.getColor()) {
             case RED:
                 return Color.web("ff471a");
@@ -208,7 +237,8 @@ class IslandCanvas extends Canvas {
         throw new IllegalStateException();
     }
 
-    private void drawHut(GraphicsContext gc, FieldBuilding building,
+    private void drawHut(GraphicsContext gc,
+             FieldBuilding building, boolean selected,
              double x, double y, double hexSizeX, double hexSizeY) {
         double x1 = x - hexSizeX / 7;
         double x2 = x;
@@ -218,10 +248,11 @@ class IslandCanvas extends Canvas {
         double y3 = y + hexSizeY / 10;
         double y4 = y + hexSizeY / 4;
 
-        drawTentShape(gc, building, x1, x2, x3, y1, y2, y3, y4);
+        drawTentShape(gc, building, selected, x1, x2, x3, y1, y2, y3, y4);
     }
 
-    private void drawTemple(GraphicsContext gc, FieldBuilding building,
+    private void drawTemple(GraphicsContext gc,
+            FieldBuilding building, boolean selected,
             double x, double y, double hexSizeX, double hexSizeY) {
         double x1 = x - hexSizeX / 4;
         double x2 = x;
@@ -231,11 +262,15 @@ class IslandCanvas extends Canvas {
         double y3 = y + hexSizeY / 1.6 - hexSizeY / 2;
         double y4 = y + hexSizeY / 1.6;
 
-        drawTentShape(gc, building, x1, x2, x3, y1, y2, y3, y4);
+        drawTentShape(gc, building, selected, x1, x2, x3, y1, y2, y3, y4);
     }
 
-    private void drawTentShape(GraphicsContext gc, FieldBuilding building,
+    private void drawTentShape(GraphicsContext gc,
+           FieldBuilding building, boolean selected,
            double x1, double x2, double x3, double y1, double y2, double y3, double y4) {
+        Color faceColor = buildingTypeFaceColor(building);
+        Color topColor = selected ? faceColor : buildingTypeTopColor(building);
+
         double[] xpoints = new double[4];
         double[] ypoints = new double[4];
         xpoints[0] = x1;
@@ -244,7 +279,7 @@ class IslandCanvas extends Canvas {
         ypoints[1] = y3;
         xpoints[2] = x3;
         ypoints[2] = y4;
-        gc.setFill(buildingTypeFacePaint(building));
+        gc.setFill(faceColor);
         gc.fillPolygon(xpoints, ypoints, 3);
         gc.setStroke(BORDER_COLOR);
         gc.strokePolygon(xpoints, ypoints, 3);
@@ -257,7 +292,7 @@ class IslandCanvas extends Canvas {
         ypoints[2] = y1;
         xpoints[3] = x1;
         ypoints[3] = y2;
-        gc.setFill(buildingTypeTopPaint(building));
+        gc.setFill(topColor);
         gc.fillPolygon(xpoints, ypoints, 4);
         gc.setStroke(BORDER_COLOR);
         gc.strokePolygon(xpoints, ypoints, 4);
@@ -270,14 +305,18 @@ class IslandCanvas extends Canvas {
         ypoints[2] = y1;
         xpoints[3] = x3;
         ypoints[3] = y2;
-        gc.setFill(buildingTypeTopPaint(building));
+        gc.setFill(topColor);
         gc.fillPolygon(xpoints, ypoints, 4);
         gc.setStroke(BORDER_COLOR);
         gc.strokePolygon(xpoints, ypoints, 4);
     }
 
-    private void drawTower(GraphicsContext gc, FieldBuilding building,
+    private void drawTower(GraphicsContext gc,
+           FieldBuilding building, boolean selected,
            double x, double y, double hexSizeX, double hexSizeY) {
+        Color faceColor = buildingTypeFaceColor(building);
+        Color topColor = selected ? faceColor : buildingTypeTopColor(building);
+
         double width = hexSizeX / 2;
         double xstart = x - width / 2;
 
@@ -285,18 +324,18 @@ class IslandCanvas extends Canvas {
         double ytop = y - hexSizeY - hexSizeY / 3;
         double ybottom = y - height / 2;
 
-        gc.setFill(buildingTypeFacePaint(building));
+        gc.setFill(faceColor);
         gc.fillOval(xstart, ybottom, width, height);
         gc.setStroke(BORDER_COLOR);
         gc.strokeOval(xstart, ybottom, width, height);
 
-        gc.setFill(buildingTypeFacePaint(building));
+        gc.setFill(faceColor);
         gc.fillRect(xstart, ytop + height/2, width, ybottom - ytop);
         gc.setStroke(BORDER_COLOR);
         gc.strokeLine(xstart, ytop + height/2, xstart, ybottom + height/2);
         gc.strokeLine(xstart + width, ytop + height/2, xstart + width, ybottom + height/2);
 
-        gc.setFill(buildingTypeTopPaint(building));
+        gc.setFill(topColor);
         gc.fillOval(xstart, ytop, width, height);
         gc.setStroke(BORDER_COLOR);
         gc.strokeOval(xstart, ytop, width, height);
