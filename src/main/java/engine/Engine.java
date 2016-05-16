@@ -17,13 +17,15 @@ public interface Engine {
 
     void unregisterObserver(EngineObserver observer);
 
+    Gamemode getGamemode();
+
     Island getIsland();
 
     TileStack getStack();
 
-    List<Turn> getTurnsFromFirst();
+    List<Player> getPlayersFromFirst();
 
-    Iterable<Turn> getTurnsFromCurrent();
+    Iterable<Player> getTurnsFromCurrent();
 
     boolean canPlaceTileOnVolcano(VolcanoTile tile, Hex hex, Orientation orientation);
 

@@ -27,6 +27,11 @@ class EngineImpl implements Engine {
 
     }
 
+    @Override
+    public Gamemode getGamemode() {
+        return null;
+    }
+
     public Island getIsland() {
         return null;
     }
@@ -37,12 +42,12 @@ class EngineImpl implements Engine {
     }
 
     @Override
-    public List<Turn> getTurnsFromFirst() {
+    public List<Player> getPlayersFromFirst() {
         return null;
     }
 
     @Override
-    public Iterable<Turn> getTurnsFromCurrent() {
+    public Iterable<Player> getTurnsFromCurrent() {
         return null;
     }
 
