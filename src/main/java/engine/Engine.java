@@ -2,7 +2,6 @@ package engine;
 
 import data.BuildingType;
 import data.FieldType;
-import data.PlayerColor;
 import data.VolcanoTile;
 import map.Hex;
 import map.Island;
@@ -25,7 +24,9 @@ public interface Engine {
 
     List<Player> getPlayersFromFirst();
 
-    Iterable<Player> getTurnsFromCurrent();
+    Player getCurrentPlayer();
+
+    Iterable<Player> getPlayersFromCurrent();
 
     boolean canPlaceTileOnVolcano(VolcanoTile tile, Hex hex, Orientation orientation);
 
@@ -35,9 +36,9 @@ public interface Engine {
 
     void placeTileOnSea(VolcanoTile tile, Hex hex, Orientation orientation);
 
-    boolean canBuild(BuildingType buildingType, Hex hex, PlayerColor color);
+    boolean canBuild(BuildingType buildingType, Hex hex);
 
-    void build(BuildingType buildingType, Hex hex, PlayerColor color);
+    void build(BuildingType buildingType, Hex hex);
 
     boolean canExpandVillage(Village village, FieldType fieldType);
 

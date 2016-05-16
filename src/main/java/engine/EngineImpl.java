@@ -9,22 +9,26 @@ import map.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 class EngineImpl implements Engine {
 
+    private final List<EngineObserver> observers;
     private final Island island;
 
     EngineImpl(Island island) {
+        this.observers = new ArrayList<>();
         this.island = island;
     }
 
     @Override
     public void registerObserver(EngineObserver observer) {
-
+        observers.add(observer);
     }
 
     @Override
     public void unregisterObserver(EngineObserver observer) {
-
+        observers.remove(observer);
     }
 
     @Override
@@ -47,7 +51,12 @@ class EngineImpl implements Engine {
     }
 
     @Override
-    public Iterable<Player> getTurnsFromCurrent() {
+    public Player getCurrentPlayer() {
+        return null;
+    }
+
+    @Override
+    public Iterable<Player> getPlayersFromCurrent() {
         return null;
     }
 
@@ -68,6 +77,7 @@ class EngineImpl implements Engine {
     @Override
     public void placeTileOnVolcano(VolcanoTile tile, Hex hex, Orientation orientation) {
         island.putTile(tile, hex, orientation);
+        observers.forEach(o -> o.onPlaceTileOnVolcano(hex, orientation));
     }
 
     @Override
@@ -82,105 +92,89 @@ class EngineImpl implements Engine {
     @Override
     public void placeTileOnSea(VolcanoTile tile, Hex hex, Orientation orientation) {
         island.putTile(tile, hex, orientation);
+        observers.forEach(o -> o.onPlaceTileOnSea(hex, orientation));
     }
 
     @Override
-    public boolean canBuild(BuildingType buildingType, Hex hex, PlayerColor color) {
-        if (buildingType == BuildingType.NONE) {
-            throw new IllegalArgumentException();
-        }
+    public boolean canBuild(BuildingType type, Hex hex) {
+        checkArgument(type != BuildingType.NONE);
 
         // Le terrain est constructible et n'est pas au niveau de la mer
         final Field field = island.getField(hex);
-        final BuildingType typeBuilding = field.getBuilding().getType();
-
-        if (!field.getType().isBuildable()
-                && (field.getLevel() < 1)
-                && !(typeBuilding == BuildingType.NONE)) {
+        if (field == Field.SEA
+                || !field.getType().isBuildable()
+                || field.getBuilding().getType() != BuildingType.NONE) {
             return false;
         }
 
-        // Au moins un village de la même couleur que le batiment à placer ne possède pas de Temple/Tour
-        if (typeBuilding == BuildingType.TEMPLE) {
-            final Iterable<Hex> neighborhood = hex.getNeighborhood();
-            for (Hex neighbor : neighborhood) {
-                if (island.getField(neighbor).getBuilding().getColor() == color) {
+        PlayerColor color = getCurrentPlayer().getColor();
+        if (type == BuildingType.TEMPLE) {
+            boolean villageFound = false;
+            for (Hex neighbor : hex.getNeighborhood()) {
+                FieldBuilding neighborBuilding = island.getField(neighbor).getBuilding();
+                if (neighborBuilding.getType() != BuildingType.NONE
+                        && neighborBuilding.getColor() == color) {
                     final Village village = island.getVillage(hex);
-                    if (!village.hasTemple()) return true;
+                    if (!village.hasTemple() && village.getFieldSize() > 2) {
+                        villageFound = true;
+                    }
                 }
             }
-        } else if (typeBuilding == BuildingType.TOWER) {
-            if (field.getLevel() < 2) return false;
-            final Iterable<Hex> neighborhood = hex.getNeighborhood();
-            for (Hex neighbor : neighborhood) {
-                if (island.getField(neighbor).getBuilding().getColor() == color) {
+
+            if (!villageFound) {
+                return false;
+            }
+        }
+        else if (type == BuildingType.TOWER) {
+            if (field.getLevel() < 3) {
+                return false;
+            }
+
+            boolean villageFound = false;
+            for (Hex neighbor : hex.getNeighborhood()) {
+                FieldBuilding neighborBuilding = island.getField(neighbor).getBuilding();
+                if (neighborBuilding.getType() != BuildingType.NONE
+                        && neighborBuilding.getColor() == color) {
                     final Village village = island.getVillage(hex);
-                    if (!village.hasTower()) return true;
+                    if (village.hasTower()) {
+                        villageFound = true;
+                    }
                 }
+            }
+
+            if (!villageFound) {
+                return false;
+            }
+        }
+        else if (type == BuildingType.HUT) {
+            if (field.getLevel() != 1) {
+                return false;
             }
         }
 
-        //TODO
-        //Condition : nombres de hutte à placer en fonction de la hauteur / nombre de hutte restante du joueur
-
-        return true;
+        return getCurrentPlayer().getBuildingCount(type) >= 1;
     }
 
     @Override
-    public void build(BuildingType buildingType, Hex hex, PlayerColor color) {
-        island.putBuilding(buildingType, hex, color);
-
+    public void build(BuildingType type, Hex hex) {
+        island.putBuilding(type, hex, getCurrentPlayer().getColor());
+        observers.forEach(o -> o.onBuild(type, hex));
     }
 
     @Override
     public boolean canExpandVillage(Village village, FieldType fieldType) {
-        final Iterable<Hex> hexes = village.getHexes();
-        PlayerColor color = null;
-        boolean colorSet = false;
-
-        for (Hex hex : hexes) {
-            if (island.getField(hex).getBuilding().getType() == BuildingType.HUT) {
-                if (!colorSet) {
-                    color = island.getField(hex).getBuilding().getColor();
-                    colorSet = true;
-                }
-
-                final Iterable<Hex> neighborhood = hex.getNeighborhood();
-                for (Hex neighborHex : neighborhood) {
-                    if (island.getField(neighborHex).getType() == fieldType
-                            && !village.isInTheVillage(neighborHex)
-                            && canBuild(BuildingType.HUT, neighborHex, color)) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
+        return !village.getExpandableHexes().get(fieldType).isEmpty();
     }
 
     @Override
     public void expandVillage(Village village, FieldType fieldType) {
-        final Iterable<Hex> hexes = village.getHexes();
-        PlayerColor color = null;
-        boolean colorSet = false;
+        PlayerColor color = getCurrentPlayer().getColor();
 
-        for (Hex hex : hexes) {
-            if (island.getField(hex).getBuilding().getType() == BuildingType.HUT) {
-                if (!colorSet) {
-                    color = island.getField(hex).getBuilding().getColor();
-                    colorSet = true;
-                }
-                final Iterable<Hex> neighborhood = hex.getNeighborhood();
-                for (Hex neighborHex : neighborhood) {
-                    if (island.getField(neighborHex).getType() == fieldType
-                            && !village.isInTheVillage(neighborHex)
-                            && canBuild(BuildingType.HUT, neighborHex, color)) {
-                        build(BuildingType.HUT, neighborHex, color);
-                    }
-                }
-            }
+        for (Hex hex : village.getExpandableHexes().get(fieldType)) {
+            island.putBuilding(BuildingType.HUT, hex, color);
         }
+
+        observers.forEach(o -> o.onExpand(village, fieldType));
     }
 
     boolean isOnSameLevelRule(Hex hex, Hex rightHex, Hex leftHex) {

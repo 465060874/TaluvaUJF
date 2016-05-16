@@ -1,17 +1,18 @@
 package engine;
 
+import data.BuildingType;
 import data.PlayerColor;
 
 public class Player {
 
     private final PlayerHandler playerHandler;
     private final PlayerColor color;
-    private final Buildings buildings;
+    private final int[] buildings;
 
     public Player(PlayerHandler playerHandler, PlayerColor color) {
         this.playerHandler = playerHandler;
         this.color = color;
-        this.buildings = null;
+        this.buildings = new int[BuildingType.values().length - 1];
     }
 
     public PlayerHandler getPlayerHandler() {
@@ -22,7 +23,7 @@ public class Player {
         return color;
     }
 
-    public Buildings getBuildings() {
-        return buildings;
+    public int getBuildingCount(BuildingType type) {
+        return buildings[type.ordinal() - 1];
     }
 }

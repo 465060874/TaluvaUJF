@@ -5,7 +5,7 @@ import data.FieldType;
 
 public class Field {
 
-    static Field SEA = new Field(0, null, Orientation.NORTH);
+    public static Field SEA = new Field(0, null, Orientation.NORTH);
 
     private final int level;
     private final FieldType type;
