@@ -4,8 +4,6 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 
-import java.util.Objects;
-
 public class Hex {
 
     public static Hex at(int line, int diag) {
@@ -52,7 +50,7 @@ public class Hex {
 
     @Override
     public int hashCode() {
-        return Objects.hash(line, diag);
+        return line * 200 + diag;
     }
 
     @Override
