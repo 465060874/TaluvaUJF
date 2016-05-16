@@ -64,7 +64,7 @@ public class IslandIO {
         if (split.hasNext()) {
             BuildingType buildingType = BuildingType.valueOf(split.next());
             PlayerColor buildingColor = PlayerColor.valueOf(split.next());
-            FieldBuilding building = new FieldBuilding(buildingType, buildingColor);
+            FieldBuilding building = FieldBuilding.of(buildingType, buildingColor);
             field = new Field(level, fieldType, orientation, building);
         }
         else {
@@ -78,27 +78,31 @@ public class IslandIO {
     public static void write(CharSink sink, Island island) {
         try (Writer writer = sink.openBufferedStream()) {
             for (Hex hex : island.getFields()) {
-                Field field = island.getField(hex);
-                FieldBuilding building = field.getBuilding();
-
-                ImmutableList.Builder<Object> builder = ImmutableList.builder()
-                        .add(hex.getLine())
-                        .add(hex.getDiag())
-                        .add(field.getLevel())
-                        .add(field.getType())
-                        .add(field.getOrientation());
-                if (building.getType() != BuildingType.NONE) {
-                    builder.add(building.getType())
-                            .add(building.getColor());
-                }
-
-                String line = JOINER.join(builder.build());
-                writer.write(line);
-                writer.write('\n');
+                writeHex(island, writer, hex);
             }
         }
         catch (IOException e) {
             throw new Exception(e);
         }
+    }
+
+    private static void writeHex(Island island, Writer writer, Hex hex) throws IOException {
+        Field field = island.getField(hex);
+        FieldBuilding building = field.getBuilding();
+
+        ImmutableList.Builder<Object> builder = ImmutableList.builder()
+                .add(hex.getLine())
+                .add(hex.getDiag())
+                .add(field.getLevel())
+                .add(field.getType())
+                .add(field.getOrientation());
+        if (building.getType() != BuildingType.NONE) {
+            builder.add(building.getType())
+                    .add(building.getColor());
+        }
+
+        String line = JOINER.join(builder.build());
+        writer.write(line);
+        writer.write('\n');
     }
 }

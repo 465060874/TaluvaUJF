@@ -171,6 +171,6 @@ class IslandImpl implements Island {
         final FieldType type = map.get(hex).getType();
         final Orientation orientation = map.get(hex).getOrientation();
 
-        map.put(hex, new Field(level, type, orientation, new FieldBuilding(buildingType, color)));
+        map.put(hex, new Field(level, type, orientation, FieldBuilding.of(buildingType, color)));
     }
 }

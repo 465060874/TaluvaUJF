@@ -13,7 +13,7 @@ public class Field {
     private final FieldBuilding building;
 
     Field(int level, FieldType type, Orientation orientation) {
-        this(level, type, orientation, new FieldBuilding(BuildingType.NONE, null));
+        this(level, type, orientation, FieldBuilding.of(BuildingType.NONE, null));
     }
 
     Field(int level, FieldType type, Orientation orientation, FieldBuilding building) {
