@@ -86,7 +86,7 @@ class IslandImpl implements Island {
             }
         }
 
-        return new VillageImpl(builder.build(), hasTemple, hasTower);
+        return new VillageImpl(this, builder.build(), hasTemple, hasTower);
     }
 
     @Override
@@ -133,7 +133,7 @@ class IslandImpl implements Island {
         ImmutableList.Builder<Village> builder = ImmutableList.builder();
 
         for (Map.Entry<Hex, List<Hex>> entry : Multimaps.asMap(villagesHexes).entrySet()) {
-            builder.add(new VillageImpl(
+            builder.add(new VillageImpl(this,
                     ImmutableList.copyOf(entry.getValue()),
                     hasTemple.contains(entry.getKey()),
                     hasTower.contains(entry.getKey())));
