@@ -5,7 +5,6 @@ import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
-import engine.Buildings;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -97,7 +96,7 @@ class IslandImpl implements Island {
 
         for (Hex hex : map) {
             Field field = map.getOrDefault(hex, SEA);
-            if (field.getBuilding().getCount() == 0
+            if (field.getBuilding().getType() == BuildingType.NONE
                     || field.getBuilding().getColor() != color) {
                 continue;
             }
@@ -106,7 +105,7 @@ class IslandImpl implements Island {
                 Field neighorField = map.getOrDefault(neighbor, SEA);
 
                 // Exploration des couleurs voisines
-                if (neighorField.getBuilding().getCount() > 0
+                if (neighorField.getBuilding().getType() != BuildingType.NONE
                         || neighorField.getBuilding().getColor() == color) {
                     unionFind.union(hex, neighbor);
                 }
@@ -172,9 +171,6 @@ class IslandImpl implements Island {
         final FieldType type = map.get(hex).getType();
         final Orientation orientation = map.get(hex).getOrientation();
 
-        final int count = (buildingType == BuildingType.TEMPLE || buildingType == BuildingType.TOWER) ?
-                1 : level;
-
-        map.put(hex, new Field(level, type, orientation, new FieldBuilding(buildingType, color, count)));
+        map.put(hex, new Field(level, type, orientation, new FieldBuilding(buildingType, color)));
     }
 }

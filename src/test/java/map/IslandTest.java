@@ -36,7 +36,6 @@ public class IslandTest {
         assertEquals(2, field1.getLevel());
         assertEquals(FieldType.LAKE, field1.getType());
         assertEquals(BuildingType.NONE, field1.getBuilding().getType());
-        assertEquals(2, field1.getBuilding().getCount());
         assertEquals(PlayerColor.RED, field1.getBuilding().getColor());
         assertEquals(BuildingType.HUT, field1.getBuilding().getType());
 
@@ -74,7 +73,6 @@ public class IslandTest {
         assertEquals(1, field4.getLevel());
         assertEquals(FieldType.ROCK, field4.getType());
         assertEquals(Orientation.NORTH_EAST, field4.getOrientation());
-        assertEquals(1, field4.getBuilding().getCount());
         assertEquals(PlayerColor.WHITE, field4.getBuilding().getColor());
         assertEquals(BuildingType.HUT, field4.getBuilding().getType());
 

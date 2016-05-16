@@ -99,10 +99,10 @@ class IslandCanvas extends Canvas {
             if (building.getType() != BuildingType.NONE) {
                 switch (building.getType()) {
                     case HUT:
-                        if (building.getCount() == 1) {
+                        if (field.getLevel() == 1) {
                             drawHut(gc, building, selected, x, y, hexSizeX, hexSizeY);
                         }
-                        else if (building.getCount() == 2) {
+                        else if (field.getLevel() == 2) {
                             drawHut(gc, building, selected, x - hexSizeX / 3, y, hexSizeX, hexSizeY);
                             drawHut(gc, building, selected, x + hexSizeX / 3, y, hexSizeX, hexSizeY);
                         }

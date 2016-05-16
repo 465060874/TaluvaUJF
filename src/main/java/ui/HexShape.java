@@ -138,11 +138,11 @@ class HexShape {
     private void bottomBorderLevel(double scale, int level, int maxLevel) {
         double hexHeight = HEX_HEIGHT * scale;
         double bottomDepth2 = hexHeight * (maxLevel - level + 1);
-        double bottomDepth1 = bottomDepth2 - hexHeight;
         if (level > 1) {
-            bottomDepth1 -= 1;
             bottomDepth2 -= 1;
         }
+
+        double bottomDepth1 = bottomDepth2 - hexHeight;
 
         bottomBorderY[0] = hexagonY[0] + bottomDepth1;
         bottomBorderY[1] = hexagonY[0] + bottomDepth2;

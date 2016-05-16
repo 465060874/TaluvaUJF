@@ -5,7 +5,7 @@ import data.FieldType;
 
 public class Field {
 
-    public static Field SEA = new Field(0, null, Orientation.NORTH);
+    static Field SEA = new Field(0, null, Orientation.NORTH);
 
     private final int level;
     private final FieldType type;
@@ -13,7 +13,7 @@ public class Field {
     private final FieldBuilding building;
 
     Field(int level, FieldType type, Orientation orientation) {
-        this(level, type, orientation, new FieldBuilding(BuildingType.NONE, null, 0));
+        this(level, type, orientation, new FieldBuilding(BuildingType.NONE, null));
     }
 
     Field(int level, FieldType type, Orientation orientation, FieldBuilding building) {

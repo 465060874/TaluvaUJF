@@ -36,6 +36,10 @@ public class IslandIO {
         try (BufferedReader reader = source.openBufferedStream()) {
             String line;
             while ((line = reader.readLine()) != null) {
+                if (line.isEmpty() || line.startsWith("#")) {
+                    continue;
+                }
+
                 readHex(line, island);
             }
         }
@@ -60,8 +64,7 @@ public class IslandIO {
         if (split.hasNext()) {
             BuildingType buildingType = BuildingType.valueOf(split.next());
             PlayerColor buildingColor = PlayerColor.valueOf(split.next());
-            int buildingCount = Integer.valueOf(split.next());
-            FieldBuilding building = new FieldBuilding(buildingType, buildingColor, buildingCount);
+            FieldBuilding building = new FieldBuilding(buildingType, buildingColor);
             field = new Field(level, fieldType, orientation, building);
         }
         else {
@@ -86,7 +89,6 @@ public class IslandIO {
                         .add(field.getOrientation());
                 if (building.getType() != BuildingType.NONE) {
                     builder.add(building.getType())
-                            .add(building.getColor())
                             .add(building.getColor());
                 }
 
