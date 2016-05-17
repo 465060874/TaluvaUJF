@@ -30,7 +30,33 @@ class BuildingShapes {
         throw new IllegalStateException();
     }
 
-    static void drawHut(GraphicsContext gc,
+    static void drawBuilding(GraphicsContext gc,
+            FieldBuilding building, int level, boolean selected,
+            double x, double y, double hexSizeX, double hexSizeY) {
+        switch (building.getType()) {
+            case HUT:
+                if (level == 1) {
+                    drawHut(gc, building, selected, x, y, hexSizeX, hexSizeY);
+                } else if (level == 2) {
+                    drawHut(gc, building, selected, x - hexSizeX / 3, y, hexSizeX, hexSizeY);
+                    drawHut(gc, building, selected, x + hexSizeX / 3, y, hexSizeX, hexSizeY);
+                } else {
+                    // TODO: More than 3
+                    drawHut(gc, building, selected, x - hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
+                    drawHut(gc, building, selected, x + hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
+                    drawHut(gc, building, selected, x, y + hexSizeY / 3, hexSizeX, hexSizeY);
+                }
+                break;
+            case TEMPLE:
+                drawTemple(gc, building, selected, x, y, hexSizeX, hexSizeY);
+                break;
+            case TOWER:
+                drawTower(gc, building, selected, x, y, hexSizeX, hexSizeY);
+                break;
+        }
+    }
+
+    private static void drawHut(GraphicsContext gc,
             FieldBuilding building, boolean selected,
             double x, double y, double hexSizeX, double hexSizeY) {
         double x1 = x - hexSizeX / 7;
@@ -44,7 +70,7 @@ class BuildingShapes {
         drawTentShape(gc, building, selected, x1, x2, x3, y1, y2, y3, y4);
     }
 
-    static void drawTemple(GraphicsContext gc,
+    private static void drawTemple(GraphicsContext gc,
             FieldBuilding building, boolean selected,
             double x, double y, double hexSizeX, double hexSizeY) {
         double x1 = x - hexSizeX / 4;
@@ -105,7 +131,7 @@ class BuildingShapes {
         gc.strokePolygon(xpoints, ypoints, 4);
     }
 
-    static void drawTower(GraphicsContext gc,
+    private static void drawTower(GraphicsContext gc,
             FieldBuilding building, boolean selected,
             double x, double y, double hexSizeX, double hexSizeY) {
         Color faceColor = buildingTypeFaceColor(building);

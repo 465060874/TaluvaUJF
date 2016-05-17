@@ -12,14 +12,14 @@ import map.FieldBuilding;
 import map.Hex;
 import map.Island;
 
-import static ui.BuildingShapes.*;
+import static ui.BuildingShapes.drawBuilding;
 import static ui.HexShape.WEIRD_RATIO;
 
 class IslandCanvas extends Canvas {
 
     static final Color BG_COLOR = Color.web("365373");
 
-    static final Color BORDER_COLOR = Color.web("352535");
+    static final Color BORDER_COLOR = Color.web("303030");
     static final Color BOTTOM_COLOR = Color.web("505050");
 
     private final Island island;
@@ -53,8 +53,11 @@ class IslandCanvas extends Canvas {
     private void mouseMoved(MouseEvent event) {
         double x = event.getX() - (getWidth() / 2 - ox);
         double y = event.getY() - (getHeight() / 2 - oy);
-        selectedHex = pointToHex(x, y);
-        redraw();
+        Hex newSelectedHex = pointToHex(x, y);
+        if (!newSelectedHex.equals(selectedHex)) {
+            selectedHex = newSelectedHex;
+            redraw();
+        }
     }
 
     private Hex pointToHex(double x, double y) {
@@ -76,8 +79,7 @@ class IslandCanvas extends Canvas {
 
     void redraw() {
         GraphicsContext gc = getGraphicsContext2D();
-
-        getGraphicsContext2D().clearRect(0, 0, getWidth(), getHeight());
+        gc.clearRect(0, 0, getWidth(), getHeight());
 
         double centerX = getWidth() / 2 - ox;
         double centerY = getHeight() / 2 - oy;
@@ -94,32 +96,10 @@ class IslandCanvas extends Canvas {
 
             hexShape.draw(gc, field, selected, x, y, hexSizeX, hexSizeY, scale);
 
-            y -= hexSizeY / 6;
             FieldBuilding building = field.getBuilding();
             if (building.getType() != BuildingType.NONE) {
-                switch (building.getType()) {
-                    case HUT:
-                        if (field.getLevel() == 1) {
-                            drawHut(gc, building, selected, x, y, hexSizeX, hexSizeY);
-                        }
-                        else if (field.getLevel() == 2) {
-                            drawHut(gc, building, selected, x - hexSizeX / 3, y, hexSizeX, hexSizeY);
-                            drawHut(gc, building, selected, x + hexSizeX / 3, y, hexSizeX, hexSizeY);
-                        }
-                        else {
-                            // TODO: More than 3
-                            drawHut(gc, building, selected, x - hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
-                            drawHut(gc, building, selected, x + hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
-                            drawHut(gc, building, selected, x, y + hexSizeY / 3, hexSizeX, hexSizeY);
-                        }
-                        break;
-                    case TEMPLE:
-                        drawTemple(gc, building, selected, x, y, hexSizeX, hexSizeY);
-                        break;
-                    case TOWER:
-                        drawTower(gc, building, selected, x, y, hexSizeX, hexSizeY);
-                        break;
-                }
+                drawBuilding(gc, building, field.getLevel(), selected,
+                        x, y - hexSizeY / 6, hexSizeX, hexSizeY);
             }
         }
 
@@ -146,7 +126,7 @@ class IslandCanvas extends Canvas {
                     double y = centerY + line * hexSizeY + line * hexSizeY / 2;
                     String hexStr = line + "," + diag;
                     gc.setTextAlign(TextAlignment.CENTER);
-                    gc.setFill(Color.WHITE);
+                    gc.setFill(Color.BLACK);
                     gc.fillText(hexStr, x, y);
                 }
             }
