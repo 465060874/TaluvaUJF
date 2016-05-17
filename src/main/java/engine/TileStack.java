@@ -7,7 +7,11 @@ import data.VolcanoTile;
  */
 public interface TileStack {
 
+    int size();
+
     boolean isEmpty();
 
-    VolcanoTile next();
+    VolcanoTile current();
+
+    void next();
 }

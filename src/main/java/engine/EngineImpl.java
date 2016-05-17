@@ -1,24 +1,81 @@
 package engine;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
+import engine.action.BuildAction;
+import engine.action.ExpandAction;
+import engine.action.SeaPlacement;
+import engine.action.VolcanoPlacement;
+import engine.rules.BuildRules;
 import map.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 class EngineImpl implements Engine {
 
     private final List<EngineObserver> observers;
-    private final Island island;
+    private final Random random;
 
-    EngineImpl(Island island) {
+    private final Gamemode gamemode;
+    private final Island island;
+    private final TileStack volcanoTileStack;
+
+    private List<Player> players;
+    private int turn;
+    private boolean placeTile;
+
+    private HexMap<SeaPlacement> seaPlacements;
+    private HexMap<VolcanoPlacement> volcanosPlacements;
+    private HexMap<BuildAction> buildActions;
+    private HexMap<ExpandAction> expandActions;
+
+    EngineImpl(Gamemode gamemode, Island island, TileStack volcanoTileStack) {
+        this(System.nanoTime(), gamemode, island, volcanoTileStack);
+    }
+
+    EngineImpl(long seed, Gamemode gamemode, Island island, TileStack volcanoTileStack) {
         this.observers = new ArrayList<>();
+        this.random = new Random(seed);
+
+        this.gamemode = gamemode;
         this.island = island;
+        this.volcanoTileStack = volcanoTileStack;
+
+        this.players = null;
+        this.turn = 0;
+        this.placeTile = false;
+
+        this.seaPlacements = HexMap.create();
+        this.volcanosPlacements = HexMap.create();
+        this.buildActions = HexMap.create();
+        this.expandActions = HexMap.create();
+    }
+
+    @Override
+    public Random getRandom() {
+        return random;
+    }
+
+    @Override
+    public void init(Player... players) {
+        checkArgument(players != null, "Player already initialized");
+
+        checkArgument(gamemode.getPlayerCount() == players.length,
+                "Gamemode " + gamemode + " expected " + gamemode.getPlayerCount() + "players, got " + players.length);
+        List<Player> tmpPlayers = Lists.newArrayList(players);
+        Collections.shuffle(tmpPlayers, random);
+        this.players = ImmutableList.copyOf(tmpPlayers);
+
     }
 
     @Override
@@ -33,245 +90,194 @@ class EngineImpl implements Engine {
 
     @Override
     public Gamemode getGamemode() {
-        return null;
+        return gamemode;
     }
 
+    @Override
     public Island getIsland() {
-        return null;
+        return island;
     }
 
     @Override
-    public TileStack getStack() {
-        return null;
+    public TileStack getVolcanoTileStack() {
+        return volcanoTileStack;
     }
 
     @Override
-    public List<Player> getPlayersFromFirst() {
-        return null;
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    @Override
+    public void start() {
+        VolcanoTile tile = volcanoTileStack.current();
+        island.putTile(tile, Hex.at(0, 0), Orientation.NORTH);
+        nextStep();
+    }
+
+    private void nextStep() {
+        if (placeTile) {
+            placeTile = false;
+
+            updateBuildActions();
+            updateExpandActions();
+
+            observers.forEach(EngineObserver::onBuildStepStart);
+        }
+        else {
+            turn++;
+            placeTile = true;
+            volcanoTileStack.next();
+            observers.forEach(EngineObserver::onTileStackChange);
+
+            updateSeaPlacements();
+            updateVolcanoPlacements();
+
+            observers.forEach(EngineObserver::onTileStepStart);
+        }
+    }
+
+    private void updateSeaPlacements() {
+        HexMap<SeaPlacement> tmpSeaPlacements = HexMap.create();
+
+        for (Hex hex : island.getCoast()) {
+            for (Orientation orientation : Orientation.values()) {
+                tmpSeaPlacements.put(hex, new SeaPlacement(hex, orientation));
+            }
+        }
+        this.seaPlacements = tmpSeaPlacements;
+    }
+
+    private void updateVolcanoPlacements() {
+        HexMap<VolcanoPlacement> tmpVolcanosPlacements = HexMap.create();
+
+        for (Hex hex : island.getVolcanos()) {
+            Orientation volcanoOrientation = island.getField(hex).getOrientation();
+            for (Orientation orientation : Orientation.values()) {
+                if (orientation != volcanoOrientation) {
+                    volcanosPlacements.put(hex, new VolcanoPlacement(hex, orientation));
+                }
+            }
+        }
+
+        this.volcanosPlacements = tmpVolcanosPlacements;
+    }
+
+    private void updateBuildActions() {
+        HexMap<BuildAction> tmpBuildActions = HexMap.create();
+        for (Hex hex : island.getFields()) {
+            Field field = island.getField(hex);
+            if (field.getBuilding().getType() == BuildingType.NONE) {
+                if (BuildRules.validate(this, BuildingType.HUT, hex)) {
+                    tmpBuildActions.put(hex, new BuildAction(BuildingType.HUT, hex));
+                }
+                if (BuildRules.validate(this, BuildingType.TEMPLE, hex)) {
+                    tmpBuildActions.put(hex, new BuildAction(BuildingType.TEMPLE, hex));
+                }
+                if (BuildRules.validate(this, BuildingType.TOWER, hex)) {
+                    tmpBuildActions.put(hex, new BuildAction(BuildingType.TOWER, hex));
+                }
+            }
+        }
+        this.buildActions = tmpBuildActions;
+    }
+
+    private void updateExpandActions() {
+        HexMap<ExpandAction> tmpExpandActions = HexMap.create();
+        Iterable<Village> villages = island.getVillages(getCurrentPlayer().getColor());
+        for (Village village : villages) {
+            boolean[] types = new boolean[FieldType.values().length];
+            for (Hex hex : village.getHexes()) {
+                final Iterable<Hex> neighborhood = hex.getNeighborhood();
+                for (Hex neighbor : neighborhood) {
+                    Field field = island.getField(neighbor);
+                    if (field != Field.SEA
+                            && field.getType().isBuildable()
+                            && field.getBuilding().getType() == BuildingType.NONE) {
+                        types[field.getType().ordinal()] = true;
+                    }
+                }
+            }
+
+            for (FieldType fieldType : FieldType.values()) {
+                if (types[fieldType.ordinal()]) {
+                    for (Hex hex : village.getHexes()) {
+                        expandActions.put(hex, new ExpandAction(village, fieldType));
+                    }
+                }
+            }
+        }
+
+        this.expandActions = tmpExpandActions;
     }
 
     @Override
     public Player getCurrentPlayer() {
-        return null;
+        return players.get(turn % players.size());
     }
 
     @Override
-    public Iterable<Player> getPlayersFromCurrent() {
-        return null;
+    public HexMap<SeaPlacement> getSeaPlacements() {
+        return seaPlacements;
     }
 
     @Override
-    public boolean canPlaceTileOnVolcano(VolcanoTile tile, Hex hex, Orientation orientation) {
-        // On vérifie que la tuile sous le volcan est bien un volcan avec une orientation différente
-        if (island.getField(hex).getType().isBuildable() || island.getField(hex).getOrientation() == orientation) {
-            return false;
-        }
-        
-        Hex rightHex = hex.getRightNeighbor(orientation);
-        Hex leftHex = hex.getLeftNeighbor(orientation);
-
-        return isOnSameLevelRule(hex, rightHex, leftHex)
-                && isFreeOfIndestructibleBuildingRule(rightHex, leftHex);
+    public HexMap<VolcanoPlacement> getVolcanoPlacements() {
+        return volcanosPlacements;
     }
 
     @Override
-    public void placeTileOnVolcano(VolcanoTile tile, Hex hex, Orientation orientation) {
-        island.putTile(tile, hex, orientation);
-        observers.forEach(o -> o.onPlaceTileOnVolcano(hex, orientation));
+    public HexMap<BuildAction> getBuildActions() {
+        return buildActions;
     }
 
     @Override
-    public boolean canPlaceTileOnSea(VolcanoTile tile, Hex hex, Orientation orientation) {
-        Hex rightHex = hex.getRightNeighbor(orientation);
-        Hex leftHex = hex.getLeftNeighbor(orientation);
-
-        return isAdjacentToCoastRule(hex, rightHex, leftHex)
-                && isOnSameLevelRule(hex, rightHex, leftHex, 0);
+    public HexMap<ExpandAction> getExpandActions() {
+        return expandActions;
     }
 
     @Override
-    public void placeTileOnSea(VolcanoTile tile, Hex hex, Orientation orientation) {
-        island.putTile(tile, hex, orientation);
-        observers.forEach(o -> o.onPlaceTileOnSea(hex, orientation));
+    public void placeOnSea(SeaPlacement placement) {
+        checkState(placeTile, "Can't place a tile during building step");
+
+        island.putTile(volcanoTileStack.current(), placement.getHex1(), placement.getOrientation());
+
+        observers.forEach(o -> o.onTilePlacementOnSea(placement));
+        nextStep();
     }
 
     @Override
-    public boolean canBuild(BuildingType type, Hex hex) {
-        checkArgument(type != BuildingType.NONE);
+    public void placeOnVolcano(VolcanoPlacement placement) {
+        checkState(placeTile, "Can't place a tile during building step");
 
-        // Le terrain est constructible et n'est pas au niveau de la mer
-        final Field field = island.getField(hex);
-        if (field == Field.SEA
-                || !field.getType().isBuildable()
-                || field.getBuilding().getType() != BuildingType.NONE) {
-            return false;
-        }
+        island.putTile(volcanoTileStack.current(), placement.getVolcanoHex(), placement.getOrientation());
+
+        observers.forEach(o -> o.onTilePlacementOnVolcano(placement));
+        nextStep();
+    }
+
+    @Override
+    public void build(BuildAction action) {
+        checkState(!placeTile, "Can't build during tile placement step");
 
         PlayerColor color = getCurrentPlayer().getColor();
-        if (type == BuildingType.TEMPLE) {
-            boolean villageFound = false;
-            for (Hex neighbor : hex.getNeighborhood()) {
-                FieldBuilding neighborBuilding = island.getField(neighbor).getBuilding();
-                if (neighborBuilding.getType() != BuildingType.NONE
-                        && neighborBuilding.getColor() == color) {
-                    final Village village = island.getVillage(hex);
-                    if (!village.hasTemple() && village.getHexSize() > 2) {
-                        villageFound = true;
-                    }
-                }
-            }
+        island.putBuilding(action.getHex(), FieldBuilding.of(action.getType(), color));
 
-            if (!villageFound) {
-                return false;
-            }
-        }
-        else if (type == BuildingType.TOWER) {
-            if (field.getLevel() < 3) {
-                return false;
-            }
-
-            boolean villageFound = false;
-            for (Hex neighbor : hex.getNeighborhood()) {
-                FieldBuilding neighborBuilding = island.getField(neighbor).getBuilding();
-                if (neighborBuilding.getType() != BuildingType.NONE
-                        && neighborBuilding.getColor() == color) {
-                    final Village village = island.getVillage(hex);
-                    if (village.hasTower()) {
-                        villageFound = true;
-                    }
-                }
-            }
-
-            if (!villageFound) {
-                return false;
-            }
-        }
-        else if (type == BuildingType.HUT) {
-            if (field.getLevel() != 1) {
-                return false;
-            }
-        }
-
-        return getCurrentPlayer().getBuildingCount(type) >= 1;
+        observers.forEach(o -> o.onBuild(action));
+        nextStep();
     }
 
     @Override
-    public void build(BuildingType type, Hex hex) {
+    public void expand(ExpandAction action) {
+        checkState(!placeTile, "Can't expand during tile placement step");
+
         PlayerColor color = getCurrentPlayer().getColor();
-        island.putBuilding(hex, FieldBuilding.of(type, color));
-        observers.forEach(o -> o.onBuild(type, hex));
-    }
-
-    @Override
-    public boolean canExpandVillage(Village village, FieldType fieldType) {
-        List<Hex> expansion = village.getExpandableHexes().get(fieldType);
-        if (expansion.isEmpty()) {
-            return false;
-        }
-
-        int hutsCount = 0;
-        for (Hex hex : expansion) {
-            hutsCount += island.getField(hex).getLevel();
-        }
-
-        return hutsCount <= getCurrentPlayer().getBuildingCount(BuildingType.HUT);
-    }
-
-    @Override
-    public void expandVillage(Village village, FieldType fieldType) {
-        PlayerColor color = getCurrentPlayer().getColor();
-
         FieldBuilding building = FieldBuilding.of(BuildingType.HUT, color);
-        for (Hex hex : village.getExpandableHexes().get(fieldType)) {
+        for (Hex hex : action.getExpandHexes()) {
             island.putBuilding(hex, building);
         }
 
-        observers.forEach(o -> o.onExpand(village, fieldType));
-    }
-
-    boolean isOnSameLevelRule(Hex hex, Hex rightHex, Hex leftHex) {
-        int[] volcanoTileLevels = new int[]{
-                island.getField(hex).getLevel(),
-                island.getField(rightHex).getLevel(),
-                island.getField(leftHex).getLevel()};
-
-        int level = volcanoTileLevels[0];
-        for (int i = 1; i < volcanoTileLevels.length; i++) {
-            if (volcanoTileLevels[i] != level) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    boolean isOnSameLevelRule(Hex hex, Hex rightHex, Hex leftHex, int level) {
-        int[] volcanoTileLevels = new int[]{
-                island.getField(hex).getLevel(),
-                island.getField(rightHex).getLevel(),
-                island.getField(leftHex).getLevel()};
-
-        for (int volcanoTileLevel : volcanoTileLevels) {
-            if (volcanoTileLevel != level) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean isFreeOfIndestructibleBuildingRule(Hex rightHex, Hex leftHex) {
-        FieldBuilding leftBuilding = island.getField(leftHex).getBuilding();
-        FieldBuilding rightBuilding = island.getField(rightHex).getBuilding();
-
-        if (leftBuilding.getType() == BuildingType.NONE
-                && rightBuilding.getType() == BuildingType.NONE) {
-            return true;
-        }
-
-        if (!leftBuilding.getType().isDestructible()
-                || !rightBuilding.getType().isDestructible()) {
-            return false;
-        }
-
-        if (leftBuilding.getType() == BuildingType.NONE) {
-            Village rightVillage = island.getVillage(rightHex);
-            return rightVillage.getHexSize() > 1;
-        }
-        else if (rightBuilding.getType() == BuildingType.NONE) {
-            Village leftVillage = island.getVillage(leftHex);
-            return leftVillage.getHexSize() > 1;
-        }
-        else if (leftBuilding.getType() != BuildingType.NONE
-                && rightBuilding.getType() != BuildingType.NONE
-                && leftBuilding.getColor() == rightBuilding.getColor()) {
-            Village village = island.getVillage(leftHex);
-            return village.getHexSize() > 2;
-        }
-        else {
-            Village leftVillage = island.getVillage(leftHex);
-            Village rightVillage = island.getVillage(rightHex);
-            return leftVillage.getHexSize() > 1
-                    && rightVillage.getHexSize() > 1;
-        }
-    }
-
-    private boolean isAdjacentToCoastRule(Hex hex, Hex rightHex, Hex leftHex) {
-        final Iterable<Hex> coast = island.getCoast();
-        List<Iterable<Hex>> neighborhoods = new ArrayList<>();
-        neighborhoods.add(hex.getNeighborhood());
-        neighborhoods.add(rightHex.getNeighborhood());
-        neighborhoods.add(leftHex.getNeighborhood());
-
-        // A optimiser
-        for (Hex hexCoast : coast) {
-            for (Iterable<Hex> neighborhood : neighborhoods) {
-                for (Hex hexNeighbor : neighborhood) {
-                    if (hexCoast.equals(hexNeighbor)) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
+        observers.forEach(o -> o.onExpand(action));
+        nextStep();
     }
 }

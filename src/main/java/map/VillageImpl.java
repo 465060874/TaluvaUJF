@@ -43,11 +43,11 @@ class VillageImpl implements Village {
         for (Hex hex : hexes) {
             final Iterable<Hex> neighborhood = hex.getNeighborhood();
             for (Hex neighbor : neighborhood) {
-                Field field = island.getField(hex);
+                Field field = island.getField(neighbor);
                 if (field != Field.SEA
                         && field.getType().isBuildable()
                         && field.getBuilding().getType() == BuildingType.NONE) {
-                    builder.put(field.getType(), hex);
+                    builder.put(field.getType(), neighbor);
                 }
             }
         }

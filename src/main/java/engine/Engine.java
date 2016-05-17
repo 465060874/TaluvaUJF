@@ -1,16 +1,26 @@
 package engine;
 
-import data.BuildingType;
-import data.FieldType;
-import data.VolcanoTile;
-import map.Hex;
+import engine.action.BuildAction;
+import engine.action.ExpandAction;
+import engine.action.SeaPlacement;
+import engine.action.VolcanoPlacement;
+import map.HexMap;
 import map.Island;
-import map.Orientation;
-import map.Village;
 
 import java.util.List;
+import java.util.Random;
 
 public interface Engine {
+
+    /**
+     * Retourne une instance commune de la classe Random
+     */
+    Random getRandom();
+
+    /**
+     * Initialise la liste de joueurs pour la partie
+     */
+    void init(Player... players);
 
     /**
      * Enregistre un observer qui sera notifié des changements
@@ -23,16 +33,27 @@ public interface Engine {
      */
     void unregisterObserver(EngineObserver observer);
 
+    /**
+     * Retourne le mode de jeu (1v1, 1v1v1, 1v1v1v1, 2v2)
+     */
     Gamemode getGamemode();
 
+    /**
+     * Retourne l'île
+     */
     Island getIsland();
 
-    TileStack getStack();
+    /**
+     * Retourne la pioche du jeu
+     */
+    TileStack getVolcanoTileStack();
 
     /**
      * Retourne la liste des joueurs dans l'ordre
      */
-    List<Player> getPlayersFromFirst();
+    List<Player> getPlayers();
+
+    void start();
 
     /**
      * Retourne le joueur dont c'est actuellement
@@ -41,25 +62,32 @@ public interface Engine {
     Player getCurrentPlayer();
 
     /**
-     * Retourne un iterable cyclique des joueurs
-     * depuis le joueur dont c'est actuellement
-     * le tour
+     * Retourne la liste des placements possibles de tuiles
+     * sur la mer
      */
-    Iterable<Player> getPlayersFromCurrent();
+    HexMap<SeaPlacement> getSeaPlacements();
 
-    boolean canPlaceTileOnVolcano(VolcanoTile tile, Hex hex, Orientation orientation);
+    /**
+     * Retourne la liste des placements possibles de tuiles
+     * sur les volcans
+     */
+    HexMap<VolcanoPlacement> getVolcanoPlacements();
 
-    void placeTileOnVolcano(VolcanoTile tile, Hex hex, Orientation orientation);
+    /**
+     * Retourne la liste des constructions possibles
+     */
+    HexMap<BuildAction> getBuildActions();
 
-    boolean canPlaceTileOnSea(VolcanoTile tile, Hex hex, Orientation orientation);
+    /**
+     * Retourne la liste des extensions de villages possibles
+     */
+    HexMap<ExpandAction> getExpandActions();
 
-    void placeTileOnSea(VolcanoTile tile, Hex hex, Orientation orientation);
-
-    boolean canBuild(BuildingType buildingType, Hex hex);
-
-    void build(BuildingType buildingType, Hex hex);
-
-    boolean canExpandVillage(Village village, FieldType fieldType);
-
-    void expandVillage(Village village, FieldType fieldType);
+    /**
+     * Joue le coup donné en paramètre
+     */
+    void placeOnSea(SeaPlacement placement);
+    void placeOnVolcano(VolcanoPlacement placement);
+    void build(BuildAction action);
+    void expand(ExpandAction action);
 }

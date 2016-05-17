@@ -1,36 +1,46 @@
 package engine;
 
-import data.BuildingType;
-import data.FieldType;
-import map.Hex;
-import map.Orientation;
-import map.Village;
+import engine.action.BuildAction;
+import engine.action.ExpandAction;
+import engine.action.SeaPlacement;
+import engine.action.VolcanoPlacement;
 
 public interface EngineObserver {
 
     /**
-     * Appelé à chaque fois qu'un nouveau tour de joueur
-     * commence
+     * Appelé à chaque fois que la pioche change
      */
-    void onTurnStart();
+    void onTileStackChange();
 
     /**
-     * Appelé quand une tuile est placé sur un volcan
+     * Appelé à chaque fois qu'un joueur commence la phase
+     * de placement de tuile de son tour
      */
-    void onPlaceTileOnVolcano(Hex hex, Orientation orientation);
+    void onTileStepStart();
+
+    /**
+     * Appelé à chaque fois qu'un joueur commence la phase
+     * de construction de son tour
+     */
+    void onBuildStepStart();
 
     /**
      * Appelé quand une tuile est placé sur la mer
      */
-    void onPlaceTileOnSea(Hex hex, Orientation orientation);
+    void onTilePlacementOnSea(SeaPlacement placement);
+
+    /**
+     * Appelé quand une tuile est placé sur un volcan
+     */
+    void onTilePlacementOnVolcano(VolcanoPlacement placement);
 
     /**
      * Appelé quand un batiment est construit
      */
-    void onBuild(BuildingType buildingType, Hex hex);
+    void onBuild(BuildAction action);
 
     /**
      * Appelé quand une extension de village est faite
      */
-    void onExpand(Village village, FieldType fieldType);
+    void onExpand(ExpandAction action);
 }
