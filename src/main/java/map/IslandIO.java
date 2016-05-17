@@ -60,15 +60,12 @@ public class IslandIO {
         FieldType fieldType = FieldType.valueOf(split.next());
         Orientation orientation = Orientation.valueOf(split.next());
 
-        Field field;
+        Field field = Field.create(level, fieldType, orientation);
         if (split.hasNext()) {
             BuildingType buildingType = BuildingType.valueOf(split.next());
             PlayerColor buildingColor = PlayerColor.valueOf(split.next());
             FieldBuilding building = FieldBuilding.of(buildingType, buildingColor);
-            field = new Field(level, fieldType, orientation, building);
-        }
-        else {
-            field = new Field(level, fieldType, orientation);
+            field = field.withBuilding(building);
         }
 
         Hex hex = Hex.at(line, diag);

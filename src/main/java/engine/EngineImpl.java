@@ -115,7 +115,7 @@ class EngineImpl implements Engine {
                 if (neighborBuilding.getType() != BuildingType.NONE
                         && neighborBuilding.getColor() == color) {
                     final Village village = island.getVillage(hex);
-                    if (!village.hasTemple() && village.getFieldSize() > 2) {
+                    if (!village.hasTemple() && village.getHexSize() > 2) {
                         villageFound = true;
                     }
                 }
@@ -157,7 +157,8 @@ class EngineImpl implements Engine {
 
     @Override
     public void build(BuildingType type, Hex hex) {
-        island.putBuilding(type, hex, getCurrentPlayer().getColor());
+        PlayerColor color = getCurrentPlayer().getColor();
+        island.putBuilding(hex, FieldBuilding.of(type, color));
         observers.forEach(o -> o.onBuild(type, hex));
     }
 
@@ -180,8 +181,9 @@ class EngineImpl implements Engine {
     public void expandVillage(Village village, FieldType fieldType) {
         PlayerColor color = getCurrentPlayer().getColor();
 
+        FieldBuilding building = FieldBuilding.of(BuildingType.HUT, color);
         for (Hex hex : village.getExpandableHexes().get(fieldType)) {
-            island.putBuilding(BuildingType.HUT, hex, color);
+            island.putBuilding(hex, building);
         }
 
         observers.forEach(o -> o.onExpand(village, fieldType));
@@ -232,23 +234,23 @@ class EngineImpl implements Engine {
 
         if (leftBuilding.getType() == BuildingType.NONE) {
             Village rightVillage = island.getVillage(rightHex);
-            return rightVillage.getFieldSize() > 1;
+            return rightVillage.getHexSize() > 1;
         }
         else if (rightBuilding.getType() == BuildingType.NONE) {
             Village leftVillage = island.getVillage(leftHex);
-            return leftVillage.getFieldSize() > 1;
+            return leftVillage.getHexSize() > 1;
         }
         else if (leftBuilding.getType() != BuildingType.NONE
                 && rightBuilding.getType() != BuildingType.NONE
                 && leftBuilding.getColor() == rightBuilding.getColor()) {
             Village village = island.getVillage(leftHex);
-            return village.getFieldSize() > 2;
+            return village.getHexSize() > 2;
         }
         else {
             Village leftVillage = island.getVillage(leftHex);
             Village rightVillage = island.getVillage(rightHex);
-            return leftVillage.getFieldSize() > 1
-                    && rightVillage.getFieldSize() > 1;
+            return leftVillage.getHexSize() > 1
+                    && rightVillage.getHexSize() > 1;
         }
     }
 

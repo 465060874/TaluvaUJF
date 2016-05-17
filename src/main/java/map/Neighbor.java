@@ -66,7 +66,6 @@ public enum Neighbor {
         throw new IllegalArgumentException();
     }
 
-
     public static ImmutableList<Neighbor> list() {
         return LIST;
     }

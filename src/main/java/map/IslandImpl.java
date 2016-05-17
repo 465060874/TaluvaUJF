@@ -156,21 +156,13 @@ class IslandImpl implements Island {
 
         int level = getField(hex).getLevel() + 1;
 
-        Field volcanoField = new Field(level, FieldType.VOLCANO, orientation);
-        Field leftField = new Field(level, tile.getLeft(), orientation.leftRotation());
-        Field rightField = new Field(level, tile.getRight(), orientation.rightRotation());
-
-        putHex(hex, volcanoField);
-        putHex(rightHex, rightField);
-        putHex(leftHex, leftField);
+        putHex(hex, Field.create(level, FieldType.VOLCANO, orientation));
+        putHex(rightHex, Field.create(level, tile.getRight(), orientation.rightRotation()));
+        putHex(leftHex, Field.create(level, tile.getLeft(), orientation.leftRotation()));
     }
 
     @Override
-    public void putBuilding(BuildingType buildingType, Hex hex, PlayerColor color) {
-        final int level = map.get(hex).getLevel();
-        final FieldType type = map.get(hex).getType();
-        final Orientation orientation = map.get(hex).getOrientation();
-
-        map.put(hex, new Field(level, type, orientation, FieldBuilding.of(buildingType, color)));
+    public void putBuilding(Hex hex, FieldBuilding building) {
+        map.put(hex, map.get(hex).withBuilding(building));
     }
 }

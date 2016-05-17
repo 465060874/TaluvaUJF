@@ -1,6 +1,5 @@
 package map;
 
-import data.BuildingType;
 import data.PlayerColor;
 import data.VolcanoTile;
 
@@ -24,5 +23,5 @@ public interface Island {
 
     void putTile(VolcanoTile tile, Hex hex, Orientation orientation);
 
-    void putBuilding(BuildingType buildingType, Hex hex, PlayerColor color);
+    void putBuilding(Hex hex, FieldBuilding building);
 }

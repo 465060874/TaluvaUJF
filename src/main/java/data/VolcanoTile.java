@@ -1,5 +1,7 @@
 package data;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * Represente une tuile volcan, en convention volcan en haut
  */
@@ -9,11 +11,11 @@ public class VolcanoTile {
     private final FieldType right;
 
     public VolcanoTile(FieldType left, FieldType right) {
+        checkArgument(left.isBuildable() && right.isBuildable(),
+                "VolcanoTile left and right FieldType must be buildable");
+
         this.left = left;
         this.right = right;
-        if (!(left.isBuildable() && right.isBuildable())) {
-            throw new IllegalArgumentException("VolcanoTile left and right FieldType must be buildable");
-        }
     }
 
     public FieldType getLeft() {

@@ -5,6 +5,20 @@ import data.PlayerColor;
 
 import static com.google.common.base.Preconditions.*;
 
+/**
+ * Représente une construction sur une case
+ *
+ * Les instances de cette classes peuvent être vues
+ * comme le produit cartésien des enums BuildingType et PlayerColor.
+ * A l'exception de BuildingType.NONE pour lequelle la couleur n'a
+ * pas de sens.
+ *
+ * Les 13 instances :
+ *    - {BuildingType.NONE} x {null}
+ *    - (BuildingType.* \ BuildingType.NONE) x PlayerColor.*
+ * sont précréées et peuvent être recuperées
+ * avec la méthode FieldBuilding.of(BuildingType, PlayerColor)
+ */
 public class FieldBuilding {
 
     public static FieldBuilding of(BuildingType type, PlayerColor color) {

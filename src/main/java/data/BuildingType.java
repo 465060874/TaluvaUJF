@@ -18,10 +18,18 @@ public enum BuildingType {
         this.destructible = destructible;
     }
 
+    /**
+     * Retourne le nombre de pièces de ce type de batiments
+     * que chaque joueur à au début du jeu
+     */
     public int getInitialCount() {
         return initialCount;
     }
 
+    /**
+     * Indique si ce type de batiment peut être détruit par
+     * un placement de tuile
+     */
     public boolean isDestructible() {
         return destructible;
     }

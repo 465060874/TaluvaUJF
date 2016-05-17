@@ -3,20 +3,22 @@ package engine;
 import data.BuildingType;
 import data.PlayerColor;
 
+/**
+ * Represente un joueur, sa couleur et ses batiments restants
+ */
 public class Player {
 
-    private final PlayerHandler playerHandler;
     private final PlayerColor color;
     private final int[] buildings;
+    private final PlayerHandler playerHandler;
 
-    public Player(PlayerHandler playerHandler, PlayerColor color) {
+    public Player(PlayerColor color, PlayerHandler playerHandler) {
         this.playerHandler = playerHandler;
-        this.color = color;
         this.buildings = new int[BuildingType.values().length - 1];
-    }
-
-    public PlayerHandler getPlayerHandler() {
-        return playerHandler;
+        for (BuildingType type : BuildingType.values()) {
+            buildings[type.ordinal() - 1] = type.getInitialCount();
+        }
+        this.color = color;
     }
 
     public PlayerColor getColor() {
@@ -25,5 +27,9 @@ public class Player {
 
     public int getBuildingCount(BuildingType type) {
         return buildings[type.ordinal() - 1];
+    }
+
+    public PlayerHandler getPlayerHandler() {
+        return playerHandler;
     }
 }

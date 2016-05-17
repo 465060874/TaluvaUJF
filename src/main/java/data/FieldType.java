@@ -20,6 +20,9 @@ public enum FieldType {
         this.buildable = buildable;
     }
 
+    /**
+     * Indique s'il est possible de construire sur ce type de terrain
+     */
     public boolean isBuildable() {
         return buildable;
     }

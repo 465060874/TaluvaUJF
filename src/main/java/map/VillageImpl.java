@@ -28,7 +28,7 @@ class VillageImpl implements Village {
     }
 
     @Override
-    public int getFieldSize() {
+    public int getHexSize() {
         return hexes.size();
     }
 
