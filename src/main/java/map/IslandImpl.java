@@ -14,7 +14,7 @@ import java.util.Queue;
 import static com.google.common.base.Preconditions.checkArgument;
 import static map.Field.SEA;
 
-class IslandImpl implements Island {
+class  IslandImpl implements Island {
 
     private final HexMap<Field> map;
 
