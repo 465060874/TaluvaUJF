@@ -163,7 +163,17 @@ class EngineImpl implements Engine {
 
     @Override
     public boolean canExpandVillage(Village village, FieldType fieldType) {
-        return !village.getExpandableHexes().get(fieldType).isEmpty();
+        List<Hex> expansion = village.getExpandableHexes().get(fieldType);
+        if (expansion.isEmpty()) {
+            return false;
+        }
+
+        int hutsCount = 0;
+        for (Hex hex : expansion) {
+            hutsCount += island.getField(hex).getLevel();
+        }
+
+        return hutsCount <= getCurrentPlayer().getBuildingCount(BuildingType.HUT);
     }
 
     @Override
