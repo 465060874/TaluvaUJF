@@ -1,12 +1,10 @@
 package engine;
 
-import data.FieldType;
 import engine.action.*;
 import map.HexMap;
 import map.Island;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 public interface Engine {
@@ -15,11 +13,6 @@ public interface Engine {
      * Retourne une instance commune de la classe Random
      */
     Random getRandom();
-
-    /**
-     * Initialise la liste de joueurs pour la partie
-     */
-    void init(Player... players);
 
     /**
      * Enregistre un observer qui sera notifié des changements
@@ -45,7 +38,7 @@ public interface Engine {
     /**
      * Retourne la pioche du jeu
      */
-    TileStack getVolcanoTileStack();
+    VolcanoTileStack getVolcanoTileStack();
 
     /**
      * Retourne la liste des joueurs dans l'ordre

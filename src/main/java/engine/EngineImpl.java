@@ -22,9 +22,9 @@ class EngineImpl implements Engine {
 
     private final Gamemode gamemode;
     private final Island island;
-    private final TileStack volcanoTileStack;
+    private final VolcanoTileStack volcanoTileStack;
 
-    private List<Player> players;
+    private ImmutableList<Player> players;
     private int turn;
     private boolean placeTile;
 
@@ -33,19 +33,32 @@ class EngineImpl implements Engine {
     private HexMap<List<BuildAction>> buildActions;
     private HexMap<List<ExpandAction>> expandActions;
 
-    EngineImpl(Gamemode gamemode, Island island, TileStack volcanoTileStack) {
-        this(System.nanoTime(), gamemode, island, volcanoTileStack);
-    }
-
-    EngineImpl(long seed, Gamemode gamemode, Island island, TileStack volcanoTileStack) {
+    /**
+     * Package-protected, voir la classe EngineBuilder
+     */
+    EngineImpl(EngineBuilder builder) {
         this.observers = new ArrayList<>();
-        this.random = new Random(seed);
+        this.random = new Random(builder.seed);
 
-        this.gamemode = gamemode;
-        this.island = island;
-        this.volcanoTileStack = volcanoTileStack;
+        this.gamemode = builder.gamemode;
+        this.island = builder.island;
+        this.volcanoTileStack = builder.volcanoTileStackFactory.create(gamemode, random);
 
-        this.players = null;
+        Map<PlayerHandler.Factory, PlayerHandler> playerHandlersMap = new IdentityHashMap<>();
+        for (PlayerHandler.Factory factory : builder.players.values()) {
+            if (!playerHandlersMap.containsKey(factory)) {
+                playerHandlersMap.put(factory, factory.create(this));
+            }
+        }
+
+        List<Player> playersBuilder = new ArrayList<>();
+        for (Map.Entry<PlayerColor, PlayerHandler.Factory> entry : builder.players.entrySet()) {
+            PlayerHandler handler = playerHandlersMap.get(entry.getValue());
+            playersBuilder.add(new Player(entry.getKey(), handler));
+        }
+        Collections.shuffle(playersBuilder, random);
+        this.players = ImmutableList.copyOf(playersBuilder);
+
         this.turn = 0;
         this.placeTile = false;
 
@@ -58,18 +71,6 @@ class EngineImpl implements Engine {
     @Override
     public Random getRandom() {
         return random;
-    }
-
-    @Override
-    public void init(Player... players) {
-        checkArgument(players != null, "Player already initialized");
-
-        checkArgument(gamemode.getPlayerCount() == players.length,
-                "Gamemode " + gamemode + " expected " + gamemode.getPlayerCount() + "players, got " + players.length);
-        List<Player> tmpPlayers = Lists.newArrayList(players);
-        Collections.shuffle(tmpPlayers, random);
-        this.players = ImmutableList.copyOf(tmpPlayers);
-
     }
 
     @Override
@@ -93,7 +94,7 @@ class EngineImpl implements Engine {
     }
 
     @Override
-    public TileStack getVolcanoTileStack() {
+    public VolcanoTileStack getVolcanoTileStack() {
         return volcanoTileStack;
     }
 
