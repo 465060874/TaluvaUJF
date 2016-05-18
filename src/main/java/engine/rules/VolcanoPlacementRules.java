@@ -1,15 +1,16 @@
 package engine.rules;
 
 import data.BuildingType;
+import data.FieldType;
 import data.VolcanoTile;
-import engine.Engine;
 import map.*;
 
-public class TilePlacementOnVolcanoRules {
+public class VolcanoPlacementRules {
 
     public static boolean validate(Island island, VolcanoTile tile, Hex hex, Orientation orientation) {
         // On vérifie que la tuile sous le volcan est bien un volcan avec une orientation différente
-        if (island.getField(hex).getType().isBuildable() || island.getField(hex).getOrientation() == orientation) {
+        if (island.getField(hex).getType() != FieldType.VOLCANO
+                || island.getField(hex).getOrientation() == orientation) {
             return false;
         }
 
@@ -20,7 +21,7 @@ public class TilePlacementOnVolcanoRules {
                 && isFreeOfIndestructibleBuilding(island, rightHex, leftHex);
     }
 
-    static boolean isOnSameLevel(Island island, Hex hex, Hex rightHex, Hex leftHex) {
+    private static boolean isOnSameLevel(Island island, Hex hex, Hex rightHex, Hex leftHex) {
         int[] volcanoTileLevels = new int[]{
                 island.getField(hex).getLevel(),
                 island.getField(rightHex).getLevel(),
@@ -35,7 +36,7 @@ public class TilePlacementOnVolcanoRules {
         return true;
     }
 
-    static boolean isFreeOfIndestructibleBuilding(Island island, Hex rightHex, Hex leftHex) {
+    private static boolean isFreeOfIndestructibleBuilding(Island island, Hex rightHex, Hex leftHex) {
         FieldBuilding leftBuilding = island.getField(leftHex).getBuilding();
         FieldBuilding rightBuilding = island.getField(rightHex).getBuilding();
 
