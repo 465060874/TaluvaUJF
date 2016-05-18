@@ -269,6 +269,19 @@ class EngineImpl implements Engine {
     }
 
     @Override
+    public void place(Placement placement) {
+        if (placement instanceof SeaPlacement) {
+            placeOnSea((SeaPlacement) placement);
+        }
+        else if (placement instanceof VolcanoPlacement) {
+            placeOnVolcano((VolcanoPlacement) placement);
+        }
+        else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
     public void placeOnSea(SeaPlacement placement) {
         checkState(placeTile, "Can't place a tile during building step");
 
@@ -286,6 +299,19 @@ class EngineImpl implements Engine {
 
         observers.forEach(o -> o.onTilePlacementOnVolcano(placement));
         nextStep();
+    }
+
+    @Override
+    public void action(Action action) {
+        if (action instanceof BuildAction) {
+            build((BuildAction) action);
+        }
+        else if (action instanceof ExpandAction) {
+            expand((ExpandAction) action);
+        }
+        else {
+            throw new IllegalArgumentException();
+        }
     }
 
     @Override

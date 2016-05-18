@@ -98,8 +98,10 @@ public interface Engine {
     /**
      * Réalise le placement passé en paramètre
      */
+    void place(Placement placement);
     void placeOnSea(SeaPlacement placement);
     void placeOnVolcano(VolcanoPlacement placement);
+    void action(Action action);
     void build(BuildAction action);
     void expand(ExpandAction action);
 }
