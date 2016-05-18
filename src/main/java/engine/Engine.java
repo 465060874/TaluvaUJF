@@ -1,13 +1,12 @@
 package engine;
 
-import engine.action.BuildAction;
-import engine.action.ExpandAction;
-import engine.action.SeaPlacement;
-import engine.action.VolcanoPlacement;
+import data.FieldType;
+import engine.action.*;
 import map.HexMap;
 import map.Island;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public interface Engine {
@@ -53,7 +52,20 @@ public interface Engine {
      */
     List<Player> getPlayers();
 
+    /**
+     * Demarre la partie
+     */
     void start();
+
+    /**
+     * Créé une copie de l'engine sans les observers
+     */
+    Engine copyWithoutObservers();
+
+    /**
+     * Annule le dernier coup (placement ou construction)
+     */
+    void cancelLastStep();
 
     /**
      * Retourne le joueur dont c'est actuellement
@@ -65,26 +77,26 @@ public interface Engine {
      * Retourne la liste des placements possibles de tuiles
      * sur la mer
      */
-    HexMap<SeaPlacement> getSeaPlacements();
+    HexMap<? extends Iterable<SeaPlacement>> getSeaPlacements();
 
     /**
      * Retourne la liste des placements possibles de tuiles
      * sur les volcans
      */
-    HexMap<VolcanoPlacement> getVolcanoPlacements();
+    HexMap<? extends Iterable<VolcanoPlacement>> getVolcanoPlacements();
 
     /**
      * Retourne la liste des constructions possibles
      */
-    HexMap<BuildAction> getBuildActions();
+    HexMap<? extends Iterable<BuildAction>> getBuildActions();
 
     /**
      * Retourne la liste des extensions de villages possibles
      */
-    HexMap<ExpandAction> getExpandActions();
+    HexMap<? extends Iterable<ExpandAction>> getExpandActions();
 
     /**
-     * Joue le coup donné en paramètre
+     * Réalise le placement passé en paramètre
      */
     void placeOnSea(SeaPlacement placement);
     void placeOnVolcano(VolcanoPlacement placement);

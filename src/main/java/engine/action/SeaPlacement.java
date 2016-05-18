@@ -3,7 +3,7 @@ package engine.action;
 import map.Hex;
 import map.Orientation;
 
-public class SeaPlacement {
+public class SeaPlacement implements Placement {
 
     private final Hex coastHex;
     private final Orientation orientation;

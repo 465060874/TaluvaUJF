@@ -6,17 +6,11 @@ import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
-import engine.action.BuildAction;
-import engine.action.ExpandAction;
-import engine.action.SeaPlacement;
-import engine.action.VolcanoPlacement;
+import engine.action.*;
 import engine.rules.BuildRules;
 import map.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
@@ -34,10 +28,10 @@ class EngineImpl implements Engine {
     private int turn;
     private boolean placeTile;
 
-    private HexMap<SeaPlacement> seaPlacements;
-    private HexMap<VolcanoPlacement> volcanosPlacements;
-    private HexMap<BuildAction> buildActions;
-    private HexMap<ExpandAction> expandActions;
+    private HexMap<List<SeaPlacement>> seaPlacements;
+    private HexMap<List<VolcanoPlacement>> volcanosPlacements;
+    private HexMap<List<BuildAction>> buildActions;
+    private HexMap<List<ExpandAction>> expandActions;
 
     EngineImpl(Gamemode gamemode, Island island, TileStack volcanoTileStack) {
         this(System.nanoTime(), gamemode, island, volcanoTileStack);
@@ -115,6 +109,16 @@ class EngineImpl implements Engine {
         nextStep();
     }
 
+    @Override
+    public Engine copyWithoutObservers() {
+        return null;
+    }
+
+    @Override
+    public void cancelLastStep() {
+
+    }
+
     private void nextStep() {
         if (placeTile) {
             placeTile = false;
@@ -138,24 +142,36 @@ class EngineImpl implements Engine {
     }
 
     private void updateSeaPlacements() {
-        HexMap<SeaPlacement> tmpSeaPlacements = HexMap.create();
+        HexMap<List<SeaPlacement>> tmpSeaPlacements = HexMap.create();
 
         for (Hex hex : island.getCoast()) {
             for (Orientation orientation : Orientation.values()) {
-                tmpSeaPlacements.put(hex, new SeaPlacement(hex, orientation));
+                List<SeaPlacement> list = tmpSeaPlacements.get(hex);
+                if (list == null) {
+                    list = new ArrayList<>();
+                    tmpSeaPlacements.put(hex, list);
+                }
+
+                list.add(new SeaPlacement(hex, orientation));
             }
         }
         this.seaPlacements = tmpSeaPlacements;
     }
 
     private void updateVolcanoPlacements() {
-        HexMap<VolcanoPlacement> tmpVolcanosPlacements = HexMap.create();
+        HexMap<List<VolcanoPlacement>> tmpVolcanosPlacements = HexMap.create();
 
         for (Hex hex : island.getVolcanos()) {
             Orientation volcanoOrientation = island.getField(hex).getOrientation();
             for (Orientation orientation : Orientation.values()) {
                 if (orientation != volcanoOrientation) {
-                    volcanosPlacements.put(hex, new VolcanoPlacement(hex, orientation));
+                    List<VolcanoPlacement> list = tmpVolcanosPlacements.get(hex);
+                    if (list == null) {
+                        list = new ArrayList<>();
+                        tmpVolcanosPlacements.put(hex, list);
+                    }
+
+                    list.add(new VolcanoPlacement(hex, orientation));
                 }
             }
         }
@@ -164,18 +180,32 @@ class EngineImpl implements Engine {
     }
 
     private void updateBuildActions() {
-        HexMap<BuildAction> tmpBuildActions = HexMap.create();
+        HexMap<List<BuildAction>> tmpBuildActions = HexMap.create();
         for (Hex hex : island.getFields()) {
             Field field = island.getField(hex);
             if (field.getBuilding().getType() == BuildingType.NONE) {
-                if (BuildRules.validate(this, BuildingType.HUT, hex)) {
-                    tmpBuildActions.put(hex, new BuildAction(BuildingType.HUT, hex));
+                boolean hutValid = BuildRules.validate(this, BuildingType.HUT, hex);
+                boolean templeValid = BuildRules.validate(this, BuildingType.TEMPLE, hex);
+                boolean towerValid = BuildRules.validate(this, BuildingType.TOWER, hex);
+
+                if (!hutValid && !templeValid && !towerValid) {
+                    break;
                 }
-                if (BuildRules.validate(this, BuildingType.TEMPLE, hex)) {
-                    tmpBuildActions.put(hex, new BuildAction(BuildingType.TEMPLE, hex));
+
+                List<BuildAction> list = tmpBuildActions.get(hex);
+                if (list == null) {
+                    list = new ArrayList<>();
+                    tmpBuildActions.put(hex, list);
                 }
-                if (BuildRules.validate(this, BuildingType.TOWER, hex)) {
-                    tmpBuildActions.put(hex, new BuildAction(BuildingType.TOWER, hex));
+
+                if (hutValid) {
+                    list.add(new BuildAction(BuildingType.HUT, hex));
+                }
+                if (templeValid) {
+                    list.add(new BuildAction(BuildingType.TEMPLE, hex));
+                }
+                if (towerValid) {
+                    list.add(new BuildAction(BuildingType.TOWER, hex));
                 }
             }
         }
@@ -183,7 +213,7 @@ class EngineImpl implements Engine {
     }
 
     private void updateExpandActions() {
-        HexMap<ExpandAction> tmpExpandActions = HexMap.create();
+        HexMap<List<ExpandAction>> tmpExpandActions = HexMap.create();
         Iterable<Village> villages = island.getVillages(getCurrentPlayer().getColor());
         for (Village village : villages) {
             boolean[] types = new boolean[FieldType.values().length];
@@ -199,12 +229,14 @@ class EngineImpl implements Engine {
                 }
             }
 
+            List<ExpandAction> actions = new ArrayList<>(FieldType.values().length);
             for (FieldType fieldType : FieldType.values()) {
                 if (types[fieldType.ordinal()]) {
-                    for (Hex hex : village.getHexes()) {
-                        expandActions.put(hex, new ExpandAction(village, fieldType));
-                    }
+                    actions.add(new ExpandAction(village, fieldType));
                 }
+            }
+            for (Hex hex : village.getHexes()) {
+                expandActions.put(hex, actions);
             }
         }
 
@@ -217,22 +249,22 @@ class EngineImpl implements Engine {
     }
 
     @Override
-    public HexMap<SeaPlacement> getSeaPlacements() {
+    public HexMap<? extends Iterable<SeaPlacement>> getSeaPlacements() {
         return seaPlacements;
     }
 
     @Override
-    public HexMap<VolcanoPlacement> getVolcanoPlacements() {
+    public HexMap<? extends Iterable<VolcanoPlacement>> getVolcanoPlacements() {
         return volcanosPlacements;
     }
 
     @Override
-    public HexMap<BuildAction> getBuildActions() {
+    public HexMap<? extends Iterable<BuildAction>> getBuildActions() {
         return buildActions;
     }
 
     @Override
-    public HexMap<ExpandAction> getExpandActions() {
+    public HexMap<? extends Iterable<ExpandAction>> getExpandActions() {
         return expandActions;
     }
 

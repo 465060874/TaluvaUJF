@@ -6,7 +6,7 @@ import map.Village;
 
 import java.util.List;
 
-public class ExpandAction {
+public class ExpandAction implements Action {
 
     private final Village village;
     private final FieldType fieldType;
