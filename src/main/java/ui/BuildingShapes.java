@@ -8,6 +8,8 @@ import static ui.IslandCanvas.BORDER_COLOR;
 
 class BuildingShapes {
 
+    private static final float STROKE_WIDTH = 1.2f;
+
     private static Color buildingTypeFaceColor(FieldBuilding building) {
         switch (building.getColor()) {
             case RED:    return Color.web("BB3F20");
@@ -102,6 +104,7 @@ class BuildingShapes {
         gc.setFill(faceColor);
         gc.fillPolygon(xpoints, ypoints, 3);
         gc.setStroke(BORDER_COLOR);
+        gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 3);
 
         xpoints[0] = x1;
@@ -115,6 +118,7 @@ class BuildingShapes {
         gc.setFill(topColor);
         gc.fillPolygon(xpoints, ypoints, 4);
         gc.setStroke(BORDER_COLOR);
+        gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 4);
 
         xpoints[0] = x3;
@@ -128,6 +132,7 @@ class BuildingShapes {
         gc.setFill(topColor);
         gc.fillPolygon(xpoints, ypoints, 4);
         gc.setStroke(BORDER_COLOR);
+        gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 4);
     }
 
@@ -148,17 +153,20 @@ class BuildingShapes {
         gc.setFill(faceColor);
         gc.fillOval(xstart, ybottom, width, height);
         gc.setStroke(BORDER_COLOR);
+        gc.setLineWidth(STROKE_WIDTH);
         gc.strokeOval(xstart, ybottom, width, height);
 
         gc.setFill(faceColor);
         gc.fillRect(xstart, ytop + height/2, width, ybottom - ytop);
         gc.setStroke(BORDER_COLOR);
+        gc.setLineWidth(STROKE_WIDTH);
         gc.strokeLine(xstart, ytop + height/2, xstart, ybottom + height/2);
         gc.strokeLine(xstart + width, ytop + height/2, xstart + width, ybottom + height/2);
 
         gc.setFill(topColor);
         gc.fillOval(xstart, ytop, width, height);
         gc.setStroke(BORDER_COLOR);
+        gc.setLineWidth(STROKE_WIDTH);
         gc.strokeOval(xstart, ytop, width, height);
     }
 }

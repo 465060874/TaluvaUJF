@@ -5,9 +5,17 @@ import map.Neighbor;
 import map.Orientation;
 
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.List;
 
+/*
+   _______
+  /\11| 0/\
+ /10\ | / 1\
+/_9__\|/__2_\
+\ 8  /|\  3 /
+ \7 / | \ 4/
+  \/_6|5_\/
+
+ */
 enum HexZone {
     HOUR_0(0),
     HOUR_1(1),
@@ -51,21 +59,7 @@ enum HexZone {
     }
 
     public static HexZone at(int zone) {
-        switch (zone) {
-            case 0: return HOUR_0;
-            case 1: return HOUR_1;
-            case 2: return HOUR_2;
-            case 3: return HOUR_3;
-            case 4: return HOUR_4;
-            case 5: return HOUR_5;
-            case 6: return HOUR_6;
-            case 7: return HOUR_7;
-            case 8: return HOUR_8;
-            case 9: return HOUR_9;
-            case 10: return HOUR_10;
-            case 11: return HOUR_11;
-        }
-        throw new InvalidParameterException("Invalide zone :" + zone);
+        return values()[zone];
     }
 
     public Orientation getBackOrientation() {

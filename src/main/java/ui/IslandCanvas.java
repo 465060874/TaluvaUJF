@@ -1,8 +1,9 @@
 package ui;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import data.BuildingType;
 import data.FieldType;
-import data.VolcanoTile;
 import javafx.beans.Observable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -32,13 +33,12 @@ class IslandCanvas extends Canvas {
     double scale;
 
     private Hex selectedHex;
+    private HexZone selectedHexZone;
 
     // Variable de selection de la tuile
-    private Hex[] temporaryHex;
-    private HexZone selectedHexZone;
+    private List<Hex> temporaryHex;
     private final static int westGap = 3;
     private final static int eastGap = 9;
-    private boolean redrawTempTile;
     private Orientation temporaryOrientation;
 
     IslandCanvas(Island island, boolean debug) {
@@ -54,34 +54,34 @@ class IslandCanvas extends Canvas {
         // Variable de selection de la tuile
         this.selectedHex = null;
         this.selectedHexZone = null;
-        this.redrawTempTile = false;
-        this.temporaryHex = new Hex[3];
+        this.temporaryHex = ImmutableList.of();
         this.temporaryOrientation = Orientation.NORTH;
 
         widthProperty().addListener(this::resize);
         heightProperty().addListener(this::resize);
 
-        setOnMouseClicked(this::mouseClicked);
         setOnMouseMoved(this::mouseMoved);
     }
 
     private void mouseMoved(MouseEvent event) {
         double x = event.getX() - (getWidth() / 2 - ox);
         double y = event.getY() - (getHeight() / 2 - oy);
-        Hex newSelectedHex = pointToHex(x, y);
 
-        if (!newSelectedHex.equals(selectedHex)) {
-            selectedHex = newSelectedHex;
-            //redraw();
-        }
-        HexZone newselectedhexZone = pointToHexZone(x, y);
-        if(newSelectedHex != selectedHex || newselectedhexZone != selectedHexZone) {
-            temporaryHex[0] = newSelectedHex;
-            temporaryHex[1] = temporaryHex[0].getRightNeighbor(temporaryOrientation);
-            temporaryHex[2] = temporaryHex[0].getLeftNeighbor(temporaryOrientation);
-            temporaryOrientation = newselectedhexZone.getBackOrientation();
-            selectedHexZone = newselectedhexZone;
-            redrawTempTile = true;
+        Hex newSelectedHex = pointToHex(x, y);
+        HexZone newSelectedHexZone = pointToHexZone(newSelectedHex, x, y);
+
+        boolean redraw = !newSelectedHex.equals(selectedHex)
+            || newSelectedHexZone != selectedHexZone;
+
+        selectedHex = newSelectedHex;
+        temporaryHex = ImmutableList.of(
+                newSelectedHex,
+                newSelectedHex.getRightNeighbor(temporaryOrientation),
+                newSelectedHex.getLeftNeighbor(temporaryOrientation));
+        temporaryOrientation = newSelectedHexZone.getBackOrientation();
+        selectedHexZone = newSelectedHexZone;
+
+        if (redraw) {
             redraw();
         }
     }
@@ -99,17 +99,9 @@ class IslandCanvas extends Canvas {
         return Hex.at((int) line, (int) diag);
     }
 
-    private void mouseClicked(MouseEvent event) {
-        double x = event.getX() - (getWidth() / 2 - ox);
-        double y = event.getY() - (getHeight() / 2 - oy);
-        pointToHexZone(x, y);
-    }
-
-    public HexZone pointToHexZone (double x, double y) {
+    private HexZone pointToHexZone(Hex hex, double x, double y) {
         double hexSizeX = HexShape.HEX_SIZE_X * scale;
         double hexSizeY = HexShape.HEX_SIZE_Y * scale;
-
-        Hex hex = pointToHex(x, y);
 
         // Calcul du centre de la tuile
         double hexCenterX = hex.getDiag() * 2 * WEIRD_RATIO * hexSizeX + hex.getLine() * WEIRD_RATIO * hexSizeX;
@@ -118,18 +110,7 @@ class IslandCanvas extends Canvas {
         double degree = Math.toDegrees(Math.atan((y - hexCenterY) / (x - hexCenterX)));
 
         // Calcul de la zone correspondante
-        /*
-          _______
-         /\11| 0/\
-        /10\ | / 1\
-       /_9__\|/__2_\
-       \ 8  /|\  3 /
-        \7 / | \ 4/
-         \/_6|5_\/
-
-         */
         // TODO Remove dirty %12
-        System.out.println((int) Math.floor(x > hexCenterX ? (degree/30) + westGap : (degree/30) + eastGap));
         return HexZone.at((int) Math.floor(x > hexCenterX ? (degree/30) + westGap : (degree/30) + eastGap) % 12);
     }
 
@@ -146,28 +127,31 @@ class IslandCanvas extends Canvas {
         double hexSizeX = HexShape.HEX_SIZE_X * scale;
         double hexSizeY = HexShape.HEX_SIZE_Y * scale;
 
-        // Affichage des tuiles temporaires
-        if (redrawTempTile && island.getField(temporaryHex[0]).isSeaLevel()
-                && !island.getField(temporaryHex[0].getNeighbor(selectedHexZone.getFrontNeighbour())).isSeaLevel()) {
-
-            for (Hex hex : temporaryHex) {
-                int line = hex.getLine();
-                int diag = hex.getDiag();
-                double x = centerX + diag * 2 * WEIRD_RATIO * hexSizeX + line * WEIRD_RATIO * hexSizeX;
-                double y = centerY + line * hexSizeY + line * hexSizeY / 2;
-                hexShape.draw(gc, Field.create(island.getField(hex).getLevel() + 1, FieldType.VOLCANO, Orientation.NORTH), false, x, y, hexSizeX, hexSizeY, scale);
-            }
-            redrawTempTile = false;
+        ImmutableList<Field> selectedFields = ImmutableList.of();
+        Iterable<Hex> allHexes = island.getFields();
+        if (!temporaryHex.isEmpty()
+                && island.getField(temporaryHex.get(0)).isSeaLevel()
+                && !island.getField(temporaryHex.get(0).getNeighbor(selectedHexZone.getFrontNeighbour())).isSeaLevel()) {
+            allHexes = Iterables.concat(temporaryHex, allHexes);
+            int selectedLevel = island.getField(temporaryHex.get(0)).getLevel() + 1;
+            selectedFields = ImmutableList.of(
+                    Field.create(selectedLevel, FieldType.VOLCANO, Orientation.NORTH),
+                    Field.create(selectedLevel, FieldType.CLEARING, Orientation.NORTH),
+                    Field.create(selectedLevel, FieldType.SAND, Orientation.NORTH));
         }
 
         // Affichage de la map
-        for (Hex hex : Hex.lineThenDiagOrdering().sortedCopy(island.getFields())) {
+        for (Hex hex : Hex.lineThenDiagOrdering().sortedCopy(allHexes)) {
             int line = hex.getLine();
             int diag = hex.getDiag();
             double x = centerX + diag * 2 * WEIRD_RATIO * hexSizeX + line * WEIRD_RATIO * hexSizeX;
             double y = centerY + line * hexSizeY + line * hexSizeY / 2;
-            Field field = island.getField(hex);
-            boolean selected = selectedHex != null && hex.equals(selectedHex);
+            int temporaryHexIndex = temporaryHex.indexOf(hex);
+            boolean isTemporary = !selectedFields.isEmpty() && temporaryHexIndex >= 0;
+            Field field = isTemporary
+                    ? selectedFields.get(temporaryHexIndex)
+                    : island.getField(hex);
+            boolean selected = !isTemporary && selectedHex != null && hex.equals(selectedHex);
 
             hexShape.draw(gc, field, selected, x, y, hexSizeX, hexSizeY, scale);
 
@@ -178,7 +162,7 @@ class IslandCanvas extends Canvas {
             }
         }
 
-            if (debug) {
+        if (debug) {
             int minLine = Integer.MAX_VALUE;
             int minDiag = Integer.MAX_VALUE;
             int maxLine = Integer.MIN_VALUE;

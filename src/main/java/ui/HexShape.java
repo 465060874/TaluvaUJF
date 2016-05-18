@@ -15,6 +15,7 @@ class HexShape {
     private static final int HEXAGON_BORDER_POINTS = 5;
     private static final int BOTTOM_POINTS = 6;
     private static final int BOTTOM_BORDER_POINTS = 5;
+    public static final float STROKE_WIDTH = 1.4f;
 
     private final double[] hexagonX;
     private final double[] hexagonY;
@@ -169,9 +170,11 @@ class HexShape {
                 HEXAGON_POINTS);
 
         gc.setStroke(IslandCanvas.BORDER_COLOR);
+        gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolyline(hexagonBorderX, hexagonBorderY, HEXAGON_BORDER_POINTS);
 
         gc.setStroke(IslandCanvas.BORDER_COLOR);
+        gc.setLineWidth(STROKE_WIDTH);
         for (int i = 1; i <= field.getLevel(); i++) {
             bottomBorderLevel(scale, i, field.getLevel());
             gc.strokePolyline(bottomBorderX, bottomBorderY, BOTTOM_BORDER_POINTS);
