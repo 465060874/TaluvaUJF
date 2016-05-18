@@ -89,4 +89,15 @@ public class VolcanoPlacementRulesTest {
         assertValidateFalse(island, hex, Orientation.SOUTH_EAST);
         assertValidateTrue_(island, hex, Orientation.NORTH_EAST);
     }
+
+    @Test
+    public void testVillages() {
+        URL rsc = VolcanoPlacementRulesTest.class.getResource("VolcanoPlacementRulesTest2.island");
+        Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
+
+        Hex hex;
+
+        hex = Hex.at(1, 0);
+        assertValidateFalse(island, hex, Orientation.SOUTH_WEST);
+    }
 }

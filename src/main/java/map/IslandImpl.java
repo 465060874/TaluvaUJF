@@ -55,7 +55,7 @@ class  IslandImpl implements Island {
     @Override
     public Village getVillage(Hex from) {
         Field fromField = map.getOrDefault(from, SEA);
-        checkArgument(fromField.getBuilding().getType() == BuildingType.NONE, "Village without a building");
+        checkArgument(fromField.getBuilding().getType() != BuildingType.NONE, "Village without a building");
         PlayerColor fromColor = fromField.getBuilding().getColor();
 
         HexMap<Boolean> queued = HexMap.create();

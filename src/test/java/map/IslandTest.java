@@ -1,127 +1,89 @@
 package map;
 
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.io.Resources;
 import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 import org.junit.Test;
 
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
+import static map.Hex.at;
 import static org.junit.Assert.*;
 
 public class IslandTest {
-    private static int ORIGIN = 100;
 
     @Test
     public void testGetField() {
-        Island island = new IslandImpl();
-        /*
-         *   L
-         * V     S/J
-         *    J/L(Red Hutx2)<- origin   V/V
-         *       R(White Hut)
-         *
-         */
+        URL rsc = IslandTest.class.getResource("IslandTest1.island");
+        Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
+        Field field;
 
-        /*
-        Testing the tile (0,0)
-        Orientation: South-East
-        Buildings: 2 Red Huts
-         */
+        field = island.getField(at(0, 0));
+        assertEquals(2, field.getLevel());
+        assertEquals(FieldType.LAKE, field.getType());
+        assertEquals(PlayerColor.RED, field.getBuilding().getColor());
+        assertEquals(BuildingType.HUT, field.getBuilding().getType());
 
-        Field field1 = island.getField(Hex.at(0, 0));
+        field = island.getField(at(-1, 0));
+        assertEquals(1, field.getLevel());
+        assertEquals(FieldType.VOLCANO, field.getType());
+        assertEquals(Orientation.SOUTH_WEST, field.getOrientation());
+        assertEquals(BuildingType.NONE, field.getBuilding().getType());
 
-        assertEquals(2, field1.getLevel());
-        assertEquals(FieldType.LAKE, field1.getType());
-        assertEquals(BuildingType.NONE, field1.getBuilding().getType());
-        assertEquals(PlayerColor.RED, field1.getBuilding().getColor());
-        assertEquals(BuildingType.HUT, field1.getBuilding().getType());
+        field = island.getField(at(0, 1));
+        assertEquals(2, field.getLevel());
+        assertEquals(FieldType.VOLCANO, field.getType());
+        assertEquals(Orientation.SOUTH_EAST, field.getOrientation());
+        assertEquals(BuildingType.NONE, field.getBuilding().getType());
 
-        /*
-        Testing the tile (0,-1)
-        Orientation: South-West
-        Buildings: None
-         */
-
-        Field field2 = island.getField(Hex.at(0, -1));
-        assertEquals(1, field2.getLevel());
-        assertEquals(FieldType.VOLCANO, field2.getType());
-        assertEquals(Orientation.SOUTH_WEST, field2.getOrientation());
-        assertEquals(BuildingType.NONE, field1.getBuilding().getType());
-
-        /*
-        Testing the tile (1,0)
-        Orientation: South-East
-        Buildings: None
-         */
-
-        Field field3 = island.getField(Hex.at(1, 0));
-        assertEquals(2, field3.getLevel());
-        assertEquals(FieldType.VOLCANO, field3.getType());
-        assertEquals(Orientation.NORTH_EAST, field3.getOrientation());
-        assertEquals(BuildingType.NONE, field3.getBuilding().getType());
-
-        /*
-        Testing the tile (0,1)
-        Orientation: North-East
-        Buildings: 1 White Hut
-         */
-
-        Field field4 = island.getField(Hex.at(0, 1));
-        assertEquals(1, field4.getLevel());
-        assertEquals(FieldType.ROCK, field4.getType());
-        assertEquals(Orientation.NORTH_EAST, field4.getOrientation());
-        assertEquals(PlayerColor.WHITE, field4.getBuilding().getColor());
-        assertEquals(BuildingType.HUT, field4.getBuilding().getType());
+        field = island.getField(at(1, 0));
+        assertEquals(1, field.getLevel());
+        assertEquals(FieldType.ROCK, field.getType());
+        assertEquals(Orientation.SOUTH, field.getOrientation());
+        assertEquals(PlayerColor.WHITE, field.getBuilding().getColor());
+        assertEquals(BuildingType.HUT, field.getBuilding().getType());
 
     }
 
     @Test
     public void testGetCoast() {
-        /*
-         * Spaces:
-         * (0,-2)
-         * (0,-3)
-         * (-1,-2)
-         * (-1,-3)
-         * (-2,-2)
-         *
-         * Coast:
-         *
-         * (0,3)
-         * (0,-8)
-         * (1,-8)
-         * (1,-7)
-         * (1,-6)
-         * (1,-5)
-         * (2,-5)
-         * (3,-5)
-         * (3,-4)
-         * (3,-3)
-         * (3,-2)
-         * (4,-2)
-         * (4,-1)
-         * (3, 0)
-         * (2, 1)
-         * (1, 2)
-         * (0,3)
-         * (-1,4)
-         * (-2,5)
-         * (-3,5)
-         * (-3,4)
-         * (-3,3)
-         * (-3,2)
-         * (-2, 1)
-         *
-         */
-
-        Island island = new IslandImpl();
+        URL rsc = IslandTest.class.getResource("IslandTest2.island");
+        Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
+        Iterable<Hex> coast = island.getCoast();
         Set<Hex> actual = new HashSet<>();
-        for (Hex hex : island.getCoast()) {
-            if (!actual.add(hex))
+
+        // On vérifie l'unicité, on ne souhaite pas que l'iterable renvoyé par
+        // getCoast contienne plusieurs fois le même élément
+        for (Hex hex : coast) {
+            if (!actual.add(hex)) {
                 fail("Duplicated elements in getCoast(): " + hex);
+            }
+        }
+
+        ImmutableSet<Hex> expected = ImmutableSet.of(
+                Hex.at(-3, -2),
+                Hex.at(-3, -1),
+                Hex.at(-2, -1),
+                Hex.at(-1, -1),
+                Hex.at(0, -1),
+                Hex.at(1, -2),
+                Hex.at(1, -3),
+                Hex.at(1, -4),
+                Hex.at(0, -4),
+                Hex.at(-1, -4),
+                Hex.at(-2, -3)
+        );
+
+        assertEquals(expected.size(), actual.size());
+        for (Hex hex : expected) {
+            assertTrue("Hex " + hex + " is part of the coast",
+                    actual.contains(hex));
         }
     }
 
