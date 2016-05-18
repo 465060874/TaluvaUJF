@@ -62,25 +62,24 @@ enum HexZone {
         return values()[zone];
     }
 
-    public Orientation getBackOrientation() {
+    public Orientation getOrientation() {
         switch (this.ordinal()) {
-            case 0: return Orientation.NORTH_EAST;
-            case 3: return Orientation.NORTH_EAST;
-            case 4: return Orientation.SOUTH;
-            case 7: return Orientation.SOUTH;
-            case 2: return Orientation.SOUTH_EAST;
-            case 5: return Orientation.SOUTH_EAST;
-            case 6: return Orientation.SOUTH_WEST;
-            case 9: return Orientation.SOUTH_WEST;
-            case 1: return Orientation.NORTH;
-            case 10: return Orientation.NORTH;
-            case 8: return Orientation.NORTH_WEST;
-            case 11: return Orientation.NORTH_WEST;
+            case 1: return Orientation.SOUTH_WEST;
+            case 2: return Orientation.SOUTH_WEST;
+            case 3: return Orientation.NORTH_WEST;
+            case 4: return Orientation.NORTH_WEST;
+            case 5: return Orientation.NORTH;
+            case 6: return Orientation.NORTH;
+            case 7: return Orientation.NORTH_EAST;
+            case 8: return Orientation.NORTH_EAST;
+            case 9: return Orientation.SOUTH_EAST;
+            case 10: return Orientation.SOUTH_EAST;
+            case 11: return Orientation.SOUTH;
+            case 0: return Orientation.SOUTH;
             default:
                 break;
         }
 
         throw new InvalidParameterException();
     }
-
 }

@@ -22,13 +22,14 @@ public enum Orientation {
 
     NORTH_WEST,
 
-    NORTH_EAST,
+    SOUTH_WEST,
 
     SOUTH,
 
-    SOUTH_WEST,
+    SOUTH_EAST,
 
-    SOUTH_EAST;
+    NORTH_EAST,
+    ;
 
     public Orientation leftRotation() {
          switch (this) {
@@ -56,5 +57,13 @@ public enum Orientation {
         }
 
         throw new IllegalArgumentException();
+    }
+
+    public Orientation clockWise() {
+        return values()[(ordinal() + values().length - 1) % values().length];
+    }
+
+    public Orientation antiClockWise() {
+        return values()[(ordinal() + 1) % values().length];
     }
 }

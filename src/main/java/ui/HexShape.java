@@ -39,12 +39,12 @@ class HexShape {
 
     private static Color fieldTypeColor(Field field) {
         switch (field.getType()) {
-            case VOLCANO:  return Color.web("D52001");
-            case JUNGLE:   return Color.web("3D9970");
-            case CLEARING: return Color.web("01FF70");
-            case SAND:     return Color.web("F7CA88");
-            case ROCK:     return Color.web("999999");
-            case LAKE:     return Color.web("0074D9");
+            case VOLCANO:  return Color.web("E97B33");
+            case JUNGLE:   return Color.web("A681B6");
+            case CLEARING: return Color.web("8DC435");
+            case SAND:     return Color.web("EEE7CD");
+            case ROCK:     return Color.web("C2D0D1");
+            case LAKE:     return Color.web("8BE1EB");
         }
 
         throw new IllegalStateException();

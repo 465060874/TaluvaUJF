@@ -4,9 +4,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import data.BuildingType;
 import data.FieldType;
+import data.VolcanoTile;
 import javafx.beans.Observable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
@@ -19,7 +21,7 @@ import static ui.HexShape.WEIRD_RATIO;
 
 class IslandCanvas extends Canvas {
 
-    static final Color BG_COLOR = Color.web("365373");
+    static final Color BG_COLOR = Color.web("5E81A2");
 
     static final Color BORDER_COLOR = Color.web("303030");
     static final Color BOTTOM_COLOR = Color.web("505050");
@@ -36,10 +38,11 @@ class IslandCanvas extends Canvas {
     private HexZone selectedHexZone;
 
     // Variable de selection de la tuile
-    private List<Hex> temporaryHex;
+    private List<Hex> stackHexes;
     private final static int westGap = 3;
     private final static int eastGap = 9;
-    private Orientation temporaryOrientation;
+    private VolcanoTile tileStack;
+    private Orientation tileStackRotation;
 
     IslandCanvas(Island island, boolean debug) {
         super(0, 0);
@@ -54,13 +57,22 @@ class IslandCanvas extends Canvas {
         // Variable de selection de la tuile
         this.selectedHex = null;
         this.selectedHexZone = null;
-        this.temporaryHex = ImmutableList.of();
-        this.temporaryOrientation = Orientation.NORTH;
+        this.stackHexes = ImmutableList.of();
+        this.tileStackRotation = Orientation.NORTH;
+        this.tileStack = new VolcanoTile(FieldType.CLEARING, FieldType.SAND);
 
         widthProperty().addListener(this::resize);
         heightProperty().addListener(this::resize);
 
         setOnMouseMoved(this::mouseMoved);
+        setOnMouseClicked(this::mouseLeftClicked);
+    }
+
+    private void mouseLeftClicked (MouseEvent event) {
+        if (MouseButton.SECONDARY.equals(event.getButton())) {
+            tileStackRotation = tileStackRotation.clockWise().clockWise();
+            redraw();
+        }
     }
 
     private void mouseMoved(MouseEvent event) {
@@ -74,12 +86,44 @@ class IslandCanvas extends Canvas {
             || newSelectedHexZone != selectedHexZone;
 
         selectedHex = newSelectedHex;
-        temporaryHex = ImmutableList.of(
-                newSelectedHex,
-                newSelectedHex.getRightNeighbor(temporaryOrientation),
-                newSelectedHex.getLeftNeighbor(temporaryOrientation));
-        temporaryOrientation = newSelectedHexZone.getBackOrientation();
         selectedHexZone = newSelectedHexZone;
+        Orientation firstCandidate = newSelectedHexZone.getOrientation();
+        Orientation candidate = firstCandidate;
+        for (int i = 0; i < Orientation.values().length; i++) {
+            ImmutableList<Hex> temporaryHex2 = ImmutableList.of(
+                    newSelectedHex,
+                    newSelectedHex.getLeftNeighbor(candidate),
+                    newSelectedHex.getRightNeighbor(candidate));
+            if (temporaryHex2.stream().allMatch(h -> island.getField(h) == Field.SEA)) {
+                boolean found = false;
+                Hex hex = temporaryHex2.get(0);
+                for (Hex hex1 : hex.getNeighborhood()) {
+                    if (island.getField(hex1) != Field.SEA) {
+                        found = true;
+                    }
+                }
+                if (!found) {
+                    stackHexes = ImmutableList.of();
+                    break;
+                }
+
+                stackHexes = temporaryHex2;
+                break;
+            }
+
+            candidate = firstCandidate;
+            if ((i & 1) == 0) {
+                for (int j = 0; j < i / 2; j++) {
+                    candidate = candidate.clockWise();
+                }
+            }
+            else {
+                for (int j = 0; j < i / 2; j++) {
+                    candidate = candidate.antiClockWise();
+                }
+            }
+        }
+
 
         if (redraw) {
             redraw();
@@ -114,6 +158,23 @@ class IslandCanvas extends Canvas {
         return HexZone.at((int) Math.floor(x > hexCenterX ? (degree/30) + westGap : (degree/30) + eastGap) % 12);
     }
 
+    private ImmutableList<Field> rotate() {
+        int selectedLevel = island.getField(stackHexes.get(0)).getLevel() + 1;
+        if (tileStackRotation == Orientation.NORTH) {
+            return ImmutableList.of(Field.create(selectedLevel, FieldType.VOLCANO, tileStackRotation),
+                    Field.create(selectedLevel, tileStack.getLeft(), tileStackRotation),
+                    Field.create(selectedLevel, tileStack.getRight(), tileStackRotation));
+        } else if (tileStackRotation == Orientation.SOUTH_EAST) {
+            return ImmutableList.of(Field.create(selectedLevel, tileStack.getLeft(), tileStackRotation),
+                    Field.create(selectedLevel, tileStack.getRight(), tileStackRotation),
+                    Field.create(selectedLevel, FieldType.VOLCANO, tileStackRotation));
+        } else {
+            return ImmutableList.of(Field.create(selectedLevel, tileStack.getRight(), tileStackRotation),
+                    Field.create(selectedLevel, FieldType.VOLCANO, tileStackRotation),
+                    Field.create(selectedLevel, tileStack.getLeft(), tileStackRotation));
+        }
+    }
+
     private void resize(Observable event) {
         redraw();
     }
@@ -129,15 +190,9 @@ class IslandCanvas extends Canvas {
 
         ImmutableList<Field> selectedFields = ImmutableList.of();
         Iterable<Hex> allHexes = island.getFields();
-        if (!temporaryHex.isEmpty()
-                && island.getField(temporaryHex.get(0)).isSeaLevel()
-                && !island.getField(temporaryHex.get(0).getNeighbor(selectedHexZone.getFrontNeighbour())).isSeaLevel()) {
-            allHexes = Iterables.concat(temporaryHex, allHexes);
-            int selectedLevel = island.getField(temporaryHex.get(0)).getLevel() + 1;
-            selectedFields = ImmutableList.of(
-                    Field.create(selectedLevel, FieldType.VOLCANO, Orientation.NORTH),
-                    Field.create(selectedLevel, FieldType.CLEARING, Orientation.NORTH),
-                    Field.create(selectedLevel, FieldType.SAND, Orientation.NORTH));
+        if (!stackHexes.isEmpty()) {
+            allHexes = Iterables.concat(stackHexes, allHexes);
+            selectedFields = rotate();
         }
 
         // Affichage de la map
@@ -146,7 +201,7 @@ class IslandCanvas extends Canvas {
             int diag = hex.getDiag();
             double x = centerX + diag * 2 * WEIRD_RATIO * hexSizeX + line * WEIRD_RATIO * hexSizeX;
             double y = centerY + line * hexSizeY + line * hexSizeY / 2;
-            int temporaryHexIndex = temporaryHex.indexOf(hex);
+            int temporaryHexIndex = stackHexes.indexOf(hex);
             boolean isTemporary = !selectedFields.isEmpty() && temporaryHexIndex >= 0;
             Field field = isTemporary
                     ? selectedFields.get(temporaryHexIndex)
@@ -194,4 +249,6 @@ class IslandCanvas extends Canvas {
         setTranslateX(-getWidth() / 3);
         setTranslateY(-getHeight() / 3);
     }
+
+
 }
