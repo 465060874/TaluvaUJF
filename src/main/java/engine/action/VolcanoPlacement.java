@@ -3,7 +3,7 @@ package engine.action;
 import map.Hex;
 import map.Orientation;
 
-public class VolcanoPlacement {
+public class VolcanoPlacement implements Placement {
 
     private final Hex volcanoHex;
     private final Orientation orientation;

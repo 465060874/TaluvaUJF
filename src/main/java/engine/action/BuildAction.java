@@ -3,7 +3,7 @@ package engine.action;
 import data.BuildingType;
 import map.Hex;
 
-public class BuildAction {
+public class BuildAction implements Action {
 
     private final BuildingType type;
     private final Hex hex;
