@@ -62,7 +62,7 @@ class IslandCanvas extends Canvas {
         this.hexShape = new HexShape();
 
         this.ox = 0;
-        this.ox = 0;
+        this.oy = 0;
         this.scale = 1;
 
         // Variable de selection de la tuile
@@ -364,13 +364,6 @@ class IslandCanvas extends Canvas {
                         info.sizeX, info.sizeY);
             }
         }
-        /*
-        if (isBuildingMode && island.getField(placedHex) != Field.SEA) {
-            drawBuilding(gc, selectedBuildingType, island.getField(placedHex).getLevel(),
-                    info.x,
-                    info.y - info.sizeY / 6,
-                    info.sizeX, info.sizeY);
-        }*/
 
         if (!isBuildingMode && placedHex == null) {
             for (HexShapeInfo info : placedFreeInfos()) {

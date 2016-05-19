@@ -1,8 +1,6 @@
 package ui;
 
 import com.google.common.io.Resources;
-import engine.rules.SeaPlacementRules;
-import engine.rules.SeaPlacementRulesTest;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
@@ -22,9 +20,10 @@ public class IslandVisu extends Application {
         URL rsc = IslandTest.class.getResource("IslandTest3.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         IslandCanvas canvas = new IslandCanvas(island, true);
+        FreeTileCanvas freeTileCanvas = new FreeTileCanvas(island, true);
 
         BorderPane mainPane = new BorderPane();
-        mainPane.setCenter(new IslandCanvasPane(canvas));
+        mainPane.setCenter(new IslandCanvasPane(canvas, freeTileCanvas));
 
         Scene scene = new Scene(mainPane, 1000, 800, true, SceneAntialiasing.BALANCED);
         stage.setScene(scene);

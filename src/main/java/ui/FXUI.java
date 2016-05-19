@@ -17,10 +17,14 @@ public class FXUI extends Application {
     public void start(Stage stage) throws Exception {
         URL rsc = FXUI.class.getResource("test.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
-        IslandCanvas canvas = new IslandCanvas(island, false);
+
+        boolean debug = false;
+
+        IslandCanvas canvas = new IslandCanvas(island, debug);
+        FreeTileCanvas freeTileCanvas = new FreeTileCanvas(island, debug);
 
         BorderPane mainPane = new BorderPane();
-        mainPane.setCenter(new IslandCanvasPane(canvas));
+        mainPane.setCenter(new IslandCanvasPane(canvas, freeTileCanvas));
 
         Scene scene = new Scene(mainPane, 1000, 800);
         stage.setScene(scene);

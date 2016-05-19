@@ -12,6 +12,7 @@ import javafx.scene.layout.StackPane;
 class IslandCanvasPane extends StackPane {
 
     private final IslandCanvas canvas;
+    private final FreeTileCanvas freeTileCanvas;
 
     private double mouseXBeforeDrag;
     private double mouseYBeforeDrag;
@@ -19,12 +20,14 @@ class IslandCanvasPane extends StackPane {
     private double mouseY;
     private double scale;
  
-    IslandCanvasPane(IslandCanvas canvas) {
+    IslandCanvasPane(IslandCanvas canvas, FreeTileCanvas freeTileCanvas) {
         this.canvas = canvas;
+        this.freeTileCanvas = freeTileCanvas;
         this.mouseX = 0;
         this.mouseY = 0;
         this.scale = 1;
         getChildren().add(canvas);
+        //getChildren().add(freeTileCanvas);
 
         BackgroundFill backgroundFill = new BackgroundFill(
                 IslandCanvas.BG_COLOR,

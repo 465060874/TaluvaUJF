@@ -3,7 +3,6 @@ package ui;
 import com.google.common.io.Resources;
 import data.BuildingType;
 import data.FieldType;
-import data.VolcanoTile;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
@@ -33,10 +32,12 @@ public class Editor extends Application {
     public void start(Stage stage) throws Exception {
         URL rsc = FXUI.class.getResource("test.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
+
         IslandCanvasEditor canvas = new IslandCanvasEditor(island, true);
+        FreeTileCanvas freeTileCanvas = new FreeTileCanvas(island, true);
 
         BorderPane mainPane = new BorderPane();
-        mainPane.setCenter(new IslandCanvasPane(canvas));
+        mainPane.setCenter(new IslandCanvasPane(canvas, freeTileCanvas));
 
         Scene scene = new Scene(mainPane, 1000, 800, true, SceneAntialiasing.BALANCED);
 
