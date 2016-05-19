@@ -11,13 +11,9 @@ import java.util.PriorityQueue;
 public class BotPlayer {
 
     // Facteur de branchment pour l'arbre MIN-MAX
-    private int branchingFactor = 10;
+    private int branchingFactor = 16;
     // Strategies possibles pour l'IA
     final static int nbStrategies = 4;
-    final static int TEMPLESTRATEGY = 0;
-    final static int TOWERSTRATEGY = 1;
-    final static int HUTSTRATEGY = 2;
-    final static int COUNTERSTRATEGY = 3;
 
     // Donnees
     Engine engine = null;
@@ -25,12 +21,13 @@ public class BotPlayer {
     int[] strategyPoints = new int[nbStrategies];
 
     // Constructeur
-    public BotPlayer(int branchingFactor) {
+    public BotPlayer(int branchingFactor, Heuristics heuristic) {
         this.branchingFactor = branchingFactor;
+        this.heuristic = heuristic;
     }
 
     // Jouer un coup
-    public FullMove play(Engine e) {
+    public FullMove play(Engine e, int depth) {
         // Créé un nouvel Engine modifiable à souhait sans interference avec
         // l'interface graphique par exemple
         engine = e.copyWithoutObservers();
@@ -60,7 +57,7 @@ public class BotPlayer {
                     m = strategiesQueues[i].poll();
                     found = false;
                     for (int k = 0; k < ind; k++) {
-                        if (branchMoves[k] == m) {
+                        if (branchMoves[k].equals(m)) {
                             found = true;
                             break;
                         }
@@ -75,13 +72,22 @@ public class BotPlayer {
         // Et de choisir le meilleur choix
         FullMove bestMove = null;
         int bestPoints = Integer.MAX_VALUE;
+        int bestConfigPoints = Integer.MIN_VALUE;
+        int p;
         for (int i = 0; i < branchingFactor; i++) {
             engine.place( branchMoves[i].placement);
             engine.action( branchMoves[i].action);
-            FullMove m = play(engine);
-            if( m.points < bestPoints ) {
-                bestPoints = m.points;
-                bestMove = m;
+            if( depth > 0 ) {
+                FullMove m = play(engine, depth - 1);
+                if (m.points < bestPoints) {
+                    bestPoints = m.points;
+                    bestMove = m;
+                }
+            }else{
+                if( (p = heuristic.evaluateConfiguration(engine)) > bestConfigPoints ){
+                    bestMove = new FullMove(branchMoves[i].action, branchMoves[i].placement, p);
+                    bestConfigPoints = p;
+                }
             }
             engine.cancelLastStep();
             engine.cancelLastStep();

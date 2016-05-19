@@ -47,7 +47,7 @@ public class BuildRules {
             FieldBuilding neighborBuilding = island.getField(neighbor).getBuilding();
             if (neighborBuilding.getType() != BuildingType.NONE
                     && neighborBuilding.getColor() == color) {
-                final Village village = island.getVillage(hex);
+                final Village village = island.getVillage(neighbor);
                 if (!village.hasTemple() && village.getHexSize() > 2) {
                     return true;
                 }
@@ -62,7 +62,7 @@ public class BuildRules {
             FieldBuilding neighborBuilding = island.getField(neighbor).getBuilding();
             if (neighborBuilding.getType() != BuildingType.NONE
                     && neighborBuilding.getColor() == color) {
-                final Village village = island.getVillage(hex);
+                final Village village = island.getVillage(neighbor);
                 if (!village.hasTower()) {
                     return true;
                 }

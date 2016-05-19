@@ -19,6 +19,26 @@ class IslandCanvasPane extends StackPane {
     private double mouseX;
     private double mouseY;
     private double scale;
+
+    IslandCanvasPane(IslandCanvas canvas) {
+        this.canvas = canvas;
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.scale = 1;
+        getChildren().add(canvas);
+        freeTileCanvas = null;
+
+        BackgroundFill backgroundFill = new BackgroundFill(
+                IslandCanvas.BG_COLOR,
+                CornerRadii.EMPTY,
+                Insets.EMPTY);
+        setBackground(new Background(backgroundFill));
+
+        setOnMousePressed(this::mousePressed);
+        setOnMouseDragged(this::mouseDragged);
+        setOnMouseReleased(this::mouseReleased);
+        setOnScroll(this::scroll);
+    }
  
     IslandCanvasPane(IslandCanvas canvas, FreeTileCanvas freeTileCanvas) {
         this.canvas = canvas;
