@@ -2,6 +2,7 @@ package map;
 
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.io.Resources;
 import data.BuildingType;
 import data.FieldType;
@@ -55,14 +56,13 @@ public class IslandTest {
     public void testGetCoast() {
         URL rsc = IslandTest.class.getResource("IslandTest2.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
-        Iterable<Hex> coast = island.getCoast();
-        Set<Hex> actual = new HashSet<>();
 
-        // On vérifie l'unicité, on ne souhaite pas que l'iterable renvoyé par
-        // getCoast contienne plusieurs fois le même élément
-        for (Hex hex : coast) {
+        Set<Hex> actual = new HashSet<>();
+        for (Hex hex : island.getCoast()) {
+            // On vérifie l'unicité, on ne souhaite pas que l'iterable renvoyé par
+            // getCoast contienne plusieurs fois le même élément
             if (!actual.add(hex)) {
-                fail("Duplicated elements in getCoast(): " + hex);
+                fail("Duplicated elements" + hex);
             }
         }
 
@@ -80,26 +80,104 @@ public class IslandTest {
                 Hex.at(-2, -3)
         );
 
-        assertEquals(expected.size(), actual.size());
-        for (Hex hex : expected) {
-            assertTrue("Hex " + hex + " is part of the coast",
-                    actual.contains(hex));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetVolcanos() {
+        URL rsc = IslandTest.class.getResource("IslandTest3.island");
+        Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
+
+        Set<Hex> actual = new HashSet<>();
+        for (Hex hex : island.getVolcanos()) {
+            // On vérifie l'unicité, on ne souhaite pas que l'iterable renvoyé par
+            // getCoast contienne plusieurs fois le même élément
+            if (!actual.add(hex)) {
+                fail("Duplicated elements " + hex);
+            }
         }
+
+        ImmutableSet<Hex> expected = ImmutableSet.of(
+                Hex.at(-1, -1),
+                Hex.at(-1, 0),
+                Hex.at(-2, 2),
+                Hex.at(0, 2),
+                Hex.at(3, -1),
+                Hex.at(0, -2),
+                Hex.at(2, -2),
+                Hex.at(2, -4),
+                Hex.at(4, -5)
+        );
+
+        assertEquals(expected, actual);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetVillageWithoutBuilding() {
+        URL rsc = IslandTest.class.getResource("IslandTest3.island");
+        Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
+
+        island.getVillage(Hex.at(0, -2));
+    }
+
+    @Test
+    public void testGetVillageWithOneHut() {
+        URL rsc = IslandTest.class.getResource("IslandTest3.island");
+        Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
+
+        Village oneHutVillage = island.getVillage(Hex.at(3, -2));
+        Set<Hex> actual = new HashSet<>();
+
+        // On vérifie l'unicité, on ne souhaite pas que l'iterable renvoyé par
+        // getCoast contienne plusieurs fois le même élément
+        for (Hex hex : oneHutVillage.getHexes()) {
+            if (!actual.add(hex)) {
+                fail("Duplicated elements in getVillages(): " + hex);
+            }
+        }
+
+        ImmutableSet<Hex> expected = ImmutableSet.of(Hex.at(3, -2));
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetVillageWithMultipleBuildings() {
+        URL rsc = IslandTest.class.getResource("IslandTest3.island");
+        Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
+
+        Village bigVillage = island.getVillage(Hex.at(0, 1));
+        Set<Hex> actual = new HashSet<>();
+
+        // On vérifie l'unicité, on ne souhaite pas que l'iterable renvoyé par
+        // getCoast contienne plusieurs fois le même élément
+        for (Hex hex : bigVillage.getHexes()) {
+            if (!actual.add(hex)) {
+                fail("Duplicated elements in getVillages(): " + hex);
+            }
+        }
+
+        ImmutableSet<Hex> expected = ImmutableSet.of(
+                Hex.at(-2, 0),
+                Hex.at(-2, 1),
+                Hex.at(-1, 1),
+                Hex.at(0, 1),
+                Hex.at(1, 1),
+                Hex.at(2, 0)
+        );
+
+        assertEquals(expected, actual);
     }
 
     @Test
     public void testGetVillages() {
-        /*
-        *
-        * Empty Fields:
-        * (1,-2) -> S
-        * (3,-1) -> S
-        * (2,0)  -> V
-        * (0,2)  -> R
-        * (-2,2) -> V
-        * (-2,3) -> V
-        */
+        URL rsc = IslandTest.class.getResource("IslandTest3.island");
+        Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
+        Iterable<Village> redVillages = island.getVillages(PlayerColor.RED);
+        Iterable<Village> yellowVillages = island.getVillages(PlayerColor.YELLOW);
+
+        assertEquals(2, Iterables.size(redVillages));
+        assertEquals(3, Iterables.size(yellowVillages));
     }
-
 }

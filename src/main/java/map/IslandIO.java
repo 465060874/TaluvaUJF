@@ -69,7 +69,7 @@ public class IslandIO {
         }
 
         Hex hex = Hex.at(line, diag);
-        island.putHex(hex, field);
+        island.putField(hex, field);
     }
 
     public static void write(CharSink sink, Island island) {
