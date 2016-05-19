@@ -21,6 +21,8 @@ public interface Island {
 
     Iterable<Village> getVillages(PlayerColor color);
 
+    void putField(Hex hex, Field field);
+
     void putTile(VolcanoTile tile, Hex hex, Orientation orientation);
 
     void putBuilding(Hex hex, FieldBuilding building);

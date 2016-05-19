@@ -36,6 +36,10 @@ public class Player {
         return buildings[type.ordinal() - 1];
     }
 
+    void updateBuildingCount(BuildingType type, int count) {
+        buildings[type.ordinal() - 1] = count;
+    }
+
     public PlayerHandler getPlayerHandler() {
         return playerHandler;
     }

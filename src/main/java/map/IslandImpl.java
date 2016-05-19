@@ -153,7 +153,7 @@ class  IslandImpl implements Island {
         return builder.build();
     }
 
-    void putHex(Hex hex, Field field) {
+    void putField(Hex hex, Field field) {
         if (field == SEA) {
             return;
         }
@@ -167,9 +167,9 @@ class  IslandImpl implements Island {
 
         int level = getField(hex).getLevel() + 1;
 
-        putHex(hex, Field.create(level, FieldType.VOLCANO, orientation));
-        putHex(rightHex, Field.create(level, tile.getRight(), orientation.rightRotation()));
-        putHex(leftHex, Field.create(level, tile.getLeft(), orientation.leftRotation()));
+        putField(hex, Field.create(level, FieldType.VOLCANO, orientation));
+        putField(rightHex, Field.create(level, tile.getRight(), orientation.rightRotation()));
+        putField(leftHex, Field.create(level, tile.getLeft(), orientation.leftRotation()));
     }
 
     @Override
