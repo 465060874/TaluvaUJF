@@ -143,4 +143,9 @@ public class BasicHeuristics implements Heuristics {
         }
         return 0;
     }
+
+    @Override
+    public int evaluateConfiguration(Engine engine) {
+        return 0;
+    }
 }

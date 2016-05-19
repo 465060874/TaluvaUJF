@@ -11,4 +11,6 @@ public interface Heuristics {
     int evaluateVolcanoPlacement(Engine e, VolcanoPlacement move);
     int evaluateBuildAction(Engine e, Placement placement, BuildAction move, int pointsPlacement, PriorityQueue<FullMove>[] strategiesQueues);
     int evaluateExpandAction(Engine e, Placement placement, ExpandAction move, int pointsPlacement, PriorityQueue<FullMove>[] strategiesQueues);
+
+    int evaluateConfiguration(Engine engine);
 }

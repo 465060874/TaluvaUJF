@@ -1,5 +1,6 @@
 package engine;
 
+import IA.BotPlayerHandler;
 import com.google.common.io.Files;
 import data.PlayerColor;
 import map.IslandIO;
@@ -13,7 +14,7 @@ public class EngineRun {
         Engine engine = new EngineBuilder()
                 .gamemode(Gamemode.TwoPlayer)
                 .player(PlayerColor.RED, PlayerHandler.dumbFactory())
-                .player(PlayerColor.WHITE, PlayerHandler.dumbFactory())
+                .player(PlayerColor.WHITE, BotPlayerHandler::new)
                 .build();
         engine.start();
 

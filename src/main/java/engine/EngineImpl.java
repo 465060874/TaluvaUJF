@@ -84,8 +84,10 @@ class EngineImpl implements Engine {
             players.add(player.copyWithDummyHandler());
         }
         this.players = players.build();
+
         this.turn = engine.turn;
         this.placeTile = engine.placeTile;
+        this.stepSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
 
         this.seaPlacements = engine.seaPlacements;
         this.volcanosPlacements = engine.volcanosPlacements;

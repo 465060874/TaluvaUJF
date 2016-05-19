@@ -24,6 +24,7 @@ public class RandomHeuristics implements Heuristics {
             if( j == nbStrategies )
                 j = 0;
             StrategyValues[j++]++;
+            i++;
         }
     }
 
@@ -53,4 +54,8 @@ public class RandomHeuristics implements Heuristics {
         return 0;
     }
 
+    @Override
+    public int evaluateConfiguration(Engine engine) {
+        return r.nextInt(40) - 20;
+    }
 }

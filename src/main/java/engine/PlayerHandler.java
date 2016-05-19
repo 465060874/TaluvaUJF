@@ -60,15 +60,11 @@ class DumbPlayerHandler implements PlayerHandler {
     @Override
     public void startTileStep() {
         List<Placement> placements = new ArrayList<>();
-        if (engine.getRandom().nextInt(3) < 2) {
             for (Iterable<SeaPlacement> seaPlacements : engine.getSeaPlacements().values()) {
                 Iterables.addAll(placements, seaPlacements);
             }
-        }
-        else {
-            for (Iterable<VolcanoPlacement> volcanoPlacements : engine.getVolcanoPlacements().values()) {
-                Iterables.addAll(placements, volcanoPlacements);
-            }
+        for (Iterable<VolcanoPlacement> volcanoPlacements : engine.getVolcanoPlacements().values()) {
+            Iterables.addAll(placements, volcanoPlacements);
         }
 
         int choice = engine.getRandom().nextInt(placements.size());
