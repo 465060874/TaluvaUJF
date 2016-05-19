@@ -1,7 +1,6 @@
 package IA;
 import engine.*;
 import engine.action.*;
-
 import java.util.PriorityQueue;
 
 public interface Heuristics {

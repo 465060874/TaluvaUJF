@@ -11,13 +11,9 @@ import java.util.PriorityQueue;
 public class BotPlayer {
 
     // Facteur de branchment pour l'arbre MIN-MAX
-    private int branchingFactor = 10;
+    private int branchingFactor = 16;
     // Strategies possibles pour l'IA
     final static int nbStrategies = 4;
-    final static int TEMPLESTRATEGY = 0;
-    final static int TOWERSTRATEGY = 1;
-    final static int HUTSTRATEGY = 2;
-    final static int COUNTERSTRATEGY = 3;
 
     // Donnees
     Engine engine = null;
@@ -60,7 +56,7 @@ public class BotPlayer {
                     m = strategiesQueues[i].poll();
                     found = false;
                     for (int k = 0; k < ind; k++) {
-                        if (branchMoves[k] == m) {
+                        if (branchMoves[k].equals(m)) {
                             found = true;
                             break;
                         }
