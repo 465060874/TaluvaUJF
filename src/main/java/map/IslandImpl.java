@@ -31,7 +31,7 @@ class  IslandImpl implements Island {
     public Iterable<Hex> getCoast() {
         ImmutableList.Builder<Hex> builder = ImmutableList.builder();
 
-        for (Hex hex : map) {
+        for (Hex hex : map.hexes()) {
             for (Hex neighbor : hex.getNeighborhood()) {
                 if (!map.contains(neighbor)) {
                     builder.add(hex);
@@ -44,12 +44,12 @@ class  IslandImpl implements Island {
 
     @Override
     public Iterable<Hex> getFields() {
-        return Iterables.unmodifiableIterable(map);
+        return Iterables.unmodifiableIterable(map.hexes());
     }
 
     @Override
     public Iterable<Hex> getVolcanos() {
-        return Iterables.filter(map, (hex) -> map.get(hex).getType() == FieldType.VOLCANO);
+        return Iterables.filter(map.hexes(), hex -> map.get(hex).getType() == FieldType.VOLCANO);
     }
 
     @Override
@@ -94,8 +94,8 @@ class  IslandImpl implements Island {
         // On regroupe les batiments en village avec un union find
         HexUnionFind unionFind = new HexUnionFind();
 
-        for (Hex hex : map) {
-            Field field = map.getOrDefault(hex, SEA);
+        for (Hex hex : map.hexes()) {
+            Field field = map.get(hex);
             if (field.getBuilding().getType() == BuildingType.NONE
                     || field.getBuilding().getColor() != color) {
                 continue;
@@ -117,7 +117,7 @@ class  IslandImpl implements Island {
         HexMap<Boolean> hasTemple = HexMap.create();
         HexMap<Boolean> hasTower = HexMap.create();
 
-        for (Hex hex : map) {
+        for (Hex hex : map.hexes()) {
             Hex parent = unionFind.find(hex);
             villagesHexes.put(parent, hex);
 

@@ -1,6 +1,6 @@
 package map;
 
-public interface HexMap<E> extends Iterable<Hex> {
+public interface HexMap<E> {
 
     static <E> HexMap<E> create() {
         return new HexMapImpl<>();
@@ -15,4 +15,8 @@ public interface HexMap<E> extends Iterable<Hex> {
     void put(Hex hex, E element);
 
     int size();
+
+    Iterable<Hex> hexes();
+
+    Iterable<E> values();
 }

@@ -1,9 +1,8 @@
 package map;
 
-import com.google.common.collect.Iterators;
+import com.google.common.collect.Iterables;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -43,8 +42,13 @@ class HexMapImpl<E> implements HexMap<E> {
     }
 
     @Override
-    public Iterator<Hex> iterator() {
-        return Iterators.unmodifiableIterator(map.keySet().iterator());
+    public Iterable<Hex> hexes() {
+        return Iterables.unmodifiableIterable(map.keySet());
+    }
+
+    @Override
+    public Iterable<E> values() {
+        return Iterables.unmodifiableIterable(map.values());
     }
 
     @Override
