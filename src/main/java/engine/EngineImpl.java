@@ -8,6 +8,7 @@ import data.VolcanoTile;
 import engine.action.*;
 import engine.rules.BuildRules;
 import engine.rules.SeaPlacementRules;
+import engine.rules.VolcanoPlacementRules;
 import map.*;
 
 import java.util.*;
@@ -169,7 +170,7 @@ class EngineImpl implements Engine {
         VolcanoTile tile = volcanoTileStack.current();
         for (Hex hex : island.getVolcanos()) {
             for (Orientation orientation : Orientation.values()) {
-                if (!SeaPlacementRules.validate(island, tile, hex, orientation)) {
+                if (!VolcanoPlacementRules.validate(island, tile, hex, orientation)) {
                     continue;
                 }
 
