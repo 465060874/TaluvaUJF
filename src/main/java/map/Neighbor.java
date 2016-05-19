@@ -40,6 +40,14 @@ public enum Neighbor {
         this.diagOffset = diagOffset;
     }
 
+    public int getDiagOffset() {
+        return diagOffset;
+    }
+
+    public int getLineOffset() {
+        return lineOffset;
+    }
+
     public static Neighbor leftOf(Orientation orientation) {
         switch (orientation) {
             case NORTH:      return Neighbor.SOUTH_WEST;
