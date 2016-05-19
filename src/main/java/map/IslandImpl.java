@@ -153,7 +153,7 @@ class  IslandImpl implements Island {
         return builder.build();
     }
 
-    void putField(Hex hex, Field field) {
+    public void putField(Hex hex, Field field) {
         if (field == SEA) {
             return;
         }
