@@ -1,6 +1,8 @@
 package ui;
 
 import com.google.common.io.Resources;
+import engine.rules.SeaPlacementRules;
+import engine.rules.SeaPlacementRulesTest;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
@@ -17,7 +19,7 @@ public class IslandVisu extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        URL rsc = IslandTest.class.getResource("IslandTest2.island");
+        URL rsc = IslandTest.class.getResource("IslandTest3.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         IslandCanvas canvas = new IslandCanvas(island, true);
 

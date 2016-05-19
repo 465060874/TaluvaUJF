@@ -7,6 +7,7 @@ import data.FieldType;
 import data.PlayerColor;
 
 import java.util.List;
+import java.util.Set;
 
 class VillageImpl implements Village {
 
@@ -24,7 +25,8 @@ class VillageImpl implements Village {
 
     @Override
     public PlayerColor getColor() {
-        return island.getField(hexes.get(0)).getBuilding().getColor();
+        Hex firstHex = hexes.iterator().next();
+        return island.getField(firstHex).getBuilding().getColor();
     }
 
     @Override

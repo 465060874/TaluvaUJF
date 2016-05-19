@@ -1,18 +1,17 @@
 package engine;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
 import engine.action.*;
 import engine.rules.BuildRules;
+import engine.rules.SeaPlacementRules;
 import map.*;
 
 import java.util.*;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 class EngineImpl implements Engine {
@@ -145,8 +144,13 @@ class EngineImpl implements Engine {
     private void updateSeaPlacements() {
         HexMap<List<SeaPlacement>> tmpSeaPlacements = HexMap.create();
 
+        VolcanoTile tile = volcanoTileStack.current();
         for (Hex hex : island.getCoast()) {
             for (Orientation orientation : Orientation.values()) {
+                if (!SeaPlacementRules.validate(island, tile, hex, orientation)) {
+                    continue;
+                }
+
                 List<SeaPlacement> list = tmpSeaPlacements.get(hex);
                 if (list == null) {
                     list = new ArrayList<>();
@@ -162,18 +166,20 @@ class EngineImpl implements Engine {
     private void updateVolcanoPlacements() {
         HexMap<List<VolcanoPlacement>> tmpVolcanosPlacements = HexMap.create();
 
+        VolcanoTile tile = volcanoTileStack.current();
         for (Hex hex : island.getVolcanos()) {
-            Orientation volcanoOrientation = island.getField(hex).getOrientation();
             for (Orientation orientation : Orientation.values()) {
-                if (orientation != volcanoOrientation) {
-                    List<VolcanoPlacement> list = tmpVolcanosPlacements.get(hex);
-                    if (list == null) {
-                        list = new ArrayList<>();
-                        tmpVolcanosPlacements.put(hex, list);
-                    }
-
-                    list.add(new VolcanoPlacement(hex, orientation));
+                if (!SeaPlacementRules.validate(island, tile, hex, orientation)) {
+                    continue;
                 }
+
+                List<VolcanoPlacement> list = tmpVolcanosPlacements.get(hex);
+                if (list == null) {
+                    list = new ArrayList<>();
+                    tmpVolcanosPlacements.put(hex, list);
+                }
+
+                list.add(new VolcanoPlacement(hex, orientation));
             }
         }
 

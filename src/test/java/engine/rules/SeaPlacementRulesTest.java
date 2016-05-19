@@ -86,14 +86,14 @@ public class SeaPlacementRulesTest {
     }
 
     private void assertValidateFalse(Island island, Hex hex, Orientation orientation) {
-        assertFalse("Placement on volcano at " + hex
+        assertFalse("Placement on sea at " + hex
                         + " with orientation " + orientation
                         + " expected to not be valid, but was",
                 SeaPlacementRules.validate(island, TILE, hex, orientation));
     }
 
     private void assertValidateTrue_(Island island, Hex hex, Orientation orientation) {
-        assertTrue("Placement on volcano at " + hex
+        assertTrue("Placement on sea at " + hex
                         + " with orientation " + orientation
                         + " expected to be valid, but was not",
                 SeaPlacementRules.validate(island, TILE, hex, orientation));

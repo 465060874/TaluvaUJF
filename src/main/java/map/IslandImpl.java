@@ -29,17 +29,17 @@ class  IslandImpl implements Island {
 
     @Override
     public Iterable<Hex> getCoast() {
-        ImmutableList.Builder<Hex> builder = ImmutableList.builder();
+        HexMap<Boolean> builder = HexMap.create();
 
         for (Hex hex : map.hexes()) {
             for (Hex neighbor : hex.getNeighborhood()) {
                 if (!map.contains(neighbor)) {
-                    builder.add(hex);
+                    builder.put(neighbor, true);
                 }
             }
         }
 
-        return builder.build();
+        return builder.hexes();
     }
 
     @Override
@@ -60,6 +60,7 @@ class  IslandImpl implements Island {
 
         HexMap<Boolean> queued = HexMap.create();
         Queue<Hex> queue = new ArrayDeque<>(map.size());
+        queued.put(from, true);
         queue.add(from);
 
         ImmutableList.Builder<Hex> builder = ImmutableList.builder();
@@ -102,11 +103,11 @@ class  IslandImpl implements Island {
             }
 
             for (Hex neighbor : hex.getNeighborhood()) {
-                Field neighorField = map.getOrDefault(neighbor, SEA);
+                Field neighborField = map.getOrDefault(neighbor, SEA);
 
                 // Exploration des couleurs voisines
-                if (neighorField.getBuilding().getType() != BuildingType.NONE
-                        || neighorField.getBuilding().getColor() == color) {
+                if (neighborField.getBuilding().getType() != BuildingType.NONE
+                        && neighborField.getBuilding().getColor() == color) {
                     unionFind.union(hex, neighbor);
                 }
             }
@@ -118,6 +119,12 @@ class  IslandImpl implements Island {
         HexMap<Boolean> hasTower = HexMap.create();
 
         for (Hex hex : map.hexes()) {
+            Field field = map.get(hex);
+            if (field.getBuilding().getType() == BuildingType.NONE
+                    || field.getBuilding().getColor() != color) {
+                continue;
+            }
+
             Hex parent = unionFind.find(hex);
             villagesHexes.put(parent, hex);
 
