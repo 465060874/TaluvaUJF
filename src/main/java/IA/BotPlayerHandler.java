@@ -1,6 +1,5 @@
 package IA;
 
-import com.sun.org.apache.xpath.internal.SourceTree;
 import engine.Engine;
 import engine.PlayerHandler;
 
@@ -20,7 +19,7 @@ public class BotPlayerHandler implements PlayerHandler {
     @Override
     public void startTileStep() {
         long startTime = System.nanoTime();
-        move = bot.play(engine, 3);
+        move = bot.play(engine.copyWithoutObservers(), 3);
         System.out.println("Fini : " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
         engine.place(move.placement);
     }

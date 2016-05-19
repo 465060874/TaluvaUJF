@@ -1,7 +1,6 @@
 package ui;
 
 import com.google.common.io.Files;
-import com.google.common.io.Resources;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
@@ -17,7 +16,6 @@ public class IslandVisu extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-
         File rsc = new File("16410698810380.island");
         Island island = IslandIO.read(Files.asCharSource(rsc, StandardCharsets.UTF_8));
         IslandCanvas canvas = new IslandCanvas(island, false);

@@ -30,8 +30,7 @@ public class BotPlayer {
     public FullMove play(Engine e, int depth) {
         // Créé un nouvel Engine modifiable à souhait sans interference avec
         // l'interface graphique par exemple
-        engine = e.copyWithoutObservers();
-
+        this.engine = e;
         @SuppressWarnings("unchecked")
         PriorityQueue<FullMove> [] strategiesQueues = new PriorityQueue[nbStrategies];
         for (int i = 0; i < nbStrategies; i++)
@@ -75,15 +74,16 @@ public class BotPlayer {
         int bestConfigPoints = Integer.MIN_VALUE;
         int p;
         for (int i = 0; i < branchingFactor; i++) {
-            engine.place( branchMoves[i].placement);
-            engine.action( branchMoves[i].action);
-            if( depth > 0 ) {
+            engine.place(branchMoves[i].placement);
+            engine.action(branchMoves[i].action);
+            if (depth > 0) {
                 FullMove m = play(engine, depth - 1);
                 if (m.points < bestPoints) {
                     bestPoints = m.points;
                     bestMove = m;
                 }
-            }else{
+            }
+            else {
                 if( (p = heuristic.evaluateConfiguration(engine)) > bestConfigPoints ){
                     bestMove = new FullMove(branchMoves[i].action, branchMoves[i].placement, p);
                     bestConfigPoints = p;
@@ -92,6 +92,7 @@ public class BotPlayer {
             engine.cancelLastStep();
             engine.cancelLastStep();
         }
+
         return bestMove;
     }
 

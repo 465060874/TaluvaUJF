@@ -88,6 +88,7 @@ class EngineImpl implements Engine {
         this.turn = engine.turn;
         this.placeTile = engine.placeTile;
         this.stepSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
+        stepSaves.addAll(engine.stepSaves);
 
         this.seaPlacements = engine.seaPlacements;
         this.volcanosPlacements = engine.volcanosPlacements;
@@ -204,6 +205,7 @@ class EngineImpl implements Engine {
                 list.add(new SeaPlacement(hex, orientation));
             }
         }
+
         this.seaPlacements = tmpSeaPlacements;
     }
 
