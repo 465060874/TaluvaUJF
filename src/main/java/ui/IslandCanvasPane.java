@@ -1,5 +1,7 @@
 package ui;
 
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -20,34 +22,25 @@ class IslandCanvasPane extends StackPane {
     private double mouseY;
     private double scale;
 
-    IslandCanvasPane(IslandCanvas canvas) {
-        this.canvas = canvas;
-        this.mouseX = 0;
-        this.mouseY = 0;
-        this.scale = 1;
-        getChildren().add(canvas);
-        freeTileCanvas = null;
 
-        BackgroundFill backgroundFill = new BackgroundFill(
-                IslandCanvas.BG_COLOR,
-                CornerRadii.EMPTY,
-                Insets.EMPTY);
-        setBackground(new Background(backgroundFill));
-
-        setOnMousePressed(this::mousePressed);
-        setOnMouseDragged(this::mouseDragged);
-        setOnMouseReleased(this::mouseReleased);
-        setOnScroll(this::scroll);
-    }
- 
     IslandCanvasPane(IslandCanvas canvas, FreeTileCanvas freeTileCanvas) {
-        this.canvas = canvas;
         this.freeTileCanvas = freeTileCanvas;
         this.mouseX = 0;
         this.mouseY = 0;
         this.scale = 1;
+
         getChildren().add(canvas);
-        //getChildren().add(freeTileCanvas);
+        getChildren().add(freeTileCanvas);
+
+        freeTileCanvas.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
+            if (!freeTileCanvas.isActive()) {
+                freeTileCanvas.setVisible(true);
+                freeTileCanvas.redraw();
+                System.out.println("freeTileEvent");
+            }
+        });
+
+        this.canvas = canvas;
 
         BackgroundFill backgroundFill = new BackgroundFill(
                 IslandCanvas.BG_COLOR,
@@ -59,6 +52,7 @@ class IslandCanvasPane extends StackPane {
         setOnMouseDragged(this::mouseDragged);
         setOnMouseReleased(this::mouseReleased);
         setOnScroll(this::scroll);
+        canvas.redraw();
     }
 
     @Override
@@ -70,12 +64,21 @@ class IslandCanvasPane extends StackPane {
         final int w = (int)getWidth() - left - right;
         final int h = (int)getHeight() - top - bottom;
 
+
         canvas.setLayoutX(left);
         canvas.setLayoutY(top);
         if (w != canvas.getWidth() || h != canvas.getHeight()) {
             canvas.setWidth(w * 3);
             canvas.setHeight(h * 3);
             canvas.redraw();
+        }
+
+        freeTileCanvas.setLayoutX(left);
+        freeTileCanvas.setLayoutY(top);
+        if (w != freeTileCanvas.getWidth() || h != freeTileCanvas.getHeight()) {
+            freeTileCanvas.setWidth(w * 3);
+            freeTileCanvas.setHeight(h * 3);
+            freeTileCanvas.redraw();
         }
     }
 
@@ -97,6 +100,12 @@ class IslandCanvasPane extends StackPane {
                 + event.getX() - mouseX);
         canvas.setTranslateY(canvas.getTranslateY()
                 + event.getY() - mouseY);
+
+        freeTileCanvas.setTranslateX(freeTileCanvas.getTranslateX()
+                + event.getX() - mouseX);
+        freeTileCanvas.setTranslateY(freeTileCanvas.getTranslateY()
+                + event.getY() - mouseY);
+
         mouseX = event.getX();
         mouseY = event.getY();
     }
@@ -108,6 +117,8 @@ class IslandCanvasPane extends StackPane {
 
         canvas.ox += mouseXBeforeDrag - event.getX();
         canvas.oy += mouseYBeforeDrag - event.getY();
+        freeTileCanvas.ox += mouseXBeforeDrag - event.getX();
+        freeTileCanvas.oy += mouseYBeforeDrag - event.getY();
         canvas.redraw();
     }
 
@@ -123,6 +134,19 @@ class IslandCanvasPane extends StackPane {
             double factor = event.getDeltaY() > 0 ? 1.1 : 1 / 1.1;
             canvas.setScaleX(canvas.getScaleX() * factor);
             canvas.setScaleY(canvas.getScaleY() * factor);
+        }
+
+        if (freeTileCanvas.getScaleX() > 1.5
+                || freeTileCanvas.getScaleX() < (1/1.5)) {
+            freeTileCanvas.scale *= freeTileCanvas.getScaleX();
+            freeTileCanvas.setScaleX(1);
+            freeTileCanvas.setScaleY(1);
+            freeTileCanvas.redraw();
+        }
+        else {
+            double factor = event.getDeltaY() > 0 ? 1.1 : 1 / 1.1;
+            freeTileCanvas.setScaleX(freeTileCanvas.getScaleX() * factor);
+            freeTileCanvas.setScaleY(freeTileCanvas.getScaleY() * factor);
         }
     }
 }

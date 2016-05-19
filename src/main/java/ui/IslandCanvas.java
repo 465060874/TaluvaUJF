@@ -16,7 +16,6 @@ import javafx.scene.text.TextAlignment;
 import map.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
@@ -36,7 +35,6 @@ class IslandCanvas extends Canvas {
     private final Island island;
     private final boolean debug;
     private final HexShape hexShape;
-    private final boolean placedTileOrientationAuto;
 
     double ox;
     double oy;
@@ -48,8 +46,6 @@ class IslandCanvas extends Canvas {
     private VolcanoTile placedTile;
     private Orientation placedTileRotation;
     private Orientation placedTileOrientation;
-    private double freeTileX;
-    private double freeTileY;
     private boolean isBuildingMode;
 
     // Variable de selection du Batiment
@@ -70,9 +66,6 @@ class IslandCanvas extends Canvas {
         this.placedTileRotation = Orientation.NORTH;
         this.placedTile = new VolcanoTile(FieldType.CLEARING, FieldType.SAND);
         this.placedTileOrientation = Orientation.NORTH;
-        this.placedTileOrientationAuto = false;
-        this.freeTileX = 0.0;
-        this.freeTileY = 0.0;
 
         // Variable de selection du Batiment
         this.selectedBuildingType = BuildingType.HUT;
@@ -100,6 +93,7 @@ class IslandCanvas extends Canvas {
             }
             redraw();
         }
+        System.out.println("IslandCanvas");
     }
 
     private void mouseMoved(MouseEvent event) {
@@ -117,9 +111,6 @@ class IslandCanvas extends Canvas {
                 .allMatch(h -> island.getField(h) == Field.SEA);
 
         if (isRobinson) {
-            freeTileX = event.getX();
-            freeTileY = event.getY();
-            placedTileOrientation = getCLosestNeighborOrientation(newPlacedHex);
             placedHex = null;
             redraw();
             return;
@@ -175,30 +166,6 @@ class IslandCanvas extends Canvas {
         if (redraw) {
             redraw();
         }
-    }
-
-    private Orientation getCLosestNeighborOrientation(Hex newSelectedHex) {
-
-        if (!placedTileOrientationAuto) return Orientation.NORTH;
-
-        final Orientation[] orientations = Orientation.values();
-        Hex[] orientationIndex = new Hex[orientations.length];
-        Arrays.fill(orientationIndex, Hex.at(newSelectedHex.getLine(), newSelectedHex.getDiag()));
-        int j = 0;
-        int i = 0;
-        while(j < 6*10) {
-            while( i < orientationIndex.length) {
-                orientationIndex[i] = orientations[i].getFrontHex(orientationIndex[i]);
-                if (island.getField(orientationIndex[i]) != Field.SEA) {
-                    return orientations[i];
-                }
-                i++;
-            }
-            if (i == orientationIndex.length) i = 0;
-            j++;
-        }
-
-        return Orientation.NORTH;
     }
 
     private Hex pointToHex(double x, double y) {
@@ -283,43 +250,6 @@ class IslandCanvas extends Canvas {
         return ImmutableList.of(info1, info2, info3);
     }
 
-    private ImmutableList<HexShapeInfo> placedFreeInfos() {
-        HexShapeInfo info1 = new HexShapeInfo();
-        HexShapeInfo info2 = new HexShapeInfo();
-        HexShapeInfo info3 = new HexShapeInfo();
-        info1.isPlacement = info2.isPlacement = info3.isPlacement = true;
-        info1.x = info2.x = info3.x = freeTileX;
-        info1.y = info2.y = info3.y = freeTileY;
-        info1.sizeX = info2.sizeX = info3.sizeX = HexShape.HEX_SIZE_X * scale;
-        info1.sizeY = info2.sizeY = info3.sizeY = HexShape.HEX_SIZE_Y * scale;
-        info1.scale = info2.scale = info3.scale = scale;
-
-        Neighbor leftNeighbor = Neighbor.leftOf(placedTileOrientation);
-        info2.x += leftNeighbor.getDiagOffset() * 2 * WEIRD_RATIO * info2.sizeX
-                + leftNeighbor.getLineOffset() * WEIRD_RATIO * info2.sizeX;
-        info2.y += leftNeighbor.getLineOffset() * info2.sizeY + leftNeighbor.getLineOffset() * info2.sizeY / 2;
-        Neighbor rightNeighbor = Neighbor.rightOf(placedTileOrientation);
-        info3.x += rightNeighbor.getDiagOffset() * 2 * WEIRD_RATIO * info3.sizeX
-                + rightNeighbor.getLineOffset() * WEIRD_RATIO * info3.sizeX;
-        info3.y += rightNeighbor.getLineOffset() * info3.sizeY + rightNeighbor.getLineOffset() * info3.sizeY / 2;
-
-        if (placedTileRotation == Orientation.NORTH) {
-            info1.field = Field.create(1, FieldType.VOLCANO, placedTileOrientation);
-            info2.field = Field.create(1, placedTile.getLeft(), placedTileOrientation.leftRotation());
-            info3.field = Field.create(1, placedTile.getRight(), placedTileOrientation.rightRotation());
-        } else if (placedTileRotation == Orientation.SOUTH_EAST) {
-            info1.field = Field.create(1, placedTile.getLeft(), placedTileOrientation);
-            info2.field = Field.create(1, placedTile.getRight(), placedTileOrientation.leftRotation());
-            info3.field = Field.create(1, FieldType.VOLCANO, placedTileOrientation.rightRotation());
-        } else {
-            info1.field = Field.create(1, placedTile.getRight(), placedTileOrientation);
-            info2.field = Field.create(1, FieldType.VOLCANO, placedTileOrientation.leftRotation());
-            info3.field = Field.create(1, placedTile.getLeft(), placedTileOrientation.rightRotation());
-        }
-
-        return ImmutableList.of(info1, info2, info3);
-    }
-
     private void resize(Observable event) {
         redraw();
     }
@@ -362,12 +292,6 @@ class IslandCanvas extends Canvas {
                         info.x,
                         info.y - info.sizeY / 6,
                         info.sizeX, info.sizeY);
-            }
-        }
-
-        if (!isBuildingMode && placedHex == null) {
-            for (HexShapeInfo info : placedFreeInfos()) {
-                hexShape.draw(gc, info);
             }
         }
 
@@ -422,6 +346,4 @@ class IslandCanvas extends Canvas {
         setTranslateX(-getWidth() / 3);
         setTranslateY(-getHeight() / 3);
     }
-
-
 }
