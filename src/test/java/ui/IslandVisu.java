@@ -16,7 +16,7 @@ public class IslandVisu extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        File rsc = new File("16410698810380.island");
+        File rsc = new File("7622606306695.island");
         Island island = IslandIO.read(Files.asCharSource(rsc, StandardCharsets.UTF_8));
         IslandCanvas canvas = new IslandCanvas(island, false);
 

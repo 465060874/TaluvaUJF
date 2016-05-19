@@ -1,6 +1,7 @@
 package engine;
 
 import com.google.common.collect.Iterables;
+import data.BuildingType;
 import engine.action.*;
 
 import java.util.ArrayList;
@@ -60,11 +61,15 @@ class DumbPlayerHandler implements PlayerHandler {
     @Override
     public void startTileStep() {
         List<Placement> placements = new ArrayList<>();
-        for (Iterable<SeaPlacement> seaPlacements : engine.getSeaPlacements().values()) {
-            Iterables.addAll(placements, seaPlacements);
+        if (engine.getVolcanoPlacements().size() == 0 || engine.getRandom().nextInt(3) < 2) {
+            for (Iterable<SeaPlacement> seaPlacements : engine.getSeaPlacements().values()) {
+                Iterables.addAll(placements, seaPlacements);
+            }
         }
-        for (Iterable<VolcanoPlacement> volcanoPlacements : engine.getVolcanoPlacements().values()) {
-            Iterables.addAll(placements, volcanoPlacements);
+        else {
+            for (Iterable<VolcanoPlacement> volcanoPlacements : engine.getVolcanoPlacements().values()) {
+                Iterables.addAll(placements, volcanoPlacements);
+            }
         }
 
         int choice = engine.getRandom().nextInt(placements.size());
@@ -74,12 +79,32 @@ class DumbPlayerHandler implements PlayerHandler {
 
     @Override
     public void startBuildStep() {
-        List<Action> actions = new ArrayList<>();
+        List<Action> buildTowerOrTemple = new ArrayList<>();
+        List<Action> buildHut = new ArrayList<>();
+        List<Action> expandVillage = new ArrayList<>();
         for (Iterable<BuildAction> placements : engine.getBuildActions().values()) {
-            Iterables.addAll(actions, placements);
+            for (BuildAction action : placements) {
+                if (action.getType() == BuildingType.HUT) {
+                    buildHut.add(action);
+                }
+                else {
+                    buildTowerOrTemple.add(action);
+                }
+            }
         }
         for (Iterable<ExpandAction> placements : engine.getExpandActions().values()) {
-            Iterables.addAll(actions, placements);
+            Iterables.addAll(expandVillage, placements);
+        }
+
+        List<Action> actions;
+        if (!buildTowerOrTemple.isEmpty()) {
+            actions = buildTowerOrTemple;
+        }
+        else if (!expandVillage.isEmpty()) {
+            actions = expandVillage;
+        }
+        else {
+            actions = buildHut;
         }
 
         int choice = engine.getRandom().nextInt(actions.size());

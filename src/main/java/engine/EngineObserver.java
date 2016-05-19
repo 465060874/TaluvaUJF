@@ -5,6 +5,8 @@ import engine.action.ExpandAction;
 import engine.action.SeaPlacement;
 import engine.action.VolcanoPlacement;
 
+import java.util.List;
+
 public interface EngineObserver {
 
     /**
@@ -43,4 +45,19 @@ public interface EngineObserver {
      * Appelé quand une extension de village est faite
      */
     void onExpand(ExpandAction action);
+
+    /**
+     * Appelé en cas d'élimination
+     */
+    void onEliminated(Player eliminated);
+
+    /**
+     * Appelé en cas de victoire
+     */
+    void onWin(WinReason reason, List<Player> winners);
+
+    enum WinReason {
+        NO_MORE_TILES,
+        TWO_BUILDING_TYPES,
+    }
 }

@@ -1,6 +1,6 @@
 package map;
 
-import com.google.common.collect.ListMultimap;
+import com.google.common.collect.SetMultimap;
 import data.FieldType;
 import data.PlayerColor;
 
@@ -38,5 +38,5 @@ public interface Village {
      * Retourne l'ensemble des hexagones sur lequelles
      * ce village peut s'étendre classés par type de champs
      */
-    ListMultimap<FieldType, Hex> getExpandableHexes();
+    SetMultimap<FieldType, Hex> getExpandableHexes();
 }

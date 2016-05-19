@@ -3,14 +3,22 @@ package engine.action;
 import map.Hex;
 import map.Orientation;
 
+import java.util.UUID;
+
 public class VolcanoPlacement implements Placement {
 
+    private final UUID stepUUID;
     private final Hex volcanoHex;
     private final Orientation orientation;
 
-    public VolcanoPlacement(Hex volcanoHex, Orientation orientation) {
+    public VolcanoPlacement(UUID stepUUID, Hex volcanoHex, Orientation orientation) {
+        this.stepUUID = stepUUID;
         this.volcanoHex = volcanoHex;
         this.orientation = orientation;
+    }
+
+    public UUID getStepUUID() {
+        return stepUUID;
     }
 
     public Hex getVolcanoHex() {
