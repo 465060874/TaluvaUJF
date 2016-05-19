@@ -2,11 +2,8 @@ package ui;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.sun.java.swing.plaf.gtk.GTKConstants;
-import com.sun.org.apache.xpath.internal.operations.Or;
 import data.BuildingType;
 import data.FieldType;
-import data.PlayerColor;
 import data.VolcanoTile;
 import javafx.beans.Observable;
 import javafx.scene.canvas.Canvas;
@@ -29,7 +26,7 @@ class IslandCanvas extends Canvas {
     static final Color BG_COLOR = Color.web("5E81A2");
 
     static final Color BORDER_COLOR = Color.web("303030");
-    static final Color BOTTOM_COLOR = Color.web("505050");
+    static final Color BOTTOM_COLOR = Color.web("707070");
 
     private final Island island;
     private final boolean debug;

@@ -13,14 +13,17 @@ class HexShape {
 
     private static final int HEXAGON_POINTS = 6;
     private static final int HEXAGON_BORDER_POINTS = 5;
+    private static final int HEXAGON_BORDER2_POINTS = 3;
     private static final int BOTTOM_POINTS = 6;
     private static final int BOTTOM_BORDER_POINTS = 5;
-    public static final float STROKE_WIDTH = 1.4f;
+    public static final float STROKE_WIDTH = 2f;
 
     private final double[] hexagonX;
     private final double[] hexagonY;
     private final double[] hexagonBorderX;
     private final double[] hexagonBorderY;
+    private final double[] hexagonBorder2X;
+    private final double[] hexagonBorder2Y;
     private final double[] bottomX;
     private final double[] bottomY;
     private final double[] bottomBorderX;
@@ -31,6 +34,8 @@ class HexShape {
         this.hexagonY = new double[HEXAGON_POINTS];
         this.hexagonBorderX = new double[HEXAGON_BORDER_POINTS];
         this.hexagonBorderY = new double[HEXAGON_BORDER_POINTS];
+        this.hexagonBorder2X = new double[HEXAGON_BORDER2_POINTS];
+        this.hexagonBorder2Y = new double[HEXAGON_BORDER2_POINTS];
         this.bottomX = new double[BOTTOM_POINTS];
         this.bottomY = new double[BOTTOM_POINTS];
         this.bottomBorderX = new double[BOTTOM_BORDER_POINTS];
@@ -57,7 +62,7 @@ class HexShape {
         double midY = sizeY / 2;
         double bottomDepth = hexHeight * field.getLevel();
 
-        hexagonX[0] = x - weirdX - 0.5;
+        hexagonX[0] = x - weirdX;
         hexagonY[0] = y + midY;
 
         hexagonX[1] = x;
@@ -67,13 +72,13 @@ class HexShape {
         hexagonY[2] = y + midY;
 
         hexagonX[3] = x + weirdX;
-        hexagonY[3] = y - midY - 0.5;
+        hexagonY[3] = y - midY;
 
         hexagonX[4] = x;
-        hexagonY[4] = y - sizeY - 0.5;
+        hexagonY[4] = y - sizeY;
 
-        hexagonX[5] = x - weirdX - 0.5;
-        hexagonY[5] = y - midY - 0.5;
+        hexagonX[5] = x - weirdX;
+        hexagonY[5] = y - midY;
 
         int orientationOffset = orientationOffset(field);
 
@@ -91,6 +96,15 @@ class HexShape {
 
         hexagonBorderX[4] = hexagonX[(orientationOffset + 4) % 6];
         hexagonBorderY[4] = hexagonY[(orientationOffset + 4) % 6];
+
+        hexagonBorder2X[0] = hexagonBorderX[4];
+        hexagonBorder2Y[0] = hexagonBorderY[4];
+
+        hexagonBorder2X[1] = hexagonX[(orientationOffset + 5) % 6];
+        hexagonBorder2Y[1] = hexagonY[(orientationOffset + 5) % 6];
+
+        hexagonBorder2X[2] = hexagonBorderX[0];
+        hexagonBorder2Y[2] = hexagonBorderY[0];
 
         bottomX[0] = hexagonX[0];
         bottomY[0] = hexagonY[0];
@@ -181,6 +195,10 @@ class HexShape {
                 bottomX,
                 bottomY,
                 HEXAGON_POINTS);
+
+        gc.setStroke(new Color(0.6, 0.6, 0.6, 0.5));
+        gc.setLineWidth(STROKE_WIDTH);
+        gc.strokePolyline(hexagonBorder2X, hexagonBorder2Y, HEXAGON_BORDER2_POINTS);
 
         gc.setStroke(IslandCanvas.BORDER_COLOR);
         gc.setLineWidth(STROKE_WIDTH);
