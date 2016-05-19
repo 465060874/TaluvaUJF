@@ -152,18 +152,31 @@ class HexShape {
         bottomBorderY[4] = hexagonY[2] + bottomDepth1;
     }
 
-    void draw(GraphicsContext gc, Field field, boolean selected,
+    private static Color fieldTypeTranslucentColor(Field field) {
+        Color color = fieldTypeColor(field);
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(), .5f);
+    }
+
+    void draw(GraphicsContext gc, Field field, boolean selected, boolean isPlacement,
               double x, double y, double sizeX, double sizeY, double scale) {
         update(x, y, sizeX, sizeY, scale, field);
-
-        Color fieldColor = fieldTypeColor(field);
+        Color fieldColor;
+        if (isPlacement) {
+            fieldColor = fieldTypeTranslucentColor(field);
+        } else {
+            fieldColor = fieldTypeColor(field);
+        }
         gc.setFill(selected ? fieldColor.darker() : fieldColor);
         gc.fillPolygon(
                 hexagonX,
                 hexagonY,
                 HEXAGON_POINTS);
 
-        gc.setFill(IslandCanvas.BOTTOM_COLOR);
+        if (isPlacement) {
+            gc.setFill(IslandCanvas.BORDER_COLOR.deriveColor(1, 1, 1, .5f));
+        } else {
+            gc.setFill(IslandCanvas.BOTTOM_COLOR);
+        }
         gc.fillPolygon(
                 bottomX,
                 bottomY,

@@ -125,10 +125,11 @@ public class Editor extends Application {
             super(island, debug);
         }
 
-        private void mouseDragged(MouseEvent event) {
+        private void mouseMoved(MouseEvent event) {
             click = new Point2D(event.getSceneX(), event.getSceneY());
             System.out.println("Dragged " + click.getX() + " " + click.getY());
             redraw();
+
         }
 
     }

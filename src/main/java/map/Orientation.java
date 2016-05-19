@@ -66,4 +66,21 @@ public enum Orientation {
     public Orientation antiClockWise() {
         return values()[(ordinal() + 1) % values().length];
     }
+
+    public Hex getFrontHex(Hex hex) {
+        final int line = hex.getLine();
+        final int diag = hex.getDiag();
+
+        switch (this) {
+            case NORTH:      return Hex.at(line - 2, diag + 1);
+            case SOUTH_WEST: return Hex.at(line + 1, diag - 2);
+            case SOUTH_EAST: return Hex.at(line + 1, diag + 1);
+
+            case SOUTH:      return Hex.at(line + 2, diag - 1);
+            case NORTH_WEST: return Hex.at(line - 1, diag - 1);
+            case NORTH_EAST: return Hex.at(line - 1, diag + 2);
+        }
+
+        throw new IllegalArgumentException();
+    }
 }
