@@ -141,7 +141,8 @@ class EngineImpl implements Engine {
     }
 
     @Override
-    public void cancelLastStep() {
+    public synchronized void cancelLastStep() {
+        getCurrentPlayer().getHandler().cancel();
         if (placeTile) {
             turn--;
         }
@@ -156,20 +157,29 @@ class EngineImpl implements Engine {
             placeTile = false;
 
             updateBuildActions();
+            if (buildActions.size() == 0) {
+                return;
+            }
             updateExpandActions();
 
             observers.forEach(EngineObserver::onBuildStepStart);
+            getCurrentPlayer().getHandler().startBuildStep();
         }
         else {
             turn++;
             placeTile = true;
             volcanoTileStack.next();
+            if (volcanoTileStack.isEmpty()) {
+                return;
+            }
+
             observers.forEach(EngineObserver::onTileStackChange);
 
             updateSeaPlacements();
             updateVolcanoPlacements();
 
             observers.forEach(EngineObserver::onTileStepStart);
+            getCurrentPlayer().getHandler().startTileStep();
         }
     }
 
@@ -183,7 +193,7 @@ class EngineImpl implements Engine {
                     continue;
                 }
 
-                List<SeaPlacement> list = tmpSeaPlacements.get(hex);
+                List<SeaPlacement> list = tmpSeaPlacements.getOrDefault(hex, null);
                 if (list == null) {
                     list = new ArrayList<>();
                     tmpSeaPlacements.put(hex, list);
@@ -205,7 +215,7 @@ class EngineImpl implements Engine {
                     continue;
                 }
 
-                List<VolcanoPlacement> list = tmpVolcanosPlacements.get(hex);
+                List<VolcanoPlacement> list = tmpVolcanosPlacements.getOrDefault(hex, null);
                 if (list == null) {
                     list = new ArrayList<>();
                     tmpVolcanosPlacements.put(hex, list);
@@ -228,10 +238,10 @@ class EngineImpl implements Engine {
                 boolean towerValid = BuildRules.validate(this, BuildingType.TOWER, hex);
 
                 if (!hutValid && !templeValid && !towerValid) {
-                    break;
+                    continue;
                 }
 
-                List<BuildAction> list = tmpBuildActions.get(hex);
+                List<BuildAction> list = tmpBuildActions.getOrDefault(hex, null);
                 if (list == null) {
                     list = new ArrayList<>();
                     tmpBuildActions.put(hex, list);
@@ -248,6 +258,7 @@ class EngineImpl implements Engine {
                 }
             }
         }
+
         this.buildActions = tmpBuildActions;
     }
 
@@ -321,7 +332,7 @@ class EngineImpl implements Engine {
     }
 
     @Override
-    public void placeOnSea(SeaPlacement placement) {
+    public synchronized void placeOnSea(SeaPlacement placement) {
         checkState(placeTile, "Can't place a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
@@ -332,7 +343,7 @@ class EngineImpl implements Engine {
     }
 
     @Override
-    public void placeOnVolcano(VolcanoPlacement placement) {
+    public synchronized void placeOnVolcano(VolcanoPlacement placement) {
         checkState(placeTile, "Can't place a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
@@ -356,7 +367,7 @@ class EngineImpl implements Engine {
     }
 
     @Override
-    public void build(BuildAction action) {
+    public synchronized void build(BuildAction action) {
         checkState(!placeTile, "Can't build during tile placement step");
 
         stepSaves.add(new ActionSave(this, action));
@@ -368,7 +379,7 @@ class EngineImpl implements Engine {
     }
 
     @Override
-    public void expand(ExpandAction action) {
+    public synchronized void expand(ExpandAction action) {
         checkState(!placeTile, "Can't expand during tile placement step");
 
         stepSaves.add(new ActionSave(this, action));

@@ -1,5 +1,6 @@
 package ui;
 
+import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import engine.rules.SeaPlacementRules;
 import engine.rules.SeaPlacementRulesTest;
@@ -10,18 +11,17 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import map.Island;
 import map.IslandIO;
-import map.IslandTest;
 
-import java.net.URL;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 public class IslandVisu extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        URL rsc = IslandTest.class.getResource("IslandTest3.island");
-        Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
-        IslandCanvas canvas = new IslandCanvas(island, true);
+        File rsc = new File("16410698810380.island");
+        Island island = IslandIO.read(Files.asCharSource(rsc, StandardCharsets.UTF_8));
+        IslandCanvas canvas = new IslandCanvas(island, false);
 
         BorderPane mainPane = new BorderPane();
         mainPane.setCenter(new IslandCanvasPane(canvas));

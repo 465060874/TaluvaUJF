@@ -16,7 +16,9 @@ public class Player {
         this.playerHandler = playerHandler;
         this.buildings = new int[BuildingType.values().length - 1];
         for (BuildingType type : BuildingType.values()) {
-            buildings[type.ordinal() - 1] = type.getInitialCount();
+            if (type != BuildingType.NONE) {
+                buildings[type.ordinal() - 1] = type.getInitialCount();
+            }
         }
         this.color = color;
     }
@@ -40,11 +42,11 @@ public class Player {
         buildings[type.ordinal() - 1] = count;
     }
 
-    public PlayerHandler getPlayerHandler() {
+    public PlayerHandler getHandler() {
         return playerHandler;
     }
 
     public Player copyWithDummyHandler() {
-        return new Player(this, new PlayerHandler.Dummy());
+        return new Player(this, PlayerHandler.dummy());
     }
 }
