@@ -3,6 +3,8 @@ package engine;
 import data.BuildingType;
 import data.PlayerColor;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * Represente un joueur, sa couleur et ses batiments restants
  */
@@ -12,7 +14,7 @@ public class Player {
     private final int[] buildings;
     private final PlayerHandler playerHandler;
 
-    public Player(PlayerColor color, PlayerHandler playerHandler) {
+    Player(PlayerColor color, PlayerHandler playerHandler) {
         this.playerHandler = playerHandler;
         this.buildings = new int[BuildingType.values().length - 1];
         for (BuildingType type : BuildingType.values()) {
@@ -39,14 +41,21 @@ public class Player {
     }
 
     void updateBuildingCount(BuildingType type, int count) {
+        checkArgument(count >= 0);
         buildings[type.ordinal() - 1] = count;
     }
 
-    public PlayerHandler getHandler() {
+    void decreaseBuildingCount(BuildingType type, int count) {
+        checkArgument(buildings[type.ordinal() - 1] >= count);
+        buildings[type.ordinal() - 1] -= count;
+    }
+
+    PlayerHandler getHandler() {
         return playerHandler;
     }
 
-    public Player copyWithDummyHandler() {
+    Player copyWithDummyHandler() {
         return new Player(this, PlayerHandler.dummy());
     }
+
 }

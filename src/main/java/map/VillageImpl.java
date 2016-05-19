@@ -1,13 +1,12 @@
 package map;
 
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ListMultimap;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.SetMultimap;
 import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 
 import java.util.List;
-import java.util.Set;
 
 class VillageImpl implements Village {
 
@@ -40,8 +39,8 @@ class VillageImpl implements Village {
     }
 
     @Override
-    public ListMultimap<FieldType, Hex> getExpandableHexes() {
-        ImmutableListMultimap.Builder<FieldType, Hex> builder = ImmutableListMultimap.builder();
+    public SetMultimap<FieldType, Hex> getExpandableHexes() {
+        ImmutableSetMultimap.Builder<FieldType, Hex> builder = ImmutableSetMultimap.builder();
         for (Hex hex : hexes) {
             final Iterable<Hex> neighborhood = hex.getNeighborhood();
             for (Hex neighbor : neighborhood) {

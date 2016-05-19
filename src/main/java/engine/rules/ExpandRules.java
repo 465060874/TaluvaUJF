@@ -7,13 +7,13 @@ import map.Hex;
 import map.Island;
 import map.Village;
 
-import java.util.List;
+import java.util.Set;
 
 public class ExpandRules {
 
     public static boolean canExpandVillage(Engine engine, Village village, FieldType fieldType) {
         Island island = engine.getIsland();
-        List<Hex> expansion = village.getExpandableHexes().get(fieldType);
+        Set<Hex> expansion = village.getExpandableHexes().get(fieldType);
         if (expansion.isEmpty()) {
             return false;
         }

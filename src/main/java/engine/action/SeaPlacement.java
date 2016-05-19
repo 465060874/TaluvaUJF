@@ -3,14 +3,22 @@ package engine.action;
 import map.Hex;
 import map.Orientation;
 
+import java.util.UUID;
+
 public class SeaPlacement implements Placement {
 
+    private final UUID stepUUID;
     private final Hex coastHex;
     private final Orientation orientation;
 
-    public SeaPlacement(Hex coastHex, Orientation orientation) {
+    public SeaPlacement(UUID stepUUID, Hex coastHex, Orientation orientation) {
+        this.stepUUID = stepUUID;
         this.coastHex = coastHex;
         this.orientation = orientation;
+    }
+
+    public UUID getStepUUID() {
+        return stepUUID;
     }
 
     public Hex getHex1() {

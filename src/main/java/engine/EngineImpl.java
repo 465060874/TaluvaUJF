@@ -2,12 +2,14 @@ package engine;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
 import engine.action.*;
 import engine.rules.BuildRules;
+import engine.rules.ExpandRules;
 import engine.rules.SeaPlacementRules;
 import engine.rules.VolcanoPlacementRules;
 import map.*;
@@ -28,6 +30,7 @@ class EngineImpl implements Engine {
 
     private int turn;
     private boolean placeTile;
+    private UUID stepUUID;
     private List<StepSave> stepSaves;
 
     private HexMap<List<SeaPlacement>> seaPlacements;
@@ -87,6 +90,7 @@ class EngineImpl implements Engine {
 
         this.turn = engine.turn;
         this.placeTile = engine.placeTile;
+        this.stepUUID = engine.stepUUID;
         this.stepSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
         stepSaves.addAll(engine.stepSaves);
 
@@ -148,6 +152,8 @@ class EngineImpl implements Engine {
         getCurrentPlayer().getHandler().cancel();
         if (placeTile) {
             turn--;
+            volcanoTileStack.previous();
+            observers.forEach(EngineObserver::onTileStackChange);
         }
         placeTile = !placeTile;
 
@@ -159,11 +165,13 @@ class EngineImpl implements Engine {
         if (placeTile) {
             placeTile = false;
 
+            stepUUID = UUID.randomUUID();
             updateBuildActions();
+            updateExpandActions();
             if (buildActions.size() == 0) {
+                System.out.println("Can't build anymore");
                 return;
             }
-            updateExpandActions();
 
             observers.forEach(EngineObserver::onBuildStepStart);
             getCurrentPlayer().getHandler().startBuildStep();
@@ -173,17 +181,45 @@ class EngineImpl implements Engine {
             placeTile = true;
             volcanoTileStack.next();
             if (volcanoTileStack.isEmpty()) {
+                List<Player> candidates = playerWithMinimumBuildingOfType(players, BuildingType.TEMPLE);
+                if (candidates.size() > 1) {
+                    candidates = playerWithMinimumBuildingOfType(candidates, BuildingType.TOWER);
+                    if (candidates.size() > 1) {
+                        candidates = playerWithMinimumBuildingOfType(candidates, BuildingType.HUT);
+                    }
+                }
+
+                List<Player> winners = candidates;
+                observers.forEach(o -> o.onWin(EngineObserver.WinReason.NO_MORE_TILES, winners));
                 return;
             }
 
             observers.forEach(EngineObserver::onTileStackChange);
 
+            stepUUID = UUID.randomUUID();
             updateSeaPlacements();
             updateVolcanoPlacements();
 
             observers.forEach(EngineObserver::onTileStepStart);
             getCurrentPlayer().getHandler().startTileStep();
         }
+    }
+
+    private List<Player> playerWithMinimumBuildingOfType(Iterable<Player> candidates, BuildingType type) {
+        List<Player> players = new ArrayList<>();
+        int minCount = Integer.MAX_VALUE;
+        for (Player player : candidates) {
+            int count = player.getBuildingCount(type);
+            if (count < minCount) {
+                players = Lists.newArrayList(player);
+                minCount = count;
+            }
+            else if (count == minCount) {
+                players.add(player);
+            }
+        }
+
+        return players;
     }
 
     private void updateSeaPlacements() {
@@ -202,7 +238,7 @@ class EngineImpl implements Engine {
                     tmpSeaPlacements.put(hex, list);
                 }
 
-                list.add(new SeaPlacement(hex, orientation));
+                list.add(new SeaPlacement(stepUUID, hex, orientation));
             }
         }
 
@@ -225,7 +261,7 @@ class EngineImpl implements Engine {
                     tmpVolcanosPlacements.put(hex, list);
                 }
 
-                list.add(new VolcanoPlacement(hex, orientation));
+                list.add(new VolcanoPlacement(stepUUID, hex, orientation));
             }
         }
 
@@ -252,13 +288,13 @@ class EngineImpl implements Engine {
                 }
 
                 if (hutValid) {
-                    list.add(new BuildAction(BuildingType.HUT, hex));
+                    list.add(new BuildAction(stepUUID, BuildingType.HUT, hex));
                 }
                 if (templeValid) {
-                    list.add(new BuildAction(BuildingType.TEMPLE, hex));
+                    list.add(new BuildAction(stepUUID, BuildingType.TEMPLE, hex));
                 }
                 if (towerValid) {
-                    list.add(new BuildAction(BuildingType.TOWER, hex));
+                    list.add(new BuildAction(stepUUID, BuildingType.TOWER, hex));
                 }
             }
         }
@@ -285,12 +321,13 @@ class EngineImpl implements Engine {
 
             List<ExpandAction> actions = new ArrayList<>(FieldType.values().length);
             for (FieldType fieldType : FieldType.values()) {
-                if (types[fieldType.ordinal()]) {
-                    actions.add(new ExpandAction(village, fieldType));
+                if (types[fieldType.ordinal()]
+                        && ExpandRules.canExpandVillage(this, village, fieldType)) {
+                    actions.add(new ExpandAction(stepUUID, village, fieldType));
                 }
             }
             for (Hex hex : village.getHexes()) {
-                expandActions.put(hex, actions);
+                tmpExpandActions.put(hex, actions);
             }
         }
 
@@ -337,6 +374,8 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void placeOnSea(SeaPlacement placement) {
+        checkState(stepUUID.equals(placement.getStepUUID()),
+                "Something has gone wrong, this is not a proposed placement");
         checkState(placeTile, "Can't place a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
@@ -348,6 +387,8 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void placeOnVolcano(VolcanoPlacement placement) {
+        checkState(stepUUID.equals(placement.getStepUUID()),
+                "Something has gone wrong, this is not a proposed placement");
         checkState(placeTile, "Can't place a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
@@ -372,29 +413,62 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void build(BuildAction action) {
+        checkState(stepUUID.equals(action.getStepUUID()),
+                "Something has gone wrong, this is not a proposed action");
         checkState(!placeTile, "Can't build during tile placement step");
 
         stepSaves.add(new ActionSave(this, action));
         PlayerColor color = getCurrentPlayer().getColor();
         island.putBuilding(action.getHex(), FieldBuilding.of(action.getType(), color));
+        int buildingCount = action.getType() == BuildingType.HUT
+                ? island.getField(action.getHex()).getLevel()
+                : 1;
+        getCurrentPlayer().decreaseBuildingCount(action.getType(), buildingCount);
 
         observers.forEach(o -> o.onBuild(action));
-        nextStep();
+        checkBuildingCounts();
     }
 
     @Override
     public synchronized void expand(ExpandAction action) {
+        checkState(stepUUID.equals(action.getStepUUID()),
+                "Something has gone wrong, this is not a proposed action");
         checkState(!placeTile, "Can't expand during tile placement step");
 
         stepSaves.add(new ActionSave(this, action));
         PlayerColor color = getCurrentPlayer().getColor();
         FieldBuilding building = FieldBuilding.of(BuildingType.HUT, color);
+        int buildingCount = 0;
         for (Hex hex : action.getExpandHexes()) {
             island.putBuilding(hex, building);
+            buildingCount += island.getField(hex).getLevel();
         }
+        getCurrentPlayer().decreaseBuildingCount(BuildingType.HUT, buildingCount);
 
         observers.forEach(o -> o.onExpand(action));
-        nextStep();
+        checkBuildingCounts();
+    }
+
+    private void checkBuildingCounts() {
+        Player player = getCurrentPlayer();
+        int remainingBuildingTypeCount = 0;
+        if (player.getBuildingCount(BuildingType.HUT) > 0) {
+            remainingBuildingTypeCount++;
+        }
+        if (player.getBuildingCount(BuildingType.TEMPLE) > 0) {
+            remainingBuildingTypeCount++;
+        }
+        if (player.getBuildingCount(BuildingType.TOWER) > 0) {
+            remainingBuildingTypeCount++;
+        }
+
+        if (remainingBuildingTypeCount <= 1) {
+            observers.forEach(o -> o.onWin(EngineObserver.WinReason.TWO_BUILDING_TYPES,
+                    ImmutableList.of(player)));
+        }
+        else {
+            nextStep();
+        }
     }
 
     private interface StepSave {
@@ -404,9 +478,11 @@ class EngineImpl implements Engine {
 
     private static class PlacementSave implements StepSave {
 
+        private final UUID stepUUID;
         private final ImmutableMap<Hex, Field> islandDiff;
 
         PlacementSave(EngineImpl engine, SeaPlacement placement) {
+            this.stepUUID = placement.getStepUUID();
             this.islandDiff = ImmutableMap.of(
                     placement.getHex1(), engine.island.getField(placement.getHex1()),
                     placement.getHex2(), engine.island.getField(placement.getHex2()),
@@ -414,6 +490,7 @@ class EngineImpl implements Engine {
         }
 
         PlacementSave(EngineImpl engine, VolcanoPlacement placement) {
+            this.stepUUID = placement.getStepUUID();
             this.islandDiff = ImmutableMap.of(
                     placement.getVolcanoHex(), engine.island.getField(placement.getVolcanoHex()),
                     placement.getLeftHex(), engine.island.getField(placement.getLeftHex()),
@@ -422,6 +499,7 @@ class EngineImpl implements Engine {
 
         @Override
         public void restore(EngineImpl engine) {
+            engine.stepUUID = stepUUID;
             for (Map.Entry<Hex, Field> entry : islandDiff.entrySet()) {
                 engine.island.putField(entry.getKey(), entry.getValue());
             }
@@ -430,11 +508,13 @@ class EngineImpl implements Engine {
 
     private static class ActionSave implements StepSave {
 
+        private final UUID stepUUID;
         private final ImmutableMap<Hex, Field> islandDiff;
         private final BuildingType buildingType;
         private final int buildingCount;
 
         ActionSave(EngineImpl engine, BuildAction action) {
+            this.stepUUID = action.getStepUUID();
             Field field = engine.island.getField(action.getHex());
             this.islandDiff = ImmutableMap.of(action.getHex(), field);
             this.buildingType = action.getType();
@@ -442,6 +522,7 @@ class EngineImpl implements Engine {
         }
 
         ActionSave(EngineImpl engine, ExpandAction action) {
+            this.stepUUID = action.getStepUUID();
             ImmutableMap.Builder<Hex, Field> islandsDiffBuilder = ImmutableMap.builder();
             for (Hex hex : action.getVillage().getExpandableHexes().get(action.getFieldType())) {
                 Field field = engine.island.getField(hex);
@@ -455,6 +536,7 @@ class EngineImpl implements Engine {
 
         @Override
         public void restore(EngineImpl engine) {
+            engine.stepUUID = stepUUID;
             for (Map.Entry<Hex, Field> entry : islandDiff.entrySet()) {
                 engine.island.putField(entry.getKey(), entry.getValue());
             }

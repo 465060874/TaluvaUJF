@@ -30,6 +30,8 @@ public interface VolcanoTileStack {
 
     VolcanoTileStack copy(Random random);
 
+    void previous();
+
     interface Factory {
 
         VolcanoTileStack create(Gamemode gamemode, Random random);
@@ -69,6 +71,11 @@ class RandomVolcanoTileStack implements VolcanoTileStack {
     @Override
     public void next() {
         index++;
+    }
+
+    @Override
+    public void previous() {
+        index--;
     }
 
     @Override

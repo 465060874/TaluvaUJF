@@ -4,16 +4,23 @@ import data.FieldType;
 import map.Hex;
 import map.Village;
 
-import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class ExpandAction implements Action {
 
+    private final UUID stepUUID;
     private final Village village;
     private final FieldType fieldType;
 
-    public ExpandAction(Village village, FieldType fieldType) {
+    public ExpandAction(UUID stepUUID, Village village, FieldType fieldType) {
+        this.stepUUID = stepUUID;
         this.village = village;
         this.fieldType = fieldType;
+    }
+
+    public UUID getStepUUID() {
+        return stepUUID;
     }
 
     public Village getVillage() {
@@ -24,7 +31,7 @@ public class ExpandAction implements Action {
         return fieldType;
     }
 
-    public List<Hex> getExpandHexes() {
+    public Set<Hex> getExpandHexes() {
         return village.getExpandableHexes().get(fieldType);
     }
 }
