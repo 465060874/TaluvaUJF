@@ -1,5 +1,7 @@
 package data;
 
+import java.security.InvalidParameterException;
+
 public enum BuildingType {
 
     NONE(0, true),
@@ -32,5 +34,19 @@ public enum BuildingType {
      */
     public boolean isDestructible() {
         return destructible;
+    }
+
+    public BuildingType nextType() {
+
+        switch (this) {
+            case HUT:
+                return TEMPLE;
+            case TEMPLE:
+                return TOWER;
+            case TOWER:
+                return HUT;
+        }
+
+        throw new InvalidParameterException();
     }
 }

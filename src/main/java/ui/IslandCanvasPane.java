@@ -7,9 +7,9 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 
-class IslandCanvasPane extends Pane {
+class IslandCanvasPane extends StackPane {
 
     private final IslandCanvas canvas;
 
@@ -89,9 +89,17 @@ class IslandCanvasPane extends Pane {
     }
 
     private void scroll(ScrollEvent event) {
-        canvas.scale = event.getDeltaY() > 0
-                ? canvas.scale * 1.1
-                : canvas.scale / 1.1;
-        canvas.redraw();
+        if (canvas.getScaleX() > 1.5
+                || canvas.getScaleX() < (1/1.5)) {
+            canvas.scale *= canvas.getScaleX();
+            canvas.setScaleX(1);
+            canvas.setScaleY(1);
+            canvas.redraw();
+        }
+        else {
+            double factor = event.getDeltaY() > 0 ? 1.1 : 1 / 1.1;
+            canvas.setScaleX(canvas.getScaleX() * factor);
+            canvas.setScaleY(canvas.getScaleY() * factor);
+        }
     }
 }

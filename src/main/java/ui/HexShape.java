@@ -55,18 +55,19 @@ class HexShape {
         throw new IllegalStateException();
     }
 
-    private void update(double x, double y, double sizeX, double sizeY, double scale, Field field) {
-        double hexHeight = HEX_HEIGHT * scale;
-        y -= (field.getLevel() - 1) * hexHeight;
-        double weirdX = sizeX * WEIRD_RATIO;
-        double midY = sizeY / 2;
-        double bottomDepth = hexHeight * field.getLevel();
+    private void update(HexShapeInfo info) {
+        double hexHeight = HEX_HEIGHT * info.scale;
+        double x = info.x;
+        double y = info.y - (info.field.getLevel() - 1) * hexHeight;
+        double weirdX = info.sizeX * WEIRD_RATIO;
+        double midY = info.sizeY / 2;
+        double bottomDepth = hexHeight * info.field.getLevel();
 
         hexagonX[0] = x - weirdX;
         hexagonY[0] = y + midY;
 
         hexagonX[1] = x;
-        hexagonY[1] = y + sizeY;
+        hexagonY[1] = y + info.sizeY;
 
         hexagonX[2] = x + weirdX;
         hexagonY[2] = y + midY;
@@ -75,12 +76,12 @@ class HexShape {
         hexagonY[3] = y - midY;
 
         hexagonX[4] = x;
-        hexagonY[4] = y - sizeY;
+        hexagonY[4] = y - info.sizeY;
 
         hexagonX[5] = x - weirdX;
         hexagonY[5] = y - midY;
 
-        int orientationOffset = orientationOffset(field);
+        int orientationOffset = orientationOffset(info.field);
 
         hexagonBorderX[0] = hexagonX[(orientationOffset) % 6];
         hexagonBorderY[0] = hexagonY[(orientationOffset) % 6];
@@ -171,43 +172,31 @@ class HexShape {
         return new Color(color.getRed(), color.getGreen(), color.getBlue(), .5f);
     }
 
-    void draw(GraphicsContext gc, Field field, boolean selected, boolean isPlacement,
-              double x, double y, double sizeX, double sizeY, double scale) {
-        update(x, y, sizeX, sizeY, scale, field);
-        Color fieldColor;
-        if (isPlacement) {
-            fieldColor = fieldTypeTranslucentColor(field);
-        } else {
-            fieldColor = fieldTypeColor(field);
-        }
-        gc.setFill(selected ? fieldColor.darker() : fieldColor);
-        gc.fillPolygon(
-                hexagonX,
-                hexagonY,
-                HEXAGON_POINTS);
+    void draw(GraphicsContext gc, HexShapeInfo info) {
+        update(info);
 
-        if (isPlacement) {
-            gc.setFill(IslandCanvas.BORDER_COLOR.deriveColor(1, 1, 1, .5f));
-        } else {
-            gc.setFill(IslandCanvas.BOTTOM_COLOR);
-        }
-        gc.fillPolygon(
-                bottomX,
-                bottomY,
-                HEXAGON_POINTS);
+        gc.setFill(info.isPlacement
+                ? fieldTypeTranslucentColor(info.field)
+                : fieldTypeColor(info.field));
+        gc.fillPolygon(hexagonX, hexagonY, HEXAGON_POINTS);
+
+        gc.setFill(info.isPlacement
+                ? IslandCanvas.BORDER_COLOR.deriveColor(1, 1, 1, .5f)
+                : IslandCanvas.BOTTOM_COLOR);
+        gc.fillPolygon(bottomX, bottomY, HEXAGON_POINTS);
 
         gc.setStroke(new Color(0.6, 0.6, 0.6, 0.5));
-        gc.setLineWidth(STROKE_WIDTH);
+        gc.setLineWidth(STROKE_WIDTH * info.scale);
         gc.strokePolyline(hexagonBorder2X, hexagonBorder2Y, HEXAGON_BORDER2_POINTS);
 
         gc.setStroke(IslandCanvas.BORDER_COLOR);
-        gc.setLineWidth(STROKE_WIDTH);
+        gc.setLineWidth(STROKE_WIDTH * info.scale);
         gc.strokePolyline(hexagonBorderX, hexagonBorderY, HEXAGON_BORDER_POINTS);
 
         gc.setStroke(IslandCanvas.BORDER_COLOR);
-        gc.setLineWidth(STROKE_WIDTH);
-        for (int i = 1; i <= field.getLevel(); i++) {
-            bottomBorderLevel(scale, i, field.getLevel());
+        gc.setLineWidth(STROKE_WIDTH * info.scale);
+        for (int i = 1; i <= info.field.getLevel(); i++) {
+            bottomBorderLevel(info.scale, i, info.field.getLevel());
             gc.strokePolyline(bottomBorderX, bottomBorderY, BOTTOM_BORDER_POINTS);
         }
     }

@@ -18,7 +18,7 @@ public class FXUI extends Application {
     public void start(Stage stage) throws Exception {
         URL rsc = FXUI.class.getResource("test.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
-        IslandCanvas canvas = new IslandCanvas(island, true);
+        IslandCanvas canvas = new IslandCanvas(island, false);
 
         BorderPane mainPane = new BorderPane();
         mainPane.setCenter(new IslandCanvasPane(canvas));

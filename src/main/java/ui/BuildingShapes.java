@@ -33,34 +33,34 @@ class BuildingShapes {
     }
 
     static void drawBuilding(GraphicsContext gc,
-            FieldBuilding building, int level, boolean selected,
+            FieldBuilding building, int level,
             double x, double y, double hexSizeX, double hexSizeY) {
         switch (building.getType()) {
             case HUT:
                 if (level == 1) {
-                    drawHut(gc, building, selected, x, y, hexSizeX, hexSizeY);
+                    drawHut(gc, building, x, y, hexSizeX, hexSizeY);
                 } else if (level == 2) {
-                    drawHut(gc, building, selected, x - hexSizeX / 3, y, hexSizeX, hexSizeY);
-                    drawHut(gc, building, selected, x + hexSizeX / 3, y, hexSizeX, hexSizeY);
+                    drawHut(gc, building, x - hexSizeX / 3, y, hexSizeX, hexSizeY);
+                    drawHut(gc, building, x + hexSizeX / 3, y, hexSizeX, hexSizeY);
                 } else {
                     // TODO: More than 3
-                    drawHut(gc, building, selected, x - hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
-                    drawHut(gc, building, selected, x + hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
-                    drawHut(gc, building, selected, x, y + hexSizeY / 3, hexSizeX, hexSizeY);
+                    drawHut(gc, building, x - hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
+                    drawHut(gc, building, x + hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
+                    drawHut(gc, building, x, y + hexSizeY / 3, hexSizeX, hexSizeY);
                 }
                 break;
             case TEMPLE:
-                drawTemple(gc, building, selected, x, y, hexSizeX, hexSizeY);
+                drawTemple(gc, building, x, y, hexSizeX, hexSizeY);
                 break;
             case TOWER:
-                drawTower(gc, building, selected, x, y, hexSizeX, hexSizeY);
+                drawTower(gc, building, x, y, hexSizeX, hexSizeY);
                 break;
         }
     }
 
     private static void drawHut(GraphicsContext gc,
-            FieldBuilding building, boolean selected,
-            double x, double y, double hexSizeX, double hexSizeY) {
+                                FieldBuilding building,
+                                double x, double y, double hexSizeX, double hexSizeY) {
         double x1 = x - hexSizeX / 7;
         double x2 = x;
         double x3 = x + hexSizeX / 7;
@@ -69,12 +69,12 @@ class BuildingShapes {
         double y3 = y + hexSizeY / 10;
         double y4 = y + hexSizeY / 4;
 
-        drawTentShape(gc, building, selected, x1, x2, x3, y1, y2, y3, y4);
+        drawTentShape(gc, building, x1, x2, x3, y1, y2, y3, y4);
     }
 
     private static void drawTemple(GraphicsContext gc,
-            FieldBuilding building, boolean selected,
-            double x, double y, double hexSizeX, double hexSizeY) {
+                                   FieldBuilding building,
+                                   double x, double y, double hexSizeX, double hexSizeY) {
         double x1 = x - hexSizeX / 4;
         double x2 = x;
         double x3 = x + hexSizeX / 4;
@@ -83,15 +83,14 @@ class BuildingShapes {
         double y3 = y + hexSizeY / 1.6 - hexSizeY / 2;
         double y4 = y + hexSizeY / 1.6;
 
-        drawTentShape(gc, building, selected, x1, x2, x3, y1, y2, y3, y4);
+        drawTentShape(gc, building, x1, x2, x3, y1, y2, y3, y4);
     }
 
     private static void drawTentShape(GraphicsContext gc,
-            FieldBuilding building, boolean selected,
-            double x1, double x2, double x3, double y1, double y2, double y3, double y4) {
+                                      FieldBuilding building,
+                                      double x1, double x2, double x3, double y1, double y2, double y3, double y4) {
         Color faceColor = buildingTypeFaceColor(building);
-        Color topColor = selected ? faceColor : buildingTypeTopColor(building);
-        faceColor = selected ? faceColor.darker() : faceColor;
+        Color topColor = buildingTypeTopColor(building);
 
         double[] xpoints = new double[4];
         double[] ypoints = new double[4];
@@ -137,11 +136,10 @@ class BuildingShapes {
     }
 
     private static void drawTower(GraphicsContext gc,
-            FieldBuilding building, boolean selected,
-            double x, double y, double hexSizeX, double hexSizeY) {
+                                  FieldBuilding building,
+                                  double x, double y, double hexSizeX, double hexSizeY) {
         Color faceColor = buildingTypeFaceColor(building);
-        Color topColor = selected ? faceColor : buildingTypeTopColor(building);
-        faceColor = selected ? faceColor.darker() : faceColor;
+        Color topColor = buildingTypeTopColor(building);
 
         double width = hexSizeX / 2;
         double xstart = x - width / 2;
