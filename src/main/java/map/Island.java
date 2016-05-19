@@ -24,4 +24,6 @@ public interface Island {
     void putTile(VolcanoTile tile, Hex hex, Orientation orientation);
 
     void putBuilding(Hex hex, FieldBuilding building);
+
+    Island copy();
 }

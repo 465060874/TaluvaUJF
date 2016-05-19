@@ -28,6 +28,8 @@ public interface VolcanoTileStack {
 
     void next();
 
+    VolcanoTileStack copy(Random random);
+
     interface Factory {
 
         VolcanoTileStack create(Gamemode gamemode, Random random);
@@ -42,6 +44,11 @@ class RandomVolcanoTileStack implements VolcanoTileStack {
     private RandomVolcanoTileStack(ImmutableList<VolcanoTile> tiles) {
         this.tiles = tiles;
         this.index = 0;
+    }
+
+    private RandomVolcanoTileStack(ImmutableList<VolcanoTile> tiles, int index) {
+        this.tiles = tiles;
+        this.index = index;
     }
 
     @Override
@@ -62,6 +69,14 @@ class RandomVolcanoTileStack implements VolcanoTileStack {
     @Override
     public void next() {
         index++;
+    }
+
+    @Override
+    public VolcanoTileStack copy(Random random) {
+        List<VolcanoTile> copyTiles = new ArrayList<>();
+        copyTiles.addAll(tiles);
+        Collections.shuffle(copyTiles.subList(index + 1, copyTiles.size()));
+        return new RandomVolcanoTileStack(ImmutableList.copyOf(copyTiles), index);
     }
 
     static class Factory implements VolcanoTileStack.Factory {

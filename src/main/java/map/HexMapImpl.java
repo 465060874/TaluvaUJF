@@ -15,6 +15,11 @@ class HexMapImpl<E> implements HexMap<E> {
         this.map = new HashMap<>();
     }
 
+    private HexMapImpl(HexMapImpl<E> hexMap) {
+        this.map = new HashMap<>();
+        map.putAll(hexMap.map);
+    }
+
     public boolean contains(Hex hex) {
         return map.containsKey(checkNotNull(hex));
     }
@@ -54,5 +59,10 @@ class HexMapImpl<E> implements HexMap<E> {
     @Override
     public int size() {
         return map.size();
+    }
+
+    @Override
+    public HexMap<E> copy() {
+        return new HexMapImpl<>(this);
     }
 }

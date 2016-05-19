@@ -22,6 +22,10 @@ class  IslandImpl implements Island {
         this.map = HexMap.create();
     }
 
+    private IslandImpl(IslandImpl island) {
+        this.map = island.map.copy();
+    }
+
     @Override
     public Field getField(Hex hex) {
         return map.getOrDefault(hex, SEA);
@@ -171,5 +175,10 @@ class  IslandImpl implements Island {
     @Override
     public void putBuilding(Hex hex, FieldBuilding building) {
         map.put(hex, map.get(hex).withBuilding(building));
+    }
+
+    @Override
+    public Island copy() {
+        return new IslandImpl(this);
     }
 }

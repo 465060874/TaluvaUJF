@@ -10,4 +10,15 @@ public interface PlayerHandler {
 
         PlayerHandler create(Engine engine);
     }
+
+    class Dummy implements PlayerHandler {
+
+        @Override
+        public void startTileStep() {
+        }
+
+        @Override
+        public void startBuildStep() {
+        }
+    }
 }

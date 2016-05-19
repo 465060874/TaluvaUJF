@@ -21,6 +21,13 @@ public class Player {
         this.color = color;
     }
 
+    private Player(Player player, PlayerHandler playerHandler) {
+        this.color = player.color;
+        this.buildings = new int[player.buildings.length];
+        System.arraycopy(player.buildings, 0, buildings, 0, buildings.length);
+        this.playerHandler = playerHandler;
+    }
+
     public PlayerColor getColor() {
         return color;
     }
@@ -31,5 +38,9 @@ public class Player {
 
     public PlayerHandler getPlayerHandler() {
         return playerHandler;
+    }
+
+    public Player copyWithDummyHandler() {
+        return new Player(this, new PlayerHandler.Dummy());
     }
 }

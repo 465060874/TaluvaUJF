@@ -68,6 +68,28 @@ class EngineImpl implements Engine {
         this.expandActions = HexMap.create();
     }
 
+    private EngineImpl(EngineImpl engine) {
+        this.observers = new ArrayList<>();
+        this.random = engine.getRandom();
+
+        this.gamemode = engine.getGamemode();
+        this.island = engine.island.copy();
+        this.volcanoTileStack = engine.volcanoTileStack.copy(random);
+
+        ImmutableList.Builder<Player> players = ImmutableList.builder();
+        for (Player player : engine.getPlayers()) {
+            players.add(player.copyWithDummyHandler());
+        }
+        this.players = players.build();
+        this.turn = engine.turn;
+        this.placeTile = engine.placeTile;
+
+        this.seaPlacements = engine.seaPlacements;
+        this.volcanosPlacements = engine.volcanosPlacements;
+        this.buildActions = engine.buildActions;
+        this.expandActions = engine.expandActions;
+    }
+
     @Override
     public Random getRandom() {
         return random;
@@ -112,7 +134,7 @@ class EngineImpl implements Engine {
 
     @Override
     public Engine copyWithoutObservers() {
-        return null;
+        return new EngineImpl(this);
     }
 
     @Override

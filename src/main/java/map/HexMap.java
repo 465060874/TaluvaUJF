@@ -19,4 +19,6 @@ public interface HexMap<E> {
     Iterable<Hex> hexes();
 
     Iterable<E> values();
+
+    HexMap<E> copy();
 }
