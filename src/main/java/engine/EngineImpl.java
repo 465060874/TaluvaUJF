@@ -29,7 +29,7 @@ class EngineImpl implements Engine {
     private final ImmutableList<Player> players;
 
     private int turn;
-    private boolean placeTile;
+    private boolean placeStep;
     private UUID stepUUID;
     private List<StepSave> stepSaves;
 
@@ -65,7 +65,7 @@ class EngineImpl implements Engine {
         this.players = ImmutableList.copyOf(playersBuilder);
 
         this.turn = 0;
-        this.placeTile = false;
+        this.placeStep = false;
         this.stepSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
 
         this.seaPlacements = HexMap.create();
@@ -89,7 +89,7 @@ class EngineImpl implements Engine {
         this.players = players.build();
 
         this.turn = engine.turn;
-        this.placeTile = engine.placeTile;
+        this.placeStep = engine.placeStep;
         this.stepUUID = engine.stepUUID;
         this.stepSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
         stepSaves.addAll(engine.stepSaves);
@@ -150,20 +150,29 @@ class EngineImpl implements Engine {
     @Override
     public synchronized void cancelLastStep() {
         getCurrentPlayer().getHandler().cancel();
-        if (placeTile) {
+        if (placeStep) {
             turn--;
             volcanoTileStack.previous();
             observers.forEach(EngineObserver::onTileStackChange);
         }
-        placeTile = !placeTile;
+        placeStep = !placeStep;
 
         StepSave save = stepSaves.remove(stepSaves.size() - 1);
         save.restore(this);
+
+        if (placeStep) {
+            updateSeaPlacements();
+            updateVolcanoPlacements();
+        }
+        else {
+            updateBuildActions();
+            updateExpandActions();
+        }
     }
 
     private void nextStep() {
-        if (placeTile) {
-            placeTile = false;
+        if (placeStep) {
+            placeStep = false;
 
             stepUUID = UUID.randomUUID();
             updateBuildActions();
@@ -178,7 +187,7 @@ class EngineImpl implements Engine {
         }
         else {
             turn++;
-            placeTile = true;
+            placeStep = true;
             volcanoTileStack.next();
             if (volcanoTileStack.isEmpty()) {
                 List<Player> candidates = playerWithMinimumBuildingOfType(players, BuildingType.TEMPLE);
@@ -341,21 +350,25 @@ class EngineImpl implements Engine {
 
     @Override
     public HexMap<? extends Iterable<SeaPlacement>> getSeaPlacements() {
+        checkState(placeStep, "Requesting sea placements during building step");
         return seaPlacements;
     }
 
     @Override
     public HexMap<? extends Iterable<VolcanoPlacement>> getVolcanoPlacements() {
+        checkState(placeStep, "Requesting volcano placements during building step");
         return volcanosPlacements;
     }
 
     @Override
     public HexMap<? extends Iterable<BuildAction>> getBuildActions() {
+        checkState(placeStep, "Requesting build actions during tile placements");
         return buildActions;
     }
 
     @Override
     public HexMap<? extends Iterable<ExpandAction>> getExpandActions() {
+        checkState(placeStep, "Requesting expand actions during tile placements");
         return expandActions;
     }
 
@@ -376,7 +389,7 @@ class EngineImpl implements Engine {
     public synchronized void placeOnSea(SeaPlacement placement) {
         checkState(stepUUID.equals(placement.getStepUUID()),
                 "Something has gone wrong, this is not a proposed placement");
-        checkState(placeTile, "Can't place a tile during building step");
+        checkState(placeStep, "Can't place a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
         island.putTile(volcanoTileStack.current(), placement.getHex1(), placement.getOrientation());
@@ -389,7 +402,7 @@ class EngineImpl implements Engine {
     public synchronized void placeOnVolcano(VolcanoPlacement placement) {
         checkState(stepUUID.equals(placement.getStepUUID()),
                 "Something has gone wrong, this is not a proposed placement");
-        checkState(placeTile, "Can't place a tile during building step");
+        checkState(placeStep, "Can't place a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
         island.putTile(volcanoTileStack.current(), placement.getVolcanoHex(), placement.getOrientation());
@@ -415,7 +428,7 @@ class EngineImpl implements Engine {
     public synchronized void build(BuildAction action) {
         checkState(stepUUID.equals(action.getStepUUID()),
                 "Something has gone wrong, this is not a proposed action");
-        checkState(!placeTile, "Can't build during tile placement step");
+        checkState(!placeStep, "Can't build during tile placement step");
 
         stepSaves.add(new ActionSave(this, action));
         PlayerColor color = getCurrentPlayer().getColor();
@@ -433,7 +446,7 @@ class EngineImpl implements Engine {
     public synchronized void expand(ExpandAction action) {
         checkState(stepUUID.equals(action.getStepUUID()),
                 "Something has gone wrong, this is not a proposed action");
-        checkState(!placeTile, "Can't expand during tile placement step");
+        checkState(!placeStep, "Can't expand during tile placement step");
 
         stepSaves.add(new ActionSave(this, action));
         PlayerColor color = getCurrentPlayer().getColor();
