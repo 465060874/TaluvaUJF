@@ -53,10 +53,10 @@ public class BasicHeuristics implements Heuristics {
             opponent = playersList.get(i++);
         int turnsLeft = e.getVolcanoTileStack().size() / 2;
         // Comparaison des constructions
-        int templesPlaced = ia.getBuildingCount(BuildingType.TEMPLE), towersPlaced = ia.getBuildingCount(BuildingType.TOWER),
-                hutsPlaced = ia.getBuildingCount(BuildingType.HUT);
-        int templesPlacedOpponent = opponent.getBuildingCount(BuildingType.TEMPLE), towersPlacedOpponent = opponent.getBuildingCount(BuildingType.TOWER),
-                hutsPlacedOpponent = opponent.getBuildingCount(BuildingType.HUT);
+        int templesPlaced = 3 - ia.getBuildingCount(BuildingType.TEMPLE), towersPlaced = 2 - ia.getBuildingCount(BuildingType.TOWER),
+                hutsPlaced = 20 - ia.getBuildingCount(BuildingType.HUT);
+        int templesPlacedOpponent = 3 - opponent.getBuildingCount(BuildingType.TEMPLE), towersPlacedOpponent = 2 - opponent.getBuildingCount(BuildingType.TOWER),
+                hutsPlacedOpponent = 20 - opponent.getBuildingCount(BuildingType.HUT);
         // Un type a été terminé
         if( templesPlaced == 3 ) {
             // Choix entre finir les huttes et finir les tours
@@ -65,11 +65,11 @@ public class BasicHeuristics implements Heuristics {
             // On regarde les tours
             if( towersPlaced == 1 && turnsLeft >= 2 ){
                 int ecart = StrategyValues[HUTSTRATEGY] - StrategyValues[HUTSTRATEGY]/2;
-                StrategyValues[HUTSTRATEGY] /= 2;
+                StrategyValues[HUTSTRATEGY] -= ecart;
                 StrategyValues[TOWERSTRATEGY] += ecart;
             }else if( towersPlaced == 0 && (20-hutsPlaced)/turnsLeft <= 2 ){
                 int ecart = StrategyValues[TOWERSTRATEGY] - StrategyValues[TOWERSTRATEGY]/2;
-                StrategyValues[TOWERSTRATEGY] /= 2;
+                StrategyValues[TOWERSTRATEGY] -= ecart;
                 StrategyValues[HUTSTRATEGY] += ecart;
             }
         }else if (towersPlaced == 2) {
@@ -79,11 +79,11 @@ public class BasicHeuristics implements Heuristics {
             // On regarde les temples
             if (turnsLeft / (3 - templesPlaced) <= 3) {
                 int ecart = StrategyValues[TEMPLESTRATEGY] - StrategyValues[TEMPLESTRATEGY] / 2;
-                StrategyValues[TEMPLESTRATEGY] /= 2;
+                StrategyValues[TEMPLESTRATEGY] -= ecart;
                 StrategyValues[HUTSTRATEGY] += ecart;
             } else {
                 int ecart = StrategyValues[HUTSTRATEGY] - StrategyValues[HUTSTRATEGY] / 2;
-                StrategyValues[HUTSTRATEGY] /= 2;
+                StrategyValues[HUTSTRATEGY] -= ecart;
                 StrategyValues[TEMPLESTRATEGY] += ecart;
             }
         }else {
@@ -91,7 +91,7 @@ public class BasicHeuristics implements Heuristics {
             if( turnsLeft >= 3 ){
                     StrategyValues[TEMPLESTRATEGY] += 2*pas*templesPlaced - pas*towersPlaced;
                     StrategyValues[TOWERSTRATEGY] += -pas*templesPlaced + 2*pas*towersPlaced;
-                    StrategyValues[COUNTERSTRATEGY] += -pas*templesPlaced;
+                    StrategyValues[COUNTERSTRATEGY] += -pas*templesPlaced -pas*towersPlaced;
             }else{
                 if( templesPlaced < templesPlacedOpponent ){
                     StrategyValues[TEMPLESTRATEGY] += StrategyValues[TOWERSTRATEGY]/2;
