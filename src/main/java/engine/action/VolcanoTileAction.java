@@ -35,7 +35,12 @@ public class VolcanoTileAction implements TileAction {
 
     @Override
     public void write(Writer writer) throws IOException {
-
+        writer.write(Integer.toString(volcanoHex.getLine()));
+        writer.write('\n');
+        writer.write(Integer.toString(volcanoHex.getDiag()));
+        writer.write('\n');
+        writer.write(orientation.name());
+        writer.write('\n');
     }
 
     static Action doRead(BufferedReader reader) throws IOException {

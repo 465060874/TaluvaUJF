@@ -14,11 +14,11 @@ import java.util.List;
 public class EngineRecorder {
 
     private final Engine engine;
-    private final Gamemode gamemode;
 
-    private ImmutableList.Builder<PlayerColor> colors;
-    private ImmutableList.Builder<VolcanoTile> tiles;
-    private ImmutableList.Builder<Action> actions;
+    private final Gamemode gamemode;
+    private final ImmutableList.Builder<PlayerColor> colors;
+    private final ImmutableList.Builder<VolcanoTile> tiles;
+    private final ImmutableList.Builder<Action> actions;
 
     public static EngineRecorder install(Engine engine) {
         return new EngineRecorder(engine);
@@ -26,8 +26,12 @@ public class EngineRecorder {
 
     private EngineRecorder(Engine engine) {
         this.engine = engine;
-        this.gamemode = engine.getGamemode();
         engine.registerObserver(new Observer());
+
+        this.gamemode = engine.getGamemode();
+        this.colors = ImmutableList.builder();
+        this.tiles = ImmutableList.builder();
+        this.actions = ImmutableList.builder();
     }
 
     private class Observer implements EngineObserver {

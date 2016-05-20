@@ -30,14 +30,18 @@ public class PlaceBuildingAction implements BuildingAction {
 
     @Override
     public void write(Writer writer) throws IOException {
+        writer.write(Integer.toString(hex.getLine()));
+        writer.write('\n');
+        writer.write(Integer.toString(hex.getDiag()));
+        writer.write('\n');
         writer.write(type.name());
         writer.write('\n');
     }
 
     static Action doRead(BufferedReader reader) throws IOException {
-        BuildingType type = BuildingType.valueOf(reader.readLine());
         int line = Integer.valueOf(reader.readLine());
         int diag = Integer.valueOf(reader.readLine());
+        BuildingType type = BuildingType.valueOf(reader.readLine());
         return new PlaceBuildingAction(type, Hex.at(line, diag));
     }
 }

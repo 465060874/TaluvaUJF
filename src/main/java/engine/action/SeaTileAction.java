@@ -35,9 +35,9 @@ public class SeaTileAction implements TileAction {
 
     @Override
     public void write(Writer writer) throws IOException {
-        writer.write(coastHex.getLine());
+        writer.write(Integer.toString(coastHex.getLine()));
         writer.write('\n');
-        writer.write(coastHex.getDiag());
+        writer.write(Integer.toString(coastHex.getDiag()));
         writer.write('\n');
         writer.write(orientation.name());
         writer.write('\n');

@@ -78,14 +78,14 @@ public class EngineRecord {
             writer.write(gamemode.name());
             writer.write('\n');
 
-            writer.write(colors.size());
+            writer.write(Integer.toString(colors.size()));
             writer.write('\n');
             for (PlayerColor color : colors) {
                 writer.write(color.name());
                 writer.write('\n');
             }
 
-            writer.write(tiles.size());
+            writer.write(Integer.toString(tiles.size()));
             writer.write('\n');
             for (VolcanoTile tile : tiles) {
                 writer.write(tile.getLeft().name());
@@ -94,7 +94,7 @@ public class EngineRecord {
                 writer.write('\n');
             }
 
-            writer.write(actions.size());
+            writer.write(Integer.toString(actions.size()));
             writer.write('\n');
             for (Action action : actions) {
                 action.write(writer);

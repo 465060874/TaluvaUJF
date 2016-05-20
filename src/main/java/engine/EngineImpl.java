@@ -138,9 +138,17 @@ class EngineImpl implements Engine {
 
     @Override
     public void start() {
-        VolcanoTile tile = volcanoTileStack.current();
-        island.putTile(tile, Hex.at(0, 0), Orientation.NORTH);
+        // TODO Fix this
+        //turn = 0;
+        //placeStep = true;
         observers.forEach(EngineObserver::onStart);
+        observers.forEach(EngineObserver::onTileStackChange);
+
+        VolcanoTile tile = volcanoTileStack.current();
+        Hex origin = Hex.at(0, 0);
+        island.putTile(tile, origin, Orientation.NORTH);
+        observers.forEach(o -> o.onTilePlacementOnSea(new SeaTileAction(origin, Orientation.NORTH)));
+
         nextStep();
     }
 

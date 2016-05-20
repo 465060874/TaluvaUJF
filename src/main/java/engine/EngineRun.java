@@ -8,6 +8,7 @@ import data.PlayerColor;
 import engine.action.*;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
+import engine.record.EngineRecorder;
 import map.IslandIO;
 
 import java.io.File;
@@ -22,13 +23,18 @@ public class EngineRun {
         Engine engine = new EngineBuilder()
                 .gamemode(Gamemode.TwoPlayer)
                 .player(PlayerColor.RED, PlayerHandler.dumbFactory())
-                .player(PlayerColor.WHITE, BotPlayerHandler::new)
+                .player(PlayerColor.WHITE, PlayerHandler.dumbFactory())
                 .build();
         engine.registerObserver(new EngineLogger(engine));
+        EngineRecorder recorder = EngineRecorder.install(engine);
         engine.start();
 
-        File destFile = new File(System.nanoTime() + ".island");
-        IslandIO.write(Files.asCharSink(destFile, StandardCharsets.UTF_8), engine.getIsland());
+        long nanoTime = System.nanoTime();
+        File islandFile = new File(nanoTime + ".island");
+        File taluvaFile = new File(nanoTime + ".taluva");
+
+        IslandIO.write(Files.asCharSink(islandFile, StandardCharsets.UTF_8), engine.getIsland());
+        recorder.getRecord().save(Files.asCharSink(taluvaFile, StandardCharsets.UTF_8));
     }
 
     private static class EngineLogger implements EngineObserver {
