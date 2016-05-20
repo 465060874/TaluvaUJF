@@ -7,13 +7,13 @@ import map.Village;
 import java.util.Set;
 import java.util.UUID;
 
-public class ExpandAction implements Action {
+public class ExpandVillageAction implements BuildingAction {
 
     private final UUID stepUUID;
     private final Village village;
     private final FieldType fieldType;
 
-    public ExpandAction(UUID stepUUID, Village village, FieldType fieldType) {
+    public ExpandVillageAction(UUID stepUUID, Village village, FieldType fieldType) {
         this.stepUUID = stepUUID;
         this.village = village;
         this.fieldType = fieldType;

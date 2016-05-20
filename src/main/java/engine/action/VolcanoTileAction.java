@@ -5,13 +5,13 @@ import map.Orientation;
 
 import java.util.UUID;
 
-public class VolcanoPlacement implements Placement {
+public class VolcanoTileAction implements TileAction {
 
     private final UUID stepUUID;
     private final Hex volcanoHex;
     private final Orientation orientation;
 
-    public VolcanoPlacement(UUID stepUUID, Hex volcanoHex, Orientation orientation) {
+    public VolcanoTileAction(UUID stepUUID, Hex volcanoHex, Orientation orientation) {
         this.stepUUID = stepUUID;
         this.volcanoHex = volcanoHex;
         this.orientation = orientation;

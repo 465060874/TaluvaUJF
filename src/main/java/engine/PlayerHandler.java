@@ -24,10 +24,6 @@ public interface PlayerHandler {
         return DummyPlayerHandler.INSTANCE;
     }
 
-    static Factory dummyFactory() {
-        return (engine) -> DummyPlayerHandler.INSTANCE;
-    }
-
     static Factory dumbFactory() {
         return (engine) -> new DumbPlayerHandler(engine);
     }
@@ -54,36 +50,36 @@ class DumbPlayerHandler implements PlayerHandler {
 
     private final Engine engine;
 
-    public DumbPlayerHandler(Engine engine) {
+    DumbPlayerHandler(Engine engine) {
         this.engine = engine;
     }
 
     @Override
     public void startTileStep() {
-        List<Placement> placements = new ArrayList<>();
+        List<TileAction> tileActions = new ArrayList<>();
         if (engine.getVolcanoPlacements().size() == 0 || engine.getRandom().nextInt(3) < 2) {
-            for (Iterable<SeaPlacement> seaPlacements : engine.getSeaPlacements().values()) {
-                Iterables.addAll(placements, seaPlacements);
+            for (Iterable<SeaTileAction> seaPlacements : engine.getSeaPlacements().values()) {
+                Iterables.addAll(tileActions, seaPlacements);
             }
         }
         else {
-            for (Iterable<VolcanoPlacement> volcanoPlacements : engine.getVolcanoPlacements().values()) {
-                Iterables.addAll(placements, volcanoPlacements);
+            for (Iterable<VolcanoTileAction> volcanoPlacements : engine.getVolcanoPlacements().values()) {
+                Iterables.addAll(tileActions, volcanoPlacements);
             }
         }
 
-        int choice = engine.getRandom().nextInt(placements.size());
-        Placement placement = placements.get(choice);
-        engine.place(placement);
+        int choice = engine.getRandom().nextInt(tileActions.size());
+        TileAction tileAction = tileActions.get(choice);
+        engine.action(tileAction);
     }
 
     @Override
     public void startBuildStep() {
-        List<Action> buildTowerOrTemple = new ArrayList<>();
-        List<Action> buildHut = new ArrayList<>();
-        List<Action> expandVillage = new ArrayList<>();
-        for (Iterable<BuildAction> placements : engine.getBuildActions().values()) {
-            for (BuildAction action : placements) {
+        List<BuildingAction> buildTowerOrTemple = new ArrayList<>();
+        List<BuildingAction> buildHut = new ArrayList<>();
+        List<BuildingAction> expandVillage = new ArrayList<>();
+        for (Iterable<PlaceBuildingAction> placements : engine.getBuildActions().values()) {
+            for (PlaceBuildingAction action : placements) {
                 if (action.getType() == BuildingType.HUT) {
                     buildHut.add(action);
                 }
@@ -92,24 +88,24 @@ class DumbPlayerHandler implements PlayerHandler {
                 }
             }
         }
-        for (Iterable<ExpandAction> placements : engine.getExpandActions().values()) {
+        for (Iterable<ExpandVillageAction> placements : engine.getExpandActions().values()) {
             Iterables.addAll(expandVillage, placements);
         }
 
-        List<Action> actions;
+        List<BuildingAction> buildingActions;
         if (!buildTowerOrTemple.isEmpty()) {
-            actions = buildTowerOrTemple;
+            buildingActions = buildTowerOrTemple;
         }
         else if (!expandVillage.isEmpty()) {
-            actions = expandVillage;
+            buildingActions = expandVillage;
         }
         else {
-            actions = buildHut;
+            buildingActions = buildHut;
         }
 
-        int choice = engine.getRandom().nextInt(actions.size());
-        Action action = actions.get(choice);
-        engine.action(action);
+        int choice = engine.getRandom().nextInt(buildingActions.size());
+        BuildingAction buildingAction = buildingActions.get(choice);
+        engine.action(buildingAction);
     }
 
     @Override

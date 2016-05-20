@@ -1,9 +1,9 @@
 package engine;
 
-import engine.action.BuildAction;
-import engine.action.ExpandAction;
-import engine.action.SeaPlacement;
-import engine.action.VolcanoPlacement;
+import engine.action.PlaceBuildingAction;
+import engine.action.ExpandVillageAction;
+import engine.action.SeaTileAction;
+import engine.action.VolcanoTileAction;
 
 import java.util.List;
 
@@ -34,22 +34,22 @@ public interface EngineObserver {
     /**
      * Appelé quand une tuile est placé sur la mer
      */
-    void onTilePlacementOnSea(SeaPlacement placement);
+    void onTilePlacementOnSea(SeaTileAction action);
 
     /**
      * Appelé quand une tuile est placé sur un volcan
      */
-    void onTilePlacementOnVolcano(VolcanoPlacement placement);
+    void onTilePlacementOnVolcano(VolcanoTileAction action);
 
     /**
      * Appelé quand un batiment est construit
      */
-    void onBuild(BuildAction action);
+    void onBuild(PlaceBuildingAction action);
 
     /**
      * Appelé quand une extension de village est faite
      */
-    void onExpand(ExpandAction action);
+    void onExpand(ExpandVillageAction action);
 
     /**
      * Appelé en cas d'élimination

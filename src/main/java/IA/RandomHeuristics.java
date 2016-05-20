@@ -28,27 +28,27 @@ public class RandomHeuristics implements Heuristics {
         }
     }
 
-    public int evaluateSeaPlacement(Engine e, SeaPlacement move){
+    public int evaluateSeaPlacement(Engine e, SeaTileAction move){
         return r.nextInt(40) - 20;
     }
 
-    public int evaluateVolcanoPlacement(Engine e, VolcanoPlacement move){
+    public int evaluateVolcanoPlacement(Engine e, VolcanoTileAction move){
         return r.nextInt(40) - 20;
     }
 
-    public int evaluateBuildAction(Engine e, Placement placement, BuildAction move, int pointsPlacement, PriorityQueue<FullMove>[] strategiesQueues){
-        FullMove m;
+    public int evaluateBuildAction(Engine e, TileAction tileAction, PlaceBuildingAction move, int pointsPlacement, PriorityQueue<Move>[] strategiesQueues){
+        Move m;
         for (int i = 0; i < nbStrategies; i++) {
-            m = new FullMove( move, placement, r.nextInt(40) + pointsPlacement - 20 );
+            m = new Move( move, tileAction, r.nextInt(40) + pointsPlacement - 20 );
             strategiesQueues[i].add(m);
         }
         return 0;
     }
 
-    public int evaluateExpandAction(Engine e, Placement placement, ExpandAction move, int pointsPlacement, PriorityQueue<FullMove>[] strategiesQueues){
-        FullMove m;
+    public int evaluateExpandAction(Engine e, TileAction tileAction, ExpandVillageAction move, int pointsPlacement, PriorityQueue<Move>[] strategiesQueues){
+        Move m;
         for (int i = 0; i < nbStrategies; i++) {
-            m = new FullMove( move, placement, r.nextInt(40) + pointsPlacement - 20 );
+            m = new Move( move, tileAction, r.nextInt(40) + pointsPlacement - 20 );
             strategiesQueues[i].add(m);
         }
         return 0;

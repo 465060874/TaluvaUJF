@@ -5,13 +5,13 @@ import map.Orientation;
 
 import java.util.UUID;
 
-public class SeaPlacement implements Placement {
+public class SeaTileAction implements TileAction {
 
     private final UUID stepUUID;
     private final Hex coastHex;
     private final Orientation orientation;
 
-    public SeaPlacement(UUID stepUUID, Hex coastHex, Orientation orientation) {
+    public SeaTileAction(UUID stepUUID, Hex coastHex, Orientation orientation) {
         this.stepUUID = stepUUID;
         this.coastHex = coastHex;
         this.orientation = orientation;

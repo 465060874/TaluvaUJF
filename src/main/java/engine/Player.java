@@ -60,7 +60,7 @@ public class Player {
         return playerHandler;
     }
 
-    Player copyWithDummyHandler() {
+    public Player copyWithDummyHandler() {
         return new Player(this, PlayerHandler.dummy());
     }
 

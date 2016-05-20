@@ -70,31 +70,30 @@ public interface Engine {
      * Retourne la liste des placements possibles de tuiles
      * sur la mer
      */
-    HexMap<? extends Iterable<SeaPlacement>> getSeaPlacements();
+    HexMap<? extends Iterable<SeaTileAction>> getSeaPlacements();
 
     /**
      * Retourne la liste des placements possibles de tuiles
      * sur les volcans
      */
-    HexMap<? extends Iterable<VolcanoPlacement>> getVolcanoPlacements();
+    HexMap<? extends Iterable<VolcanoTileAction>> getVolcanoPlacements();
 
     /**
      * Retourne la liste des constructions possibles
      */
-    HexMap<? extends Iterable<BuildAction>> getBuildActions();
+    HexMap<? extends Iterable<PlaceBuildingAction>> getBuildActions();
 
     /**
      * Retourne la liste des extensions de villages possibles
      */
-    HexMap<? extends Iterable<ExpandAction>> getExpandActions();
+    HexMap<? extends Iterable<ExpandVillageAction>> getExpandActions();
 
     /**
-     * Réalise le placement passé en paramètre
+     * Réalise l'action passée en paramètre
      */
-    void place(Placement placement);
-    void placeOnSea(SeaPlacement placement);
-    void placeOnVolcano(VolcanoPlacement placement);
-    void action(Action action);
-    void build(BuildAction action);
-    void expand(ExpandAction action);
+    void action(Action Action);
+    void placeOnSea(SeaTileAction placement);
+    void placeOnVolcano(VolcanoTileAction placement);
+    void build(PlaceBuildingAction action);
+    void expand(ExpandVillageAction action);
 }

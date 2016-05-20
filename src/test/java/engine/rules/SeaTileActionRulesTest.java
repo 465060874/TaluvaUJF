@@ -16,13 +16,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
-public class SeaPlacementRulesTest {
+public class SeaTileActionRulesTest {
 
     private static final VolcanoTile TILE = new VolcanoTile(FieldType.JUNGLE, FieldType.JUNGLE);
 
     @Test
     public void testValidate() {
-        URL rsc = SeaPlacementRulesTest.class.getResource("SeaPlacementRulesTest.island");
+        URL rsc = SeaTileActionRulesTest.class.getResource("SeaTileActionRulesTest.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
         Hex hex;
@@ -86,14 +86,14 @@ public class SeaPlacementRulesTest {
     }
 
     private void assertValidateFalse(Island island, Hex hex, Orientation orientation) {
-        assertFalse("Placement on sea at " + hex
+        assertFalse("TileAction on sea at " + hex
                         + " with orientation " + orientation
                         + " expected to not be valid, but was",
                 SeaPlacementRules.validate(island, TILE, hex, orientation));
     }
 
     private void assertValidateTrue_(Island island, Hex hex, Orientation orientation) {
-        assertTrue("Placement on sea at " + hex
+        assertTrue("TileAction on sea at " + hex
                         + " with orientation " + orientation
                         + " expected to be valid, but was not",
                 SeaPlacementRules.validate(island, TILE, hex, orientation));

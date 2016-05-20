@@ -9,7 +9,7 @@ public class BotPlayerHandler implements PlayerHandler {
 
     private final Engine engine;
     private final BotPlayer bot;
-    private FullMove move;
+    private Move move;
 
     public BotPlayerHandler(Engine engine) {
         this.engine = engine;
@@ -21,12 +21,12 @@ public class BotPlayerHandler implements PlayerHandler {
         long startTime = System.nanoTime();
         move = bot.play(engine.copyWithoutObservers(), 3);
         System.out.println("Fini : " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
-        engine.place(move.placement);
+        engine.action(move.tileAction);
     }
 
     @Override
     public void startBuildStep() {
-        engine.action(move.action);
+        engine.action(move.buildingAction);
     }
 
     @Override

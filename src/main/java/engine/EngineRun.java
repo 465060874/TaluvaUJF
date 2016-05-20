@@ -4,10 +4,9 @@ import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import data.BuildingType;
 import data.PlayerColor;
-import engine.action.BuildAction;
-import engine.action.ExpandAction;
-import engine.action.SeaPlacement;
-import engine.action.VolcanoPlacement;
+import engine.action.*;
+import engine.action.SeaTileAction;
+import engine.action.VolcanoTileAction;
 import map.IslandIO;
 
 import java.io.File;
@@ -42,6 +41,10 @@ public class EngineRun {
         }
 
         @Override
+        public void onStart() {
+        }
+
+        @Override
         public void onTileStackChange() {
             System.out.println("[[Tiles remaining " + engine.getVolcanoTileStack().size() + "]]");
         }
@@ -53,27 +56,24 @@ public class EngineRun {
 
         @Override
         public void onBuildStepStart() {
-
         }
 
         @Override
-        public void onTilePlacementOnSea(SeaPlacement placement) {
-
+        public void onTilePlacementOnSea(SeaTileAction placement) {
         }
 
         @Override
-        public void onTilePlacementOnVolcano(VolcanoPlacement placement) {
-
+        public void onTilePlacementOnVolcano(VolcanoTileAction placement) {
         }
 
         @Override
-        public void onBuild(BuildAction action) {
+        public void onBuild(PlaceBuildingAction action) {
             System.out.println("* Build");
             printRemainingBuilding();
         }
 
         @Override
-        public void onExpand(ExpandAction action) {
+        public void onExpand(ExpandVillageAction action) {
             System.out.println("* Expansion");
             printRemainingBuilding();
         }

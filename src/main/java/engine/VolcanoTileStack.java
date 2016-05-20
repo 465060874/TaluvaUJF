@@ -17,7 +17,11 @@ import static com.google.common.base.Preconditions.checkState;
 public interface VolcanoTileStack {
 
     static VolcanoTileStack.Factory randomFactory(Iterable<VolcanoTile> tiles) {
-        return new RandomVolcanoTileStack.Factory(tiles);
+        return new VolcanoTileStackImpl.RandomFactory(tiles);
+    }
+
+    static VolcanoTileStack.Factory predefinedFactory(Iterable<VolcanoTile> tiles) {
+        return new VolcanoTileStackImpl.PredefinedFactory(tiles);
     }
 
     int size();
@@ -28,7 +32,7 @@ public interface VolcanoTileStack {
 
     void next();
 
-    VolcanoTileStack copy(Random random);
+    VolcanoTileStack copyShuffled(Random random);
 
     void previous();
 
@@ -38,17 +42,17 @@ public interface VolcanoTileStack {
     }
 }
 
-class RandomVolcanoTileStack implements VolcanoTileStack {
+class VolcanoTileStackImpl implements VolcanoTileStack {
 
     private final ImmutableList<VolcanoTile> tiles;
     private int index;
 
-    private RandomVolcanoTileStack(ImmutableList<VolcanoTile> tiles) {
+    private VolcanoTileStackImpl(ImmutableList<VolcanoTile> tiles) {
         this.tiles = tiles;
         this.index = 0;
     }
 
-    private RandomVolcanoTileStack(ImmutableList<VolcanoTile> tiles, int index) {
+    private VolcanoTileStackImpl(ImmutableList<VolcanoTile> tiles, int index) {
         this.tiles = tiles;
         this.index = index;
     }
@@ -79,18 +83,18 @@ class RandomVolcanoTileStack implements VolcanoTileStack {
     }
 
     @Override
-    public VolcanoTileStack copy(Random random) {
+    public VolcanoTileStack copyShuffled(Random random) {
         List<VolcanoTile> copyTiles = new ArrayList<>();
         copyTiles.addAll(tiles);
         Collections.shuffle(copyTiles.subList(index + 1, copyTiles.size()));
-        return new RandomVolcanoTileStack(ImmutableList.copyOf(copyTiles), index);
+        return new VolcanoTileStackImpl(ImmutableList.copyOf(copyTiles), index);
     }
 
-    static class Factory implements VolcanoTileStack.Factory {
+    static class RandomFactory implements VolcanoTileStack.Factory {
 
         private final List<VolcanoTile> roulette;
 
-        Factory(Iterable<VolcanoTile> tiles) {
+        RandomFactory(Iterable<VolcanoTile> tiles) {
             this.roulette = new ArrayList<>();
             Iterables.addAll(roulette, tiles);
         }
@@ -98,11 +102,28 @@ class RandomVolcanoTileStack implements VolcanoTileStack {
         @Override
         public VolcanoTileStack create(Gamemode gamemode, Random random) {
             checkState(gamemode.getTilesCount() <= roulette.size(),
-                    "Insufficient number of tiles (" + gamemode.getTilesCount() +
+                    "Insufficient number of tiles (" + roulette.size() +
                             "), expected " + gamemode.getTilesCount() + " at least");
             Collections.shuffle(roulette, random);
 
-            return new RandomVolcanoTileStack(ImmutableList.copyOf(roulette.subList(0, gamemode.getTilesCount())));
+            return new VolcanoTileStackImpl(ImmutableList.copyOf(roulette.subList(0, gamemode.getTilesCount())));
+        }
+    }
+
+    static class PredefinedFactory implements VolcanoTileStack.Factory {
+
+        private final ImmutableList<VolcanoTile> tiles;
+
+        PredefinedFactory(Iterable<VolcanoTile> tiles) {
+            this.tiles = ImmutableList.copyOf(tiles);
+        }
+
+        @Override
+        public VolcanoTileStack create(Gamemode gamemode, Random random) {
+            checkState(gamemode.getTilesCount() <= tiles.size(),
+                    "Insufficient number of tiles (" + tiles.size() +
+                            "), expected " + gamemode.getTilesCount() + " at least");
+            return new VolcanoTileStackImpl(tiles.subList(0, gamemode.getTilesCount()));
         }
     }
 }

@@ -16,19 +16,19 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
-public class VolcanoPlacementRulesTest {
+public class VolcanoTileActionRulesTest {
 
     private static final VolcanoTile TILE = new VolcanoTile(FieldType.JUNGLE, FieldType.JUNGLE);
 
     private void assertValidateFalse(Island island, Hex hex, Orientation orientation) {
-        assertFalse("Placement on volcano at " + hex
+        assertFalse("TileAction on volcano at " + hex
                         + " with orientation " + orientation
                         + " expected to not be valid, but was",
                 VolcanoPlacementRules.validate(island, TILE, hex, orientation));
     }
 
     private void assertValidateTrue_(Island island, Hex hex, Orientation orientation) {
-        assertTrue("Placement on volcano at " + hex
+        assertTrue("TileAction on volcano at " + hex
                         + " with orientation " + orientation
                         + " expected to be valid, but was not",
                 VolcanoPlacementRules.validate(island, TILE, hex, orientation));
@@ -36,7 +36,7 @@ public class VolcanoPlacementRulesTest {
 
     @Test
     public void testOrientations() {
-        URL rsc = VolcanoPlacementRulesTest.class.getResource("VolcanoPlacementRulesTest.island");
+        URL rsc = VolcanoTileActionRulesTest.class.getResource("VolcanoTileActionRulesTest.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
         Hex hex;
@@ -92,7 +92,7 @@ public class VolcanoPlacementRulesTest {
 
     @Test
     public void testVillages() {
-        URL rsc = VolcanoPlacementRulesTest.class.getResource("VolcanoPlacementRulesTest2.island");
+        URL rsc = VolcanoTileActionRulesTest.class.getResource("VolcanoPlacementRulesTest2.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
         Hex hex;
