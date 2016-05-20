@@ -383,13 +383,13 @@ class EngineImpl implements Engine {
 
     @Override
     public HexMap<? extends Iterable<BuildAction>> getBuildActions() {
-        checkState(placeStep, "Requesting build actions during tile placements");
+        checkState(!placeStep, "Requesting build actions during tile placements");
         return buildActions;
     }
 
     @Override
     public HexMap<? extends Iterable<ExpandAction>> getExpandActions() {
-        checkState(placeStep, "Requesting expand actions during tile placements");
+        checkState(!placeStep, "Requesting expand actions during tile placements");
         return expandActions;
     }
 
