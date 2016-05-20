@@ -2,8 +2,6 @@ package menu;
 
 
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -13,7 +11,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 //import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
@@ -33,6 +30,8 @@ public class Home extends Application{
         Group root = new Group();
         Scene scene = new Scene(root, largeurs, hauteurs);
         //scene.setFill(Color.rgb(169, 234, 254));
+        scene.getStylesheets().add("/menu/menus.css");
+
 
         int lv = largeurs/2;
 
@@ -49,7 +48,7 @@ public class Home extends Application{
         //Button
         Button breprendre = new Button("REPRENDRE");
         breprendre.setPrefWidth(lv);
-        breprendre.setStyle("-fx-font: 12 arial; -fx-base: #FEB3F2;");
+        breprendre.getStyleClass().add("breprendre");
         VBox vreprendre = new VBox();
         vreprendre.setAlignment(Pos.CENTER);
         vreprendre.getChildren().add(breprendre);
@@ -80,8 +79,8 @@ public class Home extends Application{
         vBoxg.getChildren().add(hBoxh);
 
         VBox vBoxgg = new VBox(5);
-        vBoxgg.setStyle("-fx-border-color: pink;" +
-                "-fx-border-style: solid;-fx-border-width: 1;");
+       // vBoxgg.setStyle("-fx-border-color: pink;" +
+         //       "-fx-border-style: solid;-fx-border-width: 1;");
         vBoxgg.setPadding(new Insets(10, 10, 10, 10));
         vBoxgg.setPrefWidth(lv);
         vBoxgg.setAlignment(Pos.CENTER);
@@ -94,8 +93,8 @@ public class Home extends Application{
         vBoxgg.getChildren().addAll(bicone);
 
         VBox vBoxgd = new VBox(5);
-        vBoxgd.setStyle("-fx-border-color: pink;" +
-                "-fx-border-style: solid;-fx-border-width: 1;");
+       // vBoxgd.setStyle("-fx-border-color: pink;" +
+         //       "-fx-border-style: solid;-fx-border-width: 1;");
         vBoxgd.setPadding(new Insets(10, 10, 10, 10));
         vBoxgd.setPrefWidth(lv);
         vBoxgd.setAlignment(Pos.CENTER);
@@ -106,6 +105,9 @@ public class Home extends Application{
         ToggleButton difficile = new ToggleButton("DIFFICILE");
         difficile.setPrefWidth(150);
         vBoxgd.getChildren().addAll(simple,moyen,difficile);
+        simple.getStyleClass().add("buttonniveaux1");
+        moyen.getStyleClass().add("buttonniveaux2");
+        difficile.getStyleClass().add("buttonniveaux3");
 
         hBoxg.getChildren().addAll(vBoxgg,vBoxgd);
         vBoxg.getChildren().add(hBoxg);
@@ -113,19 +115,25 @@ public class Home extends Application{
 
         //grid2
         GridPane grid2 = new GridPane();
-        VBox vBoxg2 = new VBox(2);
+        VBox vBoxg2 = new VBox(5);
         vBoxg2.setAlignment(Pos.CENTER);
         vBoxg2.setPrefWidth(largeurs);
-        ToggleButton unjoueur = new ToggleButton("[JOUEUR1]");
+        Button unjoueur = new Button("[JOUEUR1]");
         unjoueur.setPrefWidth(largeurs);
-        ToggleButton deuxjoueurs = new ToggleButton("[JOUEUR1]  [JOUEUR2]");
+        Button deuxjoueurs = new Button("[JOUEUR1]  [JOUEUR2]");
         deuxjoueurs.setPrefWidth(largeurs);
-        ToggleButton troisjoueurs = new ToggleButton("[JOUEUR1]  [JOUEUR2]  [JOUEUR3]");
+        Button troisjoueurs = new Button("[JOUEUR1]  [JOUEUR2]  [JOUEUR3]");
         troisjoueurs.setPrefWidth(largeurs);
-        ToggleButton quatrejoueurs1 = new ToggleButton("[JOUEUR1]  [JOUEUR2]  [JOUEUR3]  [JOUEUR4]");
+        Button quatrejoueurs1 = new Button("[JOUEUR1]  [JOUEUR2]  [JOUEUR3]  [JOUEUR4]");
         quatrejoueurs1.setPrefWidth(largeurs);
-        ToggleButton quatrejoueurs2 = new ToggleButton("[JOUEUR1 / JOUEUR2]     [JOUEUR3 / JOUEUR4]");
+        Button quatrejoueurs2 = new Button("[JOUEUR1 / JOUEUR2]     [JOUEUR3 / JOUEUR4]");
         quatrejoueurs2.setPrefWidth(largeurs);
+
+        unjoueur.getStyleClass().add("buttonjoueur");
+        deuxjoueurs.getStyleClass().add("buttonjoueur");
+        troisjoueurs.getStyleClass().add("buttonjoueur");
+        quatrejoueurs1.getStyleClass().add("buttonjoueur");
+        quatrejoueurs2.getStyleClass().add("buttonjoueur");
 
         vBoxg2.getChildren().addAll(unjoueur,deuxjoueurs,troisjoueurs,quatrejoueurs1,quatrejoueurs2);
         grid2.getChildren().add(vBoxg2);
@@ -136,6 +144,9 @@ public class Home extends Application{
         t2.setAlignment(Pos.CENTER);
         TitledPane t3 = new TitledPane("CHANGER", new Button("B3"));
         t3.setAlignment(Pos.CENTER);
+        t1.getStyleClass().add("tp");
+        t2.getStyleClass().add("tp");
+        t3.getStyleClass().add("tp");
         Accordion accordion = new Accordion();
         accordion.getPanes().addAll(t1, t2, t3);
         for (TitledPane titledPane : accordion.getPanes()) {
