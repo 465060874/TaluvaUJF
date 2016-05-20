@@ -14,6 +14,8 @@ public interface HexMap<E> {
 
     void put(Hex hex, E element);
 
+    void remove(Hex hex);
+
     int size();
 
     Iterable<Hex> hexes();
@@ -21,4 +23,5 @@ public interface HexMap<E> {
     Iterable<E> values();
 
     HexMap<E> copy();
+
 }

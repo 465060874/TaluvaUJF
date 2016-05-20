@@ -337,6 +337,7 @@ class EngineImpl implements Engine {
         HexMap<List<ExpandVillageAction>> tmpExpandActions = HexMap.create();
         Iterable<Village> villages = island.getVillages(getCurrentPlayer().getColor());
         for (Village village : villages) {
+            Hex firstHex = village.getHexes().iterator().next();
             boolean[] types = new boolean[FieldType.values().length];
             for (Hex hex : village.getHexes()) {
                 final Iterable<Hex> neighborhood = hex.getNeighborhood();
@@ -354,7 +355,7 @@ class EngineImpl implements Engine {
             for (FieldType fieldType : FieldType.values()) {
                 if (types[fieldType.ordinal()]
                         && ExpandRules.canExpandVillage(this, village, fieldType)) {
-                    actions.add(new ExpandVillageAction(stepUUID, village, fieldType));
+                    actions.add(new ExpandVillageAction(stepUUID, firstHex, fieldType));
                 }
             }
             for (Hex hex : village.getHexes()) {
@@ -462,7 +463,8 @@ class EngineImpl implements Engine {
         PlayerColor color = getCurrentPlayer().getColor();
         FieldBuilding building = FieldBuilding.of(BuildingType.HUT, color);
         int buildingCount = 0;
-        for (Hex hex : action.getExpandHexes()) {
+        Village village = getIsland().getVillage(action.getVillageHex());
+        for (Hex hex : village.getExpandableHexes().get(action.getFieldType())) {
             island.putBuilding(hex, building);
             buildingCount += island.getField(hex).getLevel();
         }
@@ -547,7 +549,8 @@ class EngineImpl implements Engine {
         ActionSave(EngineImpl engine, ExpandVillageAction action) {
             this.stepUUID = action.getStepUUID();
             ImmutableMap.Builder<Hex, Field> islandsDiffBuilder = ImmutableMap.builder();
-            for (Hex hex : action.getVillage().getExpandableHexes().get(action.getFieldType())) {
+            Village village = engine.getIsland().getVillage(action.getVillageHex());
+            for (Hex hex : village.getExpandableHexes().get(action.getFieldType())) {
                 Field field = engine.island.getField(hex);
                 islandsDiffBuilder.put(hex, field);
             }

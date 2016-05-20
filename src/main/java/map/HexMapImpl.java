@@ -46,6 +46,10 @@ class HexMapImpl<E> implements HexMap<E> {
         map.put(checkNotNull(hex), checkNotNull(element));
     }
 
+    public void remove(Hex hex) {
+        map.remove(hex);
+    }
+
     @Override
     public Iterable<Hex> hexes() {
         return Iterables.unmodifiableIterable(map.keySet());

@@ -155,6 +155,7 @@ class  IslandImpl implements Island {
 
     public void putField(Hex hex, Field field) {
         if (field == SEA) {
+            map.remove(hex);
             return;
         }
 
