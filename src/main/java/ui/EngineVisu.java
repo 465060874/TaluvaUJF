@@ -1,15 +1,12 @@
 package ui;
 
 import IA.BotPlayerHandler;
-import com.google.common.io.Files;
 import data.PlayerColor;
 import engine.*;
 import engine.action.ExpandVillageAction;
 import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
-import engine.record.EngineRecord;
-import engine.record.EngineRecorder;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -18,8 +15,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -57,7 +52,7 @@ public class EngineVisu extends Application implements EngineObserver {
 
     @Override
     public void onStart() {
-        islandView.canvas.redraw();
+        islandView.islandCanvas.redraw();
     }
 
     @Override
@@ -75,22 +70,22 @@ public class EngineVisu extends Application implements EngineObserver {
 
     @Override
     public void onTilePlacementOnSea(SeaTileAction action) {
-        islandView.canvas.redraw();
+        islandView.islandCanvas.redraw();
     }
 
     @Override
     public void onTilePlacementOnVolcano(VolcanoTileAction action) {
-        islandView.canvas.redraw();
+        islandView.islandCanvas.redraw();
     }
 
     @Override
     public void onBuild(PlaceBuildingAction action) {
-        islandView.canvas.redraw();
+        islandView.islandCanvas.redraw();
     }
 
     @Override
     public void onExpand(ExpandVillageAction action) {
-        islandView.canvas.redraw();
+        islandView.islandCanvas.redraw();
     }
 
     @Override
