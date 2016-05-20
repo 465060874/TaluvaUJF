@@ -84,7 +84,7 @@ public class BotPlayer {
                 Move m = play(engine, depth - 1);
                 if (m.points < bestPoints) {
                     bestPoints = m.points;
-                    bestMove = m;
+                    bestMove = branchMoves[i];
                 }
             }
             else {
