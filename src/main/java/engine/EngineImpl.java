@@ -33,7 +33,6 @@ class EngineImpl implements Engine {
 
     private int turn;
     private boolean placeStep;
-    private UUID stepUUID;
     private List<StepSave> stepSaves;
 
     private HexMap<List<SeaTileAction>> seaPlacements;
@@ -93,7 +92,6 @@ class EngineImpl implements Engine {
 
         this.turn = engine.turn;
         this.placeStep = engine.placeStep;
-        this.stepUUID = engine.stepUUID;
         this.stepSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
         stepSaves.addAll(engine.stepSaves);
 
@@ -178,7 +176,6 @@ class EngineImpl implements Engine {
         if (placeStep) {
             placeStep = false;
 
-            stepUUID = UUID.randomUUID();
             updateBuildActions();
             updateExpandActions();
             if (buildActions.size() == 0 && expandActions.size() == 0) {
@@ -227,7 +224,6 @@ class EngineImpl implements Engine {
 
             observers.forEach(EngineObserver::onTileStackChange);
 
-            stepUUID = UUID.randomUUID();
             updateSeaPlacements();
             updateVolcanoPlacements();
 
@@ -269,7 +265,7 @@ class EngineImpl implements Engine {
                     tmpSeaPlacements.put(hex, list);
                 }
 
-                list.add(new SeaTileAction(stepUUID, hex, orientation));
+                list.add(new SeaTileAction(hex, orientation));
             }
         }
 
@@ -292,7 +288,7 @@ class EngineImpl implements Engine {
                     tmpVolcanosPlacements.put(hex, list);
                 }
 
-                list.add(new VolcanoTileAction(stepUUID, hex, orientation));
+                list.add(new VolcanoTileAction(hex, orientation));
             }
         }
 
@@ -319,13 +315,13 @@ class EngineImpl implements Engine {
                 }
 
                 if (hutValid) {
-                    list.add(new PlaceBuildingAction(stepUUID, BuildingType.HUT, hex));
+                    list.add(new PlaceBuildingAction(BuildingType.HUT, hex));
                 }
                 if (templeValid) {
-                    list.add(new PlaceBuildingAction(stepUUID, BuildingType.TEMPLE, hex));
+                    list.add(new PlaceBuildingAction(BuildingType.TEMPLE, hex));
                 }
                 if (towerValid) {
-                    list.add(new PlaceBuildingAction(stepUUID, BuildingType.TOWER, hex));
+                    list.add(new PlaceBuildingAction(BuildingType.TOWER, hex));
                 }
             }
         }
@@ -355,7 +351,7 @@ class EngineImpl implements Engine {
             for (FieldType fieldType : FieldType.values()) {
                 if (types[fieldType.ordinal()]
                         && ExpandRules.canExpandVillage(this, village, fieldType)) {
-                    actions.add(new ExpandVillageAction(stepUUID, firstHex, fieldType));
+                    actions.add(new ExpandVillageAction(firstHex, fieldType));
                 }
             }
             for (Hex hex : village.getHexes()) {
@@ -503,11 +499,9 @@ class EngineImpl implements Engine {
 
     private static class PlacementSave implements StepSave {
 
-        private final UUID stepUUID;
         private final ImmutableMap<Hex, Field> islandDiff;
 
         PlacementSave(EngineImpl engine, SeaTileAction placement) {
-            this.stepUUID = placement.getStepUUID();
             this.islandDiff = ImmutableMap.of(
                     placement.getHex1(), engine.island.getField(placement.getHex1()),
                     placement.getHex2(), engine.island.getField(placement.getHex2()),
@@ -515,7 +509,6 @@ class EngineImpl implements Engine {
         }
 
         PlacementSave(EngineImpl engine, VolcanoTileAction placement) {
-            this.stepUUID = placement.getStepUUID();
             this.islandDiff = ImmutableMap.of(
                     placement.getVolcanoHex(), engine.island.getField(placement.getVolcanoHex()),
                     placement.getLeftHex(), engine.island.getField(placement.getLeftHex()),
@@ -524,7 +517,6 @@ class EngineImpl implements Engine {
 
         @Override
         public void restore(EngineImpl engine) {
-            engine.stepUUID = stepUUID;
             for (Map.Entry<Hex, Field> entry : islandDiff.entrySet()) {
                 engine.island.putField(entry.getKey(), entry.getValue());
             }
@@ -533,13 +525,11 @@ class EngineImpl implements Engine {
 
     private static class ActionSave implements StepSave {
 
-        private final UUID stepUUID;
         private final ImmutableMap<Hex, Field> islandDiff;
         private final BuildingType buildingType;
         private final int buildingCount;
 
         ActionSave(EngineImpl engine, PlaceBuildingAction action) {
-            this.stepUUID = action.getStepUUID();
             Field field = engine.island.getField(action.getHex());
             this.islandDiff = ImmutableMap.of(action.getHex(), field);
             this.buildingType = action.getType();
@@ -547,7 +537,6 @@ class EngineImpl implements Engine {
         }
 
         ActionSave(EngineImpl engine, ExpandVillageAction action) {
-            this.stepUUID = action.getStepUUID();
             ImmutableMap.Builder<Hex, Field> islandsDiffBuilder = ImmutableMap.builder();
             Village village = engine.getIsland().getVillage(action.getVillageHex());
             for (Hex hex : village.getExpandableHexes().get(action.getFieldType())) {
@@ -562,7 +551,6 @@ class EngineImpl implements Engine {
 
         @Override
         public void restore(EngineImpl engine) {
-            engine.stepUUID = stepUUID;
             for (Map.Entry<Hex, Field> entry : islandDiff.entrySet()) {
                 engine.island.putField(entry.getKey(), entry.getValue());
             }

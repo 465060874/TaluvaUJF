@@ -67,13 +67,14 @@ public class EngineRun {
 
         @Override
         public void onBuild(PlaceBuildingAction action) {
-            System.out.println("* Build");
+            System.out.println("* Build a " + action.getType() + " at " + action.getHex());
             printRemainingBuilding();
         }
 
         @Override
         public void onExpand(ExpandVillageAction action) {
-            System.out.println("* Expansion");
+            System.out.println("* Expansion a village at " + action.getVillageHex()
+                    + " towards " + action.getFieldType());
             printRemainingBuilding();
         }
 

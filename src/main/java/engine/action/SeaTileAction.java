@@ -6,22 +6,15 @@ import map.Orientation;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.UUID;
 
 public class SeaTileAction implements TileAction {
 
-    private final UUID stepUUID;
     private final Hex coastHex;
     private final Orientation orientation;
 
-    public SeaTileAction(UUID stepUUID, Hex coastHex, Orientation orientation) {
-        this.stepUUID = stepUUID;
+    public SeaTileAction(Hex coastHex, Orientation orientation) {
         this.coastHex = coastHex;
         this.orientation = orientation;
-    }
-
-    public UUID getStepUUID() {
-        return stepUUID;
     }
 
     public Hex getHex1() {
@@ -54,6 +47,6 @@ public class SeaTileAction implements TileAction {
         int line = Integer.valueOf(reader.readLine());
         int diag = Integer.valueOf(reader.readLine());
         Orientation orientation = Orientation.valueOf(reader.readLine());
-        return new SeaTileAction(UUID.randomUUID(), Hex.at(line, diag), orientation);
+        return new SeaTileAction(Hex.at(line, diag), orientation);
     }
 }

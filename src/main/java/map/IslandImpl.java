@@ -156,10 +156,10 @@ class  IslandImpl implements Island {
     public void putField(Hex hex, Field field) {
         if (field == SEA) {
             map.remove(hex);
-            return;
         }
-
-        map.put(hex, field);
+        else {
+            map.put(hex, field);
+        }
     }
 
     public void putTile(VolcanoTile tile, Hex hex, Orientation orientation) {

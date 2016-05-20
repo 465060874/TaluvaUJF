@@ -6,25 +6,18 @@ import map.Hex;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.UUID;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class PlaceBuildingAction implements BuildingAction {
 
-    private final UUID stepUUID;
     private final BuildingType type;
     private final Hex hex;
 
-    public PlaceBuildingAction(UUID stepUUID, BuildingType type, Hex hex) {
+    public PlaceBuildingAction(BuildingType type, Hex hex) {
         checkArgument(type != BuildingType.NONE);
-        this.stepUUID = stepUUID;
         this.type = type;
         this.hex = hex;
-    }
-
-    public UUID getStepUUID() {
-        return stepUUID;
     }
 
     public BuildingType getType() {
@@ -45,6 +38,6 @@ public class PlaceBuildingAction implements BuildingAction {
         BuildingType type = BuildingType.valueOf(reader.readLine());
         int line = Integer.valueOf(reader.readLine());
         int diag = Integer.valueOf(reader.readLine());
-        return new PlaceBuildingAction(UUID.randomUUID(), type, Hex.at(line, diag));
+        return new PlaceBuildingAction(type, Hex.at(line, diag));
     }
 }

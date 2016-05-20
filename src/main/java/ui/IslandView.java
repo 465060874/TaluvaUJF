@@ -12,7 +12,7 @@ import map.Island;
 
 class IslandView extends StackPane {
 
-    private final IslandCanvas canvas;
+    final IslandCanvas canvas;
     private final FreeTileOverlay freeTileOverlay;
 
     private double mouseXBeforeDrag;

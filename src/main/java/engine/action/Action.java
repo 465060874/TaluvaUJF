@@ -3,11 +3,8 @@ package engine.action;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.UUID;
 
 public interface Action {
-
-    UUID getStepUUID();
 
     void write(Writer writer) throws IOException;
 

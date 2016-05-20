@@ -2,9 +2,9 @@ package engine;
 
 public enum Gamemode {
 
-    TwoPlayer(48, 2),
+    TwoPlayer(24, 2),
 
-    ThreePlayer(48, 3),
+    ThreePlayer(36, 3),
 
     FourPlayer(48, 4),
 

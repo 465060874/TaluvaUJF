@@ -6,22 +6,15 @@ import map.Orientation;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.UUID;
 
 public class VolcanoTileAction implements TileAction {
 
-    private final UUID stepUUID;
     private final Hex volcanoHex;
     private final Orientation orientation;
 
-    public VolcanoTileAction(UUID stepUUID, Hex volcanoHex, Orientation orientation) {
-        this.stepUUID = stepUUID;
+    public VolcanoTileAction(Hex volcanoHex, Orientation orientation) {
         this.volcanoHex = volcanoHex;
         this.orientation = orientation;
-    }
-
-    public UUID getStepUUID() {
-        return stepUUID;
     }
 
     public Hex getVolcanoHex() {
@@ -49,6 +42,6 @@ public class VolcanoTileAction implements TileAction {
         int line = Integer.valueOf(reader.readLine());
         int diag = Integer.valueOf(reader.readLine());
         Orientation orientation = Orientation.valueOf(reader.readLine());
-        return new VolcanoTileAction(UUID.randomUUID(), Hex.at(line, diag), orientation);
+        return new VolcanoTileAction(Hex.at(line, diag), orientation);
     }
 }
