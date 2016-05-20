@@ -1,0 +1,88 @@
+
+
+/*
+.breprendre{
+	-fx-background-color: radial-gradient(center 50% -40%, radius 200%,  #00acc1 45%,  #b2ebf2 70%);
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 5 30 5 30;
+              }
+*/
+.breprendre{
+    -fx-background-color: #aed581;
+    -fx-color: #aed581;
+    -fx-text-fill: #33691e;
+}
+
+.breprendre: hover{
+    -fx-background-color: #33691e;
+    -fx-color: #aed581;
+    -fx-text-fill: #aed581;
+}
+
+.buttonjoueur{
+    -fx-background-color: white;
+    -fx-color: white;
+    -fx-text-fill: green;
+    -fx-outer-border: green;
+}
+
+.buttonjoueur: hover{
+    -fx-background-color: #4CAF50;
+    -fx-color: white;
+    -fx-text-fill: white;
+}
+
+
+.buttonniveaux1{
+    -fx-background-color: white;
+    -fx-color: white;
+    -fx-text-fill: #FF9966;
+    -fx-outer-border: green;
+}
+
+.buttonniveaux1: hover{
+    -fx-background-color: #FF9966;
+    -fx-color: white;
+    -fx-text-fill: white;
+}
+
+
+.buttonniveaux2{
+    -fx-background-color: white;
+    -fx-color: white;
+    -fx-text-fill: #FF6666;
+    -fx-outer-border: green;
+}
+
+.buttonniveaux2: hover{
+    -fx-background-color: #FF6666;
+    -fx-color: white;
+    -fx-text-fill: white;
+}
+
+
+.buttonniveaux3{
+    -fx-background-color: white;
+    -fx-color: white;
+    -fx-text-fill: #CC0066;
+    -fx-outer-border: green;
+}
+
+.buttonniveaux3: hover{
+    -fx-background-color: #CC0066;
+    -fx-color: white;
+    -fx-text-fill: white;
+}
+
+.tp{
+    -fx-text-fill: #33691e;
+    -fx-background-color: #aed581;
+    -fx-color:#aed581;
+}
+
+.tp:hover{
+ -fx-text-fill: #33691e;
+    -fx-background-color: #aed581;
+    -fx-color:#aed581;
+ }
