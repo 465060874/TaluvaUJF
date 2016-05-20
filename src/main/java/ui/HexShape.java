@@ -1,7 +1,11 @@
 package ui;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.Light;
+import javafx.scene.effect.Lighting;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.shape.StrokeLineJoin;
 import map.Field;
 
 class HexShape {
@@ -154,11 +158,14 @@ class HexShape {
     private void bottomBorderLevel(double scale, int level, int maxLevel) {
         double hexHeight = HEX_HEIGHT * scale;
         double bottomDepth2 = hexHeight * (maxLevel - level + 1);
+        double bottomDepth1 = bottomDepth2 - hexHeight;
         if (level > 1) {
             bottomDepth2 -= 1;
         }
+        if (level == maxLevel) {
+            bottomDepth1 += scale;
+        }
 
-        double bottomDepth1 = bottomDepth2 - hexHeight;
 
         bottomBorderY[0] = hexagonY[0] + bottomDepth1;
         bottomBorderY[1] = hexagonY[0] + bottomDepth2;
@@ -175,26 +182,28 @@ class HexShape {
     void draw(GraphicsContext gc, HexShapeInfo info) {
         update(info);
 
+        gc.setEffect(new Lighting(new Light.Point(0, 0, 150, Color.WHITE)));
         gc.setFill(info.isPlacement
                 ? fieldTypeTranslucentColor(info.field)
                 : fieldTypeColor(info.field));
         gc.fillPolygon(hexagonX, hexagonY, HEXAGON_POINTS);
+        gc.setEffect(null);
 
         gc.setFill(info.isPlacement
                 ? IslandCanvas.BORDER_COLOR.deriveColor(1, 1, 1, .5f)
                 : IslandCanvas.BOTTOM_COLOR);
         gc.fillPolygon(bottomX, bottomY, HEXAGON_POINTS);
 
-        gc.setStroke(new Color(0.6, 0.6, 0.6, 0.5));
-        gc.setLineWidth(STROKE_WIDTH * info.scale);
-        gc.strokePolyline(hexagonBorder2X, hexagonBorder2Y, HEXAGON_BORDER2_POINTS);
-
         gc.setStroke(IslandCanvas.BORDER_COLOR);
         gc.setLineWidth(STROKE_WIDTH * info.scale);
+        gc.setLineCap(StrokeLineCap.ROUND);
+        gc.setLineJoin(StrokeLineJoin.ROUND);
         gc.strokePolyline(hexagonBorderX, hexagonBorderY, HEXAGON_BORDER_POINTS);
 
         gc.setStroke(IslandCanvas.BORDER_COLOR);
         gc.setLineWidth(STROKE_WIDTH * info.scale);
+        gc.setLineCap(StrokeLineCap.ROUND);
+        gc.setLineJoin(StrokeLineJoin.ROUND);
         for (int i = 1; i <= info.field.getLevel(); i++) {
             bottomBorderLevel(info.scale, i, info.field.getLevel());
             gc.strokePolyline(bottomBorderX, bottomBorderY, BOTTOM_BORDER_POINTS);

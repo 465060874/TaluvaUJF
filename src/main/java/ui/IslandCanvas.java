@@ -29,16 +29,10 @@ class IslandCanvas extends Canvas {
     static final Color BORDER_COLOR = Color.web("303030");
     static final Color BOTTOM_COLOR = Color.web("707070");
 
-    private static final int westGap = 3;
-    private static final int eastGap = 9;
-
     private final Island island;
     private final boolean debug;
     private final HexShape hexShape;
-
-    double ox;
-    double oy;
-    double scale;
+    private final Grid grid;
 
     // Variable de placement de la tuile
     private Hex placedHex;
@@ -50,15 +44,12 @@ class IslandCanvas extends Canvas {
     private boolean isBuildingMode;
     private BuildingType selectedBuildingType;
 
-    IslandCanvas(Island island, boolean debug) {
+    IslandCanvas(Island island, Grid grid, boolean debug) {
         super(0, 0);
         this.island = island;
+        this.grid = grid;
         this.debug = debug;
         this.hexShape = new HexShape();
-
-        this.ox = 0;
-        this.oy = 0;
-        this.scale = 1;
 
         // Variable de selection de la tuile
         this.placedHex = null;
@@ -75,7 +66,6 @@ class IslandCanvas extends Canvas {
         widthProperty().addListener(this::resize);
         heightProperty().addListener(this::resize);
 
-        setOnMouseMoved(this::mouseMoved);
         setOnMouseClicked(this::mouseClicked);
     }
 
@@ -92,19 +82,18 @@ class IslandCanvas extends Canvas {
             }
             redraw();
         }
-        System.out.println("IslandCanvas");
     }
 
-    private void mouseMoved(MouseEvent event) {
-        double x = event.getX() - (getWidth() / 2 - ox);
-        double y = event.getY() - (getHeight() / 2 - oy);
-        Hex newPlacedHex = pointToHex(x, y);
+    public void mouseMovedAction(MouseEvent event, double width, double height) {
+
+        Hex newPlacedHex = grid.getHex(event, width, height);
 
         if (isBuildingMode){
             placedHex = newPlacedHex;
             redraw();
             return;
         }
+
 
         boolean isRobinson = StreamSupport.stream(newPlacedHex.getNeighborhood().spliterator(), false)
                 .allMatch(h -> island.getField(h) == Field.SEA);
@@ -115,7 +104,7 @@ class IslandCanvas extends Canvas {
             return;
         }
 
-        Orientation newPlacedTileOrientation = pointToHexZone(newPlacedHex, x, y).getOrientation();
+        Orientation newPlacedTileOrientation = grid.getHexZone(event, getWidth(), getHeight()).getOrientation();
         if (island.getField(newPlacedHex).getType() == FieldType.VOLCANO) {
             placedTileOrientation = newPlacedTileOrientation;
             redraw();
@@ -167,41 +156,13 @@ class IslandCanvas extends Canvas {
         }
     }
 
-    private Hex pointToHex(double x, double y) {
-        double hexWidth = HexShape.HEX_SIZE_X * scale * WEIRD_RATIO;
-        double hexHeight = HexShape.HEX_SIZE_Y * scale;
-
-        x = x / (hexWidth * 2);
-        double t1 = (y + hexHeight) / hexHeight;
-        double t2 = Math.floor(x + t1);
-        double line = Math.floor((Math.floor(t1 - x) + t2) / 3);
-        double diag = Math.floor((Math.floor(2 * x + 1) + t2) / 3) - line;
-
-        return Hex.at((int) line, (int) diag);
-    }
-
-    private HexZone pointToHexZone(Hex hex, double x, double y) {
-        double hexSizeX = HexShape.HEX_SIZE_X * scale;
-        double hexSizeY = HexShape.HEX_SIZE_Y * scale;
-
-        // Calcul du centre de la tuile
-        double hexCenterX = hex.getDiag() * 2 * WEIRD_RATIO * hexSizeX + hex.getLine() * WEIRD_RATIO * hexSizeX;
-        double hexCenterY = hex.getLine() * hexSizeY + hex.getLine() * hexSizeY / 2;
-
-        double degree = Math.toDegrees(Math.atan((y - hexCenterY) / (x - hexCenterX)));
-
-        // Calcul de la zone correspondante
-        // TODO Remove dirty %12
-        return HexZone.at((int) Math.floor(x > hexCenterX ? (degree/30) + westGap : (degree/30) + eastGap) % 12);
-    }
-
     private ImmutableList<HexShapeInfo> placedInfos(double centerX, double centerY) {
         HexShapeInfo info1 = new HexShapeInfo();
         HexShapeInfo info2 = new HexShapeInfo();
         HexShapeInfo info3 = new HexShapeInfo();
         info1.isPlacement = info2.isPlacement = info3.isPlacement = true;
-        info1.sizeX = info2.sizeX = info3.sizeX = HexShape.HEX_SIZE_X * scale;
-        info1.sizeY = info2.sizeY = info3.sizeY = HexShape.HEX_SIZE_Y * scale;
+        info1.sizeX = info2.sizeX = info3.sizeX = HexShape.HEX_SIZE_X * grid.getScale();
+        info1.sizeY = info2.sizeY = info3.sizeY = HexShape.HEX_SIZE_Y * grid.getScale();
 
         int level = island.getField(placedHex).getLevel() + 1;
         Hex hex1 = placedHex;
@@ -216,7 +177,7 @@ class IslandCanvas extends Canvas {
         info1.y = centerY + hex1.getLine() * info1.sizeY + hex1.getLine() * info1.sizeY / 2;
         info2.y = centerY + hex2.getLine() * info2.sizeY + hex2.getLine() * info2.sizeY / 2;
         info3.y = centerY + hex3.getLine() * info3.sizeY + hex3.getLine() * info3.sizeY / 2;
-        info1.scale = info2.scale = info3.scale = scale;
+        info1.scale = info2.scale = info3.scale = grid.getScale();
 
         if (placedTileRotation == Orientation.NORTH) {
             info1.field = Field.create(level, FieldType.VOLCANO, placedTileOrientation);
@@ -241,8 +202,8 @@ class IslandCanvas extends Canvas {
             info.y = centerY + line * info.sizeY + line * info.sizeY / 2;
             info.isPlacement = false;
             info.field = island.getField(hex);
-            info.sizeX = HexShape.HEX_SIZE_X * scale;
-            info.sizeY = HexShape.HEX_SIZE_Y * scale;
+            info.sizeX = HexShape.HEX_SIZE_X * grid.getScale();
+            info.sizeY = HexShape.HEX_SIZE_Y * grid.getScale();
             infos.add(info);
         }
 
@@ -257,10 +218,10 @@ class IslandCanvas extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         gc.clearRect(0, 0, getWidth(), getHeight());
 
-        double hexSizeX = HexShape.HEX_SIZE_X * scale;
-        double hexSizeY = HexShape.HEX_SIZE_Y * scale;
-        double centerX = getWidth() / 2 - ox;
-        double centerY = getHeight() / 2 - oy;
+        double hexSizeX = HexShape.HEX_SIZE_X * grid.getScale();
+        double hexSizeY = HexShape.HEX_SIZE_Y * grid.getScale();
+        double centerX = getWidth() / 2 - grid.getOx();
+        double centerY = getHeight() / 2 - grid.getOx();
 
         List<HexShapeInfo> infos = new ArrayList<>();
         for (Hex hex : island.getFields()) {
@@ -273,7 +234,7 @@ class IslandCanvas extends Canvas {
             info.y = centerY + line * info.sizeY + line * info.sizeY / 2;
             info.isPlacement = false;
             info.field = island.getField(hex);
-            info.scale = scale;
+            info.scale = grid.getScale();
             infos.add(info);
         }
 
@@ -304,7 +265,7 @@ class IslandCanvas extends Canvas {
             info.y = centerY + line * info.sizeY + line * info.sizeY / 2;
             info.isPlacement = false;
             info.field = island.getField(placedHex);
-            info.scale = scale;
+            info.scale = grid.getScale();
             infos.add(info);
             drawBuilding(gc, FieldBuilding.of(selectedBuildingType, PlayerColor.RED), Math.max(1, island.getField(placedHex).getLevel()),
                     info.x,

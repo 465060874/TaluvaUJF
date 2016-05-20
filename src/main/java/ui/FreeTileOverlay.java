@@ -15,18 +15,12 @@ import java.util.stream.StreamSupport;
 
 import static ui.HexShape.WEIRD_RATIO;
 
-public class FreeTileOverlay extends Canvas {
+class FreeTileOverlay extends Canvas {
 
-    private static final int westGap = 3;
-    private static final int eastGap = 9;
-
+    private final Grid grid;
     private final Island island;
     private final HexShape hexShape;
     private final boolean placedTileOrientationAuto;
-
-    double ox;
-    double oy;
-    double scale;
 
 
     // Variable de placement de la tuile
@@ -36,46 +30,30 @@ public class FreeTileOverlay extends Canvas {
     private Orientation placedTileOrientation;
     private double freeTileX;
     private double freeTileY;
-    private boolean active;
 
-    FreeTileOverlay(Island island, boolean debug) {
+    FreeTileOverlay(Island island, Grid grid) {
         super(0, 0);
+        this.grid = grid;
         this.island = island;
-        //TODO Reimplement debug view is this pane
         this.hexShape = new HexShape();
-
-        this.ox = 0;
-        this.oy = 0;
-        this.scale = 1;
 
         // Variable de selection de la tuile
         this.placedHex = null;
         this.placedTileRotation = Orientation.NORTH;
         this.placedTile = new VolcanoTile(FieldType.CLEARING, FieldType.SAND);
         this.placedTileOrientation = Orientation.NORTH;
-        this.placedTileOrientationAuto = true;
+        this.placedTileOrientationAuto = false;
         this.freeTileX = 0.0;
         this.freeTileY = 0.0;
-        this.active = true;
 
         widthProperty().addListener(this::resize);
         heightProperty().addListener(this::resize);
 
-        setOnMouseMoved(this::mouseMoved);
         setOnMouseClicked(this::mouseClicked);
     }
 
-    private void mouseClicked(MouseEvent event) {
-        if (MouseButton.SECONDARY.equals(event.getButton())) {
-            placedTileRotation = placedTileRotation.clockWise().clockWise();
-            redraw();
-        }
-    }
-
-    private void mouseMoved(MouseEvent event) {
-        double x = event.getX() - (getWidth() / 2 - ox);
-        double y = event.getY() - (getHeight() / 2 - oy);
-        Hex newPlacedHex = pointToHex(x, y);
+    void mouseMovedAction(MouseEvent event, double width, double height) {
+        Hex newPlacedHex = grid.getHex(event, width, height);
 
         boolean isRobinson = StreamSupport.stream(newPlacedHex.getNeighborhood().spliterator(), false)
                 .allMatch(h -> island.getField(h) == Field.SEA);
@@ -86,13 +64,15 @@ public class FreeTileOverlay extends Canvas {
             freeTileY = event.getY();
             placedTileOrientation = getCLosestNeighborOrientation(newPlacedHex);
             placedHex = null;
-            active = true;
             redraw();
-        } else {
-            System.out.println("Not Visible");
-            this.setVisible(false);
-            active = false;
-            //redraw();
+        }
+    }
+
+
+    private void mouseClicked(MouseEvent event) {
+        if (MouseButton.SECONDARY.equals(event.getButton())) {
+            placedTileRotation = placedTileRotation.clockWise().clockWise();
+            redraw();
         }
     }
 
@@ -120,19 +100,6 @@ public class FreeTileOverlay extends Canvas {
         return Orientation.NORTH;
     }
 
-    private Hex pointToHex(double x, double y) {
-        double hexWidth = HexShape.HEX_SIZE_X * scale * WEIRD_RATIO;
-        double hexHeight = HexShape.HEX_SIZE_Y * scale;
-
-        x = x / (hexWidth * 2);
-        double t1 = (y + hexHeight) / hexHeight;
-        double t2 = Math.floor(x + t1);
-        double line = Math.floor((Math.floor(t1 - x) + t2) / 3);
-        double diag = Math.floor((Math.floor(2 * x + 1) + t2) / 3) - line;
-
-        return Hex.at((int) line, (int) diag);
-    }
-
     private ImmutableList<HexShapeInfo> placedFreeInfos() {
         HexShapeInfo info1 = new HexShapeInfo();
         HexShapeInfo info2 = new HexShapeInfo();
@@ -140,9 +107,9 @@ public class FreeTileOverlay extends Canvas {
         info1.isPlacement = info2.isPlacement = info3.isPlacement = true;
         info1.x = info2.x = info3.x = freeTileX;
         info1.y = info2.y = info3.y = freeTileY;
-        info1.sizeX = info2.sizeX = info3.sizeX = HexShape.HEX_SIZE_X * scale;
-        info1.sizeY = info2.sizeY = info3.sizeY = HexShape.HEX_SIZE_Y * scale;
-        info1.scale = info2.scale = info3.scale = scale;
+        info1.sizeX = info2.sizeX = info3.sizeX = HexShape.HEX_SIZE_X * grid.getScale();
+        info1.sizeY = info2.sizeY = info3.sizeY = HexShape.HEX_SIZE_Y * grid.getScale();
+        info1.scale = info2.scale = info3.scale = grid.getScale();
 
         Neighbor leftNeighbor = Neighbor.leftOf(placedTileOrientation);
         info2.x += leftNeighbor.getDiagOffset() * 2 * WEIRD_RATIO * info2.sizeX
@@ -175,9 +142,6 @@ public class FreeTileOverlay extends Canvas {
     }
 
     void redraw() {
-        if (!isVisible()) {
-            return;
-        }
 
         GraphicsContext gc = getGraphicsContext2D();
         gc.clearRect(0, 0, getWidth(), getHeight());
@@ -189,7 +153,4 @@ public class FreeTileOverlay extends Canvas {
         }
     }
 
-    public boolean isActive() {
-        return active;
-    }
 }

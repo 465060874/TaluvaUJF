@@ -58,8 +58,17 @@ enum HexZone {
         }
     }
 
-    public static HexZone at(int zone) {
-        return values()[zone];
+    private static final int EAST_OFFSET = 3;
+    private static final int WEST_OFFSET = 9;
+
+    public static HexZone atWestOf(double degree) {
+        int index = (int) Math.floor((degree/30) + WEST_OFFSET) % 12;
+        return values()[index];
+    }
+
+    public static HexZone atEastOf(double degree) {
+        int index = (int) Math.floor((degree/30) + EAST_OFFSET) % 12;
+        return values()[index];
     }
 
     public Orientation getOrientation() {

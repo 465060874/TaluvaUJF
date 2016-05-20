@@ -12,7 +12,9 @@ import map.Island;
 
 class IslandView extends StackPane {
 
-    final IslandCanvas canvas;
+    Grid grid;
+
+    final IslandCanvas islandCanvas;
     private final FreeTileOverlay freeTileOverlay;
 
     private double mouseXBeforeDrag;
@@ -21,21 +23,14 @@ class IslandView extends StackPane {
     private double mouseY;
 
     IslandView(Island island, boolean debug) {
-        this.canvas = new IslandCanvas(island, debug);
-        this.freeTileOverlay = new FreeTileOverlay(island, debug);
+        this.grid = new Grid(0.0, 0.0, 1);
+        this.freeTileOverlay = new FreeTileOverlay(island, grid);
+        this.islandCanvas = new IslandCanvas(island, grid, debug);
         this.mouseX = 0;
         this.mouseY = 0;
 
-        getChildren().add(canvas);
+        getChildren().add(islandCanvas);
         getChildren().add(freeTileOverlay);
-
-        freeTileOverlay.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
-            if (!freeTileOverlay.isActive()) {
-                freeTileOverlay.setVisible(true);
-                freeTileOverlay.redraw();
-                System.out.println("freeTileEvent");
-            }
-        });
 
         BackgroundFill backgroundFill = new BackgroundFill(
                 IslandCanvas.BG_COLOR,
@@ -43,11 +38,12 @@ class IslandView extends StackPane {
                 Insets.EMPTY);
         setBackground(new Background(backgroundFill));
 
+        setOnMouseMoved(this::mouseMoved);
         setOnMousePressed(this::mousePressed);
         setOnMouseDragged(this::mouseDragged);
         setOnMouseReleased(this::mouseReleased);
         setOnScroll(this::scroll);
-        canvas.redraw();
+        islandCanvas.redraw();
     }
 
     @Override
@@ -59,13 +55,12 @@ class IslandView extends StackPane {
         final int w = (int)getWidth() - left - right;
         final int h = (int)getHeight() - top - bottom;
 
-
-        canvas.setLayoutX(left);
-        canvas.setLayoutY(top);
-        if (w != canvas.getWidth() || h != canvas.getHeight()) {
-            canvas.setWidth(w * 3);
-            canvas.setHeight(h * 3);
-            canvas.redraw();
+        islandCanvas.setLayoutX(left);
+        islandCanvas.setLayoutY(top);
+        if (w != islandCanvas.getWidth() || h != islandCanvas.getHeight()) {
+            islandCanvas.setWidth(w * 3);
+            islandCanvas.setHeight(h * 3);
+            islandCanvas.redraw();
         }
 
         freeTileOverlay.setLayoutX(left);
@@ -75,6 +70,13 @@ class IslandView extends StackPane {
             freeTileOverlay.setHeight(h);
             freeTileOverlay.redraw();
         }
+    }
+
+    private void mouseMoved(MouseEvent event) {
+        islandCanvas.setVisible(true);
+        freeTileOverlay.setVisible(true);
+        islandCanvas.mouseMovedAction(event, getWidth(), getHeight());
+        freeTileOverlay.mouseMovedAction(event, getWidth(), getHeight());
     }
 
     private void mousePressed(MouseEvent event) {
@@ -91,15 +93,12 @@ class IslandView extends StackPane {
             return;
         }
 
-        canvas.setTranslateX(canvas.getTranslateX()
+        islandCanvas.setTranslateX(islandCanvas.getTranslateX()
                 + event.getX() - mouseX);
-        canvas.setTranslateY(canvas.getTranslateY()
+        islandCanvas.setTranslateY(islandCanvas.getTranslateY()
                 + event.getY() - mouseY);
 
-        freeTileOverlay.setTranslateX(freeTileOverlay.getTranslateX()
-                + event.getX() - mouseX);
-        freeTileOverlay.setTranslateY(freeTileOverlay.getTranslateY()
-                + event.getY() - mouseY);
+        freeTileOverlay.mouseMovedAction(event, getWidth(), getHeight());
 
         mouseX = event.getX();
         mouseY = event.getY();
@@ -110,18 +109,16 @@ class IslandView extends StackPane {
             return;
         }
 
-        canvas.ox += mouseXBeforeDrag - event.getX();
-        canvas.oy += mouseYBeforeDrag - event.getY();
-        freeTileOverlay.ox += mouseXBeforeDrag - event.getX();
-        freeTileOverlay.oy += mouseYBeforeDrag - event.getY();
-        canvas.redraw();
+        grid.setOx(grid.getOx() + mouseXBeforeDrag - event.getX());
+        grid.setOy(grid.getOy() + mouseYBeforeDrag - event.getY());
+        islandCanvas.redraw();
     }
 
     private void scroll(ScrollEvent event) {
         double factor = event.getDeltaY() > 0 ? 1.1 : 1 / 1.1;
-        canvas.scale *= factor;
-        canvas.redraw();
-        freeTileOverlay.scale *= factor;
+        grid.setScale(grid.getScale() * factor);
+        islandCanvas.redraw();
         freeTileOverlay.redraw();
     }
+
 }

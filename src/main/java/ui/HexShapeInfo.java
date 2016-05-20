@@ -18,6 +18,7 @@ public class HexShapeInfo implements Comparable<HexShapeInfo> {
     public int compareTo(HexShapeInfo o) {
         return ComparisonChain.start()
             .compare(y, o.y)
+            .compare(field.getLevel(), o.field.getLevel())
             .compare(x, o.x)
             .result();
     }
