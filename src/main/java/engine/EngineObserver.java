@@ -10,6 +10,11 @@ import java.util.List;
 public interface EngineObserver {
 
     /**
+     * Appelé en tout début de partie
+     */
+    void onStart();
+
+    /**
      * Appelé à chaque fois que la pioche change
      */
     void onTileStackChange();

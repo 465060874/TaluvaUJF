@@ -142,6 +142,7 @@ class EngineImpl implements Engine {
     public void start() {
         VolcanoTile tile = volcanoTileStack.current();
         island.putTile(tile, Hex.at(0, 0), Orientation.NORTH);
+        observers.forEach(EngineObserver::onStart);
         nextStep();
     }
 
@@ -180,7 +181,7 @@ class EngineImpl implements Engine {
             stepUUID = UUID.randomUUID();
             updateBuildActions();
             updateExpandActions();
-            if (buildActions.size() == 0) {
+            if (buildActions.size() == 0 && expandActions.size() == 0) {
                 Player eliminated = getCurrentPlayer();
                 eliminated.setEliminated();
                 observers.forEach(o -> o.onEliminated(eliminated));
