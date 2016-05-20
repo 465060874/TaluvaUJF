@@ -15,7 +15,7 @@ import java.util.stream.StreamSupport;
 
 import static ui.HexShape.WEIRD_RATIO;
 
-public class FreeTileCanvas extends Canvas {
+public class FreeTileOverlay extends Canvas {
 
     private static final int westGap = 3;
     private static final int eastGap = 9;
@@ -38,7 +38,7 @@ public class FreeTileCanvas extends Canvas {
     private double freeTileY;
     private boolean active;
 
-    FreeTileCanvas(Island island, boolean debug) {
+    FreeTileOverlay(Island island, boolean debug) {
         super(0, 0);
         this.island = island;
         //TODO Reimplement debug view is this pane
@@ -175,8 +175,9 @@ public class FreeTileCanvas extends Canvas {
     }
 
     void redraw() {
-
-        if (!isVisible()) { return; }
+        if (!isVisible()) {
+            return;
+        }
 
         GraphicsContext gc = getGraphicsContext2D();
         gc.clearRect(0, 0, getWidth(), getHeight());
@@ -186,9 +187,6 @@ public class FreeTileCanvas extends Canvas {
                 hexShape.draw(gc, info);
             }
         }
-
-        setTranslateX(-getWidth() / 3);
-        setTranslateY(-getHeight() / 3);
     }
 
     public boolean isActive() {

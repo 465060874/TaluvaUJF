@@ -40,15 +40,14 @@ class IslandCanvas extends Canvas {
     double oy;
     double scale;
 
-
     // Variable de placement de la tuile
     private Hex placedHex;
     private VolcanoTile placedTile;
     private Orientation placedTileRotation;
     private Orientation placedTileOrientation;
-    private boolean isBuildingMode;
 
     // Variable de selection du Batiment
+    private boolean isBuildingMode;
     private BuildingType selectedBuildingType;
 
     IslandCanvas(Island island, boolean debug) {

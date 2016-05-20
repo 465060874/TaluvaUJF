@@ -19,10 +19,10 @@ public class IslandVisu extends Application {
     public void start(Stage stage) throws Exception {
         File rsc = new File("7622606306695.island");
         Island island = IslandIO.read(Files.asCharSource(rsc, StandardCharsets.UTF_8));
-        IslandCanvas canvas = new IslandCanvas(island, false);
 
+        IslandView islandView = new IslandView(island, false);
         BorderPane mainPane = new BorderPane();
-        mainPane.setCenter(new IslandCanvasPane(canvas, new FreeTileCanvas(island, false)));
+        mainPane.setCenter(islandView);
 
         Scene scene = new Scene(mainPane, 1000, 800, true, SceneAntialiasing.BALANCED);
         stage.setScene(scene);

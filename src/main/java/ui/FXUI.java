@@ -13,18 +13,16 @@ import java.nio.charset.StandardCharsets;
 
 public class FXUI extends Application {
 
+    private static final boolean DEBUG = false;
+
     @Override
     public void start(Stage stage) throws Exception {
         URL rsc = FXUI.class.getResource("test.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
-        boolean debug = false;
-
-        IslandCanvas canvas = new IslandCanvas(island, debug);
-        FreeTileCanvas freeTileCanvas = new FreeTileCanvas(island, debug);
-
+        IslandView islandView = new IslandView(island, DEBUG);
         BorderPane mainPane = new BorderPane();
-        mainPane.setCenter(new IslandCanvasPane(canvas, freeTileCanvas));
+        mainPane.setCenter(islandView);
 
         Scene scene = new Scene(mainPane, 1000, 800);
         stage.setScene(scene);
