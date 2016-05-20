@@ -175,7 +175,9 @@ class  IslandImpl implements Island {
 
     @Override
     public void putBuilding(Hex hex, FieldBuilding building) {
-        map.put(hex, map.get(hex).withBuilding(building));
+        if (map.contains(hex)) {
+            map.put(hex, map.get(hex).withBuilding(building));
+        }
     }
 
     @Override

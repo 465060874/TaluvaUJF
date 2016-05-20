@@ -103,16 +103,58 @@ public class BasicHeuristics implements Heuristics {
 
     public int evaluateSeaPlacement(Engine e, SeaTileAction move){
         int tower = 0, temple = 0, hut = 0, counter = 0;
-        Hex hex = move.getHex1();
         Island island = e.getIsland();
+        Hex hex = move.getHex1();
+        int bonus;
         for (Neighbor neighbor : Neighbor.values()) {
             Hex adjacent = hex.getNeighbor(neighbor);
             BuildingType building = island.getField(adjacent).getBuilding().getType();
-            if( building == BuildingType.HUT && island.getField(adjacent).getLevel() == 3){ // REGARDER LE NIVEAU
+            if( building == BuildingType.HUT && island.getField(adjacent).getLevel() == 1){ // REGARDER LE NIVEAU
+                if( island.getField(adjacent).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+                    bonus = 1;
+                else
+                    bonus = -1;
                 Village village = island.getVillage(adjacent);
-                if( !village.hasTemple()){
-                    // babla
+                if( !village.hasTemple()) {
+                    temple -= bonus;
+                    if (village.getHexSize() < 3)
+                        hut -= 2*bonus;
                 }
+                counter -= bonus;
+            }
+        }
+        hex = move.getHex2();
+        for (Neighbor neighbor : Neighbor.values()) {
+            Hex adjacent = hex.getNeighbor(neighbor);
+            BuildingType building = island.getField(adjacent).getBuilding().getType();
+            if( building != BuildingType.NONE ){
+                if( island.getField(adjacent).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+                    bonus = 1;
+                else
+                    bonus = -1;
+                Village village = island.getVillage(adjacent);
+                if( !village.hasTemple()) {
+                    temple += bonus*( village.getHexSize() > 3 ? 3 : village.getHexSize());
+                    hut += 2*bonus;
+                }
+                counter += bonus;
+            }
+        }
+        hex = move.getHex3();
+        for (Neighbor neighbor : Neighbor.values()) {
+            Hex adjacent = hex.getNeighbor(neighbor);
+            BuildingType building = island.getField(adjacent).getBuilding().getType();
+            if( building != BuildingType.NONE ){
+                if( island.getField(adjacent).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+                    bonus = 1;
+                else
+                    bonus = -1;
+                Village village = island.getVillage(adjacent);
+                if( !village.hasTemple()) {
+                    temple += bonus*( village.getHexSize() > 3 ? 3 : village.getHexSize());
+                    hut += 2*bonus;
+                }
+                counter += bonus;
             }
         }
         return 0;

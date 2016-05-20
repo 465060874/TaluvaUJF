@@ -40,7 +40,7 @@ public class BotPlayer {
 
         // 1 -- Determiner le poids de chaque stratégie
         heuristic.chooseStrategies(engine,strategyPoints,branchingFactor);
-        System.out.println("-> Strategy Chosen");
+        System.out.printf("-> Strategy Chosen\n\tTemples %d\n\tTours %d\n\tHuttes %d\n\tContre %d\n\n ", strategyPoints[0], strategyPoints[1], strategyPoints[2], strategyPoints[3]);
 
         // 2 -- Determiner un sous-ensemble pertinent de coups possibles
         branchSort( strategiesQueues );
@@ -103,13 +103,14 @@ public class BotPlayer {
     // Fonction qui classe les coups selon la stratégie choisie
     private void branchSort(PriorityQueue<Move> [] strategiesQueues) {
         // Pour tout tileAction dans la mer
-        System.out.println("[Sort] Begin seaPlacements");
+        System.out.println("[Sort] Begin seaPlacements : " + engine.getSeaPlacements().size());
         for (Iterable<SeaTileAction> seaPlacements : engine.getSeaPlacements().values()) {
             for (SeaTileAction placement  : seaPlacements) {
                 int points = heuristic.evaluateSeaPlacement(engine, placement);
                 engine.placeOnSea(placement);
 
                 // Pour toute construction :
+                //System.out.println("    [Sort] Begin buildActions : " + engine.getBuildActions().size());
                 HexMap<? extends Iterable<PlaceBuildingAction>> buildActionsMap = engine.getBuildActions();
                 for (Iterable<PlaceBuildingAction> buildActions : buildActionsMap.values()) {
                     for (PlaceBuildingAction action : buildActions) {
@@ -117,7 +118,7 @@ public class BotPlayer {
                     }
 
                 }
-
+                //System.out.println("    [Sort] Begin expandActions : " + engine.getExpandActions().size());
                 HexMap<? extends Iterable<ExpandVillageAction>> expandActionsMap = engine.getExpandActions();
                 for (Iterable<ExpandVillageAction> expandActions : expandActionsMap.values()) {
                     for (ExpandVillageAction action : expandActions) {
@@ -127,7 +128,7 @@ public class BotPlayer {
                 engine.cancelLastStep();
             }
         }
-        System.out.println("[Sort] Begin volcanoPlacements");
+        System.out.println("[Sort] Begin volcanoPlacements : " + engine.getSeaPlacements().size());
         // Pour tout tileAction sur la terre
         for (Iterable<VolcanoTileAction> volcanoPlacements : engine.getVolcanoPlacements().values()) {
             for (VolcanoTileAction placement  : volcanoPlacements) {

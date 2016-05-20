@@ -13,7 +13,7 @@ public class BotPlayerHandler implements PlayerHandler {
 
     public BotPlayerHandler(Engine engine) {
         this.engine = engine;
-        this.bot = new BotPlayer(16, new RandomHeuristics());
+        this.bot = new BotPlayer(16, new BasicHeuristics());
     }
 
     @Override
