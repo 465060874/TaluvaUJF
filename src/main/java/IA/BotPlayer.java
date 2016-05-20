@@ -5,13 +5,14 @@ import engine.action.ExpandVillageAction;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
 import map.HexMap;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.util.PriorityQueue;
 
 public class BotPlayer {
 
     // Facteur de branchment pour l'arbre MIN-MAX
-    private int branchingFactor = 16;
+    private int branchingFactor = 8;
     // Strategies possibles pour l'IA
     final static int nbStrategies = 4;
 
@@ -30,6 +31,7 @@ public class BotPlayer {
     public Move play(Engine e, int depth) {
         // Créé un nouvel Engine modifiable à souhait sans interference avec
         // l'interface graphique par exemple
+        System.out.println("PLAY : depth " + depth);
         this.engine = e;
         @SuppressWarnings("unchecked")
         PriorityQueue<Move>[] strategiesQueues = new PriorityQueue[nbStrategies];
@@ -38,9 +40,11 @@ public class BotPlayer {
 
         // 1 -- Determiner le poids de chaque stratégie
         heuristic.chooseStrategies(engine,strategyPoints,branchingFactor);
+        System.out.println("-> Strategy Chosen");
 
         // 2 -- Determiner un sous-ensemble pertinent de coups possibles
         branchSort( strategiesQueues );
+        System.out.println("-> Branch Chosen");
 
         // 3 -- MIN-MAX sur l'arbre réduit
         // A ce point : strategiesQueues contient les coups possibles pour chaque stratégie.
@@ -99,6 +103,7 @@ public class BotPlayer {
     // Fonction qui classe les coups selon la stratégie choisie
     private void branchSort(PriorityQueue<Move> [] strategiesQueues) {
         // Pour tout tileAction dans la mer
+        System.out.println("[Sort] Begin seaPlacements");
         for (Iterable<SeaTileAction> seaPlacements : engine.getSeaPlacements().values()) {
             for (SeaTileAction placement  : seaPlacements) {
                 int points = heuristic.evaluateSeaPlacement(engine, placement);
@@ -122,7 +127,7 @@ public class BotPlayer {
                 engine.cancelLastStep();
             }
         }
-
+        System.out.println("[Sort] Begin volcanoPlacements");
         // Pour tout tileAction sur la terre
         for (Iterable<VolcanoTileAction> volcanoPlacements : engine.getVolcanoPlacements().values()) {
             for (VolcanoTileAction placement  : volcanoPlacements) {

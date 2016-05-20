@@ -1,5 +1,6 @@
 package engine;
 
+import IA.BotPlayerHandler;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import data.BuildingType;
@@ -19,11 +20,9 @@ public class EngineRun {
 
     public static void main(String[] args) {
         Engine engine = new EngineBuilder()
-                .gamemode(Gamemode.FourPlayer)
+                .gamemode(Gamemode.TwoPlayer)
                 .player(PlayerColor.RED, PlayerHandler.dumbFactory())
-                .player(PlayerColor.WHITE, PlayerHandler.dumbFactory())
-                .player(PlayerColor.BROWN, PlayerHandler.dumbFactory())
-                .player(PlayerColor.YELLOW, PlayerHandler.dumbFactory())
+                .player(PlayerColor.WHITE, BotPlayerHandler::new)
                 .build();
         engine.registerObserver(new EngineLogger(engine));
         engine.start();

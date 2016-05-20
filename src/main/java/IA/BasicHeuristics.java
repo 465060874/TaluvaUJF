@@ -2,10 +2,7 @@ package IA;
 import data.BuildingType;
 import engine.*;
 import engine.action.*;
-import map.Hex;
-import map.Island;
-import map.Neighbor;
-import map.Village;
+import map.*;
 
 import java.util.List;
 import java.util.Random;
@@ -111,7 +108,7 @@ public class BasicHeuristics implements Heuristics {
         for (Neighbor neighbor : Neighbor.values()) {
             Hex adjacent = hex.getNeighbor(neighbor);
             BuildingType building = island.getField(adjacent).getBuilding().getType();
-            if( building == BuildingType.HUT && true){ // REGARDER LE NIVEAU
+            if( building == BuildingType.HUT && island.getField(adjacent).getLevel() == 3){ // REGARDER LE NIVEAU
                 Village village = island.getVillage(adjacent);
                 if( !village.hasTemple()){
                     // babla

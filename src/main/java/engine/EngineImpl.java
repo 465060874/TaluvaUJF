@@ -415,8 +415,6 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void placeOnSea(SeaTileAction placement) {
-        checkState(stepUUID.equals(placement.getStepUUID()),
-                "Something has gone wrong, this is not a proposed placement");
         checkState(placeStep, "Can't action a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
@@ -428,8 +426,7 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void placeOnVolcano(VolcanoTileAction placement) {
-        checkState(stepUUID.equals(placement.getStepUUID()),
-                "Something has gone wrong, this is not a proposed placement");
+
         checkState(placeStep, "Can't action a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
@@ -441,8 +438,7 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void build(PlaceBuildingAction action) {
-        checkState(stepUUID.equals(action.getStepUUID()),
-                "Something has gone wrong, this is not a proposed action");
+
         checkState(!placeStep, "Can't build during tile placement step");
 
         stepSaves.add(new ActionSave(this, action));
@@ -459,8 +455,7 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void expand(ExpandVillageAction action) {
-        checkState(stepUUID.equals(action.getStepUUID()),
-                "Something has gone wrong, this is not a proposed action");
+
         checkState(!placeStep, "Can't expand during tile placement step");
 
         stepSaves.add(new ActionSave(this, action));
