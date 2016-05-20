@@ -51,7 +51,7 @@ class HexShape {
             case VOLCANO:  return Color.web("E97B33");
             case JUNGLE:   return Color.web("A681B6");
             case CLEARING: return Color.web("8DC435");
-            case SAND:     return Color.web("EEE7CD");
+            case SAND:     return Color.web("EFDD6F");
             case ROCK:     return Color.web("C2D0D1");
             case LAKE:     return Color.web("8BE1EB");
         }
@@ -182,7 +182,7 @@ class HexShape {
     void draw(GraphicsContext gc, HexShapeInfo info) {
         update(info);
 
-        gc.setEffect(new Lighting(new Light.Point(0, 0, 150, Color.WHITE)));
+        gc.setEffect(new Lighting(new Light.Point(0, 0, info.scale * 100, Color.WHITE)));
         gc.setFill(info.isPlacement
                 ? fieldTypeTranslucentColor(info.field)
                 : fieldTypeColor(info.field));
