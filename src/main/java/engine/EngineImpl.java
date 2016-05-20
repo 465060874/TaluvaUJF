@@ -15,8 +15,11 @@ import engine.rules.VolcanoPlacementRules;
 import map.*;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Verify.verify;
+import static java.util.stream.Collectors.toList;
 
 class EngineImpl implements Engine {
 
@@ -178,7 +181,22 @@ class EngineImpl implements Engine {
             updateBuildActions();
             updateExpandActions();
             if (buildActions.size() == 0) {
-                System.out.println("Can't build anymore");
+                Player eliminated = getCurrentPlayer();
+                eliminated.setEliminated();
+                observers.forEach(o -> o.onEliminated(eliminated));
+
+                Predicate<Player> isEliminated = Player::isEliminated;
+                List<Player> remainingPlayers = players.stream()
+                        .filter(isEliminated.negate())
+                        .collect(toList());
+                verify(remainingPlayers.size() > 0);
+
+                if (remainingPlayers.size() == 1) {
+                    observers.forEach(o -> o.onWin(EngineObserver.WinReason.LAST_STANDING, remainingPlayers));
+                }
+                else {
+                    nextStep();
+                }
                 return;
             }
 
@@ -186,7 +204,10 @@ class EngineImpl implements Engine {
             getCurrentPlayer().getHandler().startBuildStep();
         }
         else {
-            turn++;
+            do {
+                turn++;
+            } while (getCurrentPlayer().isEliminated());
+
             placeStep = true;
             volcanoTileStack.next();
             if (volcanoTileStack.isEmpty()) {

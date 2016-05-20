@@ -58,6 +58,6 @@ public interface EngineObserver {
 
     enum WinReason {
         NO_MORE_TILES,
-        TWO_BUILDING_TYPES,
+        TWO_BUILDING_TYPES, LAST_STANDING,
     }
 }
