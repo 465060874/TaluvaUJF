@@ -31,6 +31,8 @@ public class EngineVisu extends Application implements EngineObserver {
                 .player(PlayerColor.RED, (engine) -> new UIPlayerHandlerWrapper(PlayerHandler.dumbFactory().create(engine)))
                 .player(PlayerColor.WHITE, (engine) -> new UIPlayerHandlerWrapper(PlayerHandler.dumbFactory().create(engine)))
                 .build();
+        /*CharSource gameSource = Files.asCharSource(new File("9233261640382.taluva"), StandardCharsets.UTF_8);
+        this.engine = EngineRecord.load(gameSource).replay();*/
         engine.registerObserver(this);
 
         this.islandView = new IslandView(engine.getIsland(), false);
@@ -49,14 +51,14 @@ public class EngineVisu extends Application implements EngineObserver {
 
     @Override
     public void onStart() {
-        System.out.println("Starting with seed " + engine.getSeed());
+        engine.logger().info("Starting with seed {0}", Long.toString(engine.getSeed()));
         islandView.islandCanvas.redraw();
     }
 
     @Override
     public void onTileStackChange() {
         VolcanoTile tile = engine.getVolcanoTileStack().current();
-        System.out.println("Drawn : " + tile.getLeft() + " " + tile.getRight());
+        engine.logger().info("Drawn : {0} {1}", tile.getLeft(), tile.getRight());
     }
 
     @Override
@@ -89,12 +91,12 @@ public class EngineVisu extends Application implements EngineObserver {
 
     @Override
     public void onEliminated(Player eliminated) {
-        System.out.println("Eliminated : " + eliminated.getColor());
+        engine.logger().info("Eliminated : {0}", eliminated.getColor());
     }
 
     @Override
     public void onWin(WinReason reason, List<Player> winners) {
-        System.out.println("Winner : " + winners.stream()
+        engine.logger().info("Winner : {0}", winners.stream()
                 .map(Player::getColor)
                 .collect(toList())
                 .toString());

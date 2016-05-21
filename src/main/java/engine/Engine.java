@@ -1,6 +1,7 @@
 package engine;
 
 import engine.action.*;
+import engine.log.EngineLogger;
 import map.HexMap;
 import map.Island;
 
@@ -8,6 +9,11 @@ import java.util.List;
 import java.util.Random;
 
 public interface Engine {
+
+    /**
+     * Retourne le logger
+     */
+    EngineLogger logger();
 
     /**
      * Retourne la seed utilisée pour le générateur aléatoire commun
@@ -20,8 +26,7 @@ public interface Engine {
     Random getRandom();
 
     /**
-     * Enregistre un observer qui sera notifié des changements
-     * se déroulant dans le moteur
+     * Enregistre un observer qui sera notifié des changements se déroulant dans le moteur
      */
     void registerObserver(EngineObserver observer);
 
@@ -66,20 +71,27 @@ public interface Engine {
     void cancelLastStep();
 
     /**
-     * Retourne le joueur dont c'est actuellement
-     * le tour
+     * Retourne le numéro de tour (un tour est un placement et une construction d'un joueur)
+     */
+    int getTurn();
+
+    /**
+     * Indique si l'étape courante est un placement de tuile
+     */
+    boolean isTileStep();
+
+    /**
+     * Retourne le joueur dont c'est actuellement le tour
      */
     Player getCurrentPlayer();
 
     /**
-     * Retourne la liste des placements possibles de tuiles
-     * sur la mer
+     * Retourne la liste des placements possibles de tuiles sur la mer
      */
     HexMap<? extends Iterable<SeaTileAction>> getSeaPlacements();
 
     /**
-     * Retourne la liste des placements possibles de tuiles
-     * sur les volcans
+     * Retourne la liste des placements possibles de tuiles sur les volcans
      */
     HexMap<? extends Iterable<VolcanoTileAction>> getVolcanoPlacements();
 

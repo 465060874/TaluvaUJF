@@ -1,6 +1,7 @@
 package engine.record;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.UnmodifiableIterator;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
@@ -106,18 +107,16 @@ public class EngineRecord {
     }
 
     public Engine replay() {
-        EngineBuilder builder = gamemode == Gamemode.AllVsAll
-                ? EngineBuilder.allVsAll()
-                : EngineBuilder.teamVsTeam();
-        builder.tileStack(VolcanoTileStack.predefinedFactory(tiles));
-
         UnmodifiableIterator<Action> actionsIt = ImmutableList.copyOf(actions).iterator();
+        ImmutableMap.Builder<PlayerColor, PlayerHandler.Factory> playersBuilder = ImmutableMap.builder();
         PlayerHandler.Factory playerHandlerFactory = (engine) -> new RecordPlayerHandler(engine, actionsIt);
         for (PlayerColor color : colors) {
-            //builder.player(color, playerHandlerFactory);
+            playersBuilder.put(color, playerHandlerFactory);
         }
 
-        return builder.build();
+        return EngineBuilder.withPredefinedPlayers(gamemode, playersBuilder.build())
+                .tileStack(VolcanoTileStack.predefinedFactory(tiles))
+                .build();
     }
 
     private static class RecordPlayerHandler implements PlayerHandler {

@@ -1,6 +1,7 @@
 package engine;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import data.PlayerColor;
 import data.StandardVolcanoTiles;
 import map.Island;
@@ -8,27 +9,24 @@ import map.Island;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Preconditions.*;
 import static com.google.common.base.Verify.verify;
 
 /**
  * Permet de configurer la création d'une nouvelle instance d'Engine
  * Usage typique :
  *     Engine engine = EngineBuilder.allVsAll()
- *         .player(PlayerColor.RED, engine -> new MonImplementationDePlayerHandler(engine))
- *         .player(PlayerColor.WHITE, engine -> new MonAutreImplementationDePlayerHandler(engine))
+ *         .player(PlayerColor.RED, MonImplementationDePlayerHandler::new)
+ *         .player(PlayerColor.WHITE, MonAutreImplementationDePlayerHandler::new)
  *         .build();
  *
  * Ou encore :
- *     HumanPlayerHandlerFactory humanFactory = new HumanPlayerHandlerFactory();
- *     IAPlayerHandlerFactory iaFactory = new IAPlayerHandlerFactory();
  *     Engine engine = EngineBuilder.teamVsTeam()
- *         .team(PlayerColor.RED, PlayerColor.WHITE, humanFactory)
- *         .team(PlayerColor.BROWN, PlayerColor.YELLOW, iaFactory)
+ *         .team(PlayerColor.RED, PlayerColor.WHITE, HumanPlayerHandlerFactory::new)
+ *         .team(PlayerColor.BROWN, PlayerColor.YELLOW, IAPlayerHandlerFactory::new)
  *         .build();
  */
 public abstract class EngineBuilder<B extends EngineBuilder> {
@@ -44,6 +42,12 @@ public abstract class EngineBuilder<B extends EngineBuilder> {
 
     public static EngineBuilder.TeamVsTeam teamVsTeam() {
         return new EngineBuilder.TeamVsTeam();
+    }
+
+    public static EngineBuilder<?> withPredefinedPlayers(
+            Gamemode gamemode,
+            ImmutableMap<PlayerColor, PlayerHandler.Factory> players) {
+        return new WithPredefinedPlayer(gamemode, players);
     }
 
     private EngineBuilder(Gamemode gamemode) {
@@ -186,6 +190,32 @@ public abstract class EngineBuilder<B extends EngineBuilder> {
                 builder.add(new Player(color11, handler1));
                 builder.add(new Player(color22, handler2));
                 builder.add(new Player(color12, handler1));
+            }
+
+            return builder.build();
+        }
+    }
+
+    private static class WithPredefinedPlayer extends EngineBuilder<WithPredefinedPlayer> {
+        private final ImmutableMap<PlayerColor, PlayerHandler.Factory> playersMap;
+
+        public WithPredefinedPlayer(Gamemode gamemode, ImmutableMap<PlayerColor, PlayerHandler.Factory> playersMap) {
+            super(gamemode);
+            this.playersMap = playersMap;
+        }
+
+        @Override
+        WithPredefinedPlayer self() {
+            return this;
+        }
+
+        @Override
+        ImmutableList<Player> createPlayers(Engine engine) {
+            ImmutableList.Builder<Player> builder = ImmutableList.builder();
+            for (Map.Entry<PlayerColor, PlayerHandler.Factory> entry : playersMap.entrySet()) {
+                PlayerColor color = entry.getKey();
+                PlayerHandler handler = entry.getValue().create(engine);
+                builder.add(new Player(color, handler));
             }
 
             return builder.build();

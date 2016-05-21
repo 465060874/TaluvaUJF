@@ -8,13 +8,18 @@ import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
 import engine.action.*;
+import engine.log.EngineLogger;
+import engine.log.EngineLoggerSetup;
 import engine.rules.BuildRules;
 import engine.rules.ExpandRules;
 import engine.rules.SeaPlacementRules;
 import engine.rules.VolcanoPlacementRules;
 import map.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -25,10 +30,11 @@ class EngineImpl implements Engine {
 
     private static final int TILES_PER_PLAYER = 12;
 
-    private final List<EngineObserver> observers;
-
+    private final EngineLogger logger;
     private final long seed;
     private final Random random;
+
+    private final List<EngineObserver> observers;
 
     private final Gamemode gamemode;
     private final Island island;
@@ -36,7 +42,8 @@ class EngineImpl implements Engine {
     private final VolcanoTileStack volcanoTileStack;
 
     private int turn;
-    private boolean placeStep;
+    private int playerIndex;
+    private boolean tileStep;
     private List<StepSave> stepSaves;
 
     private HexMap<List<SeaTileAction>> seaPlacements;
@@ -48,9 +55,11 @@ class EngineImpl implements Engine {
      * Package-protected, voir la classe EngineBuilder
      */
     EngineImpl(EngineBuilder<?> builder) {
-        this.observers = new ArrayList<>();
+        this.logger = EngineLoggerSetup.setup();
         this.seed = builder.seed;
         this.random = new Random(builder.seed);
+
+        this.observers = new ArrayList<>();
 
         this.gamemode = builder.gamemode;
         this.island = builder.island;
@@ -58,7 +67,8 @@ class EngineImpl implements Engine {
         this.volcanoTileStack = builder.volcanoTileStackFactory.create(players.size() * TILES_PER_PLAYER, random);
 
         this.turn = 0;
-        this.placeStep = false;
+        this.playerIndex = 0;
+        this.tileStep = false;
         this.stepSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
 
         this.seaPlacements = HexMap.create();
@@ -68,9 +78,11 @@ class EngineImpl implements Engine {
     }
 
     private EngineImpl(EngineImpl engine) {
-        this.observers = new ArrayList<>();
+        this.logger = engine.logger;
         this.seed = engine.seed;
         this.random = engine.random;
+
+        this.observers = new ArrayList<>();
 
         this.gamemode = engine.gamemode;
         this.island = engine.island.copy();
@@ -83,7 +95,8 @@ class EngineImpl implements Engine {
 
 
         this.turn = engine.turn;
-        this.placeStep = engine.placeStep;
+        this.playerIndex = engine.playerIndex;
+        this.tileStep = engine.tileStep;
         this.stepSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
         stepSaves.addAll(engine.stepSaves);
 
@@ -91,6 +104,11 @@ class EngineImpl implements Engine {
         this.volcanosPlacements = engine.volcanosPlacements;
         this.buildActions = engine.buildActions;
         this.expandActions = engine.expandActions;
+    }
+
+    @Override
+    public EngineLogger logger() {
+        return logger;
     }
 
     @Override
@@ -136,7 +154,8 @@ class EngineImpl implements Engine {
     @Override
     public void start() {
         turn = 0;
-        placeStep = true;
+        playerIndex = 0;
+        tileStep = true;
         observers.forEach(EngineObserver::onStart);
 
         volcanoTileStack.next();
@@ -159,17 +178,21 @@ class EngineImpl implements Engine {
     @Override
     public synchronized void cancelLastStep() {
         getCurrentPlayer().getHandler().cancel();
-        if (placeStep) {
+        if (tileStep) {
             turn--;
+            do {
+                playerIndex--;
+            } while (getCurrentPlayer().isEliminated());
+
             volcanoTileStack.previous();
             observers.forEach(EngineObserver::onTileStackChange);
         }
-        placeStep = !placeStep;
+        tileStep = !tileStep;
 
         StepSave save = stepSaves.remove(stepSaves.size() - 1);
         save.restore(this);
 
-        if (placeStep) {
+        if (tileStep) {
             updateSeaPlacements();
             updateVolcanoPlacements();
         }
@@ -180,8 +203,8 @@ class EngineImpl implements Engine {
     }
 
     private void nextStep() {
-        if (placeStep) {
-            placeStep = false;
+        if (tileStep) {
+            tileStep = false;
 
             updateBuildActions();
             updateExpandActions();
@@ -209,11 +232,12 @@ class EngineImpl implements Engine {
             getCurrentPlayer().getHandler().startBuildStep();
         }
         else {
+            turn++;
             do {
-                turn++;
+                playerIndex++;
             } while (getCurrentPlayer().isEliminated());
 
-            placeStep = true;
+            tileStep = true;
             volcanoTileStack.next();
             if (volcanoTileStack.isEmpty()) {
                 List<Player> candidates = playerWithMinimumBuildingOfType(players, BuildingType.TEMPLE);
@@ -370,31 +394,41 @@ class EngineImpl implements Engine {
     }
 
     @Override
+    public int getTurn() {
+        return turn;
+    }
+
+    @Override
+    public boolean isTileStep() {
+        return tileStep;
+    }
+
+    @Override
     public Player getCurrentPlayer() {
-        return players.get(turn % players.size());
+        return players.get(playerIndex % players.size());
     }
 
     @Override
     public HexMap<? extends Iterable<SeaTileAction>> getSeaPlacements() {
-        checkState(placeStep, "Requesting sea placements during building step");
+        checkState(tileStep, "Requesting sea placements during building step");
         return seaPlacements;
     }
 
     @Override
     public HexMap<? extends Iterable<VolcanoTileAction>> getVolcanoPlacements() {
-        checkState(placeStep, "Requesting volcano placements during building step");
+        checkState(tileStep, "Requesting volcano placements during building step");
         return volcanosPlacements;
     }
 
     @Override
     public HexMap<? extends Iterable<PlaceBuildingAction>> getBuildActions() {
-        checkState(!placeStep, "Requesting build actions during tile placements");
+        checkState(!tileStep, "Requesting build actions during tile placements");
         return buildActions;
     }
 
     @Override
     public HexMap<? extends Iterable<ExpandVillageAction>> getExpandActions() {
-        checkState(!placeStep, "Requesting expand actions during tile placements");
+        checkState(!tileStep, "Requesting expand actions during tile placements");
         return expandActions;
     }
 
@@ -419,7 +453,7 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void placeOnSea(SeaTileAction placement) {
-        checkState(placeStep, "Can't place a tile during building step");
+        checkState(tileStep, "Can't place a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
         island.putTile(volcanoTileStack.current(), placement.getHex1(), placement.getOrientation());
@@ -431,7 +465,7 @@ class EngineImpl implements Engine {
     @Override
     public synchronized void placeOnVolcano(VolcanoTileAction placement) {
 
-        checkState(placeStep, "Can't place a tile during building step");
+        checkState(tileStep, "Can't place a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
         island.putTile(volcanoTileStack.current(), placement.getVolcanoHex(), placement.getOrientation());
@@ -443,7 +477,7 @@ class EngineImpl implements Engine {
     @Override
     public synchronized void build(PlaceBuildingAction action) {
 
-        checkState(!placeStep, "Can't build during tile placement step");
+        checkState(!tileStep, "Can't build during tile placement step");
 
         stepSaves.add(new ActionSave(this, action));
         PlayerColor color = getCurrentPlayer().getColor();
@@ -460,7 +494,7 @@ class EngineImpl implements Engine {
     @Override
     public synchronized void expand(ExpandVillageAction action) {
 
-        checkState(!placeStep, "Can't expand during tile placement step");
+        checkState(!tileStep, "Can't expand during tile placement step");
 
         stepSaves.add(new ActionSave(this, action));
         PlayerColor color = getCurrentPlayer().getColor();

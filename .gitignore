@@ -3,5 +3,6 @@
 *.iws
 .idea/
 
+/logs
 target
 hs_err_pid*
