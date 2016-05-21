@@ -83,7 +83,7 @@ class IslandCanvas extends Canvas {
         double hexSizeX = HexShape.HEX_SIZE_X * grid.getScale();
         double hexSizeY = HexShape.HEX_SIZE_Y * grid.getScale();
         double centerX = getWidth() / 2 - grid.getOx();
-        double centerY = getHeight() / 2 - grid.getOx();
+        double centerY = getHeight() / 2 - grid.getOy();
 
         List<HexShapeInfo> infos = new ArrayList<>();
         for (Hex hex : island.getFields()) {
