@@ -1,57 +1,62 @@
 package IA;
+
 import engine.Engine;
-import engine.action.PlaceBuildingAction;
 import engine.action.ExpandVillageAction;
+import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
-import map.HexMap;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.util.PriorityQueue;
 
-public class BotPlayer {
+class BotPlayer {
+
+    // Strategies possibles pour l'IA
+    private static final int NB_STRATEGIES = 4;
 
     // Facteur de branchment pour l'arbre MIN-MAX
-    private int branchingFactor = 8;
-    // Strategies possibles pour l'IA
-    final static int nbStrategies = 4;
+    private final int branchingFactor;
+    // Heuristics utilisées
+    private final Heuristics heuristics;
 
     // Donnees
-    Engine engine = null;
-    Heuristics heuristic;
-    int[] strategyPoints = new int[nbStrategies];
+    private final Engine realEngine;
+    private final int[] strategyPoints = new int[NB_STRATEGIES];
 
     // Constructeur
-    public BotPlayer(int branchingFactor, Heuristics heuristic) {
+    BotPlayer(int branchingFactor, Heuristics heuristics, Engine realEngine) {
         this.branchingFactor = branchingFactor;
-        this.heuristic = heuristic;
+        this.heuristics = heuristics;
+        this.realEngine = realEngine;
     }
 
     // Jouer un coup
-    public Move play(Engine e, int depth) {
-        // Créé un nouvel Engine modifiable à souhait sans interference avec
-        // l'interface graphique par exemple
-        System.out.println("PLAY : depth " + depth);
-        this.engine = e;
+    Move play(int depth) {
+        return doPlay(realEngine.copyWithoutObservers(), depth);
+    }
+
+    private Move doPlay(Engine engine, int depth) {
+        engine.logger().fine("PLAY : depth {0}", depth);
         @SuppressWarnings("unchecked")
-        PriorityQueue<Move>[] strategiesQueues = new PriorityQueue[nbStrategies];
-        for (int i = 0; i < nbStrategies; i++)
+        PriorityQueue<Move>[] strategiesQueues = new PriorityQueue[NB_STRATEGIES];
+        for (int i = 0; i < NB_STRATEGIES; i++)
             strategiesQueues[i] = new PriorityQueue<>((a,b) -> Integer.compare( b.points, a.points));
 
         // 1 -- Determiner le poids de chaque stratégie
-        heuristic.chooseStrategies(engine,strategyPoints,branchingFactor);
-        System.out.printf("-> Strategy Chosen\n\tTemples %d\n\tTours %d\n\tHuttes %d\n\tContre %d\n\n ", strategyPoints[0], strategyPoints[1], strategyPoints[2], strategyPoints[3]);
+        heuristics.chooseStrategies(engine,strategyPoints,branchingFactor);
+        engine.logger().fine("-> Strategy Chosen\n" +
+                "\tTemples {0}\n\tTours {1}\n\tHuttes {2}\n\tContre {3}",
+                strategyPoints[0], strategyPoints[1], strategyPoints[2], strategyPoints[3]);
 
         // 2 -- Determiner un sous-ensemble pertinent de coups possibles
-        branchSort( strategiesQueues );
-        System.out.println("-> Branch Chosen");
+        branchSort(engine, strategiesQueues);
+        engine.logger().fine("-> Branch Chosen");
 
         // 3 -- MIN-MAX sur l'arbre réduit
         // A ce point : strategiesQueues contient les coups possibles pour chaque stratégie.
         // On va donc appeler la fonction de jeu pour l'adversaire dessus...
         Move[] branchMoves = new Move[branchingFactor];
         int ind = 0;
-        for( int i = 0; i < nbStrategies; i++ ) {
+        for(int i = 0; i < NB_STRATEGIES; i++ ) {
             for (int j = strategyPoints[i]; j > 0; j--) {
                 boolean found;
                 Move m;
@@ -81,14 +86,14 @@ public class BotPlayer {
             engine.action(branchMoves[i].tileAction);
             engine.action(branchMoves[i].buildingAction);
             if (depth > 0) {
-                Move m = play(engine, depth - 1);
+                Move m = doPlay(engine, depth - 1);
                 if (m.points < bestPoints) {
                     bestPoints = m.points;
                     bestMove = branchMoves[i];
                 }
             }
             else {
-                if( (p = heuristic.evaluateConfiguration(engine)) > bestConfigPoints ){
+                if( (p = heuristics.evaluateConfiguration(engine)) > bestConfigPoints ){
                     bestMove = new Move(branchMoves[i].buildingAction, branchMoves[i].tileAction, p);
                     bestConfigPoints = p;
                 }
@@ -101,50 +106,50 @@ public class BotPlayer {
     }
 
     // Fonction qui classe les coups selon la stratégie choisie
-    private void branchSort(PriorityQueue<Move> [] strategiesQueues) {
+    private void branchSort(Engine engine, PriorityQueue<Move> [] strategiesQueues) {
         // Pour tout tileAction dans la mer
-        System.out.println("[Sort] Begin seaPlacements : " + engine.getSeaPlacements().size());
+        engine.logger().fine("[Sort] Begin seaPlacements : {0}", engine.getSeaPlacements().size());
         for (Iterable<SeaTileAction> seaPlacements : engine.getSeaPlacements().values()) {
             for (SeaTileAction placement  : seaPlacements) {
-                int points = heuristic.evaluateSeaPlacement(engine, placement);
+                int points = heuristics.evaluateSeaPlacement(engine, placement);
                 engine.placeOnSea(placement);
 
                 // Pour toute construction :
-                //System.out.println("    [Sort] Begin buildActions : " + engine.getBuildActions().size());
-                HexMap<? extends Iterable<PlaceBuildingAction>> buildActionsMap = engine.getBuildActions();
-                for (Iterable<PlaceBuildingAction> buildActions : buildActionsMap.values()) {
+                engine.logger().finer("    [Sort] Begin buildActions : {0}", engine.getBuildActions().size());
+                for (Iterable<PlaceBuildingAction> buildActions : engine.getBuildActions().values()) {
                     for (PlaceBuildingAction action : buildActions) {
-                        heuristic.evaluateBuildAction(engine, placement, action, points, strategiesQueues);
+                        heuristics.evaluateBuildAction(engine, placement, action, points, strategiesQueues);
                     }
 
                 }
-                //System.out.println("    [Sort] Begin expandActions : " + engine.getExpandActions().size());
-                HexMap<? extends Iterable<ExpandVillageAction>> expandActionsMap = engine.getExpandActions();
-                for (Iterable<ExpandVillageAction> expandActions : expandActionsMap.values()) {
+
+                engine.logger().finer("    [Sort] Begin expandActions : {0}", engine.getExpandActions().size());
+                for (Iterable<ExpandVillageAction> expandActions : engine.getExpandActions().values()) {
                     for (ExpandVillageAction action : expandActions) {
-                        heuristic.evaluateExpandAction(engine, placement, action, points, strategiesQueues);
+                        heuristics.evaluateExpandAction(engine, placement, action, points, strategiesQueues);
                     }
                 }
                 engine.cancelLastStep();
             }
         }
-        System.out.println("[Sort] Begin volcanoPlacements : " + engine.getSeaPlacements().size());
+
+        engine.logger().fine("[Sort] Begin volcanoPlacements : {0}", engine.getSeaPlacements().size());
         // Pour tout tileAction sur la terre
         for (Iterable<VolcanoTileAction> volcanoPlacements : engine.getVolcanoPlacements().values()) {
             for (VolcanoTileAction placement  : volcanoPlacements) {
-                int points = heuristic.evaluateVolcanoPlacement(engine, placement);
+                int points = heuristics.evaluateVolcanoPlacement(engine, placement);
                 engine.placeOnVolcano(placement);
 
                 // Pour toute construction :
                 for (Iterable<PlaceBuildingAction> buildActions : engine.getBuildActions().values()) {
                     for (PlaceBuildingAction action : buildActions) {
-                        heuristic.evaluateBuildAction(engine, placement, action, points, strategiesQueues);
+                        heuristics.evaluateBuildAction(engine, placement, action, points, strategiesQueues);
                     }
                 }
 
                 for (Iterable<ExpandVillageAction> expandActions : engine.getExpandActions().values()) {
                     for (ExpandVillageAction action : expandActions) {
-                        heuristic.evaluateExpandAction(engine, placement, action, points, strategiesQueues);
+                        heuristics.evaluateExpandAction(engine, placement, action, points, strategiesQueues);
                     }
                 }
                 engine.cancelLastStep();

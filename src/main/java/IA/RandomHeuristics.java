@@ -5,17 +5,17 @@ import engine.action.*;
 import java.util.Random;
 import java.util.PriorityQueue;
 
-public class RandomHeuristics implements Heuristics {
+class RandomHeuristics implements Heuristics {
 
-    Random r;
+    final Random r;
     int nbStrategies;
 
-    public RandomHeuristics(){
-        r = new Random();
-        nbStrategies = 4;
+    RandomHeuristics(Random r) {
+        this.r = r;
+        this.nbStrategies = 4;
     }
 
-    public void chooseStrategies (Engine e , int [] StrategyValues, int BranchingFactor ){
+    public void chooseStrategies(Engine e , int[] StrategyValues, int BranchingFactor) {
         int i, j;
         for( i = 0; i < nbStrategies; i++ )
             StrategyValues[i] = 0;

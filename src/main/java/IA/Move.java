@@ -1,6 +1,8 @@
 package IA;
 import engine.action.*;
 
+import java.util.Objects;
+
 class Move {
 
     final TileAction tileAction;
@@ -13,7 +15,13 @@ class Move {
         this.points = points;
     }
 
-    public boolean equals(Move m) {
-        return this.tileAction.equals(m.tileAction) && this.buildingAction.equals(m.buildingAction);
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Move)) {
+            return false;
+        }
+
+        Move other = (Move) obj;
+        return Objects.equals(this.tileAction, other.tileAction)
+                && Objects.equals(this.buildingAction, other.buildingAction);
     }
 }

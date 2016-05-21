@@ -3,7 +3,7 @@ import engine.*;
 import engine.action.*;
 import java.util.PriorityQueue;
 
-public interface Heuristics {
+interface Heuristics {
 
     void chooseStrategies (Engine e , int [] StrategyValues, int BranchingFactor );
 

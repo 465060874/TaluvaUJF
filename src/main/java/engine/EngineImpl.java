@@ -55,7 +55,7 @@ class EngineImpl implements Engine {
      * Package-protected, voir la classe EngineBuilder
      */
     EngineImpl(EngineBuilder<?> builder) {
-        this.logger = EngineLoggerSetup.setup();
+        this.logger = EngineLoggerSetup.setup(builder.logLevel);
         this.seed = builder.seed;
         this.random = new Random(builder.seed);
 

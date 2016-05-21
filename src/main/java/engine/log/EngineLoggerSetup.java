@@ -15,9 +15,10 @@ public class EngineLoggerSetup {
 
     private static final DateFormat LOG_FILE_DATE_FORMAT = new SimpleDateFormat("yyMMdd_HHmmss_SSS");
 
-    public static EngineLogger setup() {
+    public static EngineLogger setup(Level level) {
         Class<?> clazz = Engine.class;
         EngineLogger logger = new EngineLogger(clazz.getCanonicalName());
+        logger.javaLogger.setLevel(level);
         logger.javaLogger.setUseParentHandlers(false);
         logger.javaLogger.addHandler(new SystemLoggerHandler(new OneLineLoggerFormatter(false)));
 

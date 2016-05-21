@@ -1,5 +1,6 @@
 package ui;
 
+import IA.BotPlayerHandler;
 import data.PlayerColor;
 import data.VolcanoTile;
 import engine.*;
@@ -16,8 +17,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.util.List;
-
-import static java.util.stream.Collectors.toList;
+import java.util.logging.Level;
 
 public class EngineVisu extends Application implements EngineObserver {
 
@@ -28,11 +28,13 @@ public class EngineVisu extends Application implements EngineObserver {
     @Override
     public void start(Stage stage) throws Exception {
         this.engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.RED, (engine) -> new UIPlayerHandlerWrapper(PlayerHandler.dumbFactory().create(engine)))
-                .player(PlayerColor.WHITE, (engine) -> new UIPlayerHandlerWrapper(PlayerHandler.dumbFactory().create(engine)))
+                .logLevel(Level.FINE)
+                .player(PlayerColor.RED, uiWrap(PlayerHandler.dumbFactory()))
+                .player(PlayerColor.WHITE, uiWrap(BotPlayerHandler::new))
                 .build();
         /*CharSource gameSource = Files.asCharSource(new File("9233261640382.taluva"), StandardCharsets.UTF_8);
         this.engine = EngineRecord.load(gameSource).replay();*/
+        engine.registerObserver(new EngineLoggerObserver(engine));
         engine.registerObserver(this);
 
         this.islandView = new IslandView(engine.getIsland(), false);
@@ -51,7 +53,6 @@ public class EngineVisu extends Application implements EngineObserver {
 
     @Override
     public void onStart() {
-        engine.logger().info("Starting with seed {0}", Long.toString(engine.getSeed()));
         islandView.islandCanvas.redraw();
     }
 
@@ -91,15 +92,14 @@ public class EngineVisu extends Application implements EngineObserver {
 
     @Override
     public void onEliminated(Player eliminated) {
-        engine.logger().info("Eliminated : {0}", eliminated.getColor());
     }
 
     @Override
     public void onWin(WinReason reason, List<Player> winners) {
-        engine.logger().info("Winner : {0}", winners.stream()
-                .map(Player::getColor)
-                .collect(toList())
-                .toString());
+    }
+
+    private PlayerHandler.Factory uiWrap(PlayerHandler.Factory factory) {
+        return (engine) -> new UIPlayerHandlerWrapper(factory.create(engine));
     }
 
     private class UIPlayerHandlerWrapper implements PlayerHandler {

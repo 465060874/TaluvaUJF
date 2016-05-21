@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Level;
 
 import static com.google.common.base.Preconditions.*;
 import static com.google.common.base.Verify.verify;
@@ -32,6 +33,7 @@ import static com.google.common.base.Verify.verify;
 public abstract class EngineBuilder<B extends EngineBuilder> {
 
     final Gamemode gamemode;
+    Level logLevel;
     long seed;
     Island island;
     VolcanoTileStack.Factory volcanoTileStackFactory;
@@ -52,12 +54,18 @@ public abstract class EngineBuilder<B extends EngineBuilder> {
 
     private EngineBuilder(Gamemode gamemode) {
         this.gamemode = gamemode;
+        this.logLevel = Level.INFO;
         this.seed = seedUniquifier() ^ System.nanoTime();
         this.island = Island.createEmpty();
         this.volcanoTileStackFactory = VolcanoTileStack.randomFactory(StandardVolcanoTiles.LIST);
     }
 
     abstract B self();
+
+    public B logLevel(Level level) {
+        this.logLevel = level;
+        return self();
+    }
 
     public B seed(long seed) {
         this.seed = seed;

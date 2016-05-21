@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.PriorityQueue;
 
-public class BasicHeuristics implements Heuristics {
+class BasicHeuristics implements Heuristics {
     // Critères d'évaluation pondérés
     int echelle = 100 ;
     int nbStrategies = 4;
@@ -26,10 +26,7 @@ public class BasicHeuristics implements Heuristics {
     final static int HUTSTRATEGY = 2;
     final static int COUNTERSTRATEGY = 3;
 
-    Random r;
-
-    public BasicHeuristics(){
-        r = new Random();
+    BasicHeuristics() {
     }
 
     public void chooseStrategies (Engine e , int [] StrategyValues, int BranchingFactor ){
@@ -161,11 +158,12 @@ public class BasicHeuristics implements Heuristics {
     }
 
     public int evaluateVolcanoPlacement(Engine e, VolcanoTileAction move){
-        return r.nextInt(40) - 20;
+        return e.getRandom().nextInt(40) - 20;
     }
 
     public int evaluateBuildAction(Engine e, TileAction tileAction, PlaceBuildingAction move, int pointsPlacement, PriorityQueue<Move>[] strategiesQueues){
         Move m;
+        Random r = e.getRandom();
         for (int i = 0; i < nbStrategies; i++) {
             m = new Move( move, tileAction, r.nextInt(40) + pointsPlacement - 20 );
             strategiesQueues[i].add(m);
@@ -175,6 +173,7 @@ public class BasicHeuristics implements Heuristics {
 
     public int evaluateExpandAction(Engine e, TileAction tileAction, ExpandVillageAction move, int pointsPlacement, PriorityQueue<Move>[] strategiesQueues){
         Move m;
+        Random r = e.getRandom();
         for (int i = 0; i < nbStrategies; i++) {
             m = new Move( move, tileAction, r.nextInt(40) + pointsPlacement - 20 );
             strategiesQueues[i].add(m);

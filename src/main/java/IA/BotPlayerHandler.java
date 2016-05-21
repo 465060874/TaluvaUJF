@@ -13,14 +13,15 @@ public class BotPlayerHandler implements PlayerHandler {
 
     public BotPlayerHandler(Engine engine) {
         this.engine = engine;
-        this.bot = new BotPlayer(16, new BasicHeuristics());
+        this.bot = new BotPlayer(16, new BasicHeuristics(), engine);
     }
 
     @Override
     public void startTileStep() {
         long startTime = System.nanoTime();
-        move = bot.play(engine.copyWithoutObservers(), 1);
-        System.out.println("Fini : " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
+        move = bot.play(1);
+        engine.logger().info("Fini : {0}",
+                TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
         engine.action(move.tileAction);
     }
 
