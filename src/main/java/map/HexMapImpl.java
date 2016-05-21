@@ -12,7 +12,7 @@ class HexMapImpl<E> implements HexMap<E> {
     private final Map<Hex, E> map;
 
     HexMapImpl() {
-        this.map = new HashMap<>();
+        this.map = new HashMap<>(1 << 9);
     }
 
     private HexMapImpl(HexMapImpl<E> hexMap) {

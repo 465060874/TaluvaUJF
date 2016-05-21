@@ -1,7 +1,6 @@
 package map;
 
 import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 
@@ -15,8 +14,8 @@ public class Hex {
         return LINE_THEN_DIAG_ORDERING;
     }
 
-    private final int line;
-    private final int diag;
+    final int line;
+    final int diag;
 
     private Hex(int line, int diag) {
         this.line = line;
@@ -51,7 +50,7 @@ public class Hex {
 
     @Override
     public int hashCode() {
-        return line * 200 + diag;
+        return 961 + 31 * line + diag;
     }
 
     @Override
