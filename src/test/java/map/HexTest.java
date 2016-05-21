@@ -49,7 +49,6 @@ public class HexTest {
         assertEquals(hexEastExpected, hexEast);
         assertEquals(hexSouthEastExpected, hexSouthEast);
         assertEquals(hexSouthWestExpected, hexSouthWest);
-
     }
 
     @Test

@@ -16,13 +16,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
-public class SeaTileActionRulesTest {
+public class SeaPlacementRulesTest {
 
     private static final VolcanoTile TILE = new VolcanoTile(FieldType.JUNGLE, FieldType.JUNGLE);
 
     @Test
     public void testValidate() {
-        URL rsc = SeaTileActionRulesTest.class.getResource("SeaTileActionRulesTest.island");
+        URL rsc = SeaPlacementRulesTest.class.getResource("SeaPlacementRulesTest.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
         Hex hex;

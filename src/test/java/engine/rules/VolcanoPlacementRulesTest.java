@@ -16,7 +16,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
-public class VolcanoTileActionRulesTest {
+public class VolcanoPlacementRulesTest {
 
     private static final VolcanoTile TILE = new VolcanoTile(FieldType.JUNGLE, FieldType.JUNGLE);
 
@@ -36,7 +36,7 @@ public class VolcanoTileActionRulesTest {
 
     @Test
     public void testOrientations() {
-        URL rsc = VolcanoTileActionRulesTest.class.getResource("VolcanoTileActionRulesTest.island");
+        URL rsc = VolcanoPlacementRulesTest.class.getResource("VolcanoPlacementRulesTest.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
         Hex hex;
@@ -92,7 +92,7 @@ public class VolcanoTileActionRulesTest {
 
     @Test
     public void testVillages() {
-        URL rsc = VolcanoTileActionRulesTest.class.getResource("VolcanoPlacementRulesTest2.island");
+        URL rsc = VolcanoPlacementRulesTest.class.getResource("VolcanoPlacementRulesTest2.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
         Hex hex;
