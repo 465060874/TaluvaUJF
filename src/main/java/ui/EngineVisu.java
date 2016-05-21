@@ -1,7 +1,7 @@
 package ui;
 
-import IA.BotPlayerHandler;
 import data.PlayerColor;
+import data.VolcanoTile;
 import engine.*;
 import engine.action.ExpandVillageAction;
 import engine.action.PlaceBuildingAction;
@@ -27,13 +27,10 @@ public class EngineVisu extends Application implements EngineObserver {
 
     @Override
     public void start(Stage stage) throws Exception {
-        this.engine = new EngineBuilder()
-                .gamemode(Gamemode.TwoPlayer)
-                .player(PlayerColor.RED, (engine) -> new UIDumbPlayerHandler(PlayerHandler.dumbFactory().create(engine)))
-                .player(PlayerColor.WHITE, (engine) -> new UIDumbPlayerHandler(new BotPlayerHandler(engine)))
+        this.engine = EngineBuilder.allVsAll()
+                .player(PlayerColor.RED, (engine) -> new UIPlayerHandlerWrapper(PlayerHandler.dumbFactory().create(engine)))
+                .player(PlayerColor.WHITE, (engine) -> new UIPlayerHandlerWrapper(PlayerHandler.dumbFactory().create(engine)))
                 .build();
-        /*this.engine = EngineRecord.load(Files.asCharSource(new File("26350504926080.taluva"), StandardCharsets.UTF_8))
-                .replay();*/
         engine.registerObserver(this);
 
         this.islandView = new IslandView(engine.getIsland(), false);
@@ -52,12 +49,14 @@ public class EngineVisu extends Application implements EngineObserver {
 
     @Override
     public void onStart() {
+        System.out.println("Starting with seed " + engine.getSeed());
         islandView.islandCanvas.redraw();
     }
 
     @Override
     public void onTileStackChange() {
-        System.out.println("Drawn : " + engine.getVolcanoTileStack().current());
+        VolcanoTile tile = engine.getVolcanoTileStack().current();
+        System.out.println("Drawn : " + tile.getLeft() + " " + tile.getRight());
     }
 
     @Override
@@ -90,6 +89,7 @@ public class EngineVisu extends Application implements EngineObserver {
 
     @Override
     public void onEliminated(Player eliminated) {
+        System.out.println("Eliminated : " + eliminated.getColor());
     }
 
     @Override
@@ -100,42 +100,42 @@ public class EngineVisu extends Application implements EngineObserver {
                 .toString());
     }
 
-    class UIDumbPlayerHandler implements PlayerHandler {
+    private class UIPlayerHandlerWrapper implements PlayerHandler {
 
         private final PlayerHandler playerHandler;
-        private final EventHandler<MouseEvent> startTileStepHandler;
-        private final EventHandler<MouseEvent> startBuildStepHandler;
+        private final EventHandler<MouseEvent> startWrappedTileStep;
+        private final EventHandler<MouseEvent> startWrappedBuildStep;
 
-        public UIDumbPlayerHandler(PlayerHandler subHandler) {
-            this.startTileStepHandler = this::doStartTileStep;
-            this.startBuildStepHandler = this::doStartBuildStep;
+        private UIPlayerHandlerWrapper(PlayerHandler subHandler) {
+            this.startWrappedTileStep = this::startWrappedTileStep;
+            this.startWrappedBuildStep = this::startWrappedBuildStep;
             this.playerHandler = subHandler;
         }
 
         @Override
         public void startTileStep() {
-            scene.addEventHandler(MouseEvent.MOUSE_CLICKED, startTileStepHandler);
+            scene.addEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedTileStep);
         }
 
-        private void doStartTileStep(MouseEvent event) {
-            scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startTileStepHandler);
+        private void startWrappedTileStep(MouseEvent event) {
+            scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedTileStep);
             playerHandler.startTileStep();
         }
 
         @Override
         public void startBuildStep() {
-            scene.addEventHandler(MouseEvent.MOUSE_CLICKED, startBuildStepHandler);
+            scene.addEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedBuildStep);
         }
 
-        private void doStartBuildStep(MouseEvent event) {
-            scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startBuildStepHandler);
+        private void startWrappedBuildStep(MouseEvent event) {
+            scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedBuildStep);
             playerHandler.startBuildStep();
         }
 
         @Override
         public void cancel() {
-            scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startTileStepHandler);
-            scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startBuildStepHandler);
+            scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedTileStep);
+            scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedBuildStep);
         }
     }
 }

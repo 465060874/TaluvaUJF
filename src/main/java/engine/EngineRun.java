@@ -20,8 +20,7 @@ import static java.util.stream.Collectors.toList;
 public class EngineRun {
 
     public static void main(String[] args) {
-        Engine engine = new EngineBuilder()
-                .gamemode(Gamemode.TwoPlayer)
+        Engine engine = EngineBuilder.allVsAll()
                 .player(PlayerColor.RED, PlayerHandler.dumbFactory())
                 .player(PlayerColor.WHITE, PlayerHandler.dumbFactory())
                 .build();

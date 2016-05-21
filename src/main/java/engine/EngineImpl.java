@@ -23,13 +23,17 @@ import static java.util.stream.Collectors.toList;
 
 class EngineImpl implements Engine {
 
+    private static final int TILES_PER_PLAYER = 12;
+
     private final List<EngineObserver> observers;
+
+    private final long seed;
     private final Random random;
 
     private final Gamemode gamemode;
     private final Island island;
-    private final VolcanoTileStack volcanoTileStack;
     private final ImmutableList<Player> players;
+    private final VolcanoTileStack volcanoTileStack;
 
     private int turn;
     private boolean placeStep;
@@ -43,28 +47,15 @@ class EngineImpl implements Engine {
     /**
      * Package-protected, voir la classe EngineBuilder
      */
-    EngineImpl(EngineBuilder builder) {
+    EngineImpl(EngineBuilder<?> builder) {
         this.observers = new ArrayList<>();
+        this.seed = builder.seed;
         this.random = new Random(builder.seed);
 
         this.gamemode = builder.gamemode;
         this.island = builder.island;
-        this.volcanoTileStack = builder.volcanoTileStackFactory.create(gamemode, random);
-
-        Map<PlayerHandler.Factory, PlayerHandler> playerHandlersMap = new IdentityHashMap<>();
-        for (PlayerHandler.Factory factory : builder.players.values()) {
-            if (!playerHandlersMap.containsKey(factory)) {
-                playerHandlersMap.put(factory, factory.create(this));
-            }
-        }
-
-        List<Player> playersBuilder = new ArrayList<>();
-        for (Map.Entry<PlayerColor, PlayerHandler.Factory> entry : builder.players.entrySet()) {
-            PlayerHandler handler = playerHandlersMap.get(entry.getValue());
-            playersBuilder.add(new Player(entry.getKey(), handler));
-        }
-        Collections.shuffle(playersBuilder, random);
-        this.players = ImmutableList.copyOf(playersBuilder);
+        this.players = builder.createPlayers(this);
+        this.volcanoTileStack = builder.volcanoTileStackFactory.create(players.size() * TILES_PER_PLAYER, random);
 
         this.turn = 0;
         this.placeStep = false;
@@ -78,17 +69,18 @@ class EngineImpl implements Engine {
 
     private EngineImpl(EngineImpl engine) {
         this.observers = new ArrayList<>();
-        this.random = engine.getRandom();
+        this.seed = engine.seed;
+        this.random = engine.random;
 
-        this.gamemode = engine.getGamemode();
+        this.gamemode = engine.gamemode;
         this.island = engine.island.copy();
-        this.volcanoTileStack = engine.volcanoTileStack.copyShuffled(random);
-
         ImmutableList.Builder<Player> players = ImmutableList.builder();
         for (Player player : engine.getPlayers()) {
             players.add(player.copyWithDummyHandler());
         }
         this.players = players.build();
+        this.volcanoTileStack = engine.volcanoTileStack.copyShuffled(random);
+
 
         this.turn = engine.turn;
         this.placeStep = engine.placeStep;
@@ -99,6 +91,11 @@ class EngineImpl implements Engine {
         this.volcanosPlacements = engine.volcanosPlacements;
         this.buildActions = engine.buildActions;
         this.expandActions = engine.expandActions;
+    }
+
+    @Override
+    public long getSeed() {
+        return seed;
     }
 
     @Override
@@ -138,18 +135,20 @@ class EngineImpl implements Engine {
 
     @Override
     public void start() {
-        // TODO Fix this
-        //turn = 0;
-        //placeStep = true;
+        turn = 0;
+        placeStep = true;
         observers.forEach(EngineObserver::onStart);
+
+        volcanoTileStack.next();
         observers.forEach(EngineObserver::onTileStackChange);
 
-        VolcanoTile tile = volcanoTileStack.current();
-        Hex origin = Hex.at(0, 0);
-        island.putTile(tile, origin, Orientation.NORTH);
-        observers.forEach(o -> o.onTilePlacementOnSea(new SeaTileAction(origin, Orientation.NORTH)));
+        Hex originHex = Hex.at(0, 0);
+        seaPlacements = HexMap.create();
+        seaPlacements.put(originHex, ImmutableList.of(new SeaTileAction(originHex, Orientation.NORTH)));
+        volcanosPlacements = HexMap.create();
 
-        nextStep();
+        observers.forEach(EngineObserver::onTileStepStart);
+        getCurrentPlayer().getHandler().startTileStep();
     }
 
     @Override
@@ -420,7 +419,7 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void placeOnSea(SeaTileAction placement) {
-        checkState(placeStep, "Can't action a tile during building step");
+        checkState(placeStep, "Can't place a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
         island.putTile(volcanoTileStack.current(), placement.getHex1(), placement.getOrientation());
@@ -432,7 +431,7 @@ class EngineImpl implements Engine {
     @Override
     public synchronized void placeOnVolcano(VolcanoTileAction placement) {
 
-        checkState(placeStep, "Can't action a tile during building step");
+        checkState(placeStep, "Can't place a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
         island.putTile(volcanoTileStack.current(), placement.getVolcanoHex(), placement.getOrientation());

@@ -159,9 +159,6 @@ class HexShape {
         double hexHeight = HEX_HEIGHT * scale;
         double bottomDepth2 = hexHeight * (maxLevel - level + 1);
         double bottomDepth1 = bottomDepth2 - hexHeight;
-        if (level > 1) {
-            bottomDepth2 -= 1;
-        }
         if (level == maxLevel) {
             bottomDepth1 += scale;
         }
@@ -182,7 +179,7 @@ class HexShape {
     void draw(GraphicsContext gc, HexShapeInfo info) {
         update(info);
 
-        gc.setEffect(new Lighting(new Light.Point(0, 0, info.scale * 100, Color.WHITE)));
+        gc.setEffect(new Lighting(new Light.Point(0, 0, info.scale * 150, Color.WHITE)));
         gc.setFill(info.isPlacement
                 ? fieldTypeTranslucentColor(info.field)
                 : fieldTypeColor(info.field));

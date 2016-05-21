@@ -38,7 +38,7 @@ public interface VolcanoTileStack {
 
     interface Factory {
 
-        VolcanoTileStack create(Gamemode gamemode, Random random);
+        VolcanoTileStack create(int count, Random random);
     }
 }
 
@@ -49,7 +49,7 @@ class VolcanoTileStackImpl implements VolcanoTileStack {
 
     private VolcanoTileStackImpl(ImmutableList<VolcanoTile> tiles) {
         this.tiles = tiles;
-        this.index = 0;
+        this.index = -1;
     }
 
     private VolcanoTileStackImpl(ImmutableList<VolcanoTile> tiles, int index) {
@@ -100,13 +100,13 @@ class VolcanoTileStackImpl implements VolcanoTileStack {
         }
 
         @Override
-        public VolcanoTileStack create(Gamemode gamemode, Random random) {
-            checkState(gamemode.getTilesCount() <= roulette.size(),
+        public VolcanoTileStack create(int count, Random random) {
+            checkState(count <= roulette.size(),
                     "Insufficient number of tiles (" + roulette.size() +
-                            "), expected " + gamemode.getTilesCount() + " at least");
+                            "), expected " + count + " at least");
             Collections.shuffle(roulette, random);
 
-            return new VolcanoTileStackImpl(ImmutableList.copyOf(roulette.subList(0, gamemode.getTilesCount())));
+            return new VolcanoTileStackImpl(ImmutableList.copyOf(roulette.subList(0, count)));
         }
     }
 
@@ -119,11 +119,11 @@ class VolcanoTileStackImpl implements VolcanoTileStack {
         }
 
         @Override
-        public VolcanoTileStack create(Gamemode gamemode, Random random) {
-            checkState(gamemode.getTilesCount() <= tiles.size(),
+        public VolcanoTileStack create(int count, Random random) {
+            checkState(count <= tiles.size(),
                     "Insufficient number of tiles (" + tiles.size() +
-                            "), expected " + gamemode.getTilesCount() + " at least");
-            return new VolcanoTileStackImpl(tiles.subList(0, gamemode.getTilesCount()));
+                            "), expected " + count + " at least");
+            return new VolcanoTileStackImpl(tiles.subList(0, count));
         }
     }
 }

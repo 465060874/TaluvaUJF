@@ -1,80 +1,199 @@
 package engine;
 
+import com.google.common.collect.ImmutableList;
 import data.PlayerColor;
 import data.StandardVolcanoTiles;
 import map.Island;
 
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Verify.verify;
 
 /**
  * Permet de configurer la création d'une nouvelle instance d'Engine
  * Usage typique :
- *     Engine engine = new EngineBuilder()
- *         .addPlayer(PlayerColor.RED, engine -> new MonImplementationDePlayerHandler(engine))
- *         .addPlayer(PlayerColor.WHITE, engine -> new MonAutreImplementationDePlayerHandler(engine))
+ *     Engine engine = EngineBuilder.allVsAll()
+ *         .player(PlayerColor.RED, engine -> new MonImplementationDePlayerHandler(engine))
+ *         .player(PlayerColor.WHITE, engine -> new MonAutreImplementationDePlayerHandler(engine))
  *         .build();
  *
  * Ou encore :
  *     HumanPlayerHandlerFactory humanFactory = new HumanPlayerHandlerFactory();
  *     IAPlayerHandlerFactory iaFactory = new IAPlayerHandlerFactory();
- *     Engine engine = new EngineBuilder()
- *         .gamemode(Gamemode.TeamVsTeam)
- *         .player(PlayerColor.RED, humanFactory)
- *         .player(PlayerColor.WHITE, humanFactory)
- *         .player(PlayerColor.BROWN, iaFactory)
- *         .player(PlayerColor.YELLOW, iaFactory)
+ *     Engine engine = EngineBuilder.teamVsTeam()
+ *         .team(PlayerColor.RED, PlayerColor.WHITE, humanFactory)
+ *         .team(PlayerColor.BROWN, PlayerColor.YELLOW, iaFactory)
  *         .build();
  */
-public class EngineBuilder {
+public abstract class EngineBuilder<B extends EngineBuilder> {
 
+    final Gamemode gamemode;
     long seed;
-    Gamemode gamemode;
     Island island;
     VolcanoTileStack.Factory volcanoTileStackFactory;
-    final Map<PlayerColor, PlayerHandler.Factory> players;
 
-    public EngineBuilder() {
+    public static EngineBuilder.AllVsAll allVsAll() {
+        return new EngineBuilder.AllVsAll();
+    }
+
+    public static EngineBuilder.TeamVsTeam teamVsTeam() {
+        return new EngineBuilder.TeamVsTeam();
+    }
+
+    private EngineBuilder(Gamemode gamemode) {
+        this.gamemode = gamemode;
         this.seed = seedUniquifier() ^ System.nanoTime();
-        this.gamemode = Gamemode.TwoPlayer;
         this.island = Island.createEmpty();
         this.volcanoTileStackFactory = VolcanoTileStack.randomFactory(StandardVolcanoTiles.LIST);
-        this.players = new EnumMap<>(PlayerColor.class);
     }
 
-    public EngineBuilder seed(long seed) {
+    abstract B self();
+
+    public B seed(long seed) {
         this.seed = seed;
-        return this;
+        return self();
     }
 
-    public EngineBuilder gamemode(Gamemode gamemode) {
-        this.gamemode = gamemode;
-        return this;
-    }
-
-    public EngineBuilder island(Island island) {
+    public B island(Island island) {
         this.island = island;
-        return this;
+        return self();
     }
 
-    public EngineBuilder tileStack(VolcanoTileStack.Factory factory) {
+    public B tileStack(VolcanoTileStack.Factory factory) {
         this.volcanoTileStackFactory = factory;
-        return this;
+        return self();
     }
 
-    public EngineBuilder player(PlayerColor color, PlayerHandler.Factory handlerFactory) {
-        this.players.put(color, handlerFactory);
-        return this;
-    }
+    abstract ImmutableList<Player> createPlayers(Engine engine);
 
     public Engine build() {
-        verify(gamemode.getPlayerCount() == players.size());
         return new EngineImpl(this);
     }
 
+    public static class AllVsAll extends EngineBuilder<AllVsAll> {
+
+        private final PlayerHandler.Factory[] handlerFactories;
+
+        private AllVsAll() {
+            super(Gamemode.AllVsAll);
+            this.handlerFactories = new PlayerHandler.Factory[PlayerColor.values().length];
+        }
+
+        @Override
+        AllVsAll self() {
+            return this;
+        }
+
+        public AllVsAll player(PlayerColor color, PlayerHandler.Factory factory) {
+            checkNotNull(color);
+            checkNotNull(factory);
+            checkState(handlerFactories[color.ordinal()] == null, "Color already taken");
+
+            handlerFactories[color.ordinal()] = factory;
+            return this;
+        }
+
+        ImmutableList<Player> createPlayers(Engine engine) {
+            List<Player> players = new ArrayList<>();
+
+            for (PlayerColor color : PlayerColor.values()) {
+                PlayerHandler.Factory factory = handlerFactories[color.ordinal()];
+                if (factory == null) {
+                    continue;
+                }
+
+                PlayerHandler handler = factory.create(engine);
+                players.add(new Player(color, handler));
+            }
+
+            verify(players.size() > 1 && players.size() <= 4);
+            Collections.shuffle(players, engine.getRandom());
+            return ImmutableList.copyOf(players);
+        }
+    }
+
+    public static class TeamVsTeam extends EngineBuilder {
+
+        private PlayerColor color11;
+        private PlayerColor color12;
+        private PlayerHandler.Factory handlerFactory1;
+        private PlayerColor color21;
+        private PlayerColor color22;
+        private PlayerHandler.Factory handlerFactory2;
+
+        private TeamVsTeam() {
+            super(Gamemode.TeamVsTeam);
+            this.color11 = null;
+            this.color12 = null;
+            this.handlerFactory1 = null;
+            this.color21 = null;
+            this.color22 = null;
+            this.handlerFactory2 = null;
+
+        }
+
+        @Override
+        EngineBuilder self() {
+            return this;
+        }
+
+        public TeamVsTeam team(PlayerColor color1, PlayerColor color2, PlayerHandler.Factory factory) {
+            checkNotNull(color1);
+            checkNotNull(color2);
+            checkNotNull(factory);
+            checkArgument(color1 != color2, "Can't use the same color");
+            checkState(handlerFactory2 == null, "Can't add more than 2 team");
+
+            if (handlerFactory1 == null) {
+                color11 = color1;
+                color12 = color2;
+                handlerFactory1 = factory;
+            }
+            else {
+                checkArgument(color1 != color12 && color1 != color21, "Color already taken");
+                checkArgument(color2 != color12 && color2 != color21, "Color already taken");
+                color21 = color1;
+                color22 = color2;
+                handlerFactory2 = factory;
+            }
+
+            return this;
+        }
+
+        @Override
+        ImmutableList<Player> createPlayers(Engine engine) {
+            verify(handlerFactory2 != null, "Not enough team");
+
+            ImmutableList.Builder<Player> builder = ImmutableList.builder();
+            PlayerHandler handler1 = handlerFactory1.create(engine);
+            PlayerHandler handler2 = handlerFactory2.create(engine);
+            if (engine.getRandom().nextBoolean()) {
+                // Team 1 is first
+                builder.add(new Player(color11, handler1));
+                builder.add(new Player(color21, handler2));
+                builder.add(new Player(color12, handler1));
+                builder.add(new Player(color22, handler2));
+            }
+            else {
+                // Team 2 is first
+                builder.add(new Player(color21, handler2));
+                builder.add(new Player(color11, handler1));
+                builder.add(new Player(color22, handler2));
+                builder.add(new Player(color12, handler1));
+            }
+
+            return builder.build();
+        }
+    }
+
+    // Ripped from java.lang.Random
+    private static final AtomicLong seedUniquifier = new AtomicLong(8682522807148012L);
     private static long seedUniquifier() {
         for (;;) {
             long current = seedUniquifier.get();
@@ -83,7 +202,4 @@ public class EngineBuilder {
                 return next;
         }
     }
-
-    private static final AtomicLong seedUniquifier
-            = new AtomicLong(8682522807148012L);
 }

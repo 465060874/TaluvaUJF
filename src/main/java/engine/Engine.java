@@ -10,6 +10,11 @@ import java.util.Random;
 public interface Engine {
 
     /**
+     * Retourne la seed utilisée pour le générateur aléatoire commun
+     */
+    long getSeed();
+
+    /**
      * Retourne une instance commune de la classe Random
      */
     Random getRandom();

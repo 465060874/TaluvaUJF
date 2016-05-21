@@ -59,7 +59,6 @@ class FreeTileOverlay extends Canvas {
                 .allMatch(h -> island.getField(h) == Field.SEA);
 
         if (isRobinson) {
-            System.out.println("Visible");
             freeTileX = event.getX();
             freeTileY = event.getY();
             placedTileOrientation = getCLosestNeighborOrientation(newPlacedHex);

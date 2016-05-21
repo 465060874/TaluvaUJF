@@ -30,6 +30,8 @@ public class PlaceBuildingAction implements BuildingAction {
 
     @Override
     public void write(Writer writer) throws IOException {
+        writer.write(getClass().getSimpleName());
+        writer.write('\n');
         writer.write(Integer.toString(hex.getLine()));
         writer.write('\n');
         writer.write(Integer.toString(hex.getDiag()));

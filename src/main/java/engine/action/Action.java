@@ -23,7 +23,7 @@ public interface Action {
             return ExpandVillageAction.doRead(reader);
         }
         else {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Unknown action type " + type);
         }
     }
 }

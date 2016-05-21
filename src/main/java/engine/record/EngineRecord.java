@@ -106,14 +106,15 @@ public class EngineRecord {
     }
 
     public Engine replay() {
-        EngineBuilder builder = new EngineBuilder()
-                .gamemode(gamemode)
-                .tileStack(VolcanoTileStack.predefinedFactory(tiles));
+        EngineBuilder builder = gamemode == Gamemode.AllVsAll
+                ? EngineBuilder.allVsAll()
+                : EngineBuilder.teamVsTeam();
+        builder.tileStack(VolcanoTileStack.predefinedFactory(tiles));
 
         UnmodifiableIterator<Action> actionsIt = ImmutableList.copyOf(actions).iterator();
         PlayerHandler.Factory playerHandlerFactory = (engine) -> new RecordPlayerHandler(engine, actionsIt);
         for (PlayerColor color : colors) {
-            builder.player(color, playerHandlerFactory);
+            //builder.player(color, playerHandlerFactory);
         }
 
         return builder.build();
