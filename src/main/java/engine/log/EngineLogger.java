@@ -17,8 +17,8 @@ public class EngineLogger {
 
     final Logger javaLogger;
 
-    EngineLogger(String name) {
-        this.javaLogger = Logger.getLogger(name);
+    EngineLogger() {
+        this.javaLogger = Logger.getLogger(Long.toString(System.nanoTime()));
     }
 
     public void log(Level level, Throwable thrown, String message, Object... parameters) {
