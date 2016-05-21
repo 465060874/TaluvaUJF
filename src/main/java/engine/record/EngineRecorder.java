@@ -1,14 +1,11 @@
 package engine.record;
 
-import com.google.common.collect.ImmutableList;
 import data.PlayerColor;
 import data.VolcanoTile;
-import engine.Engine;
-import engine.EngineObserver;
-import engine.Gamemode;
-import engine.Player;
+import engine.*;
 import engine.action.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EngineRecorder {
@@ -16,9 +13,9 @@ public class EngineRecorder {
     private final Engine engine;
 
     private final Gamemode gamemode;
-    private final ImmutableList.Builder<PlayerColor> colors;
-    private final ImmutableList.Builder<VolcanoTile> tiles;
-    private final ImmutableList.Builder<Action> actions;
+    private final List<PlayerColor> colors;
+    private final List<VolcanoTile> tiles;
+    private final List<Action> actions;
 
     public static EngineRecorder install(Engine engine) {
         return new EngineRecorder(engine);
@@ -29,9 +26,9 @@ public class EngineRecorder {
         engine.registerObserver(new Observer());
 
         this.gamemode = engine.getGamemode();
-        this.colors = ImmutableList.builder();
-        this.tiles = ImmutableList.builder();
-        this.actions = ImmutableList.builder();
+        this.colors = new ArrayList<>();
+        this.tiles = new ArrayList<>();
+        this.actions = new ArrayList<>();
     }
 
     private class Observer implements EngineObserver {
@@ -42,14 +39,25 @@ public class EngineRecorder {
                     .forEach(colors::add);
         }
 
-        public void onTileStackChange() {
-            tiles.add(engine.getVolcanoTileStack().current());
+        public void onTileStackChange(boolean cancelled) {
+            if (cancelled) {
+                tiles.remove(tiles.size() - 1);
+            }
+            else {
+                tiles.add(engine.getVolcanoTileStack().current());
+            }
         }
 
-        public void onTileStepStart() {
+        public void onTileStepStart(boolean cancelled) {
+            if (cancelled) {
+                actions.remove(actions.size() - 1);
+            }
         }
 
-        public void onBuildStepStart() {
+        public void onBuildStepStart(boolean cancelled) {
+            if (cancelled) {
+                actions.remove(actions.size() - 1);
+            }
         }
 
         public void onTilePlacementOnSea(SeaTileAction action) {
@@ -71,11 +79,11 @@ public class EngineRecorder {
         public void onEliminated(Player eliminated) {
         }
 
-        public void onWin(WinReason reason, List<Player> winners) {
+        public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
         }
     }
 
     public EngineRecord getRecord() {
-        return new EngineRecord(gamemode, colors.build(), tiles.build(), actions.build());
+        return new EngineRecord(gamemode, colors, tiles, actions);
     }
 }

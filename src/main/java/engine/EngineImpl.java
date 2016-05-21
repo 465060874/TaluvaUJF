@@ -41,9 +41,8 @@ class EngineImpl implements Engine {
     private final ImmutableList<Player> players;
     private final VolcanoTileStack volcanoTileStack;
 
-    private int turn;
+    private EngineStatus status;
     private int playerIndex;
-    private boolean tileStep;
     private List<StepSave> stepSaves;
 
     private HexMap<List<SeaTileAction>> seaPlacements;
@@ -66,9 +65,8 @@ class EngineImpl implements Engine {
         this.players = builder.createPlayers(this);
         this.volcanoTileStack = builder.volcanoTileStackFactory.create(players.size() * TILES_PER_PLAYER, random);
 
-        this.turn = 0;
+        this.status = EngineStatus.PENDING_START;
         this.playerIndex = 0;
-        this.tileStep = false;
         this.stepSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
 
         this.seaPlacements = HexMap.create();
@@ -93,10 +91,10 @@ class EngineImpl implements Engine {
         this.players = players.build();
         this.volcanoTileStack = engine.volcanoTileStack.copyShuffled(random);
 
-
-        this.turn = engine.turn;
+        this.status = engine.status instanceof EngineStatus.Running
+                ? ((EngineStatus.Running) engine.status).copy()
+                : engine.status;
         this.playerIndex = engine.playerIndex;
-        this.tileStep = engine.tileStep;
         this.stepSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
         stepSaves.addAll(engine.stepSaves);
 
@@ -153,20 +151,17 @@ class EngineImpl implements Engine {
 
     @Override
     public void start() {
-        turn = 0;
+        status = new EngineStatus.Running();
         playerIndex = 0;
-        tileStep = true;
         observers.forEach(EngineObserver::onStart);
 
         volcanoTileStack.next();
-        observers.forEach(EngineObserver::onTileStackChange);
+        observers.forEach(o -> o.onTileStackChange(false));
 
-        Hex originHex = Hex.at(0, 0);
-        seaPlacements = HexMap.create();
-        seaPlacements.put(originHex, ImmutableList.of(new SeaTileAction(originHex, Orientation.NORTH)));
-        volcanosPlacements = HexMap.create();
+        updateSeaPlacements();
+        updateVolcanoPlacements();
 
-        observers.forEach(EngineObserver::onTileStepStart);
+        observers.forEach(o -> o.onTileStepStart(false));
         getCurrentPlayer().getHandler().startTileStep();
     }
 
@@ -177,34 +172,57 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void cancelLastStep() {
+        checkState(status != EngineStatus.PENDING_START);
+        EngineStatus.Running running;
+        if (status instanceof EngineStatus.Finished) {
+            running = new EngineStatus.Running();
+            running.turn = status.getTurn();
+            running.step = EngineStatus.TurnStep.TILE;
+        }
+        else {
+            running = (EngineStatus.Running) status;
+        }
+
+        if (running.turn == 0 && running.step == EngineStatus.TurnStep.TILE) {
+            return;
+        }
+
         getCurrentPlayer().getHandler().cancel();
-        if (tileStep) {
-            turn--;
+        StepSave save = stepSaves.remove(stepSaves.size() - 1);
+        save.restore(this);
+
+        if (running.step == EngineStatus.TurnStep.TILE) {
+            running.turn--;
             do {
                 playerIndex--;
             } while (getCurrentPlayer().isEliminated());
 
             volcanoTileStack.previous();
-            observers.forEach(EngineObserver::onTileStackChange);
-        }
-        tileStep = !tileStep;
+            observers.forEach(o -> o.onTileStackChange(true));
 
-        StepSave save = stepSaves.remove(stepSaves.size() - 1);
-        save.restore(this);
-
-        if (tileStep) {
-            updateSeaPlacements();
-            updateVolcanoPlacements();
-        }
-        else {
+            running.step = EngineStatus.TurnStep.BUILD;
             updateBuildActions();
             updateExpandActions();
+
+            observers.forEach(o -> o.onBuildStepStart(true));
+            getCurrentPlayer().getHandler().startBuildStep();
+        }
+        else {
+            running.step = EngineStatus.TurnStep.TILE;
+            updateSeaPlacements();
+            updateVolcanoPlacements();
+
+            observers.forEach(o -> o.onTileStepStart(true));
+            getCurrentPlayer().getHandler().startTileStep();
         }
     }
 
     private void nextStep() {
-        if (tileStep) {
-            tileStep = false;
+        verify(status instanceof EngineStatus.Running);
+
+        EngineStatus.Running running = (EngineStatus.Running) status;
+        if (running.step == EngineStatus.TurnStep.TILE) {
+            running.step = EngineStatus.TurnStep.BUILD;
 
             updateBuildActions();
             updateExpandActions();
@@ -220,7 +238,7 @@ class EngineImpl implements Engine {
                 verify(remainingPlayers.size() > 0);
 
                 if (remainingPlayers.size() == 1) {
-                    observers.forEach(o -> o.onWin(EngineObserver.WinReason.LAST_STANDING, remainingPlayers));
+                    observers.forEach(o -> o.onWin(EngineStatus.FinishReason.LAST_STANDING, remainingPlayers));
                 }
                 else {
                     nextStep();
@@ -228,16 +246,16 @@ class EngineImpl implements Engine {
                 return;
             }
 
-            observers.forEach(EngineObserver::onBuildStepStart);
+            observers.forEach(o -> o.onBuildStepStart(true));
             getCurrentPlayer().getHandler().startBuildStep();
         }
         else {
-            turn++;
+            running.turn++;
             do {
                 playerIndex++;
             } while (getCurrentPlayer().isEliminated());
 
-            tileStep = true;
+            running.step = EngineStatus.TurnStep.TILE;
             volcanoTileStack.next();
             if (volcanoTileStack.isEmpty()) {
                 List<Player> candidates = playerWithMinimumBuildingOfType(players, BuildingType.TEMPLE);
@@ -249,16 +267,16 @@ class EngineImpl implements Engine {
                 }
 
                 List<Player> winners = candidates;
-                observers.forEach(o -> o.onWin(EngineObserver.WinReason.NO_MORE_TILES, winners));
+                observers.forEach(o -> o.onWin(EngineStatus.FinishReason.NO_MORE_TILES, winners));
                 return;
             }
 
-            observers.forEach(EngineObserver::onTileStackChange);
+            observers.forEach(o -> o.onTileStackChange(true));
 
             updateSeaPlacements();
             updateVolcanoPlacements();
 
-            observers.forEach(EngineObserver::onTileStepStart);
+            observers.forEach(o -> o.onTileStepStart(true));
             getCurrentPlayer().getHandler().startTileStep();
         }
     }
@@ -281,6 +299,13 @@ class EngineImpl implements Engine {
     }
 
     private void updateSeaPlacements() {
+        if (status.getTurn() == 0) {
+            Hex originHex = Hex.at(0, 0);
+            seaPlacements = HexMap.create();
+            seaPlacements.put(originHex, ImmutableList.of(new SeaTileAction(originHex, Orientation.NORTH)));
+            return;
+        }
+
         HexMap<List<SeaTileAction>> tmpSeaPlacements = HexMap.create();
 
         VolcanoTile tile = volcanoTileStack.current();
@@ -304,6 +329,11 @@ class EngineImpl implements Engine {
     }
 
     private void updateVolcanoPlacements() {
+        if (status.getTurn() == 0) {
+            volcanosPlacements = HexMap.create();
+            return;
+        }
+
         HexMap<List<VolcanoTileAction>> tmpVolcanosPlacements = HexMap.create();
 
         VolcanoTile tile = volcanoTileStack.current();
@@ -394,13 +424,8 @@ class EngineImpl implements Engine {
     }
 
     @Override
-    public int getTurn() {
-        return turn;
-    }
-
-    @Override
-    public boolean isTileStep() {
-        return tileStep;
+    public EngineStatus getStatus() {
+        return status;
     }
 
     @Override
@@ -410,25 +435,33 @@ class EngineImpl implements Engine {
 
     @Override
     public HexMap<? extends Iterable<SeaTileAction>> getSeaPlacements() {
-        checkState(tileStep, "Requesting sea placements during building step");
+        checkState(status instanceof EngineStatus.Running
+                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
+                "Requesting sea placements during building step");
         return seaPlacements;
     }
 
     @Override
     public HexMap<? extends Iterable<VolcanoTileAction>> getVolcanoPlacements() {
-        checkState(tileStep, "Requesting volcano placements during building step");
+        checkState(status instanceof EngineStatus.Running
+                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
+                "Requesting volcano placements during building step");
         return volcanosPlacements;
     }
 
     @Override
     public HexMap<? extends Iterable<PlaceBuildingAction>> getBuildActions() {
-        checkState(!tileStep, "Requesting build actions during tile placements");
+        checkState(status instanceof EngineStatus.Running
+                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
+                "Requesting build actions during tile placements");
         return buildActions;
     }
 
     @Override
     public HexMap<? extends Iterable<ExpandVillageAction>> getExpandActions() {
-        checkState(!tileStep, "Requesting expand actions during tile placements");
+        checkState(status instanceof EngineStatus.Running
+                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
+                "Requesting expand actions during tile placements");
         return expandActions;
     }
 
@@ -453,7 +486,9 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void placeOnSea(SeaTileAction placement) {
-        checkState(tileStep, "Can't place a tile during building step");
+        checkState(status instanceof EngineStatus.Running
+                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
+                "Can't place a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
         island.putTile(volcanoTileStack.current(), placement.getHex1(), placement.getOrientation());
@@ -464,8 +499,9 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void placeOnVolcano(VolcanoTileAction placement) {
-
-        checkState(tileStep, "Can't place a tile during building step");
+        checkState(status instanceof EngineStatus.Running
+                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
+                "Can't place a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
         island.putTile(volcanoTileStack.current(), placement.getVolcanoHex(), placement.getOrientation());
@@ -476,8 +512,9 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void build(PlaceBuildingAction action) {
-
-        checkState(!tileStep, "Can't build during tile placement step");
+        checkState(status instanceof EngineStatus.Running
+                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
+                "Can't build during tile placement step");
 
         stepSaves.add(new ActionSave(this, action));
         PlayerColor color = getCurrentPlayer().getColor();
@@ -493,8 +530,9 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void expand(ExpandVillageAction action) {
-
-        checkState(!tileStep, "Can't expand during tile placement step");
+        checkState(status instanceof EngineStatus.Running
+                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
+                "Can't expand during tile placement step");
 
         stepSaves.add(new ActionSave(this, action));
         PlayerColor color = getCurrentPlayer().getColor();
@@ -525,7 +563,7 @@ class EngineImpl implements Engine {
         }
 
         if (remainingBuildingTypeCount <= 1) {
-            observers.forEach(o -> o.onWin(EngineObserver.WinReason.TWO_BUILDING_TYPES,
+            observers.forEach(o -> o.onWin(EngineStatus.FinishReason.TWO_BUILDING_TYPES,
                     ImmutableList.of(player)));
         }
         else {

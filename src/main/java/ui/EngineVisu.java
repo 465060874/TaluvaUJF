@@ -1,23 +1,25 @@
 package ui;
 
-import IA.BotPlayerHandler;
 import data.PlayerColor;
-import data.VolcanoTile;
 import engine.*;
 import engine.action.ExpandVillageAction;
 import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
 import javafx.application.Application;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.util.List;
 import java.util.logging.Level;
+
+import static javafx.scene.input.KeyCode.T;
 
 public class EngineVisu extends Application implements EngineObserver {
 
@@ -30,10 +32,8 @@ public class EngineVisu extends Application implements EngineObserver {
         this.engine = EngineBuilder.allVsAll()
                 .logLevel(Level.FINE)
                 .player(PlayerColor.RED, uiWrap(PlayerHandler.dumbFactory()))
-                .player(PlayerColor.WHITE, uiWrap(BotPlayerHandler::new))
+                .player(PlayerColor.WHITE, uiWrap(PlayerHandler.dumbFactory()))
                 .build();
-        /*CharSource gameSource = Files.asCharSource(new File("9233261640382.taluva"), StandardCharsets.UTF_8);
-        this.engine = EngineRecord.load(gameSource).replay();*/
         engine.registerObserver(new EngineLoggerObserver(engine));
         engine.registerObserver(this);
 
@@ -42,9 +42,16 @@ public class EngineVisu extends Application implements EngineObserver {
         mainPane.setCenter(islandView);
 
         this.scene = new Scene(mainPane, 1000, 800, true, SceneAntialiasing.BALANCED);
+        scene.addEventHandler(MouseEvent.MOUSE_CLICKED, this::cancelLastStep);
         stage.setScene(scene);
         stage.setOnShown(event -> engine.start());
         stage.show();
+    }
+
+    private void cancelLastStep(MouseEvent event) {
+        if (event.getButton() == MouseButton.SECONDARY) {
+            engine.cancelLastStep();
+        }
     }
 
     public static void main(String[] args) {
@@ -57,17 +64,17 @@ public class EngineVisu extends Application implements EngineObserver {
     }
 
     @Override
-    public void onTileStackChange() {
-        VolcanoTile tile = engine.getVolcanoTileStack().current();
-        engine.logger().info("Drawn : {0} {1}", tile.getLeft(), tile.getRight());
+    public void onTileStackChange(boolean cancelled) {
     }
 
     @Override
-    public void onTileStepStart() {
+    public void onTileStepStart(boolean cancelled) {
+        islandView.islandCanvas.redraw();
     }
 
     @Override
-    public void onBuildStepStart() {
+    public void onBuildStepStart(boolean cancelled) {
+        islandView.islandCanvas.redraw();
     }
 
     @Override
@@ -95,7 +102,7 @@ public class EngineVisu extends Application implements EngineObserver {
     }
 
     @Override
-    public void onWin(WinReason reason, List<Player> winners) {
+    public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
     }
 
     private PlayerHandler.Factory uiWrap(PlayerHandler.Factory factory) {
@@ -120,8 +127,10 @@ public class EngineVisu extends Application implements EngineObserver {
         }
 
         private void startWrappedTileStep(MouseEvent event) {
-            scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedTileStep);
-            playerHandler.startTileStep();
+            if (event.getButton() == MouseButton.PRIMARY) {
+                scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedTileStep);
+                playerHandler.startTileStep();
+            }
         }
 
         @Override
@@ -130,12 +139,15 @@ public class EngineVisu extends Application implements EngineObserver {
         }
 
         private void startWrappedBuildStep(MouseEvent event) {
-            scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedBuildStep);
-            playerHandler.startBuildStep();
+            if (event.getButton() == MouseButton.PRIMARY) {
+                scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedBuildStep);
+                playerHandler.startBuildStep();
+            }
         }
 
         @Override
         public void cancel() {
+            playerHandler.cancel();
             scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedTileStep);
             scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedBuildStep);
         }

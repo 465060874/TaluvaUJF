@@ -73,12 +73,7 @@ public interface Engine {
     /**
      * Retourne le numéro de tour (un tour est un placement et une construction d'un joueur)
      */
-    int getTurn();
-
-    /**
-     * Indique si l'étape courante est un placement de tuile
-     */
-    boolean isTileStep();
+    EngineStatus getStatus();
 
     /**
      * Retourne le joueur dont c'est actuellement le tour

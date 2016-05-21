@@ -17,19 +17,19 @@ public interface EngineObserver {
     /**
      * Appelé à chaque fois que la pioche change
      */
-    void onTileStackChange();
+    void onTileStackChange(boolean cancelled);
 
     /**
      * Appelé à chaque fois qu'un joueur commence la phase
      * de placement de tuile de son tour
      */
-    void onTileStepStart();
+    void onTileStepStart(boolean cancelled);
 
     /**
      * Appelé à chaque fois qu'un joueur commence la phase
      * de construction de son tour
      */
-    void onBuildStepStart();
+    void onBuildStepStart(boolean cancelled);
 
     /**
      * Appelé quand une tuile est placé sur la mer
@@ -59,10 +59,6 @@ public interface EngineObserver {
     /**
      * Appelé en cas de victoire
      */
-    void onWin(WinReason reason, List<Player> winners);
+    void onWin(EngineStatus.FinishReason reason, List<Player> winners);
 
-    enum WinReason {
-        NO_MORE_TILES,
-        TWO_BUILDING_TYPES, LAST_STANDING,
-    }
 }

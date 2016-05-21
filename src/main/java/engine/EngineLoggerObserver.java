@@ -2,7 +2,6 @@ package engine;
 
 import com.google.common.base.Strings;
 import data.BuildingType;
-import data.VolcanoTile;
 import engine.action.ExpandVillageAction;
 import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
@@ -26,21 +25,21 @@ public class EngineLoggerObserver implements EngineObserver {
     }
 
     @Override
-    public void onTileStackChange() {
-        VolcanoTile tile = engine.getVolcanoTileStack().current();
-        engine.logger().info("Drawn : {0} {1}", tile.getLeft(), tile.getRight());
+    public void onTileStackChange(boolean cancelled) {
     }
 
     @Override
-    public void onTileStepStart() {
-        engine.logger().info("* Turn {0} {1} ({2} tiles remaining)",
-                engine.getTurn(),
+    public void onTileStepStart(boolean cancelled) {
+        engine.logger().info("* Turn {0} {1} {2}-{3} ({4} tiles remaining)",
+                engine.getStatus().getTurn(),
                 engine.getCurrentPlayer().getColor(),
+                engine.getVolcanoTileStack().current().getLeft(),
+                engine.getVolcanoTileStack().current().getRight(),
                 engine.getVolcanoTileStack().size());
     }
 
     @Override
-    public void onBuildStepStart() {
+    public void onBuildStepStart(boolean cancelled) {
     }
 
     @Override
@@ -85,7 +84,7 @@ public class EngineLoggerObserver implements EngineObserver {
     }
 
     @Override
-    public void onWin(WinReason reason, List<Player> winners) {
+    public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
         engine.logger().info("!!! Winner(s): {0} ({1}) !!!",
                 winners.stream().map(Player::getColor).collect(toList()),
                 reason);

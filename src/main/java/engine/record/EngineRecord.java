@@ -31,15 +31,16 @@ public class EngineRecord {
     }
 
     private final Gamemode gamemode;
-    private final List<PlayerColor> colors;
-    private final List<VolcanoTile> tiles;
-    private final List<Action> actions;
+    private final ImmutableList<PlayerColor> colors;
+    private final ImmutableList<VolcanoTile> tiles;
+    private final ImmutableList<Action> actions;
 
-    EngineRecord(Gamemode gamemode, List<PlayerColor> colors, List<VolcanoTile> tiles, List<Action> actions) {
+    EngineRecord(Gamemode gamemode, List<PlayerColor> colors, List<VolcanoTile> tiles,
+                 List<Action> actions) {
         this.gamemode = gamemode;
-        this.colors = colors;
-        this.tiles = tiles;
-        this.actions = actions;
+        this.colors = ImmutableList.copyOf(colors);
+        this.tiles = ImmutableList.copyOf(tiles);
+        this.actions = ImmutableList.copyOf(actions);
     }
 
     public static EngineRecord load(CharSource source) {
