@@ -421,12 +421,14 @@ class EngineImpl implements Engine {
                     actions.add(new ExpandVillageAction(firstHex, fieldType));
                 }
             }
-            for (Hex hex : village.getHexes()) {
-                tmpExpandActions.put(hex, actions);
+            if (!actions.isEmpty()) {
+                for (Hex hex : village.getHexes()) {
+                    tmpExpandActions.put(hex, actions);
+                }
             }
-        }
 
-        this.expandActions = tmpExpandActions;
+            this.expandActions = tmpExpandActions;
+        }
     }
 
     @Override
