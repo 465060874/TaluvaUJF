@@ -7,7 +7,6 @@ import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
 import javafx.application.Application;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
@@ -18,8 +17,6 @@ import javafx.stage.Stage;
 
 import java.util.List;
 import java.util.logging.Level;
-
-import static javafx.scene.input.KeyCode.T;
 
 public class EngineVisu extends Application implements EngineObserver {
 
@@ -103,6 +100,7 @@ public class EngineVisu extends Application implements EngineObserver {
 
     @Override
     public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
+        System.out.println("Win !");
     }
 
     private PlayerHandler.Factory uiWrap(PlayerHandler.Factory factory) {

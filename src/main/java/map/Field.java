@@ -70,8 +70,4 @@ public class Field {
     public Field withBuilding(FieldBuilding building) {
         return new Field(level, type, orientation, building);
     }
-
-    public boolean isSeaLevel() {
-        return this.level == 0;
-    }
 }

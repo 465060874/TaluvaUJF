@@ -1,6 +1,5 @@
 package ui;
 
-import javafx.scene.input.MouseEvent;
 import map.Hex;
 
 import static ui.HexShape.*;
@@ -30,30 +29,10 @@ public class Grid {
         return Hex.at((int) line, (int) diag);
     }
 
-    public Hex getHex(MouseEvent event, double width, double height) {
-        double x = event.getX() - (width / 2 - ox);
-        double y = event.getY() - (height / 2 - oy);
+    public Hex getHex(double mx, double my, double width, double height) {
+        double x = mx - (width / 2 - ox);
+        double y = my - (height / 2 - oy);
         return  pointToHex(x, y);
-    }
-
-    public HexZone getHexZone(MouseEvent event, double width, double height) {
-        Hex hex = getHex(event, width, height);
-        double hexSizeX = HEX_SIZE_X * scale;
-        double hexSizeY = HEX_SIZE_Y * scale;
-
-        double x = event.getX() - (width / 2 - ox);
-        double y = event.getY() - (height / 2 - oy);
-
-        // Calcul du centre de la tuile
-        double hexCenterX = hex.getDiag() * 2 * WEIRD_RATIO * hexSizeX + hex.getLine() * WEIRD_RATIO * hexSizeX;
-        double hexCenterY = hex.getLine() * hexSizeY + hex.getLine() * hexSizeY / 2;
-
-        double degree = Math.toDegrees(Math.atan((y - hexCenterY) / (x - hexCenterX)));
-
-        // Calcul de la zone correspondante
-        return x > hexCenterX
-                ? HexZone.atEastOf(degree)
-                : HexZone.atWestOf(degree);
     }
 
     double getOx() {

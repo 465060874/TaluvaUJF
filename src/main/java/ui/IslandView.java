@@ -12,10 +12,11 @@ import map.Island;
 
 class IslandView extends StackPane {
 
-    Grid grid;
+    private Grid grid;
+    private Placement placement;
 
     final IslandCanvas islandCanvas;
-    private final FreeTileOverlay freeTileOverlay;
+    private final PlacementOverlay placementOverlay;
 
     private double mouseXBeforeDrag;
     private double mouseYBeforeDrag;
@@ -24,13 +25,16 @@ class IslandView extends StackPane {
 
     IslandView(Island island, boolean debug) {
         this.grid = new Grid(0.0, 0.0, 1);
-        this.freeTileOverlay = new FreeTileOverlay(island, grid);
-        this.islandCanvas = new IslandCanvas(island, grid, debug);
+        this.placement = new Placement(island, grid);
+        this.placementOverlay = new PlacementOverlay(island, grid, placement);
+        this.islandCanvas = new IslandCanvas(island, grid, placement, debug);
+        placement.placementOverlay = placementOverlay;
+        placement.islandCanvas = islandCanvas;
         this.mouseX = 0;
         this.mouseY = 0;
 
         getChildren().add(islandCanvas);
-        getChildren().add(freeTileOverlay);
+        getChildren().add(placementOverlay);
 
         BackgroundFill backgroundFill = new BackgroundFill(
                 IslandCanvas.BG_COLOR,
@@ -40,10 +44,10 @@ class IslandView extends StackPane {
 
         setOnMouseMoved(this::mouseMoved);
         setOnMousePressed(this::mousePressed);
+        setOnMouseClicked(this::mouseClicked);
         setOnMouseDragged(this::mouseDragged);
         setOnMouseReleased(this::mouseReleased);
         setOnScroll(this::scroll);
-        islandCanvas.redraw();
     }
 
     @Override
@@ -63,29 +67,33 @@ class IslandView extends StackPane {
             islandCanvas.redraw();
         }
 
-        freeTileOverlay.setLayoutX(left);
-        freeTileOverlay.setLayoutY(top);
-        if (w != freeTileOverlay.getWidth() || h != freeTileOverlay.getHeight()) {
-            freeTileOverlay.setWidth(w);
-            freeTileOverlay.setHeight(h);
-            freeTileOverlay.redraw();
+        placementOverlay.setLayoutX(left);
+        placementOverlay.setLayoutY(top);
+        if (w != placementOverlay.getWidth() || h != placementOverlay.getHeight()) {
+            placementOverlay.setWidth(w);
+            placementOverlay.setHeight(h);
+            placementOverlay.redraw();
         }
     }
 
     private void mouseMoved(MouseEvent event) {
-        islandCanvas.setVisible(true);
-        freeTileOverlay.setVisible(true);
-        islandCanvas.mouseMovedAction(event, getWidth(), getHeight());
-        freeTileOverlay.mouseMovedAction(event, getWidth(), getHeight());
+        placement.updateMouse(event.getX(), event.getY(), getWidth(), getHeight());
     }
 
     private void mousePressed(MouseEvent event) {
-        if (event.getButton() != MouseButton.PRIMARY) {
-            return;
+        if (event.getButton() == MouseButton.PRIMARY) {
+            mouseXBeforeDrag = mouseX = event.getX();
+            mouseYBeforeDrag = mouseY = event.getY();
         }
+    }
 
-        mouseXBeforeDrag = mouseX = event.getX();
-        mouseYBeforeDrag = mouseY = event.getY();
+    private void mouseClicked(MouseEvent event) {
+        if (event.getButton() == MouseButton.PRIMARY) {
+            placement.cyclePrimary();
+        }
+        else if (event.getButton() == MouseButton.SECONDARY) {
+            placement.cycleSecondary();
+        }
     }
 
     private void mouseDragged(MouseEvent event) {
@@ -97,8 +105,6 @@ class IslandView extends StackPane {
                 + event.getX() - mouseX);
         islandCanvas.setTranslateY(islandCanvas.getTranslateY()
                 + event.getY() - mouseY);
-
-        freeTileOverlay.mouseMovedAction(event, getWidth(), getHeight());
 
         mouseX = event.getX();
         mouseY = event.getY();
@@ -118,7 +124,6 @@ class IslandView extends StackPane {
         double factor = event.getDeltaY() > 0 ? 1.1 : 1 / 1.1;
         grid.setScale(grid.getScale() * factor);
         islandCanvas.redraw();
-        freeTileOverlay.redraw();
+        placementOverlay.redraw();
     }
-
 }
