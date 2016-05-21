@@ -238,6 +238,9 @@ class EngineImpl implements Engine {
                 verify(remainingPlayers.size() > 0);
 
                 if (remainingPlayers.size() == 1) {
+                    this.status = new EngineStatus.Finished(status.getTurn(),
+                            EngineStatus.FinishReason.LAST_STANDING,
+                            remainingPlayers);
                     observers.forEach(o -> o.onWin(EngineStatus.FinishReason.LAST_STANDING, remainingPlayers));
                 }
                 else {
@@ -267,6 +270,9 @@ class EngineImpl implements Engine {
                 }
 
                 List<Player> winners = candidates;
+                this.status = new EngineStatus.Finished(status.getTurn(),
+                        EngineStatus.FinishReason.NO_MORE_TILES,
+                        winners);
                 observers.forEach(o -> o.onWin(EngineStatus.FinishReason.NO_MORE_TILES, winners));
                 return;
             }
@@ -563,8 +569,11 @@ class EngineImpl implements Engine {
         }
 
         if (remainingBuildingTypeCount <= 1) {
-            observers.forEach(o -> o.onWin(EngineStatus.FinishReason.TWO_BUILDING_TYPES,
-                    ImmutableList.of(player)));
+            ImmutableList<Player> winners = ImmutableList.of(player);
+            this.status = new EngineStatus.Finished(status.getTurn(),
+                    EngineStatus.FinishReason.TWO_BUILDING_TYPES,
+                    winners);
+            observers.forEach(o -> o.onWin(EngineStatus.FinishReason.TWO_BUILDING_TYPES, winners));
         }
         else {
             nextStep();
