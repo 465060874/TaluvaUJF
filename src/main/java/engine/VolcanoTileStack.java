@@ -102,7 +102,7 @@ class VolcanoTileStackImpl implements VolcanoTileStack {
         @Override
         public VolcanoTileStack create(int count, Random random) {
             checkState(count <= roulette.size(),
-                    "Insufficient number create tiles (" + roulette.size() +
+                    "Insufficient number of tiles (" + roulette.size() +
                             "), expected " + count + " at least");
             Collections.shuffle(roulette, random);
 
@@ -121,7 +121,7 @@ class VolcanoTileStackImpl implements VolcanoTileStack {
         @Override
         public VolcanoTileStack create(int count, Random random) {
             checkState(count <= tiles.size(),
-                    "Insufficient number create tiles (" + tiles.size() +
+                    "Insufficient number of tiles (" + tiles.size() +
                             "), expected " + count + " at least");
             return new VolcanoTileStackImpl(tiles.subList(0, count));
         }
