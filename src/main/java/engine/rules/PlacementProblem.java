@@ -1,0 +1,14 @@
+package engine.rules;
+
+public enum PlacementProblem {
+
+    NOT_ON_SEA_OR_VOLCANO,
+    NOT_ALL_ON_SEA,
+    NOT_ADJACENT_TO_COAST,
+
+    NOT_ON_VOLCANO,
+    SAME_VOLCANO_ORIENTATION,
+    NOT_ON_SAME_LEVEL,
+    CANT_DESTROY_TOWER_OR_TEMPLE,
+    CANT_DESTROY_VILLAGE;
+}

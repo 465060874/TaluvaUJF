@@ -12,7 +12,7 @@ import org.junit.Test;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
@@ -20,18 +20,23 @@ public class VolcanoPlacementRulesTest {
 
     private static final VolcanoTile TILE = new VolcanoTile(FieldType.JUNGLE, FieldType.JUNGLE);
 
-    private void assertValidateFalse(Island island, Hex hex, Orientation orientation) {
-        assertFalse("TileAction on volcano at " + hex
-                        + " with orientation " + orientation
-                        + " expected to not be valid, but was",
-                VolcanoPlacementRules.validate(island, TILE, hex, orientation));
-    }
-
-    private void assertValidateTrue_(Island island, Hex hex, Orientation orientation) {
+    private void assertValid(Island island, Hex hex, Orientation orientation) {
+        Problems<PlacementProblem> actual = VolcanoPlacementRules.validate(island, TILE, hex, orientation);
         assertTrue("TileAction on volcano at " + hex
                         + " with orientation " + orientation
-                        + " expected to be valid, but was not",
-                VolcanoPlacementRules.validate(island, TILE, hex, orientation));
+                        + " expected to be valid, but has problems " + actual,
+                actual.isValid());
+    }
+
+    private void assertProblems(Island island, Hex hex, Orientation orientation,
+                                PlacementProblem first, PlacementProblem... others) {
+        Problems<PlacementProblem> expected = Problems.of(first, others);
+        Problems<PlacementProblem> actual = VolcanoPlacementRules.validate(island, TILE, hex, orientation);
+        assertEquals("TileAction on volcano at " + hex
+                        + " with orientation " + orientation
+                        + " expected to have problems " + expected
+                        + ", but has " + actual,
+                expected, actual);
     }
 
     @Test
@@ -42,52 +47,52 @@ public class VolcanoPlacementRulesTest {
         Hex hex;
 
         hex = Hex.at(0, 2);
-        assertValidateFalse(island, hex, Orientation.NORTH);
-        assertValidateFalse(island, hex, Orientation.NORTH_WEST);
-        assertValidateFalse(island, hex, Orientation.SOUTH_WEST);
-        assertValidateFalse(island, hex, Orientation.SOUTH);
-        assertValidateFalse(island, hex, Orientation.SOUTH_EAST);
-        assertValidateTrue_(island, hex, Orientation.NORTH_EAST);
+        assertProblems(island, hex, Orientation.NORTH, PlacementProblem.SAME_VOLCANO_ORIENTATION);
+        assertProblems(island, hex, Orientation.NORTH_WEST, PlacementProblem.NOT_ON_SAME_LEVEL);
+        assertProblems(island, hex, Orientation.SOUTH_WEST, PlacementProblem.NOT_ON_SAME_LEVEL);
+        assertProblems(island, hex, Orientation.SOUTH, PlacementProblem.NOT_ON_SAME_LEVEL);
+        assertProblems(island, hex, Orientation.SOUTH_EAST, PlacementProblem.NOT_ON_SAME_LEVEL);
+        assertValid(island, hex, Orientation.NORTH_EAST);
 
         hex = Hex.at(2, -2);
-        assertValidateFalse(island, hex, Orientation.NORTH);
-        assertValidateFalse(island, hex, Orientation.NORTH_WEST);
-        assertValidateTrue_(island, hex, Orientation.SOUTH_WEST);
-        assertValidateFalse(island, hex, Orientation.SOUTH_EAST);
-        assertValidateTrue_(island, hex, Orientation.SOUTH);
-        assertValidateFalse(island, hex, Orientation.NORTH_EAST);
+        assertProblems(island, hex, Orientation.NORTH, PlacementProblem.NOT_ON_SAME_LEVEL);
+        assertProblems(island, hex, Orientation.NORTH_WEST, PlacementProblem.SAME_VOLCANO_ORIENTATION);
+        assertValid(island, hex, Orientation.SOUTH_WEST);
+        assertProblems(island, hex, Orientation.SOUTH_EAST, PlacementProblem.NOT_ON_SAME_LEVEL);
+        assertValid(island, hex, Orientation.SOUTH);
+        assertProblems(island, hex, Orientation.NORTH_EAST, PlacementProblem.NOT_ON_SAME_LEVEL);
 
         hex = Hex.at(2, 2);
-        assertValidateFalse(island, hex, Orientation.NORTH);
-        assertValidateFalse(island, hex, Orientation.NORTH_WEST);
-        assertValidateFalse(island, hex, Orientation.SOUTH_WEST);
-        assertValidateFalse(island, hex, Orientation.SOUTH);
-        assertValidateTrue_(island, hex, Orientation.SOUTH_EAST);
-        assertValidateFalse(island, hex, Orientation.NORTH_EAST);
+        assertProblems(island, hex, Orientation.NORTH, PlacementProblem.NOT_ON_SAME_LEVEL);
+        assertProblems(island, hex, Orientation.NORTH_WEST, PlacementProblem.NOT_ON_SAME_LEVEL);
+        assertProblems(island, hex, Orientation.SOUTH_WEST, PlacementProblem.NOT_ON_SAME_LEVEL);
+        assertProblems(island, hex, Orientation.SOUTH, PlacementProblem.NOT_ON_SAME_LEVEL);
+        assertValid(island, hex, Orientation.SOUTH_EAST);
+        assertProblems(island, hex, Orientation.NORTH_EAST, PlacementProblem.SAME_VOLCANO_ORIENTATION);
 
         hex = Hex.at(1, 0);
-        assertValidateFalse(island, hex, Orientation.NORTH);
-        assertValidateFalse(island, hex, Orientation.NORTH_WEST);
-        assertValidateTrue_(island, hex, Orientation.SOUTH_WEST);
-        assertValidateFalse(island, hex, Orientation.SOUTH);
-        assertValidateTrue_(island, hex, Orientation.SOUTH_EAST);
-        assertValidateTrue_(island, hex, Orientation.NORTH_EAST);
+        assertProblems(island, hex, Orientation.NORTH, PlacementProblem.NOT_ON_SAME_LEVEL);
+        assertProblems(island, hex, Orientation.NORTH_WEST, PlacementProblem.NOT_ON_SAME_LEVEL);
+        assertValid(island, hex, Orientation.SOUTH_WEST);
+        assertProblems(island, hex, Orientation.SOUTH, PlacementProblem.SAME_VOLCANO_ORIENTATION);
+        assertValid(island, hex, Orientation.SOUTH_EAST);
+        assertValid(island, hex, Orientation.NORTH_EAST);
 
         hex = Hex.at(5, -1);
-        assertValidateFalse(island, hex, Orientation.NORTH);
-        assertValidateFalse(island, hex, Orientation.NORTH_WEST);
-        assertValidateFalse(island, hex, Orientation.SOUTH_WEST);
-        assertValidateFalse(island, hex, Orientation.SOUTH);
-        assertValidateFalse(island, hex, Orientation.SOUTH_EAST);
-        assertValidateFalse(island, hex, Orientation.NORTH_EAST);
+        assertProblems(island, hex, Orientation.NORTH, PlacementProblem.NOT_ON_VOLCANO);
+        assertProblems(island, hex, Orientation.NORTH_WEST, PlacementProblem.NOT_ON_VOLCANO);
+        assertProblems(island, hex, Orientation.SOUTH_WEST, PlacementProblem.NOT_ON_VOLCANO);
+        assertProblems(island, hex, Orientation.SOUTH, PlacementProblem.NOT_ON_VOLCANO);
+        assertProblems(island, hex, Orientation.SOUTH_EAST, PlacementProblem.NOT_ON_VOLCANO);
+        assertProblems(island, hex, Orientation.NORTH_EAST, PlacementProblem.NOT_ON_VOLCANO);
 
         hex = Hex.at(1, -1);
-        assertValidateTrue_(island, hex, Orientation.NORTH);
-        assertValidateTrue_(island, hex, Orientation.NORTH_WEST);
-        assertValidateTrue_(island, hex, Orientation.SOUTH_WEST);
-        assertValidateTrue_(island, hex, Orientation.SOUTH);
-        assertValidateFalse(island, hex, Orientation.SOUTH_EAST);
-        assertValidateTrue_(island, hex, Orientation.NORTH_EAST);
+        assertValid(island, hex, Orientation.NORTH);
+        assertValid(island, hex, Orientation.NORTH_WEST);
+        assertValid(island, hex, Orientation.SOUTH_WEST);
+        assertValid(island, hex, Orientation.SOUTH);
+        assertProblems(island, hex, Orientation.SOUTH_EAST, PlacementProblem.SAME_VOLCANO_ORIENTATION);
+        assertValid(island, hex, Orientation.NORTH_EAST);
     }
 
     @Test
@@ -97,7 +102,23 @@ public class VolcanoPlacementRulesTest {
 
         Hex hex;
 
+        hex = Hex.at(-1, 2);
+        assertValid(island, hex, Orientation.NORTH);
+
+        hex = Hex.at(1, -1);
+        assertProblems(island, hex, Orientation.SOUTH, PlacementProblem.CANT_DESTROY_TOWER_OR_TEMPLE);
+
         hex = Hex.at(1, 0);
-        assertValidateFalse(island, hex, Orientation.SOUTH_WEST);
+        assertProblems(island, hex, Orientation.SOUTH_WEST, PlacementProblem.CANT_DESTROY_VILLAGE);
+        assertProblems(island, hex, Orientation.NORTH_EAST, PlacementProblem.CANT_DESTROY_TOWER_OR_TEMPLE);
+
+        hex = Hex.at(2, -2);
+        assertProblems(island, hex, Orientation.SOUTH_WEST, PlacementProblem.CANT_DESTROY_TOWER_OR_TEMPLE);
+
+        hex = Hex.at(2, 2);
+        assertProblems(island, hex, Orientation.SOUTH_EAST, PlacementProblem.CANT_DESTROY_VILLAGE);
+
+        hex = Hex.at(5, 0);
+        assertValid(island, hex, Orientation.SOUTH);
     }
 }

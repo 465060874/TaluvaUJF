@@ -12,7 +12,7 @@ class HexShape {
 
     static final double HEX_SIZE_X = 60d;
     static final double HEX_SIZE_Y = 60d * 0.8d;
-    static final double HEX_HEIGHT = 5d;
+    static final double HEX_HEIGHT = 10d;
     static final double WEIRD_RATIO = Math.cos(Math.toRadians(30d));
 
     private static final int HEXAGON_POINTS = 6;

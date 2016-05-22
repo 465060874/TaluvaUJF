@@ -149,10 +149,10 @@ class IslandCanvas extends Canvas {
                 maxDiag = Math.max(maxDiag, hex.getDiag());
             }
 
-            minLine -= 1;
-            minDiag -= 1;
-            maxLine += 1;
-            maxDiag += 1;
+            minLine -= 3;
+            minDiag -= 3;
+            maxLine += 3;
+            maxDiag += 3;
             for (int line = minLine; line <= maxLine; line++) {
                 for (int diag = minDiag; diag <= maxDiag; diag++) {
                     double x = centerX + diag * 2 * WEIRD_RATIO * hexSizeX + line * WEIRD_RATIO * hexSizeX;

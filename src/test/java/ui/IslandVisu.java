@@ -1,7 +1,8 @@
 
 package ui;
 
-import com.google.common.io.Files;
+import com.google.common.io.Resources;
+import engine.rules.VolcanoPlacementRulesTest;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
@@ -10,17 +11,17 @@ import javafx.stage.Stage;
 import map.Island;
 import map.IslandIO;
 
-import java.io.File;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class IslandVisu extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        File rsc = new File("3169794265085.island");
-        Island island = IslandIO.read(Files.asCharSource(rsc, StandardCharsets.UTF_8));
+        URL rsc = VolcanoPlacementRulesTest.class.getResource("VolcanoPlacementRulesTest2.island");
+        Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
-        IslandView islandView = new IslandView(island, false);
+        IslandView islandView = new IslandView(island, true);
         BorderPane mainPane = new BorderPane();
         mainPane.setCenter(islandView);
 

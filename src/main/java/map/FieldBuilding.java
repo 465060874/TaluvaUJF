@@ -17,7 +17,7 @@ import static com.google.common.base.Preconditions.*;
  *    - {BuildingType.NONE} x {null}
  *    - (BuildingType.* \ BuildingType.NONE) x PlayerColor.*
  * sont précréées et peuvent être recuperées
- * avec la méthode FieldBuilding.of(BuildingType, PlayerColor)
+ * avec la méthode FieldBuilding.create(BuildingType, PlayerColor)
  */
 public class FieldBuilding {
 

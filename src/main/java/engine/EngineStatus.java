@@ -11,8 +11,8 @@ import java.util.List;
  *     type FinishReason = ...;;
  *     type EngineStatus =
  *          | PENDING_START
- *          | Running of int * TurnStep
- *          | Finished of FinishReason * (Player list)
+ *          | Running create int * TurnStep
+ *          | Finished create FinishReason * (Player list)
  */
 public abstract class EngineStatus {
 
