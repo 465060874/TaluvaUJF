@@ -1,5 +1,8 @@
 package ui;
 
+import data.PlayerColor;
+import engine.Engine;
+import engine.Player;
 import javafx.beans.Observable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -7,25 +10,56 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
+import java.util.List;
+
 public class Hud extends AnchorPane {
 
-    int nbPlayer;
-    Button player1;
-    Button player2;
-    Button player3;
-    Button player4;
-    StackTileIcon stackTileIcon;
+    private final Engine engine;
 
+    Button[] playersIcon;
+
+    StackTileIcon stackTileIcon;
 
     VBox vboxLeft;
     TextArea textBottom;
 
-    public Hud(int nbPlayer) {
-        this.nbPlayer = nbPlayer;
-        this.player1 = new Button("Player1, Score");
-        this.player2 = new Button("Player2, Score");
-        this.player3 =  new Button("Player3, Score");
-        this.player4 = new Button("Player4, Score");
+    public Hud(Engine engine) {
+        this.engine = engine;
+        int size = engine.getPlayers().size();
+        this.playersIcon = new Button[size];
+
+        List<Player> players = engine.getPlayers();
+        for (int i = 0; i < size; i++) {
+            Player player = players.get(i);
+            PlayerColor color = player.getColor();
+            playersIcon[i] = new Button();
+            switch (color) {
+                case BROWN:
+                    playersIcon[i].setGraphic(new ImageView("hud/brownPlayer.png"));
+                    break;
+                case YELLOW:
+                    playersIcon[i].setGraphic(new ImageView("hud/yellowPlayer.png"));
+                    break;
+                case RED:
+                    playersIcon[i].setGraphic(new ImageView("hud/redPlayer.png"));
+                    break;
+                case WHITE:
+                    playersIcon[i].setGraphic(new ImageView("hud/whitePlayer.png"));
+                    break;
+            }
+
+            playersIcon[i].setStyle(
+                    "-fx-background-radius: 3em; " +
+                            "-fx-min-width: 150px; " +
+                            "-fx-min-height: 150px; " +
+                            "-fx-max-width: 150px; " +
+                            "-fx-max-height: 150px;"
+            );
+
+        }
+
+        //player.getBuildingCount(BuildingType.HUT);
+        //player.isEliminated();
 
         this.vboxLeft = new VBox();
         Button left1 = new Button();
@@ -35,7 +69,7 @@ public class Hud extends AnchorPane {
         vboxLeft.getChildren().add(left1);
 
         Button left2 = new Button();
-        left2.setGraphic(new ImageView("hud/settingsHalf.png"));
+        left2.setGraphic(new ImageView("hud/save.png"));
         left2.setStyle( "-fx-background-color: transparent;");
         vboxLeft.getChildren().add(left2);
 
@@ -46,25 +80,32 @@ public class Hud extends AnchorPane {
         textBottom.setPrefRowCount(2);
         textBottom.setEditable(false);
 
-        AnchorPane.setLeftAnchor(player1, 0.0);
-        AnchorPane.setTopAnchor(player1, 0.0);
+        if (size > 1) {
+            AnchorPane.setLeftAnchor(playersIcon[0], 0.0);
+            AnchorPane.setTopAnchor(playersIcon[0], 0.0);
 
-        AnchorPane.setRightAnchor(player2, 0.0);
-        AnchorPane.setTopAnchor(player2, 0.0);
+            AnchorPane.setRightAnchor(playersIcon[1], 0.0);
+            AnchorPane.setTopAnchor(playersIcon[1], 0.0);
+        }
 
-        AnchorPane.setLeftAnchor(player3, 0.0);
-        AnchorPane.setBottomAnchor(player3, 0.0);
+        if (size == 3) {
+            AnchorPane.setLeftAnchor(playersIcon[2], 0.0);
+            AnchorPane.setBottomAnchor(playersIcon[2], 0.0);
+        }
 
-        AnchorPane.setRightAnchor(player4, 0.0);
-        AnchorPane.setBottomAnchor(player4, 0.0);
+        if (size > 3) {
+            AnchorPane.setRightAnchor(playersIcon[3], 0.0);
+            AnchorPane.setBottomAnchor(playersIcon[3], 0.0);
+        }
 
         AnchorPane.setLeftAnchor(vboxLeft, 0.0);
         AnchorPane.setBottomAnchor(textBottom, 0.0);
 
-        getChildren().add(player1);
-        getChildren().add(player2);
-        getChildren().add(player3);
-        getChildren().add(player4);
+
+        for (Button button : playersIcon) {
+            getChildren().add(button);
+        }
+
         getChildren().add(vboxLeft);
         getChildren().add(textBottom);
 

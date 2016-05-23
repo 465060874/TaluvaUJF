@@ -12,6 +12,8 @@ import map.Orientation;
 
 public class Placement {
 
+    private Mode saveMode;
+
     public enum Mode {
         NONE,
         TILE,
@@ -42,6 +44,7 @@ public class Placement {
         this.grid = grid;
 
         this.mode = Mode.NONE;
+        this.saveMode = Mode.NONE;
         this.valid = false;
         this.hex = Hex.at(0, 0);
 
@@ -133,5 +136,16 @@ public class Placement {
         this.valid = field != Field.SEA
                 && field.getBuilding().getType() == BuildingType.NONE;
         placementOverlay.redraw();
+    }
+
+    public void saveMode() {
+        saveMode = mode;
+        mode = Mode.NONE;
+        updateValidTile();
+    }
+
+    public void restoreMode() {
+        mode = saveMode;
+        updateValidTile();
     }
 }

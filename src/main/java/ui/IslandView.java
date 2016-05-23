@@ -56,7 +56,19 @@ class IslandView extends StackPane {
         setOnMouseClicked(this::mouseClicked);
         setOnMouseDragged(this::mouseDragged);
         setOnMouseReleased(this::mouseReleased);
+        setOnMouseExited(this::mouseExited);
+        setOnMouseEntered(this::mouseEntered);
         setOnScroll(this::scroll);
+    }
+
+    private void mouseExited(MouseEvent event) {
+        System.out.println("Yop !");
+        placement.saveMode();
+    }
+
+    private void mouseEntered(MouseEvent event) {
+        System.out.println("PPPop ");
+        placement.restoreMode();
     }
 
     @Override
