@@ -21,6 +21,8 @@ public abstract class EngineStatus {
 
     public abstract int getTurn();
 
+    public abstract TurnStep getStep();
+
     public enum TurnStep {
         TILE,
         BUILD
@@ -29,6 +31,11 @@ public abstract class EngineStatus {
     public static final EngineStatus PENDING_START = new EngineStatus() {
         @Override
         public int getTurn() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public TurnStep getStep() {
             throw new UnsupportedOperationException();
         }
     };
@@ -53,6 +60,7 @@ public abstract class EngineStatus {
             return turn;
         }
 
+        @Override
         public TurnStep getStep() {
             return step;
         }
@@ -71,11 +79,13 @@ public abstract class EngineStatus {
     public static final class Finished extends EngineStatus {
 
         private final int turn;
+        private final TurnStep step;
         private final FinishReason reason;
         private final List<Player> winners;
 
-        Finished(int turn, FinishReason reason, List<Player> winners) {
-            this.turn = turn;
+        Finished(Running running, FinishReason reason, List<Player> winners) {
+            this.turn = running.turn;
+            this.step = running.step;
             this.reason = reason;
             this.winners = ImmutableList.copyOf(winners);
         }
@@ -83,6 +93,11 @@ public abstract class EngineStatus {
         @Override
         public int getTurn() {
             return turn;
+        }
+
+        @Override
+        public TurnStep getStep() {
+            return step;
         }
 
         public FinishReason getWinReason() {

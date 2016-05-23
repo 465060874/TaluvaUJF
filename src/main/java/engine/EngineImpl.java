@@ -177,7 +177,8 @@ class EngineImpl implements Engine {
         if (status instanceof EngineStatus.Finished) {
             running = new EngineStatus.Running();
             running.turn = status.getTurn();
-            running.step = EngineStatus.TurnStep.TILE;
+            running.step = status.getStep();
+            status = running;
         }
         else {
             running = (EngineStatus.Running) status;
@@ -192,7 +193,9 @@ class EngineImpl implements Engine {
         if (running.step == EngineStatus.TurnStep.TILE) {
             running.turn--;
             do {
-                playerIndex--;
+                playerIndex = playerIndex == 0
+                        ? players.size()
+                        : playerIndex - 1;
             } while (getCurrentPlayer().isEliminated());
 
             StepSave save = stepSaves.remove(stepSaves.size() - 1);
@@ -242,7 +245,7 @@ class EngineImpl implements Engine {
                 verify(remainingPlayers.size() > 0);
 
                 if (remainingPlayers.size() == 1) {
-                    this.status = new EngineStatus.Finished(status.getTurn(),
+                    this.status = new EngineStatus.Finished((EngineStatus.Running) status,
                             EngineStatus.FinishReason.LAST_STANDING,
                             remainingPlayers);
                     observers.forEach(o -> o.onWin(EngineStatus.FinishReason.LAST_STANDING, remainingPlayers));
@@ -274,7 +277,7 @@ class EngineImpl implements Engine {
                 }
 
                 List<Player> winners = candidates;
-                this.status = new EngineStatus.Finished(status.getTurn(),
+                this.status = new EngineStatus.Finished((EngineStatus.Running) status,
                         EngineStatus.FinishReason.NO_MORE_TILES,
                         winners);
                 observers.forEach(o -> o.onWin(EngineStatus.FinishReason.NO_MORE_TILES, winners));
@@ -430,9 +433,12 @@ class EngineImpl implements Engine {
                     tmpExpandActions.put(hex, actions);
                 }
             }
-
-            this.expandActions = tmpExpandActions;
         }
+
+        if (status.getTurn() == 0 && tmpExpandActions.size() > 0) {
+            System.out.println("Debug");
+        }
+        this.expandActions = tmpExpandActions;
     }
 
     @Override
@@ -576,7 +582,7 @@ class EngineImpl implements Engine {
 
         if (remainingBuildingTypeCount <= 1) {
             ImmutableList<Player> winners = ImmutableList.of(player);
-            this.status = new EngineStatus.Finished(status.getTurn(),
+            this.status = new EngineStatus.Finished((EngineStatus.Running) status,
                     EngineStatus.FinishReason.TWO_BUILDING_TYPES,
                     winners);
             observers.forEach(o -> o.onWin(EngineStatus.FinishReason.TWO_BUILDING_TYPES, winners));
