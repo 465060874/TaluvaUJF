@@ -317,7 +317,7 @@ class EngineImpl implements Engine {
         VolcanoTile tile = volcanoTileStack.current();
         for (Hex hex : island.getCoast()) {
             for (Orientation orientation : Orientation.values()) {
-                if (SeaPlacementRules.validate(island, tile, hex, orientation).isValid()) {
+                if (!SeaPlacementRules.validate(island, tile, hex, orientation).isValid()) {
                     continue;
                 }
 
@@ -345,7 +345,7 @@ class EngineImpl implements Engine {
         VolcanoTile tile = volcanoTileStack.current();
         for (Hex hex : island.getVolcanos()) {
             for (Orientation orientation : Orientation.values()) {
-                if (VolcanoPlacementRules.validate(island, tile, hex, orientation).isValid()) {
+                if (!VolcanoPlacementRules.validate(island, tile, hex, orientation).isValid()) {
                     continue;
                 }
 
