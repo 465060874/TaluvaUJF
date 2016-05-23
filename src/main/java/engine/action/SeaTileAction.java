@@ -1,54 +1,26 @@
 package engine.action;
 
+import data.FieldType;
+import data.VolcanoTile;
 import map.Hex;
 import map.Orientation;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Writer;
 
-public class SeaTileAction implements TileAction {
+public class SeaTileAction extends TileAction {
 
-    private final Hex coastHex;
-    private final Orientation orientation;
-
-    public SeaTileAction(Hex coastHex, Orientation orientation) {
-        this.coastHex = coastHex;
-        this.orientation = orientation;
-    }
-
-    public Hex getHex1() {
-        return coastHex;
-    }
-
-    public Hex getHex2() {
-        return coastHex.getLeftNeighbor(orientation);
-    }
-
-    public Hex getHex3() {
-        return coastHex.getRightNeighbor(orientation);
-    }
-
-    public Orientation getOrientation() {
-        return orientation;
-    }
-
-    @Override
-    public void write(Writer writer) throws IOException {
-        writer.write(getClass().getSimpleName());
-        writer.write('\n');
-        writer.write(Integer.toString(coastHex.getLine()));
-        writer.write('\n');
-        writer.write(Integer.toString(coastHex.getDiag()));
-        writer.write('\n');
-        writer.write(orientation.name());
-        writer.write('\n');
+    public SeaTileAction(VolcanoTile tile, Hex volcanoHex, Orientation orientation) {
+        super(tile, volcanoHex, orientation);
     }
 
     static Action doRead(BufferedReader reader) throws IOException {
         int line = Integer.valueOf(reader.readLine());
         int diag = Integer.valueOf(reader.readLine());
+        FieldType leftFieldType = FieldType.valueOf(reader.readLine());
+        FieldType rightFieldType = FieldType.valueOf(reader.readLine());
+        VolcanoTile tile = new VolcanoTile(leftFieldType, rightFieldType);
         Orientation orientation = Orientation.valueOf(reader.readLine());
-        return new SeaTileAction(Hex.at(line, diag), orientation);
+        return new SeaTileAction(tile, Hex.at(line, diag), orientation);
     }
-}
+ }

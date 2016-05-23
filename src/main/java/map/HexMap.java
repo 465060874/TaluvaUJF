@@ -12,9 +12,9 @@ public interface HexMap<E> {
 
     E getOrDefault(Hex hex, E fallbackValue);
 
-    void put(Hex hex, E element);
+    E put(Hex hex, E element);
 
-    void remove(Hex hex);
+    E remove(Hex hex);
 
     int size();
 
@@ -23,5 +23,4 @@ public interface HexMap<E> {
     Iterable<E> values();
 
     HexMap<E> copy();
-
 }

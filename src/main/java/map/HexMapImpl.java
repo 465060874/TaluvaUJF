@@ -9,10 +9,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 class HexMapImpl<E> implements HexMap<E> {
 
+    static final int INITIAL_CAPACITY = (1 << 9);
+
     private final Map<Hex, E> map;
 
     HexMapImpl() {
-        this.map = new HashMap<>(1 << 9);
+        this.map = new HashMap<>(INITIAL_CAPACITY);
     }
 
     private HexMapImpl(HexMapImpl<E> hexMap) {
@@ -42,12 +44,12 @@ class HexMapImpl<E> implements HexMap<E> {
         return element;
     }
 
-    public void put(Hex hex, E element) {
-        map.put(checkNotNull(hex), checkNotNull(element));
+    public E put(Hex hex, E element) {
+        return map.put(checkNotNull(hex), checkNotNull(element));
     }
 
-    public void remove(Hex hex) {
-        map.remove(hex);
+    public E remove(Hex hex) {
+        return map.remove(hex);
     }
 
     @Override

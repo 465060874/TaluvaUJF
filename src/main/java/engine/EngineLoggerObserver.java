@@ -51,7 +51,8 @@ public class EngineLoggerObserver implements EngineObserver {
 
     @Override
     public void onTilePlacementOnSea(SeaTileAction placement) {
-        engine.logger().info("{0}  Placed on sea {1} {2}", prefix, placement.getHex1(), placement.getOrientation());
+        engine.logger().info("{0}  Placed on sea {1} {2}", prefix,
+                placement.getVolcanoHex(), placement.getOrientation());
     }
 
     @Override

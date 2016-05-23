@@ -101,7 +101,7 @@ class BasicHeuristics implements Heuristics {
     public int evaluateSeaPlacement(Engine e, SeaTileAction move){
         int tower = 0, temple = 0, hut = 0, counter = 0;
         Island island = e.getIsland();
-        Hex hex = move.getHex1();
+        Hex hex = move.getVolcanoHex();
         int bonus;
         for (Neighbor neighbor : Neighbor.values()) {
             Hex adjacent = hex.getNeighbor(neighbor);
@@ -114,13 +114,14 @@ class BasicHeuristics implements Heuristics {
                 Village village = island.getVillage(adjacent);
                 if( !village.hasTemple()) {
                     temple -= bonus;
-                    if (village.getHexSize() < 3)
+                    if (village.getHexes().size() < 3)
                         hut -= 2*bonus;
                 }
                 counter -= bonus;
             }
         }
-        hex = move.getHex2();
+
+        hex = move.getLeftHex();
         for (Neighbor neighbor : Neighbor.values()) {
             Hex adjacent = hex.getNeighbor(neighbor);
             BuildingType building = island.getField(adjacent).getBuilding().getType();
@@ -131,13 +132,14 @@ class BasicHeuristics implements Heuristics {
                     bonus = -1;
                 Village village = island.getVillage(adjacent);
                 if( !village.hasTemple()) {
-                    temple += bonus*( village.getHexSize() > 3 ? 3 : village.getHexSize());
+                    temple += bonus*( village.getHexes().size() > 3 ? 3 : village.getHexes().size());
                     hut += 2*bonus;
                 }
                 counter += bonus;
             }
         }
-        hex = move.getHex3();
+
+        hex = move.getRightHex();
         for (Neighbor neighbor : Neighbor.values()) {
             Hex adjacent = hex.getNeighbor(neighbor);
             BuildingType building = island.getField(adjacent).getBuilding().getType();
@@ -148,7 +150,7 @@ class BasicHeuristics implements Heuristics {
                     bonus = -1;
                 Village village = island.getVillage(adjacent);
                 if( !village.hasTemple()) {
-                    temple += bonus*( village.getHexSize() > 3 ? 3 : village.getHexSize());
+                    temple += bonus*( village.getHexes().size() > 3 ? 3 : village.getHexes().size());
                     hut += 2*bonus;
                 }
                 counter += bonus;
