@@ -12,6 +12,7 @@
     -fx-background-color: #aed581;
     -fx-color: #aed581;
     -fx-text-fill: #33691e;
+    //-fx-background-image: url('/testing/background.png');
 }
 
 .breprendre: hover{
