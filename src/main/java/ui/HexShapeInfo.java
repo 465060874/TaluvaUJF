@@ -7,6 +7,7 @@ public class HexShapeInfo implements Comparable<HexShapeInfo> {
 
     Field field;
     boolean isPlacement;
+    boolean isPlacementValid;
 
     double x;
     double y;

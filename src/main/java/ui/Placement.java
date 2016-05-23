@@ -60,6 +60,7 @@ public class Placement {
         else if (mode == Mode.TILE) {
             mode = Mode.BUILDING;
             updateValidBuilding();
+            islandCanvas.redraw();
         }
         else {
             mode = Mode.NONE;
@@ -119,31 +120,18 @@ public class Placement {
             placementOverlay.redraw();
             islandCanvas.redraw();
         }
+        else if (valid) {
+            islandCanvas.redraw();
+        }
         else {
-            redraw();
+            placementOverlay.redraw();
         }
     }
 
     private void updateValidBuilding() {
-        boolean wasValid = valid;
         Field field = island.getField(hex);
         this.valid = field != Field.SEA
                 && field.getBuilding().getType() == BuildingType.NONE;
-        if (wasValid != valid) {
-            placementOverlay.redraw();
-            islandCanvas.redraw();
-        }
-        else {
-            redraw();
-        }
-    }
-
-    void redraw() {
-        if (valid) {
-            islandCanvas.redraw();
-        }
-        else {
-            placementOverlay.redraw();
-        }
+        placementOverlay.redraw();
     }
 }

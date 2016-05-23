@@ -88,7 +88,7 @@ class IslandView extends StackPane {
     }
 
     private void mouseClicked(MouseEvent event) {
-        if (event.getButton() == MouseButton.PRIMARY) {
+        if (event.getButton() == MouseButton.MIDDLE) {
             placement.cyclePrimary();
         }
         else if (event.getButton() == MouseButton.SECONDARY) {
@@ -104,6 +104,11 @@ class IslandView extends StackPane {
         islandCanvas.setTranslateX(islandCanvas.getTranslateX()
                 + event.getX() - mouseX);
         islandCanvas.setTranslateY(islandCanvas.getTranslateY()
+                + event.getY() - mouseY);
+
+        placementOverlay.setTranslateX(placementOverlay.getTranslateX()
+                + event.getX() - mouseX);
+        placementOverlay.setTranslateY(placementOverlay.getTranslateY()
                 + event.getY() - mouseY);
 
         mouseX = event.getX();

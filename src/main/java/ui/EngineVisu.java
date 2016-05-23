@@ -30,6 +30,8 @@ public class EngineVisu extends Application implements EngineObserver {
                 .logLevel(Level.FINE)
                 .player(PlayerColor.RED, uiWrap(PlayerHandler.dumbFactory()))
                 .player(PlayerColor.WHITE, uiWrap(PlayerHandler.dumbFactory()))
+                .player(PlayerColor.BROWN, uiWrap(PlayerHandler.dumbFactory()))
+                .player(PlayerColor.YELLOW, uiWrap(PlayerHandler.dumbFactory()))
                 .build();
         engine.registerObserver(new EngineLoggerObserver(engine));
         engine.registerObserver(this);

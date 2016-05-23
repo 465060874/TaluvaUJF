@@ -47,6 +47,7 @@ class IslandCanvas extends Canvas {
         HexShapeInfo info2 = new HexShapeInfo();
         HexShapeInfo info3 = new HexShapeInfo();
         info1.isPlacement = info2.isPlacement = info3.isPlacement = true;
+        info1.isPlacementValid = info2.isPlacementValid = info3.isPlacementValid = placement.valid;
         info1.sizeX = info2.sizeX = info3.sizeX = HexShape.HEX_SIZE_X * grid.getScale();
         info1.sizeY = info2.sizeY = info3.sizeY = HexShape.HEX_SIZE_Y * grid.getScale();
 
@@ -66,8 +67,8 @@ class IslandCanvas extends Canvas {
         info1.scale = info2.scale = info3.scale = grid.getScale();
 
         info1.field = Field.create(level, FieldType.VOLCANO, placement.tileOrientation);
-        info2.field = Field.create(level, placement.tileFields.getLeft(), placement.tileOrientation);
-        info3.field = Field.create(level, placement.tileFields.getRight(), placement.tileOrientation);
+        info2.field = Field.create(level, placement.tileFields.getLeft(), placement.tileOrientation.leftRotation());
+        info3.field = Field.create(level, placement.tileFields.getRight(), placement.tileOrientation.rightRotation());
 
         return ImmutableList.of(info1, info2, info3);
     }
@@ -110,30 +111,11 @@ class IslandCanvas extends Canvas {
 
             FieldBuilding building = info.field.getBuilding();
             if (building.getType() != BuildingType.NONE) {
-                drawBuilding(gc, building, info.field.getLevel(),
-                        info.x,
-                        info.y - info.sizeY / 6,
+                drawBuilding(gc, building, info.field.getLevel(), false, false,
+                        grid.scale,
+                        info.x, info.y - info.sizeY / 6,
                         info.sizeX, info.sizeY);
             }
-        }
-
-        if (placement.valid && placement.mode == Placement.Mode.BUILDING) {
-            HexShapeInfo info = new HexShapeInfo();
-            int line = placement.hex.getLine();
-            int diag = placement.hex.getDiag();
-            info.sizeX = hexSizeX;
-            info.sizeY = hexSizeY;
-            info.x = centerX + diag * 2 * WEIRD_RATIO * info.sizeX + line * WEIRD_RATIO * info.sizeX;
-            info.y = centerY + line * info.sizeY + line * info.sizeY / 2;
-            info.isPlacement = false;
-            info.field = island.getField(placement.hex);
-            info.scale = grid.getScale();
-            infos.add(info);
-            FieldBuilding fieldBuilding = FieldBuilding.of(placement.buildingType, placement.buildingColor);
-            drawBuilding(gc, fieldBuilding, Math.max(1, island.getField(placement.hex).getLevel()),
-                    info.x,
-                    info.y - info.sizeY / 6,
-                    info.sizeX, info.sizeY);
         }
 
         if (debug) {

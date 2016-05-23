@@ -2,7 +2,6 @@
 package ui;
 
 import com.google.common.io.Resources;
-import engine.rules.VolcanoPlacementRulesTest;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
@@ -18,10 +17,10 @@ public class IslandVisu extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        URL rsc = VolcanoPlacementRulesTest.class.getResource("VolcanoPlacementRulesTest2.island");
+        URL rsc = IslandVisu.class.getResource("test.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
-        IslandView islandView = new IslandView(island, true);
+        IslandView islandView = new IslandView(island, false);
         BorderPane mainPane = new BorderPane();
         mainPane.setCenter(islandView);
 

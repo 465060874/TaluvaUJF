@@ -4,6 +4,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.Light;
 import javafx.scene.effect.Lighting;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import map.Field;
@@ -44,19 +45,6 @@ class HexShape {
         this.bottomY = new double[BOTTOM_POINTS];
         this.bottomBorderX = new double[BOTTOM_BORDER_POINTS];
         this.bottomBorderY = new double[BOTTOM_BORDER_POINTS];
-    }
-
-    private static Color fieldTypeColor(Field field) {
-        switch (field.getType()) {
-            case VOLCANO:  return Color.web("E97B33");
-            case JUNGLE:   return Color.web("A681B6");
-            case CLEARING: return Color.web("8DC435");
-            case SAND:     return Color.web("EFDD6F");
-            case ROCK:     return Color.web("C2D0D1");
-            case LAKE:     return Color.web("8BE1EB");
-        }
-
-        throw new IllegalStateException();
     }
 
     private void update(HexShapeInfo info) {
@@ -171,18 +159,31 @@ class HexShape {
         bottomBorderY[4] = hexagonY[2] + bottomDepth1;
     }
 
-    private static Color fieldTypeTranslucentColor(Field field) {
-        Color color = fieldTypeColor(field);
-        return new Color(color.getRed(), color.getGreen(), color.getBlue(), .5f);
+    private static Color fieldTypeColor(Field field) {
+        switch (field.getType()) {
+            case VOLCANO:  return Color.web("E97B33");
+            case JUNGLE:   return Color.web("A681B6");
+            case CLEARING: return Color.web("8DC435");
+            case SAND:     return Color.web("EFDD6F");
+            case ROCK:     return Color.web("C2D0D1");
+            case LAKE:     return Color.web("8BE1EB");
+        }
+
+        throw new IllegalStateException();
+    }
+
+    private static Paint fieldTypePaint(HexShapeInfo info) {
+        Color color = fieldTypeColor(info.field);
+        return info.isPlacement
+                ? new Color(color.getRed(), color.getGreen(), color.getBlue(), info.isPlacementValid ? .75f : .5f)
+                : color;
     }
 
     void draw(GraphicsContext gc, HexShapeInfo info) {
         update(info);
 
         gc.setEffect(new Lighting(new Light.Point(0, 0, info.scale * 150, Color.WHITE)));
-        gc.setFill(info.isPlacement
-                ? fieldTypeTranslucentColor(info.field)
-                : fieldTypeColor(info.field));
+        gc.setFill(fieldTypePaint(info));
         gc.fillPolygon(hexagonX, hexagonY, HEXAGON_POINTS);
         gc.setEffect(null);
 
