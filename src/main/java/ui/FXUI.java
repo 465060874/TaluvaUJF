@@ -3,7 +3,6 @@ package ui;
 import com.google.common.io.Resources;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import map.Island;
 import map.IslandIO;
@@ -21,10 +20,10 @@ public class FXUI extends Application {
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
         IslandView islandView = new IslandView(island, DEBUG);
-        BorderPane mainPane = new BorderPane();
-        mainPane.setCenter(islandView);
+        Hud hud = new Hud(2);
+        GameView gameView = new GameView(islandView, hud);
 
-        Scene scene = new Scene(mainPane, 1000, 800);
+        Scene scene = new Scene(gameView, 1000, 800);
         stage.setScene(scene);
         stage.show();
     }
