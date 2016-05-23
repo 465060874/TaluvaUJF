@@ -1,13 +1,15 @@
 package IA;
 
+import com.google.common.collect.Iterables;
 import engine.Engine;
 import engine.EngineLoggerObserver;
-import engine.action.ExpandVillageAction;
-import engine.action.PlaceBuildingAction;
-import engine.action.SeaTileAction;
-import engine.action.VolcanoTileAction;
+import engine.EngineStatus;
+import engine.action.*;
+import ui.Placement;
 
 import java.util.PriorityQueue;
+
+import static com.google.common.collect.Iterables.getOnlyElement;
 
 class BotPlayer {
 
@@ -32,14 +34,32 @@ class BotPlayer {
 
     // Jouer un coup
     Move play(int depth) {
+        if( realEngine.getStatus().getTurn() == 0 )
+            return doFirstPlay(realEngine);
         Engine engineCopy = realEngine.copyWithoutObservers();
-        engineCopy.registerObserver(new EngineLoggerObserver(engineCopy, "[IA]"));
+        //engineCopy.registerObserver(new EngineLoggerObserver(engineCopy, "[IA]"));
         return doPlay(engineCopy, depth);
     }
+
+    private Move doFirstPlay( Engine engine){
+        Move m;
+        TileAction seaPlacement = getOnlyElement(getOnlyElement(engine.getSeaPlacements().values()));
+        Engine engineCopy  = realEngine.copyWithoutObservers();
+        engineCopy.action( seaPlacement );
+        BuildingAction buildAction1 = getOnlyElement(Iterables.get( engineCopy.getBuildActions().values(), 0));
+        BuildingAction buildAction2 = getOnlyElement(Iterables.get( engineCopy.getBuildActions().values(), 1));
+        int n = engine.getRandom().nextInt(2);
+        if( n == 0 )
+            return new Move( buildAction1, seaPlacement, 0);
+        else
+            return new Move( buildAction2, seaPlacement, 0);
+    }
+
 
     private Move doPlay(Engine engine, int depth) {
         engine.logger().fine("PLAY : depth {0}", depth);
         @SuppressWarnings("unchecked")
+
         PriorityQueue<Move>[] strategiesQueues = new PriorityQueue[NB_STRATEGIES];
         for (int i = 0; i < NB_STRATEGIES; i++)
             strategiesQueues[i] = new PriorityQueue<>((a,b) -> Integer.compare( b.points, a.points));
@@ -88,14 +108,18 @@ class BotPlayer {
         for (int i = 0; i < branchingFactor; i++) {
             engine.action(branchMoves[i].tileAction);
             engine.action(branchMoves[i].buildingAction);
-            if (depth > 0) {
+            if( engine.getStatus() instanceof EngineStatus.Finished ){
+                if( ! ((EngineStatus.Finished) engine.getStatus()).getWinners().contains( engine.getCurrentPlayer()))
+                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MAX_VALUE);
+                else
+                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MIN_VALUE);
+            }else if (depth > 0) {
                 Move m = doPlay(engine, depth - 1);
                 if (m.points < bestPoints) {
                     bestPoints = m.points;
                     bestMove = branchMoves[i];
                 }
-            }
-            else {
+            }else{
                 if( (p = heuristics.evaluateConfiguration(engine)) > bestConfigPoints ){
                     bestMove = new Move(branchMoves[i].buildingAction, branchMoves[i].tileAction, p);
                     bestConfigPoints = p;
@@ -136,7 +160,7 @@ class BotPlayer {
             }
         }
 
-        engine.logger().fine("[Sort] Begin volcanoPlacements : {0}", engine.getSeaPlacements().size());
+        engine.logger().fine("[Sort] Begin volcanoPlacements : {0}", engine.getVolcanoPlacements().size());
         // Pour tout tileAction sur la terre
         for (Iterable<VolcanoTileAction> volcanoPlacements : engine.getVolcanoPlacements().values()) {
             for (VolcanoTileAction placement  : volcanoPlacements) {

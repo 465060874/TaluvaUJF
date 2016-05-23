@@ -3,6 +3,7 @@ package IA;
 import engine.Engine;
 import engine.PlayerHandler;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class BotPlayerHandler implements PlayerHandler {
@@ -13,7 +14,7 @@ public class BotPlayerHandler implements PlayerHandler {
 
     public BotPlayerHandler(Engine engine) {
         this.engine = engine;
-        this.bot = new BotPlayer(16, new BasicHeuristics(), engine);
+        this.bot = new BotPlayer(16, new RandomHeuristics(engine.getRandom()), engine);
     }
 
     @Override
