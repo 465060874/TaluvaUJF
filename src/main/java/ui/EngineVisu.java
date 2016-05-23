@@ -28,8 +28,8 @@ public class EngineVisu extends Application implements EngineObserver {
     @Override
     public void start(Stage stage) throws Exception {
         this.engine = EngineBuilder.allVsAll()
-                .logLevel(Level.FINE)
-                //.seed(8006670317173563071L)
+                .logLevel(Level.INFO)
+                //.seed(8006726615907585890L)
                 .player(PlayerColor.RED, uiWrap(BotPlayerHandler::new))
                 .player(PlayerColor.WHITE, uiWrap(BotPlayerHandler::new))
                 .build();

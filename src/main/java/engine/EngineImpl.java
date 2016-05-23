@@ -43,7 +43,7 @@ class EngineImpl implements Engine {
 
     private EngineStatus status;
     private int playerIndex;
-    private List<StepSave> stepSaves;
+    private List<ActionSave> actionSaves;
 
     private HexMap<List<SeaTileAction>> seaPlacements;
     private HexMap<List<VolcanoTileAction>> volcanosPlacements;
@@ -67,7 +67,7 @@ class EngineImpl implements Engine {
 
         this.status = EngineStatus.PENDING_START;
         this.playerIndex = 0;
-        this.stepSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
+        this.actionSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
 
         this.seaPlacements = HexMap.create();
         this.volcanosPlacements = HexMap.create();
@@ -95,8 +95,8 @@ class EngineImpl implements Engine {
                 ? ((EngineStatus.Running) engine.status).copy()
                 : engine.status;
         this.playerIndex = engine.playerIndex;
-        this.stepSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
-        stepSaves.addAll(engine.stepSaves);
+        this.actionSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
+        actionSaves.addAll(engine.actionSaves);
 
         this.seaPlacements = engine.seaPlacements;
         this.volcanosPlacements = engine.volcanosPlacements;
@@ -198,13 +198,15 @@ class EngineImpl implements Engine {
                         : playerIndex - 1;
             } while (getCurrentPlayer().isEliminated());
 
-            StepSave save = stepSaves.remove(stepSaves.size() - 1);
-            save.restore(this);
+            ActionSave save = actionSaves.remove(actionSaves.size() - 1);
+            save.revert(this);
 
             volcanoTileStack.previous();
             observers.forEach(o -> o.onTileStackChange(true));
 
             running.step = EngineStatus.TurnStep.BUILD;
+            updateSeaPlacements();
+            updateVolcanoPlacements();
             updateBuildActions();
             updateExpandActions();
 
@@ -212,12 +214,10 @@ class EngineImpl implements Engine {
             getCurrentPlayer().getHandler().startBuildStep();
         }
         else {
-            StepSave save = stepSaves.remove(stepSaves.size() - 1);
-            save.restore(this);
+            ActionSave save = actionSaves.remove(actionSaves.size() - 1);
+            save.revert(this);
 
             running.step = EngineStatus.TurnStep.TILE;
-            updateSeaPlacements();
-            updateVolcanoPlacements();
 
             observers.forEach(o -> o.onTileStepStart(true));
             getCurrentPlayer().getHandler().startTileStep();
@@ -231,8 +231,11 @@ class EngineImpl implements Engine {
         if (running.step == EngineStatus.TurnStep.TILE) {
             running.step = EngineStatus.TurnStep.BUILD;
 
+            updateSeaPlacements();
+            updateVolcanoPlacements();
             updateBuildActions();
             updateExpandActions();
+
             if (buildActions.size() == 0 && expandActions.size() == 0) {
                 Player eliminated = getCurrentPlayer();
                 eliminated.setEliminated();
@@ -283,11 +286,7 @@ class EngineImpl implements Engine {
                 observers.forEach(o -> o.onWin(EngineStatus.FinishReason.NO_MORE_TILES, winners));
                 return;
             }
-
             observers.forEach(o -> o.onTileStackChange(true));
-
-            updateSeaPlacements();
-            updateVolcanoPlacements();
 
             observers.forEach(o -> o.onTileStepStart(true));
             getCurrentPlayer().getHandler().startTileStep();
@@ -435,9 +434,6 @@ class EngineImpl implements Engine {
             }
         }
 
-        if (status.getTurn() == 0 && tmpExpandActions.size() > 0) {
-            System.out.println("Debug");
-        }
         this.expandActions = tmpExpandActions;
     }
 
@@ -454,33 +450,45 @@ class EngineImpl implements Engine {
     @Override
     public HexMap<? extends Iterable<SeaTileAction>> getSeaPlacements() {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
-        checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
-                "Requesting sea placements during building step");
         return seaPlacements;
     }
 
     @Override
     public HexMap<? extends Iterable<VolcanoTileAction>> getVolcanoPlacements() {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
-        checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
-                "Requesting volcano placements during building step");
         return volcanosPlacements;
     }
 
     @Override
     public HexMap<? extends Iterable<PlaceBuildingAction>> getBuildActions() {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
-        checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
-                "Requesting build actions during tile placements");
         return buildActions;
+    }
+
+    @Override
+    public List<PlaceBuildingAction> getBuildActions(TileAction action) {
+        checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
+        TileActionSave save = TileActionSave.of(this, action);
+        action(action);
+        // Do stuffs
+        save.revert(this);
+        return ImmutableList.of();
     }
 
     @Override
     public HexMap<? extends Iterable<ExpandVillageAction>> getExpandActions() {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
-        checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
-                "Requesting expand actions during tile placements");
         return expandActions;
+    }
+
+    @Override
+    public List<ExpandVillageAction> getExpandActions(TileAction action) {
+        checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
+        TileActionSave save = TileActionSave.of(this, action);
+        action(action);
+        // Do stuffs
+        save.revert(this);
+        return ImmutableList.of();
     }
 
     @Override
@@ -508,7 +516,7 @@ class EngineImpl implements Engine {
         checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
                 "Can't place a tile during building step");
 
-        stepSaves.add(new PlacementSave(this, placement));
+        actionSaves.add(new TileActionSave(this, placement));
         island.putTile(volcanoTileStack.current(), placement.getHex1(), placement.getOrientation());
 
         observers.forEach(o -> o.onTilePlacementOnSea(placement));
@@ -521,7 +529,7 @@ class EngineImpl implements Engine {
         checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
                 "Can't place a tile during building step");
 
-        stepSaves.add(new PlacementSave(this, placement));
+        actionSaves.add(new TileActionSave(this, placement));
         island.putTile(volcanoTileStack.current(), placement.getVolcanoHex(), placement.getOrientation());
 
         observers.forEach(o -> o.onTilePlacementOnVolcano(placement));
@@ -534,7 +542,7 @@ class EngineImpl implements Engine {
         checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
                 "Can't build during tile placement step");
 
-        stepSaves.add(new ActionSave(this, action));
+        actionSaves.add(new BuildActionSave(this, action));
         PlayerColor color = getCurrentPlayer().getColor();
         island.putBuilding(action.getHex(), FieldBuilding.of(action.getType(), color));
         int buildingCount = action.getType() == BuildingType.HUT
@@ -552,7 +560,7 @@ class EngineImpl implements Engine {
         checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
                 "Can't expand during tile placement step");
 
-        stepSaves.add(new ActionSave(this, action));
+        actionSaves.add(new BuildActionSave(this, action));
         PlayerColor color = getCurrentPlayer().getColor();
         FieldBuilding building = FieldBuilding.of(BuildingType.HUT, color);
         int buildingCount = 0;
@@ -592,23 +600,29 @@ class EngineImpl implements Engine {
         }
     }
 
-    private interface StepSave {
+    private interface ActionSave {
 
-        void restore(EngineImpl engine);
+        void revert(EngineImpl engine);
     }
 
-    private static class PlacementSave implements StepSave {
+    private static class TileActionSave implements ActionSave {
 
         private final ImmutableMap<Hex, Field> islandDiff;
 
-        PlacementSave(EngineImpl engine, SeaTileAction placement) {
+        public static TileActionSave of(EngineImpl engine, TileAction action) {
+            return action instanceof SeaTileAction
+                    ? new TileActionSave(engine, (SeaTileAction) action)
+                    : new TileActionSave(engine, (VolcanoTileAction) action);
+        }
+
+        TileActionSave(EngineImpl engine, SeaTileAction placement) {
             this.islandDiff = ImmutableMap.of(
                     placement.getHex1(), engine.island.getField(placement.getHex1()),
                     placement.getHex2(), engine.island.getField(placement.getHex2()),
                     placement.getHex3(), engine.island.getField(placement.getHex3()));
         }
 
-        PlacementSave(EngineImpl engine, VolcanoTileAction placement) {
+        TileActionSave(EngineImpl engine, VolcanoTileAction placement) {
             this.islandDiff = ImmutableMap.of(
                     placement.getVolcanoHex(), engine.island.getField(placement.getVolcanoHex()),
                     placement.getLeftHex(), engine.island.getField(placement.getLeftHex()),
@@ -616,27 +630,27 @@ class EngineImpl implements Engine {
         }
 
         @Override
-        public void restore(EngineImpl engine) {
+        public void revert(EngineImpl engine) {
             for (Map.Entry<Hex, Field> entry : islandDiff.entrySet()) {
                 engine.island.putField(entry.getKey(), entry.getValue());
             }
         }
     }
 
-    private static class ActionSave implements StepSave {
+    private static class BuildActionSave implements ActionSave {
 
         private final ImmutableMap<Hex, Field> islandDiff;
         private final BuildingType buildingType;
         private final int buildingCount;
 
-        ActionSave(EngineImpl engine, PlaceBuildingAction action) {
+        BuildActionSave(EngineImpl engine, PlaceBuildingAction action) {
             Field field = engine.island.getField(action.getHex());
             this.islandDiff = ImmutableMap.of(action.getHex(), field);
             this.buildingType = action.getType();
             this.buildingCount = engine.getCurrentPlayer().getBuildingCount(action.getType());
         }
 
-        ActionSave(EngineImpl engine, ExpandVillageAction action) {
+        BuildActionSave(EngineImpl engine, ExpandVillageAction action) {
             ImmutableMap.Builder<Hex, Field> islandsDiffBuilder = ImmutableMap.builder();
             Village village = engine.getIsland().getVillage(action.getVillageHex());
             for (Hex hex : village.getExpandableHexes().get(action.getFieldType())) {
@@ -650,7 +664,7 @@ class EngineImpl implements Engine {
         }
 
         @Override
-        public void restore(EngineImpl engine) {
+        public void revert(EngineImpl engine) {
             for (Map.Entry<Hex, Field> entry : islandDiff.entrySet()) {
                 engine.island.putField(entry.getKey(), entry.getValue());
             }

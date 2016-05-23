@@ -2,6 +2,7 @@ package engine;
 
 import engine.action.*;
 import engine.log.EngineLogger;
+import engine.rules.SeaPlacementRules;
 import map.HexMap;
 import map.Island;
 
@@ -91,14 +92,26 @@ public interface Engine {
     HexMap<? extends Iterable<VolcanoTileAction>> getVolcanoPlacements();
 
     /**
-     * Retourne la liste des constructions possibles
+     * Retourne l'ensemble des constructions possibles pour un tour exceptés
+     * ceux liés au placement de tuile du même tour
      */
     HexMap<? extends Iterable<PlaceBuildingAction>> getBuildActions();
 
     /**
-     * Retourne la liste des extensions de villages possibles
+     * Retourne la liste des constructions possibles liés au placements de la tuile
+     */
+    List<PlaceBuildingAction> getBuildActions(TileAction action);
+
+    /**
+     * Retourne l'ensemble des extensions possibles pour un tour exceptés
+     * ceux liés au placement de tuile du même tour
      */
     HexMap<? extends Iterable<ExpandVillageAction>> getExpandActions();
+
+    /**
+     * Retourne la liste des extensions possibles liés au placements de la tuile
+     */
+    List<ExpandVillageAction> getExpandActions(TileAction action);
 
     /**
      * Réalise l'action passée en paramètre
