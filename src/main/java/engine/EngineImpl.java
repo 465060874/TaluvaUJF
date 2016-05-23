@@ -209,6 +209,9 @@ class EngineImpl implements Engine {
             getCurrentPlayer().getHandler().startBuildStep();
         }
         else {
+            StepSave save = stepSaves.remove(stepSaves.size() - 1);
+            save.restore(this);
+
             running.step = EngineStatus.TurnStep.TILE;
             updateSeaPlacements();
             updateVolcanoPlacements();
