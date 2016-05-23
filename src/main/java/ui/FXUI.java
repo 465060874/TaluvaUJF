@@ -26,6 +26,8 @@ public class FXUI extends Application {
                 .island(island1)
                 .player(PlayerColor.BROWN, e -> PlayerHandler.dummy())
                 .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
+                .player(PlayerColor.YELLOW, e -> PlayerHandler.dummy())
+                .player(PlayerColor.RED, e -> PlayerHandler.dummy())
                 .build();
         engine.start();
 

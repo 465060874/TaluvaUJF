@@ -49,11 +49,10 @@ public class Hud extends AnchorPane {
             }
 
             playersIcon[i].setStyle(
-                    "-fx-background-radius: 3em; " +
-                            "-fx-min-width: 150px; " +
-                            "-fx-min-height: 150px; " +
-                            "-fx-max-width: 150px; " +
-                            "-fx-max-height: 150px;"
+                            "-fx-min-width: 177px; " +
+                            "-fx-min-height: 177px; " +
+                            "-fx-max-width: 177px; " +
+                            "-fx-max-height: 177px;"
             );
 
         }
@@ -88,7 +87,7 @@ public class Hud extends AnchorPane {
             AnchorPane.setTopAnchor(playersIcon[1], 0.0);
         }
 
-        if (size == 3) {
+        if (size > 2) {
             AnchorPane.setLeftAnchor(playersIcon[2], 0.0);
             AnchorPane.setBottomAnchor(playersIcon[2], 0.0);
         }
