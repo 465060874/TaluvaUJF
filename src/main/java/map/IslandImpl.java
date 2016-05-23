@@ -6,10 +6,7 @@ import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
 
-import java.util.ArrayDeque;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static map.Field.SEA;
@@ -67,7 +64,7 @@ class  IslandImpl implements Island {
         queued.put(from, true);
         queue.add(from);
 
-        ImmutableList.Builder<Hex> builder = ImmutableList.builder();
+        ImmutableSet.Builder<Hex> builder = ImmutableSet.builder();
         boolean hasTower = false;
         boolean hasTemple = false;
 
@@ -118,7 +115,7 @@ class  IslandImpl implements Island {
         }
 
         // Regroupement des villages par representant
-        ListMultimap<Hex, Hex> villagesHexes = ArrayListMultimap.create();
+        SetMultimap<Hex, Hex> villagesHexes = HashMultimap.create();
         HexMap<Boolean> hasTemple = HexMap.create();
         HexMap<Boolean> hasTower = HexMap.create();
 
@@ -143,9 +140,9 @@ class  IslandImpl implements Island {
         // Construction de la liste de villages
         ImmutableList.Builder<Village> builder = ImmutableList.builder();
 
-        for (Map.Entry<Hex, List<Hex>> entry : Multimaps.asMap(villagesHexes).entrySet()) {
+        for (Map.Entry<Hex, Set<Hex>> entry : Multimaps.asMap(villagesHexes).entrySet()) {
             builder.add(new VillageImpl(this,
-                    ImmutableList.copyOf(entry.getValue()),
+                    ImmutableSet.copyOf(entry.getValue()),
                     hasTemple.contains(entry.getKey()),
                     hasTower.contains(entry.getKey())));
         }

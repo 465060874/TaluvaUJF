@@ -7,15 +7,16 @@ import data.FieldType;
 import data.PlayerColor;
 
 import java.util.List;
+import java.util.Set;
 
 class VillageImpl implements Village {
 
     private final Island island;
-    private final List<Hex> hexes;
+    private final Set<Hex> hexes;
     private final boolean hasTemple;
     private final boolean hasTower;
 
-    VillageImpl(Island island, List<Hex> hexes, boolean hasTemple, boolean hasTower) {
+    VillageImpl(Island island, Set<Hex> hexes, boolean hasTemple, boolean hasTower) {
         this.island = island;
         this.hexes = hexes;
         this.hasTemple = hasTemple;
@@ -64,5 +65,11 @@ class VillageImpl implements Village {
     @Override
     public boolean hasTower() {
         return hasTower;
+    }
+
+    @Override
+    public boolean isSameAs(Village village) {
+        Hex hex = village.getHexes().iterator().next();
+        return hexes.contains(hex);
     }
 }

@@ -39,4 +39,6 @@ public interface Village {
      * ce village peut s'étendre classés par type de champs
      */
     SetMultimap<FieldType, Hex> getExpandableHexes();
+
+    boolean isSameAs(Village villae);
 }
