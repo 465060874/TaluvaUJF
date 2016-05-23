@@ -48,7 +48,7 @@ public class EngineVisu extends Application implements EngineObserver {
     }
 
     private void cancelLastStep(MouseEvent event) {
-        if (event.getButton() == MouseButton.SECONDARY) {
+        if (event.getButton() == MouseButton.PRIMARY && event.isControlDown()) {
             engine.cancelLastStep();
         }
     }
@@ -102,7 +102,6 @@ public class EngineVisu extends Application implements EngineObserver {
 
     @Override
     public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
-        System.out.println("Win !");
     }
 
     private PlayerHandler.Factory uiWrap(PlayerHandler.Factory factory) {
@@ -127,7 +126,7 @@ public class EngineVisu extends Application implements EngineObserver {
         }
 
         private void startWrappedTileStep(MouseEvent event) {
-            if (event.getButton() == MouseButton.PRIMARY) {
+            if (event.getButton() == MouseButton.PRIMARY && !event.isControlDown()) {
                 scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedTileStep);
                 playerHandler.startTileStep();
             }
@@ -139,7 +138,7 @@ public class EngineVisu extends Application implements EngineObserver {
         }
 
         private void startWrappedBuildStep(MouseEvent event) {
-            if (event.getButton() == MouseButton.PRIMARY) {
+            if (event.getButton() == MouseButton.PRIMARY && !event.isControlDown()) {
                 scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedBuildStep);
                 playerHandler.startBuildStep();
             }

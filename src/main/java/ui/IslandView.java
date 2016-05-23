@@ -89,10 +89,10 @@ class IslandView extends StackPane {
 
     private void mouseClicked(MouseEvent event) {
         if (event.getButton() == MouseButton.MIDDLE) {
-            placement.cyclePrimary();
+            placement.cycleMode();
         }
-        else if (event.getButton() == MouseButton.SECONDARY) {
-            placement.cycleSecondary();
+        else if (event.getButton() == MouseButton.SECONDARY){
+            placement.cycleTileOrientationOrBuildingTypeAndColor();
         }
     }
 

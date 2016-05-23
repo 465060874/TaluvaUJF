@@ -52,7 +52,7 @@ public class Placement {
         this.buildingColor = PlayerColor.RED;
     }
 
-    public void cyclePrimary() {
+    public void cycleMode() {
         if (mode == Mode.NONE) {
             mode = Mode.TILE;
             updateValidTile();
@@ -69,7 +69,7 @@ public class Placement {
         }
     }
 
-    public void cycleSecondary() {
+    public void cycleTileOrientationOrBuildingTypeAndColor() {
         if (mode == Mode.TILE) {
             tileOrientation = tileOrientation.clockWise();
             updateValidTile();
