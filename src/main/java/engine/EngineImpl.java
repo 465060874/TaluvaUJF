@@ -188,14 +188,15 @@ class EngineImpl implements Engine {
         }
 
         getCurrentPlayer().getHandler().cancel();
-        StepSave save = stepSaves.remove(stepSaves.size() - 1);
-        save.restore(this);
 
         if (running.step == EngineStatus.TurnStep.TILE) {
             running.turn--;
             do {
                 playerIndex--;
             } while (getCurrentPlayer().isEliminated());
+
+            StepSave save = stepSaves.remove(stepSaves.size() - 1);
+            save.restore(this);
 
             volcanoTileStack.previous();
             observers.forEach(o -> o.onTileStackChange(true));
@@ -443,32 +444,32 @@ class EngineImpl implements Engine {
 
     @Override
     public HexMap<? extends Iterable<SeaTileAction>> getSeaPlacements() {
-        checkState(status instanceof EngineStatus.Running
-                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
+        checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
+        checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
                 "Requesting sea placements during building step");
         return seaPlacements;
     }
 
     @Override
     public HexMap<? extends Iterable<VolcanoTileAction>> getVolcanoPlacements() {
-        checkState(status instanceof EngineStatus.Running
-                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
+        checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
+        checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
                 "Requesting volcano placements during building step");
         return volcanosPlacements;
     }
 
     @Override
     public HexMap<? extends Iterable<PlaceBuildingAction>> getBuildActions() {
-        checkState(status instanceof EngineStatus.Running
-                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
+        checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
+        checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
                 "Requesting build actions during tile placements");
         return buildActions;
     }
 
     @Override
     public HexMap<? extends Iterable<ExpandVillageAction>> getExpandActions() {
-        checkState(status instanceof EngineStatus.Running
-                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
+        checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
+        checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
                 "Requesting expand actions during tile placements");
         return expandActions;
     }
@@ -494,8 +495,8 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void placeOnSea(SeaTileAction placement) {
-        checkState(status instanceof EngineStatus.Running
-                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
+        checkState(status instanceof EngineStatus.Running, "Can't do an action while the game is not running");
+        checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
                 "Can't place a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
@@ -507,8 +508,8 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void placeOnVolcano(VolcanoTileAction placement) {
-        checkState(status instanceof EngineStatus.Running
-                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
+        checkState(status instanceof EngineStatus.Running, "Can't do an action while the game is not running");
+        checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
                 "Can't place a tile during building step");
 
         stepSaves.add(new PlacementSave(this, placement));
@@ -520,8 +521,8 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void build(PlaceBuildingAction action) {
-        checkState(status instanceof EngineStatus.Running
-                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
+        checkState(status instanceof EngineStatus.Running, "Can't do an action while the game is not running");
+        checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
                 "Can't build during tile placement step");
 
         stepSaves.add(new ActionSave(this, action));
@@ -538,8 +539,8 @@ class EngineImpl implements Engine {
 
     @Override
     public synchronized void expand(ExpandVillageAction action) {
-        checkState(status instanceof EngineStatus.Running
-                        && ((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
+        checkState(status instanceof EngineStatus.Running, "Can't do an action while the game is not running");
+        checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
                 "Can't expand during tile placement step");
 
         stepSaves.add(new ActionSave(this, action));

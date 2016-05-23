@@ -1,6 +1,7 @@
 package IA;
 
 import engine.Engine;
+import engine.EngineLoggerObserver;
 import engine.action.ExpandVillageAction;
 import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
@@ -31,7 +32,9 @@ class BotPlayer {
 
     // Jouer un coup
     Move play(int depth) {
-        return doPlay(realEngine.copyWithoutObservers(), depth);
+        Engine engineCopy = realEngine.copyWithoutObservers();
+        engineCopy.registerObserver(new EngineLoggerObserver(engineCopy, "[IA]"));
+        return doPlay(engineCopy, depth);
     }
 
     private Move doPlay(Engine engine, int depth) {
