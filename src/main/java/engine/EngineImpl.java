@@ -16,10 +16,7 @@ import engine.rules.SeaPlacementRules;
 import engine.rules.VolcanoPlacementRules;
 import map.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -160,6 +157,8 @@ class EngineImpl implements Engine {
 
         updateSeaPlacements();
         updateVolcanoPlacements();
+        updateBuildActions();
+        updateExpandActions();
 
         observers.forEach(o -> o.onTileStepStart(false));
         getCurrentPlayer().getHandler().startTileStep();
@@ -205,8 +204,6 @@ class EngineImpl implements Engine {
             observers.forEach(o -> o.onTileStackChange(true));
 
             running.step = EngineStatus.TurnStep.BUILD;
-            updateSeaPlacements();
-            updateVolcanoPlacements();
             updateBuildActions();
             updateExpandActions();
 
@@ -218,6 +215,11 @@ class EngineImpl implements Engine {
             save.revert(this);
 
             running.step = EngineStatus.TurnStep.TILE;
+
+            updateSeaPlacements();
+            updateVolcanoPlacements();
+            updateBuildActions();
+            updateExpandActions();
 
             observers.forEach(o -> o.onTileStepStart(true));
             getCurrentPlayer().getHandler().startTileStep();
@@ -231,8 +233,6 @@ class EngineImpl implements Engine {
         if (running.step == EngineStatus.TurnStep.TILE) {
             running.step = EngineStatus.TurnStep.BUILD;
 
-            updateSeaPlacements();
-            updateVolcanoPlacements();
             updateBuildActions();
             updateExpandActions();
 
@@ -270,16 +270,9 @@ class EngineImpl implements Engine {
 
             running.step = EngineStatus.TurnStep.TILE;
             volcanoTileStack.next();
-            if (volcanoTileStack.isEmpty()) {
-                List<Player> candidates = playerWithMinimumBuildingOfType(players, BuildingType.TEMPLE);
-                if (candidates.size() > 1) {
-                    candidates = playerWithMinimumBuildingOfType(candidates, BuildingType.TOWER);
-                    if (candidates.size() > 1) {
-                        candidates = playerWithMinimumBuildingOfType(candidates, BuildingType.HUT);
-                    }
-                }
 
-                List<Player> winners = candidates;
+            if (volcanoTileStack.isEmpty()) {
+                List<Player> winners = winnersByScore();
                 this.status = new EngineStatus.Finished((EngineStatus.Running) status,
                         EngineStatus.FinishReason.NO_MORE_TILES,
                         winners);
@@ -287,6 +280,11 @@ class EngineImpl implements Engine {
                 return;
             }
             observers.forEach(o -> o.onTileStackChange(true));
+
+            updateSeaPlacements();
+            updateVolcanoPlacements();
+            updateBuildActions();
+            updateExpandActions();
 
             observers.forEach(o -> o.onTileStepStart(true));
             getCurrentPlayer().getHandler().startTileStep();
@@ -308,6 +306,17 @@ class EngineImpl implements Engine {
         }
 
         return players;
+    }
+
+    private List<Player> winnersByScore() {
+        List<Player> candidates = playerWithMinimumBuildingOfType(players, BuildingType.TEMPLE);
+        if (candidates.size() > 1) {
+            candidates = playerWithMinimumBuildingOfType(candidates, BuildingType.TOWER);
+            if (candidates.size() > 1) {
+                candidates = playerWithMinimumBuildingOfType(candidates, BuildingType.HUT);
+            }
+        }
+        return candidates;
     }
 
     private void updateSeaPlacements() {
@@ -500,18 +509,6 @@ class EngineImpl implements Engine {
         action(action);
 
         ImmutableList.Builder<ExpandVillageAction> builder = ImmutableList.builder();
-        Hex leftHex = action.getLeftHex();
-        Hex rightHex = action.getLeftHex();
-        for (Hex neighbor : leftHex.getNeighborhood()) {
-            Field neighborField = island.getField(neighbor);
-            if (neighborField.getBuilding().getType() != BuildingType.NONE) {
-            }
-        }
-        for (Hex neighbor : rightHex.getNeighborhood()) {
-            Field neighborField = island.getField(neighbor);
-            if (neighborField.getBuilding().getType() != BuildingType.NONE) {
-            }
-        }
 
         save.revert(this);
         return builder.build();

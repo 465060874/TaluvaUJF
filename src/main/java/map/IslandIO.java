@@ -42,6 +42,8 @@ public class IslandIO {
 
                 readHex(line, island);
             }
+
+            island.villages.reset();
         }
         catch (IOException e) {
             throw new Exception(e);
@@ -69,7 +71,7 @@ public class IslandIO {
         }
 
         Hex hex = Hex.at(line, diag);
-        island.putField(hex, field);
+        island.doPutField(hex, field);
     }
 
     public static void write(CharSink sink, Island island) {

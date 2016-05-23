@@ -61,13 +61,13 @@ public class VolcanoPlacementRules {
 
         if (leftBuilding.getType() == BuildingType.NONE) {
             Village rightVillage = island.getVillage(rightHex);
-            if (rightVillage.getHexSize() == 1) {
+            if (rightVillage.getHexes().size() == 1) {
                 problems.add(PlacementProblem.CANT_DESTROY_VILLAGE);
             }
         }
         else if (rightBuilding.getType() == BuildingType.NONE) {
             Village leftVillage = island.getVillage(leftHex);
-            if (leftVillage.getHexSize() == 1) {
+            if (leftVillage.getHexes().size() == 1) {
                 problems.add(PlacementProblem.CANT_DESTROY_VILLAGE);
             }
         }
@@ -75,14 +75,14 @@ public class VolcanoPlacementRules {
                 && rightBuilding.getType() != BuildingType.NONE
                 && leftBuilding.getColor() == rightBuilding.getColor()) {
             Village village = island.getVillage(leftHex);
-            if (village.getHexSize() == 2) {
+            if (village.getHexes().size() == 2) {
                 problems.add(PlacementProblem.CANT_DESTROY_VILLAGE);
             }
         }
         else {
             Village leftVillage = island.getVillage(leftHex);
             Village rightVillage = island.getVillage(rightHex);
-            if (leftVillage.getHexSize() == 1 || rightVillage.getHexSize() > 1) {
+            if (leftVillage.getHexes().size() == 1 || rightVillage.getHexes().size() > 1) {
                 problems.add(PlacementProblem.CANT_DESTROY_VILLAGE);
             }
         }

@@ -114,7 +114,7 @@ class BasicHeuristics implements Heuristics {
                 Village village = island.getVillage(adjacent);
                 if( !village.hasTemple()) {
                     temple -= bonus;
-                    if (village.getHexSize() < 3)
+                    if (village.getHexes().size() < 3)
                         hut -= 2*bonus;
                 }
                 counter -= bonus;
@@ -132,7 +132,7 @@ class BasicHeuristics implements Heuristics {
                     bonus = -1;
                 Village village = island.getVillage(adjacent);
                 if( !village.hasTemple()) {
-                    temple += bonus*( village.getHexSize() > 3 ? 3 : village.getHexSize());
+                    temple += bonus*( village.getHexes().size() > 3 ? 3 : village.getHexes().size());
                     hut += 2*bonus;
                 }
                 counter += bonus;
@@ -150,7 +150,7 @@ class BasicHeuristics implements Heuristics {
                     bonus = -1;
                 Village village = island.getVillage(adjacent);
                 if( !village.hasTemple()) {
-                    temple += bonus*( village.getHexSize() > 3 ? 3 : village.getHexSize());
+                    temple += bonus*( village.getHexes().size() > 3 ? 3 : village.getHexes().size());
                     hut += 2*bonus;
                 }
                 counter += bonus;

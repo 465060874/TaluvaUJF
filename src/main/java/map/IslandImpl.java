@@ -1,26 +1,27 @@
 package map;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Iterables;
 import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
 
-import java.util.*;
-
-import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static map.Field.SEA;
 
 class  IslandImpl implements Island {
 
     private final HexMap<Field> map;
+    final Villages villages;
 
     IslandImpl() {
         this.map = HexMap.create();
+        this.villages = new Villages(this);
     }
 
     private IslandImpl(IslandImpl island) {
         this.map = island.map.copy();
+        this.villages = island.villages.copy(this);
     }
 
     @Override
@@ -55,107 +56,26 @@ class  IslandImpl implements Island {
 
     @Override
     public Village getVillage(Hex from) {
-        Field fromField = map.getOrDefault(from, SEA);
-        checkArgument(fromField.getBuilding().getType() != BuildingType.NONE, "Village without a building");
-        PlayerColor fromColor = fromField.getBuilding().getColor();
-
-        HexMap<Boolean> queued = HexMap.create();
-        Queue<Hex> queue = new ArrayDeque<>(map.size());
-        queued.put(from, true);
-        queue.add(from);
-
-        ImmutableSet.Builder<Hex> builder = ImmutableSet.builder();
-        boolean hasTower = false;
-        boolean hasTemple = false;
-
-        while (!queue.isEmpty()) {
-            Hex hex = queue.remove();
-            FieldBuilding building = map.getOrDefault(hex, SEA).getBuilding();
-            if (building.getType() == BuildingType.NONE
-                    || building.getColor() != fromColor) {
-                continue;
-            }
-
-            hasTower = hasTower || building.getType() == BuildingType.TOWER;
-            hasTemple = hasTemple || building.getType() == BuildingType.TEMPLE;
-
-            builder.add(hex);
-            for (Hex neighbor : hex.getNeighborhood()) {
-                if (!queued.getOrDefault(neighbor, false)) {
-                    queued.put(neighbor, true);
-                    queue.add(neighbor);
-                }
-            }
-        }
-
-        return new VillageImpl(this, builder.build(), hasTemple, hasTower);
+        return villages.get(from);
     }
 
     @Override
     public Iterable<Village> getVillages(PlayerColor color) {
-        // On regroupe les batiments en village avec un union find
-        HexUnionFind unionFind = new HexUnionFind();
-
-        for (Hex hex : map.hexes()) {
-            Field field = map.get(hex);
-            if (field.getBuilding().getType() == BuildingType.NONE
-                    || field.getBuilding().getColor() != color) {
-                continue;
-            }
-
-            for (Hex neighbor : hex.getNeighborhood()) {
-                Field neighborField = map.getOrDefault(neighbor, SEA);
-
-                // Exploration des couleurs voisines
-                if (neighborField.getBuilding().getType() != BuildingType.NONE
-                        && neighborField.getBuilding().getColor() == color) {
-                    unionFind.union(hex, neighbor);
-                }
-            }
-        }
-
-        // Regroupement des villages par representant
-        SetMultimap<Hex, Hex> villagesHexes = HashMultimap.create();
-        HexMap<Boolean> hasTemple = HexMap.create();
-        HexMap<Boolean> hasTower = HexMap.create();
-
-        for (Hex hex : map.hexes()) {
-            Field field = map.get(hex);
-            if (field.getBuilding().getType() == BuildingType.NONE
-                    || field.getBuilding().getColor() != color) {
-                continue;
-            }
-
-            Hex parent = unionFind.find(hex);
-            villagesHexes.put(parent, hex);
-
-            if (map.get(hex).getBuilding().getType() == BuildingType.TEMPLE) {
-                hasTemple.put(hex, true);
-            }
-            else if (map.get(hex).getBuilding().getType() == BuildingType.TOWER) {
-                hasTower.put(hex, true);
-            }
-        }
-
-        // Construction de la liste de villages
-        ImmutableList.Builder<Village> builder = ImmutableList.builder();
-
-        for (Map.Entry<Hex, Set<Hex>> entry : Multimaps.asMap(villagesHexes).entrySet()) {
-            builder.add(new VillageImpl(this,
-                    ImmutableSet.copyOf(entry.getValue()),
-                    hasTemple.contains(entry.getKey()),
-                    hasTower.contains(entry.getKey())));
-        }
-
-        return builder.build();
+        return villages.getAll(color);
     }
 
+    Field doPutField(Hex hex, Field field) {
+        Field fieldBefore = field == SEA
+                ? map.remove(hex)
+                : map.put(hex, field);
+        return firstNonNull(fieldBefore, SEA);
+    }
+
+    @Override
     public void putField(Hex hex, Field field) {
-        if (field == SEA) {
-            map.remove(hex);
-        }
-        else {
-            map.put(hex, field);
+        Field fieldBefore = doPutField(hex, field);
+        if (fieldBefore.getBuilding().getType() != BuildingType.NONE) {
+            villages.reset();
         }
     }
 
@@ -166,14 +86,20 @@ class  IslandImpl implements Island {
         int level = getField(hex).getLevel() + 1;
 
         putField(hex, Field.create(level, FieldType.VOLCANO, orientation));
-        putField(rightHex, Field.create(level, tile.getRight(), orientation.rightRotation()));
-        putField(leftHex, Field.create(level, tile.getLeft(), orientation.leftRotation()));
+        Field fieldBefore1 = doPutField(rightHex, Field.create(level, tile.getRight(), orientation.rightRotation()));
+        Field fieldBefore2 = doPutField(leftHex, Field.create(level, tile.getLeft(), orientation.leftRotation()));
+        if (fieldBefore1.getBuilding().getType() != BuildingType.NONE
+                || fieldBefore2.getBuilding().getType() != BuildingType.NONE) {
+            villages.reset();
+        }
     }
 
     @Override
     public void putBuilding(Hex hex, FieldBuilding building) {
         if (map.contains(hex)) {
-            map.put(hex, map.get(hex).withBuilding(building));
+            Field fieldBefore = map.get(hex);
+            map.put(hex, fieldBefore.withBuilding(building));
+            villages.update(hex);
         }
     }
 
