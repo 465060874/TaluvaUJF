@@ -3,13 +3,17 @@ package ui;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.Light;
 import javafx.scene.effect.Lighting;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import map.Field;
 
 class HexShape {
+
+    static final boolean IMG_FIELD_TYPE = false;
 
     static final double HEX_SIZE_X = 60d;
     static final double HEX_SIZE_Y = 60d * 0.8d;
@@ -172,11 +176,55 @@ class HexShape {
         throw new IllegalStateException();
     }
 
+    private static final ImagePattern VOLCANO;
+    private static final ImagePattern JUNGLE;
+    private static final ImagePattern CLEARING;
+    private static final ImagePattern SAND;
+    private static final ImagePattern ROCK;
+    private static final ImagePattern LAKE;
+
+    static {
+        if (IMG_FIELD_TYPE) {
+            VOLCANO = new ImagePattern(new Image(HexShape.class.getResource("volcano.png").toString()));
+            JUNGLE = new ImagePattern(new Image(HexShape.class.getResource("jungle.png").toString()));
+            CLEARING = new ImagePattern(new Image(HexShape.class.getResource("clearing.png").toString()));
+            SAND = new ImagePattern(new Image(HexShape.class.getResource("sand.png").toString()));
+            ROCK = new ImagePattern(new Image(HexShape.class.getResource("rock.png").toString()));
+            LAKE = new ImagePattern(new Image(HexShape.class.getResource("lake.png").toString()));
+        }
+        else {
+            VOLCANO = null;
+            JUNGLE = null;
+            CLEARING = null;
+            SAND = null;
+            ROCK = null;
+            LAKE = null;
+        }
+    }
+
+    private static ImagePattern fieldTypeImage(Field field) {
+        switch (field.getType()) {
+            case VOLCANO:  return VOLCANO;
+            case JUNGLE:   return JUNGLE;
+            case CLEARING: return CLEARING;
+            case SAND:     return SAND;
+            case ROCK:     return ROCK;
+            case LAKE:     return LAKE;
+        }
+
+        throw new IllegalStateException();
+    }
+
     private static Paint fieldTypePaint(HexShapeInfo info) {
-        Color color = fieldTypeColor(info.field);
-        return info.isPlacement
-                ? new Color(color.getRed(), color.getGreen(), color.getBlue(), info.isPlacementValid ? .75f : .5f)
-                : color;
+        if (IMG_FIELD_TYPE) {
+            return fieldTypeImage(info.field);
+        }
+        else {
+            Color color = fieldTypeColor(info.field);
+            return info.isPlacement
+                    ? new Color(color.getRed(), color.getGreen(), color.getBlue(), info.isPlacementValid ? .75f : .5f)
+                    : color;
+        }
     }
 
     void draw(GraphicsContext gc, HexShapeInfo info) {

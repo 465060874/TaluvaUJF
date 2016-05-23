@@ -1,13 +1,11 @@
 package ui;
 
 import javafx.geometry.Insets;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import map.Island;
 
 class IslandView extends StackPane {
@@ -36,11 +34,22 @@ class IslandView extends StackPane {
         getChildren().add(islandCanvas);
         getChildren().add(placementOverlay);
 
-        BackgroundFill backgroundFill = new BackgroundFill(
-                IslandCanvas.BG_COLOR,
-                CornerRadii.EMPTY,
-                Insets.EMPTY);
-        setBackground(new Background(backgroundFill));
+        if (HexShape.IMG_FIELD_TYPE) {
+            BackgroundImage bgImage = new BackgroundImage(
+                    new Image(IslandView.class.getResource("sea.jpg").toString()),
+                    BackgroundRepeat.REPEAT,
+                    BackgroundRepeat.REPEAT,
+                    BackgroundPosition.DEFAULT,
+                    BackgroundSize.DEFAULT);
+            setBackground(new Background(bgImage));
+        }
+        else {
+            BackgroundFill backgroundFill = new BackgroundFill(
+                    IslandCanvas.BG_COLOR,
+                    CornerRadii.EMPTY,
+                    Insets.EMPTY);
+            setBackground(new Background(backgroundFill));
+        }
 
         setOnMouseMoved(this::mouseMoved);
         setOnMousePressed(this::mousePressed);

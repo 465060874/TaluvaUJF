@@ -70,11 +70,11 @@ class BuildingShapes {
                 } else {
                     // TODO: More than 3
                     drawHut(gc, building, isPlacement, isPlacementValid,
-                            x - hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
+                            x - hexSizeX / 3, y - hexSizeY / 4, hexSizeX, hexSizeY);
                     drawHut(gc, building, isPlacement, isPlacementValid,
-                            x + hexSizeX / 3, y - hexSizeY / 3, hexSizeX, hexSizeY);
+                            x + hexSizeX / 3, y - hexSizeY / 4, hexSizeX, hexSizeY);
                     drawHut(gc, building, isPlacement, isPlacementValid,
-                            x, y + hexSizeY / 3, hexSizeX, hexSizeY);
+                            x, y + hexSizeY / 2, hexSizeX, hexSizeY);
                 }
                 break;
             case TEMPLE:
