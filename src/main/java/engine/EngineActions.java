@@ -175,7 +175,7 @@ class EngineActions {
             List<ExpandVillageAction> actions = new ArrayList<>(FieldType.values().length);
             for (FieldType fieldType : FieldType.values()) {
                 if (types[fieldType.ordinal()]
-                        && ExpandRules.canExpandVillage(engine, village, fieldType)) {
+                        && ExpandRules.validate(engine, village, fieldType)) {
                     actions.add(new ExpandVillageAction(firstHex, fieldType));
                 }
             }
@@ -236,7 +236,7 @@ class EngineActions {
         for (Map.Entry<Village, FieldType> entry : villageExpansion.entries()) {
             Village village = entry.getKey();
             FieldType fieldType = entry.getValue();
-            if (ExpandRules.canExpandVillage(engine, village, fieldType)) {
+            if (ExpandRules.validate(engine, village, fieldType)) {
                 builder.add(new ExpandVillageAction(village, fieldType));
             }
         }

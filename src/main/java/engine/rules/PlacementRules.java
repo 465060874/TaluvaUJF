@@ -9,8 +9,7 @@ import map.Orientation;
 
 public class PlacementRules {
 
-    public static Problems<PlacementProblem>
-            validate(Island island, VolcanoTile tile, Hex hex, Orientation orientation) {
+    public static Problems validate(Island island, VolcanoTile tile, Hex hex, Orientation orientation) {
         Field field = island.getField(hex);
         if (field == Field.SEA) {
             return SeaPlacementRules.validate(island, tile, hex, orientation);
@@ -19,7 +18,7 @@ public class PlacementRules {
             return VolcanoPlacementRules.validate(island, tile, hex, orientation);
         }
         else {
-            return Problems.of(PlacementProblem.NOT_ON_SEA_OR_VOLCANO);
+            return Problems.of(Problem.NOT_ON_SEA_OR_VOLCANO);
         }
     }
 }

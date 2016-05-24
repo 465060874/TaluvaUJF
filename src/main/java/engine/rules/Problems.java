@@ -6,32 +6,22 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.Iterator;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-public class Problems<P extends Enum<P>> implements Iterable<P> {
+public class Problems implements Iterable<Problem> {
 
     private static final Joiner JOINER = Joiner.on(", ");
 
-    public static <P extends Enum<P>> Problems<P> of(P first, P... others) {
-        Problems<P> p = new Problems<>(first.getDeclaringClass());
-        p.add(first);
-        for (P problem : others) {
+    public static Problems of(Problem... problems) {
+        Problems p = new Problems();
+        for (Problem problem : problems) {
             p.add(problem);
         }
 
         return p;
     }
 
-    public static <P extends Enum<P>> Problems<P> create(Class<P> clazz) {
-        return new Problems<>(clazz);
-    }
-
-    private final P[] values;
     private int mask;
 
-    private Problems(Class<P> clazz) {
-        this.values = clazz.getEnumConstants();
-        checkArgument(values.length <= 32);
+    private Problems() {
         this.mask = 0;
     }
 
@@ -39,33 +29,33 @@ public class Problems<P extends Enum<P>> implements Iterable<P> {
         return mask == 0;
     }
 
-    public boolean has(P problem) {
+    public boolean has(Problem problem) {
         return (mask & (1 << problem.ordinal())) != 0;
     }
 
-    void add(P problem) {
+    void add(Problem problem) {
         mask |= 1 << problem.ordinal();
     }
 
     @Override
-    public Iterator<P> iterator() {
-        if (values == null) {
-            return ImmutableList.<P>of().iterator();
+    public Iterator<Problem> iterator() {
+        if (mask == 0) {
+            return ImmutableList.<Problem>of().iterator();
         }
 
-        return new AbstractIterator<P>() {
+        return new AbstractIterator<Problem>() {
             private int mask = Problems.this.mask;
             private int i = -1;
 
             @Override
-            protected P computeNext() {
+            protected Problem computeNext() {
                 do {
                     i++;
-                    if (i >= values.length) {
+                    if (i >= Problem.values().length) {
                         return endOfData();
                     }
                 } while ((mask & (1 << i)) == 0);
-                return values[i];
+                return Problem.values()[i];
             }
         };
     }
@@ -82,8 +72,7 @@ public class Problems<P extends Enum<P>> implements Iterable<P> {
         }
 
         Problems other = (Problems) obj;
-        return values[0].getClass() == other.values[0].getClass()
-                && mask == other.mask;
+        return mask == other.mask;
     }
 
     @Override

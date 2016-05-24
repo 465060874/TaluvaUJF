@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class ExpandRules {
 
-    public static boolean canExpandVillage(Engine engine, Village village, FieldType fieldType) {
+    public static boolean validate(Engine engine, Village village, FieldType fieldType) {
         Island island = engine.getIsland();
         Set<Hex> expansion = village.getExpandableHexes().get(fieldType);
         if (expansion.isEmpty()) {

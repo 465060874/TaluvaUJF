@@ -21,17 +21,16 @@ public class SeaPlacementRulesTest {
     private static final VolcanoTile TILE = new VolcanoTile(FieldType.JUNGLE, FieldType.JUNGLE);
 
     private void assertValid(Island island, Hex hex, Orientation orientation) {
-        Problems<PlacementProblem> actual = SeaPlacementRules.validate(island, TILE, hex, orientation);
+        Problems actual = SeaPlacementRules.validate(island, TILE, hex, orientation);
         assertTrue("TileAction on sea at " + hex
                         + " with orientation " + orientation
                         + " expected to be valid, but has problems " + actual,
                 actual.isValid());
     }
 
-    private void assertProblems(Island island, Hex hex, Orientation orientation,
-                                PlacementProblem first, PlacementProblem... others) {
-        Problems<PlacementProblem> expected = Problems.of(first, others);
-        Problems<PlacementProblem> actual = SeaPlacementRules.validate(island, TILE, hex, orientation);
+    private void assertProblems(Island island, Hex hex, Orientation orientation, Problem... problems) {
+        Problems expected = Problems.of(problems);
+        Problems actual = SeaPlacementRules.validate(island, TILE, hex, orientation);
         assertEquals("TileAction on sea at " + hex
                         + " with orientation " + orientation
                         + " expected to have problems " + expected
@@ -47,52 +46,52 @@ public class SeaPlacementRulesTest {
         Hex hex;
 
         hex = Hex.at(0, -1);
-        assertProblems(island, hex, Orientation.NORTH, PlacementProblem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.NORTH, Problem.NOT_ALL_ON_SEA);
         assertValid(island, hex, Orientation.NORTH_WEST);
-        assertProblems(island, hex, Orientation.SOUTH_WEST, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.SOUTH, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.SOUTH_EAST, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.NORTH_EAST, PlacementProblem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.SOUTH_WEST, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.SOUTH, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.SOUTH_EAST, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.NORTH_EAST, Problem.NOT_ALL_ON_SEA);
 
         hex = Hex.at(0, 0);
         assertValid(island, hex, Orientation.NORTH);
-        assertProblems(island, hex, Orientation.NORTH_WEST, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.SOUTH_WEST, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.SOUTH, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.SOUTH_EAST, PlacementProblem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.NORTH_WEST, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.SOUTH_WEST, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.SOUTH, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.SOUTH_EAST, Problem.NOT_ALL_ON_SEA);
         assertValid(island, hex, Orientation.NORTH_EAST);
 
         hex = Hex.at(2, -3);
-        assertProblems(island, hex, Orientation.NORTH, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.NORTH_WEST, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.SOUTH_WEST, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.SOUTH, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.SOUTH_EAST, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.NORTH_EAST, PlacementProblem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.NORTH, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.NORTH_WEST, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.SOUTH_WEST, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.SOUTH, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.SOUTH_EAST, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.NORTH_EAST, Problem.NOT_ALL_ON_SEA);
 
         hex = Hex.at(-1, 0);
-        assertProblems(island, hex, Orientation.NORTH, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.NORTH_WEST, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.SOUTH_WEST, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.SOUTH, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.SOUTH_EAST, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.NORTH_EAST, PlacementProblem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.NORTH, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.NORTH_WEST, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.SOUTH_WEST, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.SOUTH, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.SOUTH_EAST, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.NORTH_EAST, Problem.NOT_ALL_ON_SEA);
 
         hex = Hex.at(4, -3);
         assertValid(island, hex, Orientation.NORTH);
         assertValid(island, hex, Orientation.NORTH_WEST);
-        assertProblems(island, hex, Orientation.SOUTH_WEST, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.SOUTH, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.SOUTH_EAST, PlacementProblem.NOT_ALL_ON_SEA);
-        assertProblems(island, hex, Orientation.NORTH_EAST, PlacementProblem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.SOUTH_WEST, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.SOUTH, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.SOUTH_EAST, Problem.NOT_ALL_ON_SEA);
+        assertProblems(island, hex, Orientation.NORTH_EAST, Problem.NOT_ALL_ON_SEA);
 
         hex = Hex.at(-1, -4);
-        assertProblems(island, hex, Orientation.NORTH, PlacementProblem.NOT_ADJACENT_TO_COAST);
+        assertProblems(island, hex, Orientation.NORTH, Problem.NOT_ADJACENT_TO_COAST);
         assertValid(island, hex, Orientation.NORTH_WEST);
         assertValid(island, hex, Orientation.SOUTH_WEST);
-        assertProblems(island, hex, Orientation.SOUTH, PlacementProblem.NOT_ADJACENT_TO_COAST);
-        assertProblems(island, hex, Orientation.SOUTH_EAST, PlacementProblem.NOT_ADJACENT_TO_COAST);
-        assertProblems(island, hex, Orientation.NORTH_EAST, PlacementProblem.NOT_ADJACENT_TO_COAST);
+        assertProblems(island, hex, Orientation.SOUTH, Problem.NOT_ADJACENT_TO_COAST);
+        assertProblems(island, hex, Orientation.SOUTH_EAST, Problem.NOT_ADJACENT_TO_COAST);
+        assertProblems(island, hex, Orientation.NORTH_EAST, Problem.NOT_ADJACENT_TO_COAST);
 
     }
 }
