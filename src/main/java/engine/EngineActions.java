@@ -27,7 +27,9 @@ class EngineActions {
     List<SeaTileAction> seaTiles;
     List<VolcanoTileAction> volcanosTiles;
     List<PlaceBuildingAction> placeBuildings;
+    List<PlaceBuildingAction> newPlaceBuildings;
     List<ExpandVillageAction> expandVillages;
+    List<ExpandVillageAction> newExpandVillages;
 
     EngineActions(Engine engine) {
         this.engine = engine;
@@ -35,7 +37,9 @@ class EngineActions {
         this.seaTiles = ImmutableList.of();
         this.volcanosTiles = ImmutableList.of();
         this.placeBuildings = ImmutableList.of();
+        this.newPlaceBuildings = ImmutableList.of();
         this.expandVillages = ImmutableList.of();
+        this.newExpandVillages = ImmutableList.of();
     }
 
     EngineActions(Engine engine, EngineActions actions) {
@@ -51,22 +55,27 @@ class EngineActions {
         if (engine.getStatus().getTurn() == 0) {
             VolcanoTile tile = engine.getVolcanoTileStack().current();
             Hex originHex = Hex.at(0, 0);
-            seaTiles = ImmutableList.of(new SeaTileAction(tile, originHex, Orientation.NORTH));
-            volcanosTiles = ImmutableList.of();
-            placeBuildings = ImmutableList.of();
-            expandVillages = ImmutableList.of();
-            return;
+            this.seaTiles = ImmutableList.of(new SeaTileAction(tile, originHex, Orientation.NORTH));
+            this.volcanosTiles = ImmutableList.of();
+            this.placeBuildings = ImmutableList.of();
+            this.expandVillages = ImmutableList.of();
+        }
+        else {
+            updateSeaTiles();
+            updateVolcanoTiles();
+            updatePlaceBuildings();
+            updateExpandVillages();
         }
 
-        updateSeaTiles();
-        updateVolcanoTiles();
-        updatePlaceBuildings();
-        updateExpandVillages();
+        this.newPlaceBuildings= ImmutableList.of();
+        this.newExpandVillages = ImmutableList.of();
     }
 
-    void updateBuilding() {
+    void updateWithNewTile(TileAction action) {
         updatePlaceBuildings();
         updateExpandVillages();
+        updateNewPlaceBuildings(action);
+        updateNewExpandVillages(action);
     }
 
     private void updateSeaTiles() {
@@ -206,11 +215,15 @@ class EngineActions {
         this.expandVillages = builder.build();
     }
 
-    List<PlaceBuildingAction> getPlaceBuilding(TileAction action) {
+    private void updateNewPlaceBuildings(TileAction action) {
         ImmutableList.Builder<PlaceBuildingAction> builder = ImmutableList.builder();
         Hex leftHex = action.getLeftHex();
         Hex rightHex = action.getLeftHex();
         for (BuildingType type : BuildingType.values()) {
+            if (type == BuildingType.NONE) {
+                continue;
+            }
+
             if (BuildRules.validate(engine, type, leftHex)) {
                 builder.add(new PlaceBuildingAction(type, leftHex));
             }
@@ -219,10 +232,10 @@ class EngineActions {
             }
         }
 
-        return builder.build();
+        this.newPlaceBuildings = builder.build();
     }
 
-    List<ExpandVillageAction> getExpandVillage(TileAction action) {
+    private void updateNewExpandVillages(TileAction action) {
         ImmutableList.Builder<ExpandVillageAction> builder = ImmutableList.builder();
 
         Island island = engine.getIsland();
@@ -258,6 +271,6 @@ class EngineActions {
             }
         }
 
-        return builder.build();
+        this.newExpandVillages = builder.build();
     }
 }
