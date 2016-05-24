@@ -1,23 +1,19 @@
 package engine;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import data.BuildingType;
-import data.FieldType;
 import data.PlayerColor;
-import data.VolcanoTile;
 import engine.action.*;
 import engine.log.EngineLogger;
 import engine.log.EngineLoggerSetup;
-import engine.rules.BuildRules;
-import engine.rules.ExpandRules;
-import engine.rules.SeaPlacementRules;
-import engine.rules.VolcanoPlacementRules;
 import map.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -41,12 +37,10 @@ class EngineImpl implements Engine {
 
     private EngineStatus status;
     private int playerIndex;
-    private List<ActionSave> actionSaves;
 
-    private HexMap<List<SeaTileAction>> seaPlacements;
-    private HexMap<List<VolcanoTileAction>> volcanosPlacements;
-    private HexMap<List<PlaceBuildingAction>> buildActions;
-    private HexMap<List<ExpandVillageAction>> expandActions;
+
+    private final List<ActionSave> actionSaves;
+    private final EngineActions actions;
 
     /**
      * Package-protected, voir la classe EngineBuilder
@@ -65,12 +59,9 @@ class EngineImpl implements Engine {
 
         this.status = EngineStatus.PENDING_START;
         this.playerIndex = 0;
-        this.actionSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
 
-        this.seaPlacements = HexMap.create();
-        this.volcanosPlacements = HexMap.create();
-        this.buildActions = HexMap.create();
-        this.expandActions = HexMap.create();
+        this.actionSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
+        this.actions = new EngineActions(this);
     }
 
     private EngineImpl(EngineImpl engine) {
@@ -93,13 +84,10 @@ class EngineImpl implements Engine {
                 ? ((EngineStatus.Running) engine.status).copy()
                 : engine.status;
         this.playerIndex = engine.playerIndex;
+
         this.actionSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
         actionSaves.addAll(engine.actionSaves);
-
-        this.seaPlacements = engine.seaPlacements;
-        this.volcanosPlacements = engine.volcanosPlacements;
-        this.buildActions = engine.buildActions;
-        this.expandActions = engine.expandActions;
+        this.actions = new EngineActions(engine.actions);
     }
 
     @Override
@@ -156,10 +144,7 @@ class EngineImpl implements Engine {
         volcanoTileStack.next();
         observers.forEach(o -> o.onTileStackChange(false));
 
-        updateSeaPlacements();
-        updateVolcanoPlacements();
-        updateBuildActions();
-        updateExpandActions();
+        actions.updateAll();
 
         observers.forEach(o -> o.onTileStepStart(false));
         getCurrentPlayer().getHandler().startTileStep();
@@ -205,8 +190,7 @@ class EngineImpl implements Engine {
             observers.forEach(o -> o.onTileStackChange(true));
 
             running.step = EngineStatus.TurnStep.BUILD;
-            updateBuildActions();
-            updateExpandActions();
+            actions.updateAll();
 
             observers.forEach(o -> o.onBuildStepStart(true));
             getCurrentPlayer().getHandler().startBuildStep();
@@ -217,10 +201,7 @@ class EngineImpl implements Engine {
 
             running.step = EngineStatus.TurnStep.TILE;
 
-            updateSeaPlacements();
-            updateVolcanoPlacements();
-            updateBuildActions();
-            updateExpandActions();
+            actions.updateAll();
 
             observers.forEach(o -> o.onTileStepStart(true));
             getCurrentPlayer().getHandler().startTileStep();
@@ -234,10 +215,9 @@ class EngineImpl implements Engine {
         if (running.step == EngineStatus.TurnStep.TILE) {
             running.step = EngineStatus.TurnStep.BUILD;
 
-            updateBuildActions();
-            updateExpandActions();
+            actions.updateBuilding();
 
-            if (buildActions.size() == 0 && expandActions.size() == 0) {
+            if (actions.build.size() == 0 && actions.expand.size() == 0) {
                 Player eliminated = getCurrentPlayer();
                 eliminated.setEliminated();
                 observers.forEach(o -> o.onEliminated(eliminated));
@@ -282,10 +262,7 @@ class EngineImpl implements Engine {
             }
             observers.forEach(o -> o.onTileStackChange(true));
 
-            updateSeaPlacements();
-            updateVolcanoPlacements();
-            updateBuildActions();
-            updateExpandActions();
+            actions.updateAll();
 
             observers.forEach(o -> o.onTileStepStart(true));
             getCurrentPlayer().getHandler().startTileStep();
@@ -320,133 +297,6 @@ class EngineImpl implements Engine {
         return candidates;
     }
 
-    private void updateSeaPlacements() {
-        VolcanoTile tile = volcanoTileStack.current();
-        if (status.getTurn() == 0) {
-            Hex originHex = Hex.at(0, 0);
-            seaPlacements = HexMap.create();
-            seaPlacements.put(originHex, ImmutableList.of(new SeaTileAction(tile, originHex, Orientation.NORTH)));
-            return;
-        }
-
-        HexMap<List<SeaTileAction>> tmpSeaPlacements = HexMap.create();
-
-        for (Hex hex : island.getCoast()) {
-            for (Orientation orientation : Orientation.values()) {
-                if (!SeaPlacementRules.validate(island, tile, hex, orientation).isValid()) {
-                    continue;
-                }
-
-                List<SeaTileAction> list = tmpSeaPlacements.getOrDefault(hex, null);
-                if (list == null) {
-                    list = new ArrayList<>();
-                    tmpSeaPlacements.put(hex, list);
-                }
-
-                list.add(new SeaTileAction(tile, hex, orientation));
-            }
-        }
-
-        this.seaPlacements = tmpSeaPlacements;
-    }
-
-    private void updateVolcanoPlacements() {
-        if (status.getTurn() == 0) {
-            volcanosPlacements = HexMap.create();
-            return;
-        }
-
-        HexMap<List<VolcanoTileAction>> tmpVolcanosPlacements = HexMap.create();
-
-        VolcanoTile tile = volcanoTileStack.current();
-        for (Hex hex : island.getVolcanos()) {
-            for (Orientation orientation : Orientation.values()) {
-                if (!VolcanoPlacementRules.validate(island, tile, hex, orientation).isValid()) {
-                    continue;
-                }
-
-                List<VolcanoTileAction> list = tmpVolcanosPlacements.getOrDefault(hex, null);
-                if (list == null) {
-                    list = new ArrayList<>();
-                    tmpVolcanosPlacements.put(hex, list);
-                }
-
-                list.add(new VolcanoTileAction(tile, hex, orientation));
-            }
-        }
-
-        this.volcanosPlacements = tmpVolcanosPlacements;
-    }
-
-    private void updateBuildActions() {
-        HexMap<List<PlaceBuildingAction>> tmpBuildActions = HexMap.create();
-        for (Hex hex : island.getFields()) {
-            Field field = island.getField(hex);
-            if (field.getBuilding().getType() == BuildingType.NONE) {
-                boolean hutValid = BuildRules.validate(this, BuildingType.HUT, hex);
-                boolean templeValid = BuildRules.validate(this, BuildingType.TEMPLE, hex);
-                boolean towerValid = BuildRules.validate(this, BuildingType.TOWER, hex);
-
-                if (!hutValid && !templeValid && !towerValid) {
-                    continue;
-                }
-
-                List<PlaceBuildingAction> list = tmpBuildActions.getOrDefault(hex, null);
-                if (list == null) {
-                    list = new ArrayList<>();
-                    tmpBuildActions.put(hex, list);
-                }
-
-                if (hutValid) {
-                    list.add(new PlaceBuildingAction(BuildingType.HUT, hex));
-                }
-                if (templeValid) {
-                    list.add(new PlaceBuildingAction(BuildingType.TEMPLE, hex));
-                }
-                if (towerValid) {
-                    list.add(new PlaceBuildingAction(BuildingType.TOWER, hex));
-                }
-            }
-        }
-
-        this.buildActions = tmpBuildActions;
-    }
-
-    private void updateExpandActions() {
-        HexMap<List<ExpandVillageAction>> tmpExpandActions = HexMap.create();
-        Iterable<Village> villages = island.getVillages(getCurrentPlayer().getColor());
-        for (Village village : villages) {
-            Hex firstHex = village.getHexes().iterator().next();
-            boolean[] types = new boolean[FieldType.values().length];
-            for (Hex hex : village.getHexes()) {
-                final Iterable<Hex> neighborhood = hex.getNeighborhood();
-                for (Hex neighbor : neighborhood) {
-                    Field field = island.getField(neighbor);
-                    if (field != Field.SEA
-                            && field.getType().isBuildable()
-                            && field.getBuilding().getType() == BuildingType.NONE) {
-                        types[field.getType().ordinal()] = true;
-                    }
-                }
-            }
-
-            List<ExpandVillageAction> actions = new ArrayList<>(FieldType.values().length);
-            for (FieldType fieldType : FieldType.values()) {
-                if (types[fieldType.ordinal()]
-                        && ExpandRules.canExpandVillage(this, village, fieldType)) {
-                    actions.add(new ExpandVillageAction(firstHex, fieldType));
-                }
-            }
-            if (!actions.isEmpty()) {
-                for (Hex hex : village.getHexes()) {
-                    tmpExpandActions.put(hex, actions);
-                }
-            }
-        }
-
-        this.expandActions = tmpExpandActions;
-    }
-
     @Override
     public EngineStatus getStatus() {
         return status;
@@ -460,19 +310,19 @@ class EngineImpl implements Engine {
     @Override
     public HexMap<? extends Iterable<SeaTileAction>> getSeaPlacements() {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
-        return seaPlacements;
+        return actions.seaTile;
     }
 
     @Override
     public HexMap<? extends Iterable<VolcanoTileAction>> getVolcanoPlacements() {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
-        return volcanosPlacements;
+        return actions.volcanosTile;
     }
 
     @Override
     public HexMap<? extends Iterable<PlaceBuildingAction>> getBuildActions() {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
-        return buildActions;
+        return actions.build;
     }
 
     @Override
@@ -480,27 +330,15 @@ class EngineImpl implements Engine {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
         TileActionSave save = new TileActionSave(this, action);
         action(action);
-
-        ImmutableList.Builder<PlaceBuildingAction> builder = ImmutableList.builder();
-        Hex leftHex = action.getLeftHex();
-        Hex rightHex = action.getLeftHex();
-        for (BuildingType type : BuildingType.values()) {
-            if (BuildRules.validate(this, type, leftHex)) {
-                builder.add(new PlaceBuildingAction(type, leftHex));
-            }
-            if (BuildRules.validate(this, type, rightHex)) {
-                builder.add(new PlaceBuildingAction(type, rightHex));
-            }
-        }
-
+        List<PlaceBuildingAction> result = actions.getBuildActions(action);
         save.revert(this);
-        return builder.build();
+        return result;
     }
 
     @Override
     public HexMap<? extends Iterable<ExpandVillageAction>> getExpandActions() {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
-        return expandActions;
+        return actions.expand;
     }
 
     @Override
@@ -508,39 +346,9 @@ class EngineImpl implements Engine {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
         TileActionSave save = new TileActionSave(this, action);
         action(action);
-
-        ImmutableList.Builder<ExpandVillageAction> builder = ImmutableList.builder();
-
-        PlayerColor color = getCurrentPlayer().getColor();
-        Hex leftHex = action.getLeftHex();
-        Hex rightHex = action.getLeftHex();
-        FieldType leftFieldType = action.getLeftFieldType();
-        FieldType rightFieldType = action.getRightFieldType();
-
-        // NB: Village do not implements hashCode/equals
-        // This store them by identity instead of equality, which is what we want
-        HashMultimap<Village, FieldType> villageExpansion = HashMultimap.create();
-        for (Hex hex : leftHex.getNeighborhood()) {
-            FieldBuilding building = island.getField(hex).getBuilding();
-            if (building.getType() != BuildingType.NONE
-                    && building.getColor() == color) {
-                villageExpansion.put(island.getVillage(hex), leftFieldType);
-            }
-        }
-        for (Hex hex : rightHex.getNeighborhood()) {
-            FieldBuilding building = island.getField(hex).getBuilding();
-            if (building.getType() != BuildingType.NONE
-                    && building.getColor() == color) {
-                villageExpansion.put(island.getVillage(hex), rightFieldType);
-            }
-        }
-
-        for (Map.Entry<Village, FieldType> entry : villageExpansion.entries()) {
-            builder.add(new ExpandVillageAction(entry.getKey(), entry.getValue()));
-        }
-
+        List<ExpandVillageAction> result = actions.getExpandActions(action);
         save.revert(this);
-        return builder.build();
+        return result;
     }
 
     @Override
