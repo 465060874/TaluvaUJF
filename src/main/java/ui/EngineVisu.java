@@ -29,7 +29,7 @@ public class EngineVisu extends Application implements EngineObserver {
     public void start(Stage stage) throws Exception {
         this.engine = EngineBuilder.allVsAll()
                 .logLevel(Level.INFO)
-                //.seed(8006677791747077112L)
+                //.seed(8006695491958633869)
                 .player(PlayerColor.RED, uiWrap(PlayerHandler.dumbFactory()))
                 .player(PlayerColor.WHITE, uiWrap(BotPlayerHandler.factory(16, 2)))
                 .build();

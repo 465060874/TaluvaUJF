@@ -116,7 +116,7 @@ class BotPlayer {
 
     // Fonction qui classe les coups selon la stratégie choisie
     // !!! NE PLUS UTILISER
-    private void branchSort(Engine engine, int[] strategyPoints, Move[] branchMoves) {
+    private int branchSort(Engine engine, int[] strategyPoints, Move[] branchMoves) {
         int comp = 0;
         // POUR GERER LE CAS OU LE JOUEUR NE PEUT PLUS JOUER AUCUN COUP
         branchMoves[0] = null;
@@ -165,7 +165,7 @@ class BotPlayer {
             }
             engine.cancelLastStep();
         }
-        engine.logger().fine("[Sort] {0} evaluations made", comp);
+        engine.logger().info("[Sort] {0} evaluations made", comp);
 
         // On choisit les meilleurs coups
         int ind = 0;
@@ -188,7 +188,7 @@ class BotPlayer {
                 branchMoves[ind++] = m;
             }
         }
-
+        return branchingFactor;
     }
 
     // Retourne le nombre de coups ajoutes dans le tableau branchMoves
@@ -287,11 +287,11 @@ class BotPlayer {
         Move m = moves.poll();
         while( nb > 0 ){
             // Si plus aucun coup possible
-            if( m == null && ( place == null || build == null )){
+            if( (m == null && ( place == null || build == null ))) {
                 return added;
             }
             // Si aucun coup entier ou s'ils sont tous moins bons que la premiere combinaison
-            else if( m == null || m.points < place.points + build.points ) {
+            else if( place != null && build != null && ( m == null || m.points < place.points + build.points )) {
                 // Teste de compatibilite entre les deux actions
                 if (compatible(engine, place.tileAction, build.buildingAction)) {
                     // Ajout sans doublon dans le tableau branchMoves[]
@@ -328,13 +328,15 @@ class BotPlayer {
                     }
                 }
             }// Sinon on ajoute le coup entier et on passe au suivant
-            else{
+            else if( m != null){
                 if( add( m, branchMoves, ind) ) {
                     ind++;
                     nb--;
                     added++;
                 }
                 m = moves.poll();
+            }else{
+                return added;
             }
         }
         return added;

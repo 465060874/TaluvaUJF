@@ -7,6 +7,9 @@ import map.*;
 import java.util.List;
 import java.util.Random;
 import java.util.PriorityQueue;
+import java.util.concurrent.TimeUnit;
+
+import static java.lang.Thread.sleep;
 
 class BasicHeuristics implements Heuristics {
     // Critères d'évaluation pondérés
@@ -27,6 +30,7 @@ class BasicHeuristics implements Heuristics {
     final static int COUNTERSTRATEGY = 3;
 
     BasicHeuristics() {
+
     }
 
     public void chooseStrategies (Engine e , int [] StrategyValues, int BranchingFactor ){
@@ -100,23 +104,26 @@ class BasicHeuristics implements Heuristics {
 
     public int evaluateSeaPlacement(Engine e, SeaTileAction move){
         int tower = 0, temple = 0, hut = 0, counter = 0;
+        int scale = 2;
         Island island = e.getIsland();
         Hex hex = move.getVolcanoHex();
         int bonus;
         for (Neighbor neighbor : Neighbor.values()) {
             Hex adjacent = hex.getNeighbor(neighbor);
             BuildingType building = island.getField(adjacent).getBuilding().getType();
-            if( building == BuildingType.HUT && island.getField(adjacent).getLevel() == 1){ // REGARDER LE NIVEAU
+            // Si on place le volcan a côté de huttes -> possibilité de les écraser plus tard
+            if( building == BuildingType.HUT && island.getField(adjacent).getLevel() == 1){
                 if( island.getField(adjacent).getBuilding().getColor() == e.getCurrentPlayer().getColor())
                     bonus = 1;
                 else
                     bonus = -1;
                 Village village = island.getVillage(adjacent);
                 if( !village.hasTemple()) {
-                    temple -= bonus;
+                    temple -= bonus; // Ecraser une de ses propres villes pourrait faire perdre des points pour temple
                     if (village.getHexes().size() < 3)
-                        hut -= 2*bonus;
+                        hut -= 2*bonus; // Ecraser un petit village ( i.e l'annihiler ) est mauvais pour la strategie hutte
                 }
+                // Peut être tester si on peut accéder à un espace haut de 3 du haut
                 counter -= bonus;
             }
         }
@@ -156,18 +163,81 @@ class BasicHeuristics implements Heuristics {
                 counter += bonus;
             }
         }
-        return 0;
+        return scale * (temple + tower + hut + counter );
     }
 
     public int evaluateVolcanoPlacement(Engine e, VolcanoTileAction move){
-        return e.getRandom().nextInt(40) - 20;
+        int tower = 0, temple = 0, hut = 0, counter = 0;
+        int scale = 1;
+        int res = 0;
+        Island island = e.getIsland();
+        Hex hex = move.getVolcanoHex();
+        int bonus;
+        for (Neighbor neighbor : Neighbor.values()) {
+            Hex adjacent = hex.getNeighbor(neighbor);
+            BuildingType building = island.getField(adjacent).getBuilding().getType();
+            // Si on place le volcan a côté de huttes -> possibilité de les écraser plus tard
+            if( building == BuildingType.HUT && island.getField(adjacent).getLevel() == island.getField(hex).getLevel() + 1 ){
+                if( island.getField(adjacent).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+                    bonus = 1;
+                else
+                    bonus = -1;
+                Village village = island.getVillage(adjacent);
+                if( !village.hasTemple()) {
+                    temple -= bonus; // Ecraser une de ses propres villes pourrait faire perdre des points pour temple
+                    if (village.getHexes().size() < 3)
+                        hut -= 2*bonus; // Ecraser un petit village ( i.e l'annihiler ) est mauvais pour la strategie hutte
+                }
+                // Peut être tester si on peut accéder à un espace haut de 3 du haut
+                counter -= bonus;
+            }
+        }
+
+        // Etude des hex qu'on va écraser
+        hex = move.getLeftHex();
+        BuildingType building = island.getField(hex).getBuilding().getType();
+        if( building != BuildingType.NONE ){
+            if( island.getField(hex).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+                bonus = 2;
+            else
+                bonus = -2;
+            Village village = island.getVillage(hex);
+            if( !village.hasTemple()) {
+                temple -= bonus*( village.getHexes().size() > 3 ? 3 : village.getHexes().size());
+            }
+            if( !village.hasTower())
+                tower -= bonus*( village.getHexes().size() > 2 ? 2 : village.getHexes().size());
+            counter -= 2*bonus;
+            res -= scale*bonus;
+        }
+
+
+        hex = move.getRightHex();
+        building = island.getField(hex).getBuilding().getType();
+        if( building != BuildingType.NONE ){
+            if( island.getField(hex).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+                bonus = 2;
+            else
+                bonus = -2;
+            Village village = island.getVillage(hex);
+            if( !village.hasTemple()) {
+                temple -= bonus*( village.getHexes().size() > 3 ? 3 : village.getHexes().size());
+            }
+            if( !village.hasTower())
+                tower -= bonus*( village.getHexes().size() > 2 ? 2 : village.getHexes().size());
+            counter -= 2*bonus;
+            res -= scale*bonus;
+        }
+        return res*40;
     }
 
     public int evaluateBuildAction(Engine e, TileAction tileAction, PlaceBuildingAction move, int pointsPlacement, PriorityQueue<Move>[] strategiesQueues){
         Move m;
         Random r = e.getRandom();
+        long t = System.nanoTime() + TimeUnit.MICROSECONDS.toNanos(50);
+        while (System.nanoTime() < t) { }
         for (int i = 0; i < nbStrategies; i++) {
-            m = new Move( move, tileAction, r.nextInt(40) + pointsPlacement - 20 );
+            m = new Move( move, tileAction, pointsPlacement);
             strategiesQueues[i].add(m);
         }
         return 0;
@@ -176,8 +246,10 @@ class BasicHeuristics implements Heuristics {
     public int evaluateExpandAction(Engine e, TileAction tileAction, ExpandVillageAction move, int pointsPlacement, PriorityQueue<Move>[] strategiesQueues){
         Move m;
         Random r = e.getRandom();
+        long t = System.nanoTime() + TimeUnit.MICROSECONDS.toNanos(50);
+        while (System.nanoTime() < t) { }
         for (int i = 0; i < nbStrategies; i++) {
-            m = new Move( move, tileAction, r.nextInt(40) + pointsPlacement - 20 );
+            m = new Move( move, tileAction, pointsPlacement );
             strategiesQueues[i].add(m);
         }
         return 0;
