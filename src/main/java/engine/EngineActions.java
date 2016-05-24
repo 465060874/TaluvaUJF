@@ -23,80 +23,83 @@ import java.util.Map;
 class EngineActions {
 
     private final Engine engine;
-    HexMap<List<SeaTileAction>> seaTile;
-    HexMap<List<VolcanoTileAction>> volcanosTile;
-    HexMap<List<PlaceBuildingAction>> build;
-    HexMap<List<ExpandVillageAction>> expand;
+
+    List<SeaTileAction> seaTiles;
+    List<VolcanoTileAction> volcanosTiles;
+    List<PlaceBuildingAction> placeBuildings;
+    List<ExpandVillageAction> expandVillages;
 
     EngineActions(Engine engine) {
         this.engine = engine;
 
-        this.seaTile = HexMap.create();
-        this.volcanosTile = HexMap.create();
-        this.build = HexMap.create();
-        this.expand = HexMap.create();
+        this.seaTiles = ImmutableList.of();
+        this.volcanosTiles = ImmutableList.of();
+        this.placeBuildings = ImmutableList.of();
+        this.expandVillages = ImmutableList.of();
     }
 
     EngineActions(EngineActions actions) {
         this.engine = actions.engine;
 
-        this.seaTile = actions.seaTile;
-        this.volcanosTile = actions.volcanosTile;
-        this.build = actions.build;
-        this.expand = actions.expand;
+        this.seaTiles = actions.seaTiles;
+        this.volcanosTiles = actions.volcanosTiles;
+        this.placeBuildings = actions.placeBuildings;
+        this.expandVillages = actions.expandVillages;
     }
 
     void updateAll() {
-        updateSeaTile();
-        updateVolcanoTile();
-        updateBuild();
-        updateExpand();
-    }
-
-    void updateBuilding() {
-        updateBuild();
-        updateExpand();
-    }
-
-    private void updateSeaTile() {
-        VolcanoTile tile = engine.getVolcanoTileStack().current();
         if (engine.getStatus().getTurn() == 0) {
+            VolcanoTile tile = engine.getVolcanoTileStack().current();
             Hex originHex = Hex.at(0, 0);
-            seaTile = HexMap.create();
-            seaTile.put(originHex, ImmutableList.of(new SeaTileAction(tile, originHex, Orientation.NORTH)));
+            seaTiles = ImmutableList.of(new SeaTileAction(tile, originHex, Orientation.NORTH));
+            volcanosTiles = ImmutableList.of();
+            placeBuildings = ImmutableList.of();
+            expandVillages = ImmutableList.of();
             return;
         }
 
-        Island island = engine.getIsland();
-        HexMap<List<SeaTileAction>> tmpSeaPlacements = HexMap.create();
+        updateSeaTiles();
+        updateVolcanoTiles();
+        updatePlaceBuildings();
+        updateExpandVillages();
+    }
 
+    void updateBuilding() {
+        updatePlaceBuildings();
+        updateExpandVillages();
+    }
+
+    private void updateSeaTiles() {
+        Island island = engine.getIsland();
+        VolcanoTile tile = engine.getVolcanoTileStack().current();
+
+        HexMap<List<SeaTileAction>> seaTilesMap = HexMap.create();
         for (Hex hex : island.getCoast()) {
             for (Orientation orientation : Orientation.values()) {
                 if (!SeaPlacementRules.validate(island, tile, hex, orientation).isValid()) {
                     continue;
                 }
 
-                List<SeaTileAction> list = tmpSeaPlacements.getOrDefault(hex, null);
+                List<SeaTileAction> list = seaTilesMap.getOrDefault(hex, null);
                 if (list == null) {
                     list = new ArrayList<>();
-                    tmpSeaPlacements.put(hex, list);
+                    seaTilesMap.put(hex, list);
                 }
 
                 list.add(new SeaTileAction(tile, hex, orientation));
             }
         }
 
-        this.seaTile = tmpSeaPlacements;
+        ImmutableList.Builder<SeaTileAction> builder = ImmutableList.builder();
+        for (List<SeaTileAction> actions : seaTilesMap.values()) {
+            builder.addAll(actions);
+        }
+        this.seaTiles = builder.build();
     }
 
-    private void updateVolcanoTile() {
-        if (engine.getStatus().getTurn() == 0) {
-            volcanosTile = HexMap.create();
-            return;
-        }
-
+    private void updateVolcanoTiles() {
         Island island = engine.getIsland();
-        HexMap<List<VolcanoTileAction>> tmpVolcanosPlacements = HexMap.create();
+        HexMap<List<VolcanoTileAction>> volcanoTilesMap = HexMap.create();
 
         VolcanoTile tile = engine.getVolcanoTileStack().current();
         for (Hex hex : island.getVolcanos()) {
@@ -105,22 +108,27 @@ class EngineActions {
                     continue;
                 }
 
-                List<VolcanoTileAction> list = tmpVolcanosPlacements.getOrDefault(hex, null);
+                List<VolcanoTileAction> list = volcanoTilesMap.getOrDefault(hex, null);
                 if (list == null) {
                     list = new ArrayList<>();
-                    tmpVolcanosPlacements.put(hex, list);
+                    volcanoTilesMap.put(hex, list);
                 }
 
                 list.add(new VolcanoTileAction(tile, hex, orientation));
             }
         }
 
-        this.volcanosTile = tmpVolcanosPlacements;
+        ImmutableList.Builder<VolcanoTileAction> builder = ImmutableList.builder();
+        for (List<VolcanoTileAction> actions : volcanoTilesMap.values()) {
+            builder.addAll(actions);
+        }
+        this.volcanosTiles = builder.build();
     }
 
-    private void updateBuild() {
+    private void updatePlaceBuildings() {
         Island island = engine.getIsland();
-        HexMap<List<PlaceBuildingAction>> tmpBuildActions = HexMap.create();
+
+        HexMap<List<PlaceBuildingAction>> buildsMap = HexMap.create();
         for (Hex hex : island.getFields()) {
             Field field = island.getField(hex);
             if (field.getBuilding().getType() == BuildingType.NONE) {
@@ -132,10 +140,10 @@ class EngineActions {
                     continue;
                 }
 
-                List<PlaceBuildingAction> list = tmpBuildActions.getOrDefault(hex, null);
+                List<PlaceBuildingAction> list = buildsMap.getOrDefault(hex, null);
                 if (list == null) {
                     list = new ArrayList<>();
-                    tmpBuildActions.put(hex, list);
+                    buildsMap.put(hex, list);
                 }
 
                 if (hutValid) {
@@ -150,13 +158,18 @@ class EngineActions {
             }
         }
 
-        this.build = tmpBuildActions;
+        ImmutableList.Builder<PlaceBuildingAction> builder = ImmutableList.builder();
+        for (List<PlaceBuildingAction> actions : buildsMap.values()) {
+            builder.addAll(actions);
+        }
+        this.placeBuildings = builder.build();
     }
 
-    private void updateExpand() {
+    private void updateExpandVillages() {
         Island island = engine.getIsland();
-        HexMap<List<ExpandVillageAction>> tmpExpandActions = HexMap.create();
         Iterable<Village> villages = island.getVillages(engine.getCurrentPlayer().getColor());
+
+        HexMap<List<ExpandVillageAction>> expandsMap = HexMap.create();
         for (Village village : villages) {
             Hex firstHex = village.getHexes().iterator().next();
             boolean[] types = new boolean[FieldType.values().length];
@@ -181,15 +194,19 @@ class EngineActions {
             }
             if (!actions.isEmpty()) {
                 for (Hex hex : village.getHexes()) {
-                    tmpExpandActions.put(hex, actions);
+                    expandsMap.put(hex, actions);
                 }
             }
         }
 
-        this.expand = tmpExpandActions;
+        ImmutableList.Builder<ExpandVillageAction> builder = ImmutableList.builder();
+        for (List<ExpandVillageAction> actions : expandsMap.values()) {
+            builder.addAll(actions);
+        }
+        this.expandVillages = builder.build();
     }
 
-    List<PlaceBuildingAction> getBuildActions(TileAction action) {
+    List<PlaceBuildingAction> getPlaceBuilding(TileAction action) {
         ImmutableList.Builder<PlaceBuildingAction> builder = ImmutableList.builder();
         Hex leftHex = action.getLeftHex();
         Hex rightHex = action.getLeftHex();
@@ -205,7 +222,7 @@ class EngineActions {
         return builder.build();
     }
 
-    List<ExpandVillageAction> getExpandActions(TileAction action) {
+    List<ExpandVillageAction> getExpandVillage(TileAction action) {
         ImmutableList.Builder<ExpandVillageAction> builder = ImmutableList.builder();
 
         Island island = engine.getIsland();

@@ -1,8 +1,9 @@
 package engine;
 
-import com.google.common.collect.Iterables;
 import data.BuildingType;
-import engine.action.*;
+import engine.action.BuildingAction;
+import engine.action.PlaceBuildingAction;
+import engine.action.TileAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,16 +58,8 @@ class DumbPlayerHandler implements PlayerHandler {
     @Override
     public void startTileStep() {
         List<TileAction> tileActions = new ArrayList<>();
-        if (engine.getVolcanoPlacements().size() == 0 || engine.getRandom().nextInt(3) < 2) {
-            for (Iterable<SeaTileAction> seaPlacements : engine.getSeaPlacements().values()) {
-                Iterables.addAll(tileActions, seaPlacements);
-            }
-        }
-        else {
-            for (Iterable<VolcanoTileAction> volcanoPlacements : engine.getVolcanoPlacements().values()) {
-                Iterables.addAll(tileActions, volcanoPlacements);
-            }
-        }
+        tileActions.addAll(engine.getSeaTileActions());
+        tileActions.addAll(engine.getVolcanoTileActions());
 
         int choice = engine.getRandom().nextInt(tileActions.size());
         TileAction tileAction = tileActions.get(choice);
@@ -77,27 +70,21 @@ class DumbPlayerHandler implements PlayerHandler {
     public void startBuildStep() {
         List<BuildingAction> buildTowerOrTemple = new ArrayList<>();
         List<BuildingAction> buildHut = new ArrayList<>();
-        List<BuildingAction> expandVillage = new ArrayList<>();
-        for (Iterable<PlaceBuildingAction> placements : engine.getBuildActions().values()) {
-            for (PlaceBuildingAction action : placements) {
-                if (action.getType() == BuildingType.HUT) {
-                    buildHut.add(action);
-                }
-                else {
-                    buildTowerOrTemple.add(action);
-                }
+        for (PlaceBuildingAction action : engine.getPlaceBuildingActions()) {
+            if (action.getType() == BuildingType.HUT) {
+                buildHut.add(action);
+            }
+            else {
+                buildTowerOrTemple.add(action);
             }
         }
-        for (Iterable<ExpandVillageAction> placements : engine.getExpandActions().values()) {
-            Iterables.addAll(expandVillage, placements);
-        }
 
-        List<BuildingAction> buildingActions;
+        List<? extends BuildingAction> buildingActions;
         if (!buildTowerOrTemple.isEmpty()) {
             buildingActions = buildTowerOrTemple;
         }
-        else if (!expandVillage.isEmpty()) {
-            buildingActions = expandVillage;
+        else if (!engine.getExpandVillageActions().isEmpty()) {
+            buildingActions = engine.getExpandVillageActions();
         }
         else {
             buildingActions = buildHut;

@@ -2,8 +2,6 @@ package engine;
 
 import engine.action.*;
 import engine.log.EngineLogger;
-import engine.rules.SeaPlacementRules;
-import map.HexMap;
 import map.Island;
 
 import java.util.List;
@@ -84,34 +82,36 @@ public interface Engine {
     /**
      * Retourne la liste des placements possibles de tuiles sur la mer
      */
-    HexMap<? extends Iterable<SeaTileAction>> getSeaPlacements();
+    List<SeaTileAction> getSeaTileActions();
 
     /**
      * Retourne la liste des placements possibles de tuiles sur les volcans
      */
-    HexMap<? extends Iterable<VolcanoTileAction>> getVolcanoPlacements();
+    List<VolcanoTileAction> getVolcanoTileActions();
 
     /**
      * Retourne l'ensemble des constructions possibles pour un tour exceptés
      * ceux liés au placement de tuile du même tour
      */
-    HexMap<? extends Iterable<PlaceBuildingAction>> getBuildActions();
+    List<PlaceBuildingAction> getPlaceBuildingActions();
 
     /**
-     * Retourne la liste des constructions possibles liés au placements de la tuile
+     * Retourne la liste des constructions possibles liés au placement
+     * de la tuile en paramètre
      */
-    List<PlaceBuildingAction> getBuildActions(TileAction action);
+    List<PlaceBuildingAction> getPlaceBuildingActions(TileAction action);
 
     /**
      * Retourne l'ensemble des extensions possibles pour un tour exceptés
      * ceux liés au placement de tuile du même tour
      */
-    HexMap<? extends Iterable<ExpandVillageAction>> getExpandActions();
+    List<ExpandVillageAction> getExpandVillageActions();
 
     /**
-     * Retourne la liste des extensions possibles liés au placements de la tuile
+     * Retourne la liste des extensions possibles liés au placements
+     * de la tuile en paramètre
      */
-    List<ExpandVillageAction> getExpandActions(TileAction action);
+    List<ExpandVillageAction> getExpandVillageActions(TileAction action);
 
     /**
      * Réalise l'action passée en paramètre

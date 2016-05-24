@@ -1,16 +1,11 @@
 package IA;
 
-import com.google.common.collect.Iterables;
 import engine.Engine;
-import engine.EngineLoggerObserver;
 import engine.EngineStatus;
 import engine.action.*;
-import ui.Placement;
 
 import java.util.Iterator;
 import java.util.PriorityQueue;
-
-import static com.google.common.collect.Iterables.getOnlyElement;
 
 class BotPlayer {
 
@@ -35,25 +30,17 @@ class BotPlayer {
 
     // Jouer un coup
     Move play(int depth) {
-        if( realEngine.getStatus().getTurn() == 0 )
-            return doFirstPlay(realEngine);
         Engine engineCopy = realEngine.copyWithoutObservers();
-        //engineCopy.registerObserver(new EngineLoggerObserver(engineCopy, "[IA]"));
-        return doPlay(engineCopy, depth);
+        return realEngine.getStatus().getTurn() == 0
+                ? doFirstPlay(engineCopy)
+                : doPlay(engineCopy, depth);
     }
 
-    private Move doFirstPlay( Engine engine){
-        Move m;
-        TileAction seaPlacement = getOnlyElement(getOnlyElement(engine.getSeaPlacements().values()));
-        Engine engineCopy  = realEngine.copyWithoutObservers();
-        engineCopy.action( seaPlacement );
-        BuildingAction buildAction1 = getOnlyElement(Iterables.get( engineCopy.getBuildActions().values(), 0));
-        BuildingAction buildAction2 = getOnlyElement(Iterables.get( engineCopy.getBuildActions().values(), 1));
-        int n = engine.getRandom().nextInt(2);
-        if( n == 0 )
-            return new Move( buildAction1, seaPlacement, 0);
-        else
-            return new Move( buildAction2, seaPlacement, 0);
+    private Move doFirstPlay(Engine engineCopy){
+        TileAction seaPlacement = engineCopy.getSeaTileActions().get(0);
+        engineCopy.action(seaPlacement);
+        BuildingAction buildAction = engineCopy.getPlaceBuildingActions().get(realEngine.getRandom().nextInt(2));
+        return new Move(buildAction, seaPlacement, 0);
     }
 
 
@@ -111,61 +98,50 @@ class BotPlayer {
     // Fonction qui classe les coups selon la stratégie choisie
     private void branchSort(Engine engine, int[] strategyPoints, Move[] branchMoves) {
         int comp = 0;
+
+        @SuppressWarnings("unchecked")
         PriorityQueue<Move>[] strategiesQueues = new PriorityQueue[NB_STRATEGIES];
         for (int i = 0; i < NB_STRATEGIES; i++)
             strategiesQueues[i] = new PriorityQueue<>((a,b) -> Integer.compare( b.points, a.points));
 
         // Pour tout tileAction dans la mer
-        engine.logger().fine("[Sort] Begin seaPlacements : {0}", engine.getSeaPlacements().size());
-        for (Iterable<SeaTileAction> seaPlacements : engine.getSeaPlacements().values()) {
-            for (SeaTileAction placement  : seaPlacements) {
-                int points = heuristics.evaluateSeaPlacement(engine, placement);
-                engine.placeOnSea(placement);
+        engine.logger().fine("[Sort] Begin seaPlacements : {0}", engine.getSeaTileActions().size());
+        for (SeaTileAction tileAction : engine.getSeaTileActions()) {
+            int points = heuristics.evaluateSeaPlacement(engine, tileAction);
+            engine.placeOnSea(tileAction);
 
-                // Pour toute construction :
-                engine.logger().finer("    [Sort] Begin buildActions : {0}", engine.getBuildActions().size());
-                for (Iterable<PlaceBuildingAction> buildActions : engine.getBuildActions().values()) {
-                    for (PlaceBuildingAction action : buildActions) {
-                        heuristics.evaluateBuildAction(engine, placement, action, points, strategiesQueues);
-                        comp++;
-                    }
-
-                }
-
-                engine.logger().finer("    [Sort] Begin expandActions : {0}", engine.getExpandActions().size());
-                for (Iterable<ExpandVillageAction> expandActions : engine.getExpandActions().values()) {
-                    for (ExpandVillageAction action : expandActions) {
-                        heuristics.evaluateExpandAction(engine, placement, action, points, strategiesQueues);
-                        comp++;
-                    }
-                }
-                engine.cancelLastStep();
+            // Pour toute construction :
+            engine.logger().finer("    [Sort] Begin buildActions : {0}", engine.getPlaceBuildingActions().size());
+            for (PlaceBuildingAction buildingAction : engine.getPlaceBuildingActions()) {
+                heuristics.evaluateBuildAction(engine, tileAction, buildingAction, points, strategiesQueues);
+                comp++;
             }
+
+            engine.logger().finer("    [Sort] Begin expandActions : {0}", engine.getExpandVillageActions().size());
+            for (ExpandVillageAction buildingAction : engine.getExpandVillageActions()) {
+                heuristics.evaluateExpandAction(engine, tileAction, buildingAction, points, strategiesQueues);
+                comp++;
+            }
+            engine.cancelLastStep();
         }
 
-        engine.logger().fine("[Sort] Begin volcanoPlacements : {0}", engine.getVolcanoPlacements().size());
+        engine.logger().fine("[Sort] Begin volcanoPlacements : {0}", engine.getVolcanoTileActions().size());
         // Pour tout tileAction sur la terre
-        for (Iterable<VolcanoTileAction> volcanoPlacements : engine.getVolcanoPlacements().values()) {
-            for (VolcanoTileAction placement  : volcanoPlacements) {
-                int points = heuristics.evaluateVolcanoPlacement(engine, placement);
-                engine.placeOnVolcano(placement);
+        for (VolcanoTileAction tileActions  : engine.getVolcanoTileActions()) {
+            int points = heuristics.evaluateVolcanoPlacement(engine, tileActions);
+            engine.placeOnVolcano(tileActions);
 
-                // Pour toute construction :
-                for (Iterable<PlaceBuildingAction> buildActions : engine.getBuildActions().values()) {
-                    for (PlaceBuildingAction action : buildActions) {
-                        heuristics.evaluateBuildAction(engine, placement, action, points, strategiesQueues);
-                        comp++;
-                    }
-                }
-
-                for (Iterable<ExpandVillageAction> expandActions : engine.getExpandActions().values()) {
-                    for (ExpandVillageAction action : expandActions) {
-                        heuristics.evaluateExpandAction(engine, placement, action, points, strategiesQueues);
-                        comp++;
-                    }
-                }
-                engine.cancelLastStep();
+            // Pour toute construction :
+            for (PlaceBuildingAction buildingAction : engine.getPlaceBuildingActions()) {
+                heuristics.evaluateBuildAction(engine, tileActions, buildingAction, points, strategiesQueues);
+                comp++;
             }
+
+            for (ExpandVillageAction bulidingAction : engine.getExpandVillageActions()) {
+                heuristics.evaluateExpandAction(engine, tileActions, bulidingAction, points, strategiesQueues);
+                comp++;
+            }
+            engine.cancelLastStep();
         }
         engine.logger().fine("[Sort] {0} evaluations made", comp);
 
@@ -206,59 +182,53 @@ class BotPlayer {
         }
 
         // Evaluation des seaPlacements + moves entiers a la volee
-        engine.logger().fine("[Sort] Begin seaPlacements : {0}", engine.getSeaPlacements().size());
-        for (Iterable<SeaTileAction> seaPlacements : engine.getSeaPlacements().values()) {
-            for (SeaTileAction placement  : seaPlacements) {
-                int points = heuristics.evaluateSeaPlacement(engine, placement);
-                // Ajout du placement seul
-                placements.add( new Move(null, placement, points));
-                engine.placeOnSea(placement);
+        engine.logger().fine("[Sort] Begin seaPlacements : {0}", engine.getSeaTileActions().size());
+        for (SeaTileAction tileAction : engine.getSeaTileActions()) {
+            int points = heuristics.evaluateSeaPlacement(engine, tileAction);
+            // Ajout du placement seul
+            placements.add( new Move(null, tileAction, points));
+            engine.placeOnSea(tileAction);
+            comp++;
+            // Pour chaque construction et extension correlee
+            for (PlaceBuildingAction action : engine.getPlaceBuildingActions(tileAction)) {
+                heuristics.evaluateBuildAction(engine, tileAction, action, points, moves);
                 comp++;
-                // Pour chaque construction et extension correlee
-                for (PlaceBuildingAction action : engine.getBuildActions(placement)) {
-                    heuristics.evaluateBuildAction(engine, placement, action, points, moves);
-                    comp++;
-                }
-                for (ExpandVillageAction action : engine.getExpandActions(placement)) {
-                    heuristics.evaluateExpandAction(engine, placement, action, points, moves);
-                    comp++;
-                }
-                engine.cancelLastStep();
             }
+            for (ExpandVillageAction action : engine.getExpandVillageActions(tileAction)) {
+                heuristics.evaluateExpandAction(engine, tileAction, action, points, moves);
+                comp++;
+            }
+            engine.cancelLastStep();
         }
 
         // Evaluation des placements sur la terre + moves entiers a la volee
-        engine.logger().fine("[Sort] Begin volcanoPlacements : {0}", engine.getVolcanoPlacements().size());
-        for (Iterable<VolcanoTileAction> volcanoPlacements : engine.getVolcanoPlacements().values()) {
-            for (VolcanoTileAction placement  : volcanoPlacements) {
-                int points = heuristics.evaluateVolcanoPlacement(engine, placement);
-                placements.add( new Move(null, placement, points));
-                engine.placeOnVolcano(placement);
+        engine.logger().fine("[Sort] Begin volcanoPlacements : {0}", engine.getVolcanoTileActions().size());
+        for (VolcanoTileAction tileAction : engine.getVolcanoTileActions()) {
+            int points = heuristics.evaluateVolcanoPlacement(engine, tileAction);
+            placements.add( new Move(null, tileAction, points));
+            engine.placeOnVolcano(tileAction);
+            comp++;
+
+            for (PlaceBuildingAction buildingaction : engine.getPlaceBuildingActions(tileAction)) {
+                heuristics.evaluateBuildAction(engine, tileAction, buildingaction, points, moves);
                 comp++;
-                for (PlaceBuildingAction action : engine.getBuildActions(placement)) {
-                    heuristics.evaluateBuildAction(engine, placement, action, points, moves);
-                    comp++;
-                }
-                for (ExpandVillageAction action : engine.getExpandActions(placement)) {
-                    heuristics.evaluateExpandAction(engine, placement, action, points, moves);
-                    comp++;
-                }
-                engine.cancelLastStep();
             }
+            for (ExpandVillageAction action : engine.getExpandVillageActions(tileAction)) {
+                heuristics.evaluateExpandAction(engine, tileAction, action, points, moves);
+                comp++;
+            }
+            engine.cancelLastStep();
         }
 
         // Evaluation des constructions seules
-        for (Iterable<PlaceBuildingAction> buildActions : engine.getBuildActions().values()) {
-            for (PlaceBuildingAction action : buildActions) {
-                heuristics.evaluateBuildAction(engine, null, action, 0, building);
-                comp++;
-            }
+        for (PlaceBuildingAction action : engine.getPlaceBuildingActions()) {
+            heuristics.evaluateBuildAction(engine, null, action, 0, building);
+            comp++;
         }
-        for (Iterable<ExpandVillageAction> expandActions : engine.getExpandActions().values()) {
-            for (ExpandVillageAction action : expandActions) {
-                heuristics.evaluateExpandAction(engine, null, action, 0, building);
-                comp++;
-            }
+
+        for (ExpandVillageAction action : engine.getExpandVillageActions()) {
+            heuristics.evaluateExpandAction(engine, null, action, 0, building);
+            comp++;
         }
 
         // Fusion :

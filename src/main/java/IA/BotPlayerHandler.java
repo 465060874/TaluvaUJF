@@ -3,7 +3,6 @@ package IA;
 import engine.Engine;
 import engine.PlayerHandler;
 
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class BotPlayerHandler implements PlayerHandler {
@@ -21,7 +20,7 @@ public class BotPlayerHandler implements PlayerHandler {
     public void startTileStep() {
         long startTime = System.nanoTime();
         move = bot.play(1);
-        engine.logger().info("Fini : {0}",
+        engine.logger().info("[IA] {0}ms pour determiner le coup à jouer",
                 TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
         engine.action(move.tileAction);
     }

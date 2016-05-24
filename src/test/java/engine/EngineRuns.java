@@ -21,7 +21,7 @@ public class EngineRuns {
                 continue;
             }
 
-            engine.logger().info("Game seeded with seed {0} finished because of {1}",
+            engine.logger().info("Game seeded with {0} finished because of {1}",
                     Long.toString(engine.getSeed()),
                     ((EngineStatus.Finished) engine.getStatus()).getWinReason());
         }

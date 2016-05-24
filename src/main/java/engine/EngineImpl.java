@@ -217,7 +217,7 @@ class EngineImpl implements Engine {
 
             actions.updateBuilding();
 
-            if (actions.build.size() == 0 && actions.expand.size() == 0) {
+            if (actions.placeBuildings.size() == 0 && actions.expandVillages.size() == 0) {
                 Player eliminated = getCurrentPlayer();
                 eliminated.setEliminated();
                 observers.forEach(o -> o.onEliminated(eliminated));
@@ -308,45 +308,45 @@ class EngineImpl implements Engine {
     }
 
     @Override
-    public HexMap<? extends Iterable<SeaTileAction>> getSeaPlacements() {
+    public List<SeaTileAction> getSeaTileActions() {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
-        return actions.seaTile;
+        return actions.seaTiles;
     }
 
     @Override
-    public HexMap<? extends Iterable<VolcanoTileAction>> getVolcanoPlacements() {
+    public List<VolcanoTileAction> getVolcanoTileActions() {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
-        return actions.volcanosTile;
+        return actions.volcanosTiles;
     }
 
     @Override
-    public HexMap<? extends Iterable<PlaceBuildingAction>> getBuildActions() {
+    public List<PlaceBuildingAction> getPlaceBuildingActions() {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
-        return actions.build;
+        return actions.placeBuildings;
     }
 
     @Override
-    public List<PlaceBuildingAction> getBuildActions(TileAction action) {
+    public List<PlaceBuildingAction> getPlaceBuildingActions(TileAction action) {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
         TileActionSave save = new TileActionSave(this, action);
         action(action);
-        List<PlaceBuildingAction> result = actions.getBuildActions(action);
+        List<PlaceBuildingAction> result = actions.getPlaceBuilding(action);
         save.revert(this);
         return result;
     }
 
     @Override
-    public HexMap<? extends Iterable<ExpandVillageAction>> getExpandActions() {
+    public List<ExpandVillageAction> getExpandVillageActions() {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
-        return actions.expand;
+        return actions.expandVillages;
     }
 
     @Override
-    public List<ExpandVillageAction> getExpandActions(TileAction action) {
+    public List<ExpandVillageAction> getExpandVillageActions(TileAction action) {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
         TileActionSave save = new TileActionSave(this, action);
         action(action);
-        List<ExpandVillageAction> result = actions.getExpandActions(action);
+        List<ExpandVillageAction> result = actions.getExpandVillage(action);
         save.revert(this);
         return result;
     }
