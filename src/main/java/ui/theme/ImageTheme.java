@@ -7,12 +7,17 @@ import javafx.scene.paint.Paint;
 
 public class ImageTheme extends BasicTheme {
 
-    private final ImagePattern volcano = new ImagePattern(new Image(ImageTheme.class.getResource("volcano.png").toString()));
-    private final ImagePattern jungle = new ImagePattern(new Image(ImageTheme.class.getResource("jungle.png").toString()));
-    private final ImagePattern clearing = new ImagePattern(new Image(ImageTheme.class.getResource("clearing.png").toString()));
-    private final ImagePattern sand = new ImagePattern(new Image(ImageTheme.class.getResource("sand.png").toString()));
-    private final ImagePattern rock = new ImagePattern(new Image(ImageTheme.class.getResource("rock.png").toString()));
-    private final ImagePattern lake = new ImagePattern(new Image(ImageTheme.class.getResource("lake.png").toString()));
+    private static final ImagePattern loadImagePattern(String resourceName) {
+        String resource = ImageTheme.class.getResource(resourceName).toString();
+        return new ImagePattern(new Image(resource));
+    }
+
+    private final ImagePattern volcano = loadImagePattern("fields/volcano.png");
+    private final ImagePattern jungle = loadImagePattern("fields/jungle.png");
+    private final ImagePattern clearing = loadImagePattern("fields/clearing.png");
+    private final ImagePattern sand = loadImagePattern("fields/sand.png");
+    private final ImagePattern rock = loadImagePattern("fields/rock.png");
+    private final ImagePattern lake = loadImagePattern("fields/lake.png");
 
     @Override
     public Paint getTileTopPaint(FieldType type, PlacementState placementState) {

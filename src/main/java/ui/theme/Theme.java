@@ -29,7 +29,7 @@ public interface Theme {
 
     class CurrentThemeHolder {
 
-        private static ObjectProperty<Theme> CURRENT_THEME = new SimpleObjectProperty<>(new ImageTheme());
+        private static ObjectProperty<Theme> CURRENT_THEME = new SimpleObjectProperty<>(new BasicTheme());
     }
 }
 

@@ -5,11 +5,16 @@ import data.PlayerColor;
 import engine.Engine;
 import engine.Player;
 import javafx.beans.Observable;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 
 import java.util.List;
 
@@ -20,7 +25,7 @@ public class Hud extends AnchorPane {
     Button[] playersIcon;
 
     VBox vboxLeft;
-    TextArea textBottom;
+    TextFlow textBottom;
 
     public Hud(Engine engine) {
         this.engine = engine;
@@ -95,12 +100,14 @@ public class Hud extends AnchorPane {
         vboxLeft.getChildren().add(left2);
         //vboxLeft.setSpacing();
 
-        this.textBottom = new TextArea();
-        textBottom.setScrollTop(2);
-        textBottom.setMaxWidth(300);
-        textBottom.disabledProperty();
-        textBottom.setPrefRowCount(2);
-        textBottom.setEditable(false);
+        Font font = new Font(16);
+        Text firstLine = new Text("Text goes here !");
+        firstLine.setFont(font);
+        Text secondLine = new Text("And second line is there");
+        secondLine.setFont(font);
+        this.textBottom = new TextFlow(firstLine, new Text("\n"), secondLine);
+        textBottom.setTextAlignment(TextAlignment.CENTER);
+        textBottom.setPadding(new Insets(0, 0, 10, 0));
 
         if (size > 1) {
             AnchorPane.setLeftAnchor(playersIcon[0], 0.0);
