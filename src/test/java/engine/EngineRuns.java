@@ -1,5 +1,6 @@
 package engine;
 
+import IA.BotPlayerHandler;
 import data.PlayerColor;
 
 import java.util.logging.Level;
@@ -13,7 +14,7 @@ public class EngineRuns {
             Engine engine = EngineBuilder.allVsAll()
                     .logLevel(Level.INFO)
                     .player(PlayerColor.RED, PlayerHandler.dumbFactory())
-                    .player(PlayerColor.WHITE, PlayerHandler.dumbFactory())
+                    .player(PlayerColor.WHITE, BotPlayerHandler.factory(16, 2))
                     .build();
             engine.start();
 

@@ -2,6 +2,7 @@ package engine.action;
 
 import data.FieldType;
 import map.Hex;
+import map.Island;
 import map.Village;
 
 import java.io.BufferedReader;
@@ -24,6 +25,10 @@ public class ExpandVillageAction implements BuildingAction {
 
     public Hex getVillageHex() {
         return villageHex;
+    }
+
+    public Village getVillage(Island island) {
+        return island.getVillage(villageHex);
     }
 
     public FieldType getFieldType() {

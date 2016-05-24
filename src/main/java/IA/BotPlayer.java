@@ -1,11 +1,16 @@
 package IA;
 
+import data.BuildingType;
+import data.FieldType;
 import engine.Engine;
 import engine.EngineStatus;
 import engine.action.*;
+import map.Hex;
 
 import java.util.Iterator;
 import java.util.PriorityQueue;
+
+import static engine.rules.BuildRules.validate;
 
 class BotPlayer {
 
@@ -47,6 +52,17 @@ class BotPlayer {
     private Move doPlay(Engine engine, int depth) {
         engine.logger().fine("PLAY : depth {0}", depth);
 
+        // 0 -- Test d'un gagnant ou perdant
+        // Test effectué au début du coup : si le joueur appartient à la liste des gagnants
+        if( engine.getStatus() instanceof EngineStatus.Finished ){
+            if( ((EngineStatus.Finished) engine.getStatus()).getWinners().contains( engine.getCurrentPlayer()))
+                return new Move( null, null, Integer.MAX_VALUE);
+            else
+                return new Move( null, null, Integer.MIN_VALUE);
+        }
+        // Ou s'il ne peut plus rien jouer...
+
+
         // 1 -- Determiner le poids de chaque stratégie
         heuristics.chooseStrategies(engine,strategyPoints,branchingFactor);
         engine.logger().fine("-> Strategy Chosen\n" +
@@ -55,14 +71,17 @@ class BotPlayer {
 
         // 2 -- Determiner un sous-ensemble pertinent de coups possibles
         Move[] branchMoves = new Move[branchingFactor];
-        branchSort(engine, strategyPoints, branchMoves );
+        branchSortFusion(engine, strategyPoints, branchMoves );
+        // Test du cas où aucun coup n'est jouable !!
+        if( branchMoves[0] == null){
+            return new Move(null, null, Integer.MIN_VALUE);
+        }
+
         engine.logger().fine("-> Branch Chosen");
 
         // 3 -- MIN-MAX sur l'arbre réduit
         // A ce point : strategiesQueues contient les coups possibles pour chaque stratégie.
         // On va donc appeler la fonction de jeu pour l'adversaire dessus...
-
-        // Maintenant il suffit d'appeler la fonction d'evaluation pour l'adversaire
         // Et de choisir le meilleur choix
         Move bestMove = null;
         int bestPoints = Integer.MAX_VALUE;
@@ -72,7 +91,7 @@ class BotPlayer {
             engine.action(branchMoves[i].tileAction);
             engine.action(branchMoves[i].buildingAction);
             if( engine.getStatus() instanceof EngineStatus.Finished ){
-                if( ! ((EngineStatus.Finished) engine.getStatus()).getWinners().contains( engine.getCurrentPlayer()))
+                if( ((EngineStatus.Finished) engine.getStatus()).getWinners().contains( engine.getCurrentPlayer()))
                     return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MAX_VALUE);
                 else
                     return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MIN_VALUE);
@@ -98,6 +117,8 @@ class BotPlayer {
     // Fonction qui classe les coups selon la stratégie choisie
     private void branchSort(Engine engine, int[] strategyPoints, Move[] branchMoves) {
         int comp = 0;
+        // POUR GERER LE CAS OU LE JOUEUR NE PEUT PLUS JOUER AUCUN COUP
+        branchMoves[0] = null;
 
         @SuppressWarnings("unchecked")
         PriorityQueue<Move>[] strategiesQueues = new PriorityQueue[NB_STRATEGIES];
@@ -190,11 +211,11 @@ class BotPlayer {
             engine.placeOnSea(tileAction);
             comp++;
             // Pour chaque construction et extension correlee
-            for (PlaceBuildingAction action : engine.getPlaceBuildingActions(tileAction)) {
+            for (PlaceBuildingAction action : engine.getNewPlaceBuildingActions()) {
                 heuristics.evaluateBuildAction(engine, tileAction, action, points, moves);
                 comp++;
             }
-            for (ExpandVillageAction action : engine.getExpandVillageActions(tileAction)) {
+            for (ExpandVillageAction action : engine.getNewExpandVillageActions()) {
                 heuristics.evaluateExpandAction(engine, tileAction, action, points, moves);
                 comp++;
             }
@@ -209,11 +230,11 @@ class BotPlayer {
             engine.placeOnVolcano(tileAction);
             comp++;
 
-            for (PlaceBuildingAction buildingaction : engine.getPlaceBuildingActions(tileAction)) {
+            for (PlaceBuildingAction buildingaction : engine.getNewPlaceBuildingActions()) {
                 heuristics.evaluateBuildAction(engine, tileAction, buildingaction, points, moves);
                 comp++;
             }
-            for (ExpandVillageAction action : engine.getExpandVillageActions(tileAction)) {
+            for (ExpandVillageAction action : engine.getNewExpandVillageActions()) {
                 heuristics.evaluateExpandAction(engine, tileAction, action, points, moves);
                 comp++;
             }
@@ -236,6 +257,8 @@ class BotPlayer {
         int ind = 0;
         for(int i = 0; i < NB_STRATEGIES; i++ )
             ind += combine(engine, placements, building[i], branchMoves, ind, strategyPoints[i], moves[i]);
+
+        engine.logger().info("[Sort] {0} evaluations", comp);
 
     }
 
@@ -268,12 +291,22 @@ class BotPlayer {
                     return sauv;
                 if (place.points - p.points > build.points - b.points){
                     // On garde le meme placement et on change de construction
-                    build = b;
-                    b = bi.next();
+                    if( bi.hasNext()){
+                        build = b;
+                        b = bi.next();
+                    }else{
+                        place = p;
+                        p = pi.next();
+                    }
                 }else{
                     // On garde la meme construction et on change le placement
-                    place = p;
-                    p = pi.next();
+                    if( pi.hasNext()) {
+                        place = p;
+                        p = pi.next();
+                    }else{
+                        build = b;
+                        b = bi.next();
+                    }
                 }
             }// Sinon on ajoute le coup entier et on passe au suivant
             else{
@@ -289,23 +322,60 @@ class BotPlayer {
 
     private boolean compatible( Engine engine, TileAction placement, BuildingAction build ){
         if( placement instanceof SeaTileAction ){
+            // Construction + placement mer ne pose jamais de problème
             if( build instanceof PlaceBuildingAction )
                 return true;
+            // Si extension et placement mer :
             else{
-                // EXTENSION
-                return false;
+                // On vérifie que le palcement ne modifie pas l'extension :
+                if( placement.getLeftFieldType() == ((ExpandVillageAction)build).getFieldType() ){
+                    for(Hex neighbor : placement.getLeftHex().getNeighborhood() )
+                        if( engine.getIsland().getField(neighbor).getBuilding().getType() != BuildingType.NONE)
+                            if( engine.getIsland().getVillage( neighbor).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
+                                return false;
+                }else if( placement.getRightFieldType() == ((ExpandVillageAction)build).getFieldType() ){
+                    for(Hex neighbor : placement.getRightHex().getNeighborhood() )
+                        if( engine.getIsland().getField(neighbor).getBuilding().getType() != BuildingType.NONE)
+                            if( engine.getIsland().getVillage( neighbor).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
+                                return false;
+                }
+                return true;
             }
         }else{
-            if( build instanceof PlaceBuildingAction )
-                return ( ((VolcanoTileAction)placement).getLeftHex() != ((PlaceBuildingAction)build).getHex()
-                        && ((VolcanoTileAction)placement).getRightHex() != ((PlaceBuildingAction)build).getHex() );
-            else {
-                // EXTENSION
-                return false;
+            // Placement volcan + construction simple
+            if( build instanceof PlaceBuildingAction ) {
+                engine.action(placement);
+                if (!validate(engine, ((PlaceBuildingAction) build).getType(), ((PlaceBuildingAction) build).getHex())) {
+                    engine.cancelLastStep();
+                    return false;
+                }else {
+                    engine.cancelLastStep();
+                    return (placement.getLeftHex() != ((PlaceBuildingAction) build).getHex()
+                            && placement.getRightHex() != ((PlaceBuildingAction) build).getHex());
+                }
+            }else {
+                // On vérifie que le palcement ne modifie pas l'extension :
+                if( placement.getLeftFieldType() == ((ExpandVillageAction)build).getFieldType() ){
+                    for(Hex neighbor : placement.getLeftHex().getNeighborhood() )
+                        if( engine.getIsland().getField(neighbor).getBuilding().getType() != BuildingType.NONE)
+                            if( engine.getIsland().getVillage( neighbor).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
+                                return false;
+                }else if( placement.getRightFieldType() == ((ExpandVillageAction)build).getFieldType() ){
+                    for(Hex neighbor : placement.getRightHex().getNeighborhood() )
+                        if( engine.getIsland().getField(neighbor).getBuilding().getType() != BuildingType.NONE)
+                            if( engine.getIsland().getVillage( neighbor).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
+                                return false;
+                }
+                // On vérifie qu'on écrase pas le village
+                if( engine.getIsland().getField(placement.getLeftHex()).getBuilding().getType() != BuildingType.NONE)
+                    if( engine.getIsland().getVillage( placement.getLeftHex()).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
+                        return false;
+                if( engine.getIsland().getField(placement.getRightHex()).getBuilding().getType() != BuildingType.NONE)
+                    if( engine.getIsland().getVillage( placement.getRightHex()).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
+                        return false;
+                return true;
             }
-            // !!! TEMPLE / TOUR - BuildRules -> validate
         }
-
     }
 
     private boolean add( Move m, Move[] branchMoves, int ind){
