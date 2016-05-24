@@ -75,7 +75,10 @@ class  IslandImpl implements Island {
     public void putField(Hex hex, Field field) {
         Field fieldBefore = doPutField(hex, field);
         if (fieldBefore.getBuilding().getType() != BuildingType.NONE) {
-            villages.reset();
+            villages.reset(hex);
+        }
+        else if (field.getBuilding().getType() != BuildingType.NONE) {
+            villages.update(hex);
         }
     }
 
@@ -86,12 +89,19 @@ class  IslandImpl implements Island {
         int level = getField(hex).getLevel() + 1;
 
         putField(hex, Field.create(level, FieldType.VOLCANO, orientation));
-        Field fieldBefore1 = doPutField(rightHex, Field.create(level, tile.getRight(), orientation.rightRotation()));
-        Field fieldBefore2 = doPutField(leftHex, Field.create(level, tile.getLeft(), orientation.leftRotation()));
-        if (fieldBefore1.getBuilding().getType() != BuildingType.NONE
-                || fieldBefore2.getBuilding().getType() != BuildingType.NONE) {
-            villages.reset();
+        Field leftFieldBefore = doPutField(leftHex, Field.create(level, tile.getLeft(), orientation.leftRotation()));
+        Field rightFieldBefore = doPutField(rightHex, Field.create(level, tile.getRight(), orientation.rightRotation()));
+        if (leftFieldBefore.getBuilding().getType() != BuildingType.NONE
+                && rightFieldBefore.getBuilding().getType() != BuildingType.NONE) {
+            villages.reset(leftHex, rightHex);
         }
+        else if (leftFieldBefore.getBuilding().getType() != BuildingType.NONE) {
+            villages.reset(leftHex);
+        }
+        else if (rightFieldBefore.getBuilding().getType() != BuildingType.NONE) {
+            villages.reset(rightHex);
+        }
+
     }
 
     @Override

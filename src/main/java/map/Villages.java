@@ -32,7 +32,7 @@ class Villages {
         this.perColors = new EnumMap<>(PlayerColor.class);
     }
 
-    public Villages(Villages villages, Island island) {
+    Villages(Villages villages, Island island) {
         this.island = island;
         this.map = new HashMap<>();
         map.putAll(villages.map);
@@ -123,10 +123,38 @@ class Villages {
     }
 
     // TODO optimize
-    void reset() {
-        map.clear();
-        perColors.clear();
+    void reset(Hex... hexes) {
+        Set<Hex> hexesToUpdate = new HashSet<>();
+        for (Hex hex : hexes) {
+            if (map.containsKey(hex)) {
+                Hex root = find(hex);
+                checkState(map.containsKey(root), "Something has gone wrong");
+                Village village = (VillageImpl2) map.get(root);
+                if (perColors.containsKey(village.getColor())) {
+                    perColors.get(village.getColor()).remove(root);
+                }
 
+                if (!hexesToUpdate.contains(hex)) {
+                    hexesToUpdate.addAll(village.getHexes());
+                }
+            }
+        }
+
+        for (Hex hex : hexesToUpdate) {
+            if (island.getField(hex).getBuilding().getType() != BuildingType.NONE) {
+                create(hex);
+            }
+            else {
+                map.remove(hex);
+            }
+        }
+
+        for (Hex hex : hexesToUpdate) {
+            doUpdate(hex);
+        }
+    }
+
+    void populate() {
         for (Hex existing : island.getFields()) {
             FieldBuilding building = island.getField(existing).getBuilding();
             if (building.getType() != BuildingType.NONE) {
@@ -149,20 +177,23 @@ class Villages {
     class VillageImpl2 implements Village {
 
         private final Island island;
+        private final PlayerColor color;
         private final Set<Hex> hexes;
         private final boolean hasTemple;
         private final boolean hasTower;
 
         VillageImpl2(Island island, Hex hex) {
             this.island = island;
+            Field field = island.getField(hex);
+            this.color = field.getBuilding().getColor();
             this.hexes = ImmutableSet.of(hex);
-            FieldBuilding building = island.getField(hex).getBuilding();
-            this.hasTemple = building.getType() == BuildingType.TEMPLE;
-            this.hasTower = building.getType() == BuildingType.TOWER;
+            this.hasTemple = field.getBuilding().getType() == BuildingType.TEMPLE;
+            this.hasTower = field.getBuilding().getType() == BuildingType.TOWER;
         }
 
         VillageImpl2(VillageImpl2 village1, VillageImpl2 village2) {
             this.island = village1.island;
+            this.color = village1.color;
             this.hexes = ImmutableSet.<Hex>builder()
                     .addAll(village1.hexes)
                     .addAll(village2.hexes)
@@ -173,8 +204,7 @@ class Villages {
 
         @Override
         public PlayerColor getColor() {
-            Hex firstHex = hexes.iterator().next();
-            return island.getField(firstHex).getBuilding().getColor();
+            return color;
         }
 
         @Override

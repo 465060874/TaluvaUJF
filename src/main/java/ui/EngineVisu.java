@@ -1,6 +1,5 @@
 package ui;
 
-import IA.BotPlayerHandler;
 import data.PlayerColor;
 import engine.*;
 import engine.action.ExpandVillageAction;
@@ -30,8 +29,8 @@ public class EngineVisu extends Application implements EngineObserver {
         this.engine = EngineBuilder.allVsAll()
                 .logLevel(Level.INFO)
                 //.seed(8006726615907585890L)
-                .player(PlayerColor.RED, uiWrap(BotPlayerHandler::new))
-                .player(PlayerColor.WHITE, uiWrap(BotPlayerHandler::new))
+                .player(PlayerColor.RED, uiWrap(PlayerHandler.dumbFactory()))
+                .player(PlayerColor.WHITE, uiWrap(PlayerHandler.dumbFactory()))
                 .build();
         engine.registerObserver(new EngineLoggerObserver(engine));
         engine.registerObserver(this);

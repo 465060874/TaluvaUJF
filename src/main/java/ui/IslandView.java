@@ -62,12 +62,10 @@ class IslandView extends StackPane {
     }
 
     private void mouseExited(MouseEvent event) {
-        System.out.println("Yop !");
         placement.saveMode();
     }
 
     private void mouseEntered(MouseEvent event) {
-        System.out.println("PPPop ");
         placement.restoreMode();
     }
 

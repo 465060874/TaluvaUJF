@@ -43,7 +43,7 @@ public class IslandIO {
                 readHex(line, island);
             }
 
-            island.villages.reset();
+            island.villages.populate();
         }
         catch (IOException e) {
             throw new Exception(e);
