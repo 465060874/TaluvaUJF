@@ -20,7 +20,7 @@ public class BuildingShapes {
 
         switch (building.getType()) {
             case HUT:
-                if (level == 1) {
+                if (placementState == PlacementState.INVALID || level == 1) {
                     drawHut(gc, building, placementState, x, y, hexSizeX, hexSizeY);
                 } else if (level == 2) {
                     drawHut(gc, building, placementState,
