@@ -1,5 +1,6 @@
 package ui;
 
+import data.ChoosenColors;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -15,13 +16,13 @@ class BuildingShapes {
     private static Color buildingTypeFaceColor(FieldBuilding building) {
         switch (building.getColor()) {
             case RED:
-                return Color.web("BB3F20");
+                return ChoosenColors.RED.color().darker();
             case WHITE:
-                return Color.web("C8C8C8");
+                return ChoosenColors.WHITE.color().darker();
             case BROWN:
-                return Color.web("734D26");
+                return ChoosenColors.BROWN.color().darker();
             case YELLOW:
-                return Color.DARKGOLDENROD;
+                return ChoosenColors.YELLOW.color().darker();
         }
 
         throw new IllegalStateException();
@@ -36,10 +37,10 @@ class BuildingShapes {
 
     private static Color buildingTypeTopColor(FieldBuilding building) {
         switch (building.getColor()) {
-            case RED:    return Color.web("ff471a");
-            case WHITE:  return Color.web("e4e4e4");
-            case BROWN:  return Color.web("996633");
-            case YELLOW: return Color.GOLDENROD;
+            case RED:    return ChoosenColors.RED.color();
+            case WHITE:  return ChoosenColors.WHITE.color();
+            case BROWN:  return ChoosenColors.BROWN.color();
+            case YELLOW: return ChoosenColors.YELLOW.color();
         }
 
         throw new IllegalStateException();

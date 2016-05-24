@@ -1,5 +1,6 @@
 package ui;
 
+import data.ChoosenColors;
 import data.PlayerColor;
 import engine.Engine;
 import engine.Player;
@@ -29,6 +30,7 @@ public class Hud extends AnchorPane {
         this.playersIcon = new Button[size];
 
         List<Player> players = engine.getPlayers();
+        String[] radius = new String[]{"0em 10em 10em 10em","10em 0em 10em 10em","10em 10em 10em 0em","10em 10em 0em 10em"};
         for (int i = 0; i < size; i++) {
             Player player = players.get(i);
             PlayerColor color = player.getColor();
@@ -48,11 +50,33 @@ public class Hud extends AnchorPane {
                     break;
             }
 
+            String iconBgColor = "";
+            switch(color) {
+                case BROWN: iconBgColor = ChoosenColors.BROWN.cssDefinition();
+                    break;
+                case YELLOW: iconBgColor = ChoosenColors.YELLOW.cssDefinition();
+                    break;
+                case RED: iconBgColor = ChoosenColors.RED.cssDefinition();
+                    break;
+                case WHITE: iconBgColor = ChoosenColors.WHITE.cssDefinition();
+                    break;
+            }
+
             playersIcon[i].setStyle(
-                            "-fx-min-width: 177px; " +
-                            "-fx-min-height: 177px; " +
-                            "-fx-max-width: 177px; " +
-                            "-fx-max-height: 177px;"
+                            "-fx-background-color: " + iconBgColor +" ;" +
+                                    "-fx-background-radius: " + radius[i] +" ;" +
+                                    "-fx-min-width: 100px; " +
+                                    "-fx-min-height: 100px; " +
+                                    "-fx-max-width: 172px; " +
+                                    "-fx-max-height: 172px;" +
+                                    "-fx-border-color: rgb(0, 0, 0);" +
+                                    "-fx-border-radius: " + radius[i]+ " ;" +
+                                    "-fx-border-width: 2px;" +
+                                    "-fx-border-style: solid;" +
+                            "-fx-min-width: 100px; " +
+                            "-fx-min-height: 100px; " +
+                            "-fx-max-width: 172px; " +
+                            "-fx-max-height: 172px;"
             );
 
         }
@@ -62,15 +86,16 @@ public class Hud extends AnchorPane {
 
         this.vboxLeft = new VBox();
         Button left1 = new Button();
-        left1.setGraphic(new ImageView("hud/houseHalf.png"));
-        left1.setStyle( "-fx-background-color: transparent;");
+        left1.setGraphic(new ImageView("hud/101__home.png"));
+        left1.setStyle( "-fx-background-color: rgb(0,0,0, 0);");
         left1.setOnAction((e) -> System.out.println("Debug"));
         vboxLeft.getChildren().add(left1);
 
         Button left2 = new Button();
-        left2.setGraphic(new ImageView("hud/save.png"));
-        left2.setStyle( "-fx-background-color: transparent;");
+        left2.setGraphic(new ImageView("hud/027__download.png"));
+        left2.setStyle( "-fx-background-color: rgb(0,0,0, 0);");
         vboxLeft.getChildren().add(left2);
+        //vboxLeft.setSpacing();
 
         this.textBottom = new TextArea();
         textBottom.setScrollTop(2);

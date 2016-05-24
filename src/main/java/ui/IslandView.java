@@ -34,7 +34,7 @@ class IslandView extends StackPane {
         getChildren().add(islandCanvas);
         getChildren().add(placementOverlay);
 
-        if (HexShape.IMG_FIELD_TYPE) {
+        if (false && HexShape.IMG_FIELD_TYPE) {
             BackgroundImage bgImage = new BackgroundImage(
                     new Image(IslandView.class.getResource("sea.jpg").toString()),
                     BackgroundRepeat.REPEAT,
