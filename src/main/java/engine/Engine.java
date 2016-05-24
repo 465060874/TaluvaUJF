@@ -99,7 +99,7 @@ public interface Engine {
      * Retourne la liste des constructions possibles liés au placement
      * de la tuile en paramètre
      */
-    List<PlaceBuildingAction> getPlaceBuildingActions(TileAction action);
+    List<PlaceBuildingAction> getNewPlaceBuildingActions();
 
     /**
      * Retourne l'ensemble des extensions possibles pour un tour exceptés
@@ -111,7 +111,7 @@ public interface Engine {
      * Retourne la liste des extensions possibles liés au placements
      * de la tuile en paramètre
      */
-    List<ExpandVillageAction> getExpandVillageActions(TileAction action);
+    List<ExpandVillageAction> getNewExpandVillageActions();
 
     /**
      * Réalise l'action passée en paramètre

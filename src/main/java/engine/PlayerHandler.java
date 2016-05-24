@@ -1,5 +1,7 @@
 package engine;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import data.BuildingType;
 import engine.action.BuildingAction;
 import engine.action.PlaceBuildingAction;
@@ -70,7 +72,8 @@ class DumbPlayerHandler implements PlayerHandler {
     public void startBuildStep() {
         List<BuildingAction> buildTowerOrTemple = new ArrayList<>();
         List<BuildingAction> buildHut = new ArrayList<>();
-        for (PlaceBuildingAction action : engine.getPlaceBuildingActions()) {
+        for (PlaceBuildingAction action :
+                Iterables.concat(engine.getPlaceBuildingActions(), engine.getNewPlaceBuildingActions())) {
             if (action.getType() == BuildingType.HUT) {
                 buildHut.add(action);
             }
@@ -84,7 +87,10 @@ class DumbPlayerHandler implements PlayerHandler {
             buildingActions = buildTowerOrTemple;
         }
         else if (!engine.getExpandVillageActions().isEmpty()) {
-            buildingActions = engine.getExpandVillageActions();
+            buildingActions = ImmutableList.<BuildingAction>builder()
+                    .addAll(engine.getExpandVillageActions())
+                    .addAll(engine.getNewExpandVillageActions())
+                    .build();
         }
         else {
             buildingActions = buildHut;

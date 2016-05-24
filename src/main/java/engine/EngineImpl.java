@@ -191,6 +191,8 @@ class EngineImpl implements Engine {
 
             running.step = EngineStatus.TurnStep.BUILD;
             actions.updateAll();
+            // TODO See how to handle this:
+            // actions.updateWithNewTile(...);
 
             observers.forEach(o -> o.onBuildStepStart(true));
             getCurrentPlayer().getHandler().startBuildStep();
@@ -215,9 +217,10 @@ class EngineImpl implements Engine {
         if (running.step == EngineStatus.TurnStep.TILE) {
             running.step = EngineStatus.TurnStep.BUILD;
 
-            actions.updateBuilding();
-
-            if (actions.placeBuildings.size() == 0 && actions.expandVillages.size() == 0) {
+            if (actions.placeBuildings.isEmpty()
+                    && actions.newPlaceBuildings.isEmpty()
+                    && actions.expandVillages.isEmpty()
+                    && actions.newExpandVillages.isEmpty()) {
                 Player eliminated = getCurrentPlayer();
                 eliminated.setEliminated();
                 observers.forEach(o -> o.onEliminated(eliminated));
@@ -326,13 +329,9 @@ class EngineImpl implements Engine {
     }
 
     @Override
-    public List<PlaceBuildingAction> getPlaceBuildingActions(TileAction action) {
+    public List<PlaceBuildingAction> getNewPlaceBuildingActions() {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
-        TileActionSave save = new TileActionSave(this, action);
-        action(action);
-        List<PlaceBuildingAction> result = actions.getPlaceBuilding(action);
-        save.revert(this);
-        return result;
+        return actions.newPlaceBuildings;
     }
 
     @Override
@@ -342,13 +341,9 @@ class EngineImpl implements Engine {
     }
 
     @Override
-    public List<ExpandVillageAction> getExpandVillageActions(TileAction action) {
+    public List<ExpandVillageAction> getNewExpandVillageActions() {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
-        TileActionSave save = new TileActionSave(this, action);
-        action(action);
-        List<ExpandVillageAction> result = actions.getExpandVillage(action);
-        save.revert(this);
-        return result;
+        return actions.newExpandVillages;
     }
 
     @Override
@@ -379,20 +374,22 @@ class EngineImpl implements Engine {
         actionSaves.add(new TileActionSave(this, action));
         island.putTile(volcanoTileStack.current(), action.getVolcanoHex(), action.getOrientation());
 
+        actions.updateWithNewTile(action);
         observers.forEach(o -> o.onTilePlacementOnSea(action));
         nextStep();
     }
 
     @Override
-    public synchronized void placeOnVolcano(VolcanoTileAction placement) {
+    public synchronized void placeOnVolcano(VolcanoTileAction action) {
         checkState(status instanceof EngineStatus.Running, "Can't do an action while the game is not running");
         checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
                 "Can't place a tile during building step");
 
-        actionSaves.add(new TileActionSave(this, placement));
-        island.putTile(volcanoTileStack.current(), placement.getVolcanoHex(), placement.getOrientation());
+        actionSaves.add(new TileActionSave(this, action));
+        island.putTile(volcanoTileStack.current(), action.getVolcanoHex(), action.getOrientation());
 
-        observers.forEach(o -> o.onTilePlacementOnVolcano(placement));
+        actions.updateWithNewTile(action);
+        observers.forEach(o -> o.onTilePlacementOnVolcano(action));
         nextStep();
     }
 
