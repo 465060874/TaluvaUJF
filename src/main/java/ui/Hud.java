@@ -89,14 +89,21 @@ public class Hud extends AnchorPane {
 
         this.vboxLeft = new VBox();
         Button left1 = new Button();
-        left1.setGraphic(new ImageView("hud/101__home.png"));
+        ImageView homeImageView = new ImageView("hud/home.png");
+        homeImageView.setFitWidth(60);
+        homeImageView.setFitHeight(60);
+        left1.setGraphic(homeImageView);
         left1.setStyle( "-fx-background-color: rgb(0,0,0, 0);");
-        left1.setOnAction((e) -> System.out.println("Debug"));
+        left1.setOnAction((e) -> System.out.println("Home !"));
         vboxLeft.getChildren().add(left1);
 
         Button left2 = new Button();
-        left2.setGraphic(new ImageView("hud/027__download.png"));
+        ImageView saveImageView = new ImageView("hud/save.png");
+        saveImageView.setFitWidth(60);
+        saveImageView.setFitHeight(60);
+        left2.setGraphic(saveImageView);
         left2.setStyle( "-fx-background-color: rgb(0,0,0, 0);");
+        left2.setOnAction((e) -> System.out.println("Save !"));
         vboxLeft.getChildren().add(left2);
         //vboxLeft.setSpacing();
 
