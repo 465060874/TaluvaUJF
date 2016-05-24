@@ -71,7 +71,7 @@ class BotPlayer {
 
         // 2 -- Determiner un sous-ensemble pertinent de coups possibles
         Move[] branchMoves = new Move[branchingFactor];
-        branchSortFusion(engine, strategyPoints, branchMoves );
+        int branchNb = branchSortFusion(engine, strategyPoints, branchMoves );
         // Test du cas où aucun coup n'est jouable !!
         if( branchMoves[0] == null){
             return new Move(null, null, Integer.MIN_VALUE);
@@ -87,7 +87,7 @@ class BotPlayer {
         int bestPoints = Integer.MAX_VALUE;
         int bestConfigPoints = Integer.MIN_VALUE;
         int p;
-        for (int i = 0; i < branchingFactor; i++) {
+        for (int i = 0; i < branchNb; i++) {
             engine.action(branchMoves[i].tileAction);
             engine.action(branchMoves[i].buildingAction);
             if( engine.getStatus() instanceof EngineStatus.Finished ){
@@ -115,6 +115,7 @@ class BotPlayer {
     }
 
     // Fonction qui classe les coups selon la stratégie choisie
+    // !!! NE PLUS UTILISER
     private void branchSort(Engine engine, int[] strategyPoints, Move[] branchMoves) {
         int comp = 0;
         // POUR GERER LE CAS OU LE JOUEUR NE PEUT PLUS JOUER AUCUN COUP
@@ -190,7 +191,8 @@ class BotPlayer {
 
     }
 
-    private void branchSortFusion( Engine engine, int [] strategyPoints, Move [] branchMoves) {
+    // Retourne le nombre de coups ajoutes dans le tableau branchMoves
+    private int branchSortFusion( Engine engine, int [] strategyPoints, Move [] branchMoves) {
         int comp = 0;
         // Donnees pour classer les differents coups ( placements, constructions, move complet ... )
         PriorityQueue<Move> placements = new PriorityQueue<Move>((a,b) -> Integer.compare( b.points, a.points));
@@ -259,44 +261,58 @@ class BotPlayer {
             ind += combine(engine, placements, building[i], branchMoves, ind, strategyPoints[i], moves[i]);
 
         engine.logger().info("[Sort] {0} evaluations", comp);
-
+        return ind;
     }
 
     // Ajoute à partir de l'indice ind dans branchMoves[] nb moves les meilleurs en combinant les placements <placements> et les constructions <building> et les coups entiers <moves>
-    // Renvoie l'argument nb
+    // Renvoie le nombre de coups ajoutes
     private int combine( Engine engine, PriorityQueue<Move> placements, PriorityQueue<Move> building, Move[] branchMoves, int ind, int nb, PriorityQueue<Move> moves){
-        Move place, build, p, b;
-        int sauv = nb;
+        Move place, build, p = null, b = null;
+        int added = 0;
         Iterator<Move> pi, bi;
         place = placements.peek();
         build = building.peek();
         pi = placements.iterator();
         bi = building.iterator();
-        b = bi.next();
-        p = pi.next();
+        // Cas ou aucun placement ou aucune construction n'est possible
+        if( !(bi.hasNext() && pi.hasNext()) ) {
+            if (moves.size() == 0)
+                return 0;
+            place = null;
+            build = null;
+        }else {
+            b = bi.next();
+            p = pi.next();
+        }
         Move m = moves.poll();
         while( nb > 0 ){
+            // Si plus aucun coup possible
+            if( m == null && ( place == null || build == null )){
+                return added;
+            }
             // Si aucun coup entier ou s'ils sont tous moins bons que la premiere combinaison
-            if( m == null || m.points < place.points + build.points ) {
+            else if( m == null || m.points < place.points + build.points ) {
                 // Teste de compatibilite entre les deux actions
                 if (compatible(engine, place.tileAction, build.buildingAction)) {
                     // Ajout sans doublon dans le tableau branchMoves[]
                     if( add( new Move(build.buildingAction, place.tileAction, place.points + build.points), branchMoves, ind) ) {
                         nb--;
                         ind++;
+                        added++;
                     }
                 }
-                // Cas d'erreur qui ne devrait pas apparaître !
-                if (!pi.hasNext() && !bi.hasNext())
-                    return sauv;
                 if (place.points - p.points > build.points - b.points){
                     // On garde le meme placement et on change de construction
                     if( bi.hasNext()){
                         build = b;
                         b = bi.next();
                     }else{
-                        place = p;
-                        p = pi.next();
+                        if( pi.hasNext() ){
+                            place = p;
+                            p = pi.next();
+                        }else{
+                            place = null;
+                        }
                     }
                 }else{
                     // On garde la meme construction et on change le placement
@@ -304,8 +320,11 @@ class BotPlayer {
                         place = p;
                         p = pi.next();
                     }else{
-                        build = b;
-                        b = bi.next();
+                        if( bi.hasNext() ) {
+                            build = b;
+                            b = bi.next();
+                        }else
+                            build = null;
                     }
                 }
             }// Sinon on ajoute le coup entier et on passe au suivant
@@ -313,11 +332,12 @@ class BotPlayer {
                 if( add( m, branchMoves, ind) ) {
                     ind++;
                     nb--;
+                    added++;
                 }
                 m = moves.poll();
             }
         }
-        return sauv;
+        return added;
     }
 
     private boolean compatible( Engine engine, TileAction placement, BuildingAction build ){
