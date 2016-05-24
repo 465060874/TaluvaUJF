@@ -1,24 +1,18 @@
-package ui;
+package ui.shape;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.Light;
 import javafx.scene.effect.Lighting;
-import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import map.Field;
+import ui.theme.Theme;
 
-class HexShape {
+import static ui.island.Grid.HEX_HEIGHT;
+import static ui.island.Grid.WEIRD_RATIO;
 
-    static final boolean IMG_FIELD_TYPE = false;
-
-    static final double HEX_SIZE_X = 60d;
-    static final double HEX_SIZE_Y = 60d * 0.8d;
-    static final double HEX_HEIGHT = 10d;
-    static final double WEIRD_RATIO = Math.cos(Math.toRadians(30d));
+public class HexShape {
 
     private static final int HEXAGON_POINTS = 6;
     private static final int HEXAGON_BORDER_POINTS = 5;
@@ -38,7 +32,7 @@ class HexShape {
     private final double[] bottomBorderX;
     private final double[] bottomBorderY;
 
-    HexShape() {
+    public HexShape() {
         this.hexagonX = new double[HEXAGON_POINTS];
         this.hexagonY = new double[HEXAGON_POINTS];
         this.hexagonBorderX = new double[HEXAGON_BORDER_POINTS];
@@ -163,93 +157,25 @@ class HexShape {
         bottomBorderY[4] = hexagonY[2] + bottomDepth1;
     }
 
-    private static Color fieldTypeColor(Field field) {
-        switch (field.getType()) {
-            case VOLCANO:  return Color.web("E97B33");
-            case JUNGLE:   return Color.web("A681B6");
-            case CLEARING: return Color.web("8DC435");
-            case SAND:     return Color.web("EFDD6F");
-            case ROCK:     return Color.web("C2D0D1");
-            case LAKE:     return Color.web("8BE1EB");
-        }
-
-        throw new IllegalStateException();
-    }
-
-    private static final ImagePattern VOLCANO;
-    private static final ImagePattern JUNGLE;
-    private static final ImagePattern CLEARING;
-    private static final ImagePattern SAND;
-    private static final ImagePattern ROCK;
-    private static final ImagePattern LAKE;
-
-    static {
-        if (IMG_FIELD_TYPE) {
-            VOLCANO = new ImagePattern(new Image(HexShape.class.getResource("volcano.png").toString()));
-            JUNGLE = new ImagePattern(new Image(HexShape.class.getResource("jungle.png").toString()));
-            CLEARING = new ImagePattern(new Image(HexShape.class.getResource("clearing.png").toString()));
-            SAND = new ImagePattern(new Image(HexShape.class.getResource("sand.png").toString()));
-            ROCK = new ImagePattern(new Image(HexShape.class.getResource("rock.png").toString()));
-            LAKE = new ImagePattern(new Image(HexShape.class.getResource("lake.png").toString()));
-        }
-        else {
-            VOLCANO = null;
-            JUNGLE = null;
-            CLEARING = null;
-            SAND = null;
-            ROCK = null;
-            LAKE = null;
-        }
-    }
-
-    private static ImagePattern fieldTypeImage(Field field) {
-        switch (field.getType()) {
-            case VOLCANO:  return VOLCANO;
-            case JUNGLE:   return JUNGLE;
-            case CLEARING: return CLEARING;
-            case SAND:     return SAND;
-            case ROCK:     return ROCK;
-            case LAKE:     return LAKE;
-        }
-
-        throw new IllegalStateException();
-    }
-
-    private static Paint fieldTypePaint(HexShapeInfo info) {
-        if (IMG_FIELD_TYPE) {
-            return fieldTypeImage(info.field);
-        }
-        else {
-            Color color = fieldTypeColor(info.field);
-            return info.isPlacement
-                    ? new Color(color.getRed(), color.getGreen(), color.getBlue(), info.isPlacementValid ? .75f : .5f)
-                    : color;
-        }
-    }
-
-    void draw(GraphicsContext gc, HexShapeInfo info) {
+    public void draw(GraphicsContext gc, HexShapeInfo info) {
         update(info);
 
+        // Fill shape
         gc.setEffect(new Lighting(new Light.Point(0, 0, info.scale * 150, Color.WHITE)));
-        gc.setFill(fieldTypePaint(info));
+        gc.setFill(Theme.getCurrent().get().getTileTopPaint(info.field.getType(), info.placementState));
         gc.fillPolygon(hexagonX, hexagonY, HEXAGON_POINTS);
         gc.setEffect(null);
 
-        gc.setFill(info.isPlacement
-                ? IslandCanvas.BORDER_COLOR.deriveColor(1, 1, 1, .5f)
-                : IslandCanvas.BOTTOM_COLOR);
+        gc.setFill(Theme.getCurrent().get().getTileBottomPaint(info.placementState));
         gc.fillPolygon(bottomX, bottomY, HEXAGON_POINTS);
 
-        gc.setStroke(IslandCanvas.BORDER_COLOR);
+        // Draw borders
+        gc.setStroke(Theme.getCurrent().get().getTileBorderPaint(info.placementState));
         gc.setLineWidth(STROKE_WIDTH * info.scale);
         gc.setLineCap(StrokeLineCap.ROUND);
         gc.setLineJoin(StrokeLineJoin.ROUND);
-        gc.strokePolyline(hexagonBorderX, hexagonBorderY, HEXAGON_BORDER_POINTS);
 
-        gc.setStroke(IslandCanvas.BORDER_COLOR);
-        gc.setLineWidth(STROKE_WIDTH * info.scale);
-        gc.setLineCap(StrokeLineCap.ROUND);
-        gc.setLineJoin(StrokeLineJoin.ROUND);
+        gc.strokePolyline(hexagonBorderX, hexagonBorderY, HEXAGON_BORDER_POINTS);
         for (int i = 1; i <= info.field.getLevel(); i++) {
             bottomBorderLevel(info.scale, i, info.field.getLevel());
             gc.strokePolyline(bottomBorderX, bottomBorderY, BOTTOM_BORDER_POINTS);

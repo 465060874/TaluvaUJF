@@ -1,4 +1,4 @@
-package ui;
+package ui.island;
 
 import data.BuildingType;
 import data.FieldType;

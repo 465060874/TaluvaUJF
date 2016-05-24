@@ -1,60 +1,19 @@
-package ui;
+package ui.shape;
 
-import data.ChoosenColors;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import map.FieldBuilding;
+import ui.theme.PlacementState;
+import ui.theme.Theme;
 
-import static ui.HexShape.HEX_HEIGHT;
-import static ui.IslandCanvas.BORDER_COLOR;
+import static ui.island.Grid.HEX_HEIGHT;
 
-class BuildingShapes {
+public class BuildingShapes {
 
     private static final float STROKE_WIDTH = 1.2f;
 
-    private static Color buildingTypeFaceColor(FieldBuilding building) {
-        switch (building.getColor()) {
-            case RED:
-                return ChoosenColors.RED.color().darker();
-            case WHITE:
-                return ChoosenColors.WHITE.color().darker();
-            case BROWN:
-                return ChoosenColors.BROWN.color().darker();
-            case YELLOW:
-                return ChoosenColors.YELLOW.color().darker();
-        }
-
-        throw new IllegalStateException();
-    }
-
-    private static Paint buildingTypeFacePaint(FieldBuilding building, boolean isPlacement, boolean isPlacementValid) {
-        Color color = buildingTypeFaceColor(building);
-        return isPlacement
-                ? new Color(color.getRed(), color.getGreen(), color.getBlue(), isPlacementValid ? .75f : .5f)
-                : color;
-    }
-
-    private static Color buildingTypeTopColor(FieldBuilding building) {
-        switch (building.getColor()) {
-            case RED:    return ChoosenColors.RED.color();
-            case WHITE:  return ChoosenColors.WHITE.color();
-            case BROWN:  return ChoosenColors.BROWN.color();
-            case YELLOW: return ChoosenColors.YELLOW.color();
-        }
-
-        throw new IllegalStateException();
-    }
-
-    private static Paint buildingTypeTopPaint(FieldBuilding building, boolean isPlacement, boolean isPlacementValid) {
-        Color color = buildingTypeTopColor(building);
-        return isPlacement
-                ? new Color(color.getRed(), color.getGreen(), color.getBlue(), isPlacementValid ? .75f : .5f)
-                : color;
-    }
-
-    static void drawBuilding(GraphicsContext gc,
-            FieldBuilding building, int level, boolean isPlacement, boolean isPlacementValid,
+    public static void drawBuilding(GraphicsContext gc,
+            FieldBuilding building, int level, PlacementState placementState,
              double scale, double x, double y, double hexSizeX, double hexSizeY) {
         double hexHeight = HEX_HEIGHT * scale;
         y -= (level - 1) * hexHeight;
@@ -62,33 +21,33 @@ class BuildingShapes {
         switch (building.getType()) {
             case HUT:
                 if (level == 1) {
-                    drawHut(gc, building, isPlacement, isPlacementValid, x, y, hexSizeX, hexSizeY);
+                    drawHut(gc, building, placementState, x, y, hexSizeX, hexSizeY);
                 } else if (level == 2) {
-                    drawHut(gc, building, isPlacement, isPlacementValid,
+                    drawHut(gc, building, placementState,
                             x - hexSizeX / 3, y, hexSizeX, hexSizeY);
-                    drawHut(gc, building, isPlacement, isPlacementValid,
+                    drawHut(gc, building, placementState,
                             x + hexSizeX / 3, y, hexSizeX, hexSizeY);
                 } else {
                     // TODO: More than 3
-                    drawHut(gc, building, isPlacement, isPlacementValid,
+                    drawHut(gc, building, placementState,
                             x - hexSizeX / 3, y - hexSizeY / 4, hexSizeX, hexSizeY);
-                    drawHut(gc, building, isPlacement, isPlacementValid,
+                    drawHut(gc, building, placementState,
                             x + hexSizeX / 3, y - hexSizeY / 4, hexSizeX, hexSizeY);
-                    drawHut(gc, building, isPlacement, isPlacementValid,
+                    drawHut(gc, building, placementState,
                             x, y + hexSizeY / 2, hexSizeX, hexSizeY);
                 }
                 break;
             case TEMPLE:
-                drawTemple(gc, building, isPlacement, isPlacementValid, x, y, hexSizeX, hexSizeY);
+                drawTemple(gc, building, placementState, x, y, hexSizeX, hexSizeY);
                 break;
             case TOWER:
-                drawTower(gc, building, isPlacement, isPlacementValid, x, y, hexSizeX, hexSizeY);
+                drawTower(gc, building, placementState, x, y, hexSizeX, hexSizeY);
                 break;
         }
     }
 
     private static void drawHut(GraphicsContext gc,
-            FieldBuilding building, boolean isPlacement, boolean isPlacementValid,
+            FieldBuilding building, PlacementState placementState,
             double x, double y, double hexSizeX, double hexSizeY) {
         double x1 = x - hexSizeX / 7;
         double x2 = x;
@@ -98,12 +57,12 @@ class BuildingShapes {
         double y3 = y + hexSizeY / 10;
         double y4 = y + hexSizeY / 4;
 
-        drawTentShape(gc, building, isPlacement, isPlacementValid, x1, x2, x3, y1, y2, y3, y4);
+        drawTentShape(gc, building, placementState, x1, x2, x3, y1, y2, y3, y4);
     }
 
     private static void drawTemple(GraphicsContext gc,
             FieldBuilding building,
-            boolean isPlacement, boolean isPlacementValid,
+            PlacementState placementState,
             double x, double y, double hexSizeX, double hexSizeY) {
         double x1 = x - hexSizeX / 4;
         double x2 = x;
@@ -113,14 +72,14 @@ class BuildingShapes {
         double y3 = y + hexSizeY / 1.6 - hexSizeY / 2;
         double y4 = y + hexSizeY / 1.6;
 
-        drawTentShape(gc, building, isPlacement, isPlacementValid, x1, x2, x3, y1, y2, y3, y4);
+        drawTentShape(gc, building, placementState, x1, x2, x3, y1, y2, y3, y4);
     }
 
     private static void drawTentShape(GraphicsContext gc,
-            FieldBuilding building, boolean isPlacement, boolean isPlacementValid,
+            FieldBuilding building, PlacementState placementState,
             double x1, double x2, double x3, double y1, double y2, double y3, double y4) {
-        Paint facePaint = buildingTypeFacePaint(building, isPlacement, isPlacementValid);
-        Paint topPaint = buildingTypeTopPaint(building, isPlacement, isPlacementValid);
+        Paint facePaint = Theme.getCurrent().get().getBuildingFacePaint(building, placementState);
+        Paint topPaint = Theme.getCurrent().get().getBuildingTopPaint(building, placementState);
 
         double[] xpoints = new double[4];
         double[] ypoints = new double[4];
@@ -132,7 +91,7 @@ class BuildingShapes {
         ypoints[2] = y4;
         gc.setFill(facePaint);
         gc.fillPolygon(xpoints, ypoints, 3);
-        gc.setStroke(BORDER_COLOR);
+        gc.setStroke(Theme.getCurrent().get().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 3);
 
@@ -146,7 +105,7 @@ class BuildingShapes {
         ypoints[3] = y2;
         gc.setFill(topPaint);
         gc.fillPolygon(xpoints, ypoints, 4);
-        gc.setStroke(BORDER_COLOR);
+        gc.setStroke(Theme.getCurrent().get().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 4);
 
@@ -160,16 +119,15 @@ class BuildingShapes {
         ypoints[3] = y2;
         gc.setFill(topPaint);
         gc.fillPolygon(xpoints, ypoints, 4);
-        gc.setStroke(BORDER_COLOR);
+        gc.setStroke(Theme.getCurrent().get().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 4);
     }
 
-    private static void drawTower(GraphicsContext gc,
-                                  FieldBuilding building,
-                                  boolean isPlacement, boolean isPlacementValid, double x, double y, double hexSizeX, double hexSizeY) {
-        Paint facePaint = buildingTypeFacePaint(building, isPlacement, isPlacementValid);
-        Paint topPaint = buildingTypeTopPaint(building, isPlacement, isPlacementValid);
+    private static void drawTower(GraphicsContext gc, FieldBuilding building, PlacementState placementState,
+              double x, double y, double hexSizeX, double hexSizeY) {
+        Paint facePaint = Theme.getCurrent().get().getBuildingFacePaint(building, placementState);
+        Paint topPaint = Theme.getCurrent().get().getBuildingTopPaint(building, placementState);
 
         double width = hexSizeX / 2;
         double xstart = x - width / 2;
@@ -180,20 +138,20 @@ class BuildingShapes {
 
         gc.setFill(facePaint);
         gc.fillOval(xstart, ybottom, width, height);
-        gc.setStroke(BORDER_COLOR);
+        gc.setStroke(Theme.getCurrent().get().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokeOval(xstart, ybottom, width, height);
 
         gc.setFill(facePaint);
         gc.fillRect(xstart, ytop + height/2, width, ybottom - ytop);
-        gc.setStroke(BORDER_COLOR);
+        gc.setStroke(Theme.getCurrent().get().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokeLine(xstart, ytop + height/2, xstart, ybottom + height/2);
         gc.strokeLine(xstart + width, ytop + height/2, xstart + width, ybottom + height/2);
 
         gc.setFill(topPaint);
         gc.fillOval(xstart, ytop, width, height);
-        gc.setStroke(BORDER_COLOR);
+        gc.setStroke(Theme.getCurrent().get().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokeOval(xstart, ytop, width, height);
     }

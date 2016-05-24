@@ -1,19 +1,19 @@
-package ui;
+package ui.shape;
 
 import com.google.common.collect.ComparisonChain;
 import map.Field;
+import ui.theme.PlacementState;
 
 public class HexShapeInfo implements Comparable<HexShapeInfo> {
 
-    Field field;
-    boolean isPlacement;
-    boolean isPlacementValid;
+    public Field field;
+    public PlacementState placementState;
 
-    double x;
-    double y;
-    double sizeX;
-    double sizeY;
-    double scale;
+    public double x;
+    public double y;
+    public double sizeX;
+    public double sizeY;
+    public double scale;
 
     @Override
     public int compareTo(HexShapeInfo o) {

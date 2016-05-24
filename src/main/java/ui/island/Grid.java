@@ -1,10 +1,13 @@
-package ui;
+package ui.island;
 
 import map.Hex;
 
-import static ui.HexShape.*;
-
 public class Grid {
+
+    public static final double HEX_SIZE_X = 60d;
+    public static final double HEX_SIZE_Y = 60d * 0.8d;
+    public static final double HEX_HEIGHT = 10d;
+    public static final double WEIRD_RATIO = Math.cos(Math.toRadians(30d));
 
     double ox;
     double oy;

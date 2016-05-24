@@ -15,6 +15,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import ui.island.IslandView;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -59,7 +60,7 @@ public class EngineVisu extends Application implements EngineObserver {
 
     @Override
     public void onStart() {
-        islandView.islandCanvas.redraw();
+        islandView.redrawIsland();
     }
 
     @Override
@@ -68,32 +69,32 @@ public class EngineVisu extends Application implements EngineObserver {
 
     @Override
     public void onTileStepStart(boolean cancelled) {
-        islandView.islandCanvas.redraw();
+        islandView.redrawIsland();
     }
 
     @Override
     public void onBuildStepStart(boolean cancelled) {
-        islandView.islandCanvas.redraw();
+        islandView.redrawIsland();
     }
 
     @Override
     public void onTilePlacementOnSea(SeaTileAction action) {
-        islandView.islandCanvas.redraw();
+        islandView.redrawIsland();
     }
 
     @Override
     public void onTilePlacementOnVolcano(VolcanoTileAction action) {
-        islandView.islandCanvas.redraw();
+        islandView.redrawIsland();
     }
 
     @Override
     public void onBuild(PlaceBuildingAction action) {
-        islandView.islandCanvas.redraw();
+        islandView.redrawIsland();
     }
 
     @Override
     public void onExpand(ExpandVillageAction action) {
-        islandView.islandCanvas.redraw();
+        islandView.redrawIsland();
     }
 
     @Override

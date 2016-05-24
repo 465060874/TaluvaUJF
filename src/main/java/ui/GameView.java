@@ -3,6 +3,7 @@ package ui;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
+import ui.island.IslandView;
 
 public class GameView extends StackPane {
     IslandView islandView;

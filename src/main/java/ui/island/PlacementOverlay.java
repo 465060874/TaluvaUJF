@@ -1,4 +1,4 @@
-package ui;
+package ui.island;
 
 import com.google.common.collect.ImmutableList;
 import data.FieldType;
@@ -9,9 +9,14 @@ import map.Field;
 import map.FieldBuilding;
 import map.Island;
 import map.Neighbor;
+import ui.shape.HexShape;
+import ui.shape.HexShapeInfo;
+import ui.theme.PlacementState;
 
-import static ui.BuildingShapes.drawBuilding;
-import static ui.HexShape.WEIRD_RATIO;
+import static ui.island.Grid.HEX_SIZE_X;
+import static ui.island.Grid.HEX_SIZE_Y;
+import static ui.island.Grid.WEIRD_RATIO;
+import static ui.shape.BuildingShapes.drawBuilding;
 
 class PlacementOverlay extends Canvas {
 
@@ -35,12 +40,11 @@ class PlacementOverlay extends Canvas {
         HexShapeInfo info1 = new HexShapeInfo();
         HexShapeInfo info2 = new HexShapeInfo();
         HexShapeInfo info3 = new HexShapeInfo();
-        info1.isPlacement = info2.isPlacement = info3.isPlacement = true;
-        info1.isPlacementValid = info2.isPlacementValid = info3.isPlacementValid = placement.valid;
+        info1.placementState = info2.placementState = info3.placementState = PlacementState.INVALID;
         info1.x = info2.x = info3.x = placement.mouseX;
         info1.y = info2.y = info3.y = placement.mouseY;
-        info1.sizeX = info2.sizeX = info3.sizeX = HexShape.HEX_SIZE_X * grid.getScale();
-        info1.sizeY = info2.sizeY = info3.sizeY = HexShape.HEX_SIZE_Y * grid.getScale();
+        info1.sizeX = info2.sizeX = info3.sizeX = HEX_SIZE_X * grid.getScale();
+        info1.sizeY = info2.sizeY = info3.sizeY = HEX_SIZE_Y * grid.getScale();
         info1.scale = info2.scale = info3.scale = grid.getScale();
 
         Neighbor leftNeighbor = Neighbor.leftOf(placement.tileOrientation);
@@ -70,8 +74,8 @@ class PlacementOverlay extends Canvas {
         if (placement.mode == Placement.Mode.BUILDING) {
             HexShapeInfo info = new HexShapeInfo();
 
-            info.sizeX = HexShape.HEX_SIZE_X * grid.getScale();
-            info.sizeY = HexShape.HEX_SIZE_Y * grid.getScale();
+            info.sizeX = HEX_SIZE_X * grid.getScale();
+            info.sizeY = HEX_SIZE_Y * grid.getScale();
             if (placement.valid) {
                 double centerX = getWidth() / 2 - grid.getOx();
                 double centerY = getHeight() / 2 - grid.getOy();
@@ -85,12 +89,12 @@ class PlacementOverlay extends Canvas {
                 info.y = placement.mouseY;
             }
 
-            info.isPlacement = true;
+            info.placementState = PlacementState.INVALID;
             info.field = island.getField(placement.hex);
             info.scale = grid.getScale();
             FieldBuilding fieldBuilding = FieldBuilding.of(placement.buildingType, placement.buildingColor);
             drawBuilding(gc, fieldBuilding, Math.max(1, island.getField(placement.hex).getLevel()),
-                    true, placement.valid,
+                    placement.valid ? PlacementState.VALID : PlacementState.INVALID,
                     grid.scale,
                     info.x, info.y - info.sizeY / 6,
                     info.sizeX, info.sizeY);

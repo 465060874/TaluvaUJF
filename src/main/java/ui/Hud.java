@@ -19,8 +19,6 @@ public class Hud extends AnchorPane {
 
     Button[] playersIcon;
 
-    StackTileIcon stackTileIcon;
-
     VBox vboxLeft;
     TextArea textBottom;
 

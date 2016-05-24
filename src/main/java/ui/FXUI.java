@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import map.Island;
 import map.IslandIO;
+import ui.island.IslandView;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;

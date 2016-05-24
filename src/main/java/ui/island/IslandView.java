@@ -1,14 +1,14 @@
-package ui;
+package ui.island;
 
-import javafx.geometry.Insets;
-import javafx.scene.image.Image;
+import javafx.beans.Observable;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.StackPane;
 import map.Island;
+import ui.theme.Theme;
 
-class IslandView extends StackPane {
+public class IslandView extends StackPane {
 
     private Grid grid;
     private Placement placement;
@@ -21,7 +21,7 @@ class IslandView extends StackPane {
     private double mouseX;
     private double mouseY;
 
-    IslandView(Island island, boolean debug) {
+    public IslandView(Island island, boolean debug) {
         this.grid = new Grid(0.0, 0.0, 1);
         this.placement = new Placement(island, grid);
         this.placementOverlay = new PlacementOverlay(island, grid, placement);
@@ -34,22 +34,8 @@ class IslandView extends StackPane {
         getChildren().add(islandCanvas);
         getChildren().add(placementOverlay);
 
-        if (false && HexShape.IMG_FIELD_TYPE) {
-            BackgroundImage bgImage = new BackgroundImage(
-                    new Image(IslandView.class.getResource("sea.jpg").toString()),
-                    BackgroundRepeat.REPEAT,
-                    BackgroundRepeat.REPEAT,
-                    BackgroundPosition.DEFAULT,
-                    BackgroundSize.DEFAULT);
-            setBackground(new Background(bgImage));
-        }
-        else {
-            BackgroundFill backgroundFill = new BackgroundFill(
-                    IslandCanvas.BG_COLOR,
-                    CornerRadii.EMPTY,
-                    Insets.EMPTY);
-            setBackground(new Background(backgroundFill));
-        }
+        Theme.getCurrent().addListener(this::updateTheme);
+        updateTheme(null);
 
         setOnMouseMoved(this::mouseMoved);
         setOnMousePressed(this::mousePressed);
@@ -59,6 +45,12 @@ class IslandView extends StackPane {
         setOnMouseExited(this::mouseExited);
         setOnMouseEntered(this::mouseEntered);
         setOnScroll(this::scroll);
+    }
+
+    private void updateTheme(Observable observable) {
+        setBackground(Theme.getCurrent().get().getIslandBackground());
+        islandCanvas.redraw();
+        placementOverlay.redraw();
     }
 
     private void mouseExited(MouseEvent event) {
@@ -110,7 +102,7 @@ class IslandView extends StackPane {
         if (event.getButton() == MouseButton.MIDDLE) {
             placement.cycleMode();
         }
-        else if (event.getButton() == MouseButton.SECONDARY){
+        else if (event.getButton() == MouseButton.SECONDARY) {
             placement.cycleTileOrientationOrBuildingTypeAndColor();
         }
     }
@@ -149,5 +141,9 @@ class IslandView extends StackPane {
         grid.setScale(grid.getScale() * factor);
         islandCanvas.redraw();
         placementOverlay.redraw();
+    }
+
+    public void redrawIsland() {
+        islandCanvas.redraw();
     }
 }
