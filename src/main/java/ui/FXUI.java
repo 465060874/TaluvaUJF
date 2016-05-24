@@ -10,14 +10,11 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import map.Island;
 import map.IslandIO;
-import ui.island.IslandView;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class FXUI extends Application {
-
-    private static final boolean DEBUG = false;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -32,9 +29,7 @@ public class FXUI extends Application {
                 .build();
         engine.start();
 
-        IslandView islandView = new IslandView(engine.getIsland(), DEBUG);
-        Hud hud = new Hud(engine);
-        GameView gameView = new GameView(islandView, hud);
+        GameView gameView = new GameView(engine);
 
         Scene scene = new Scene(gameView, 1000, 800);
         stage.setScene(scene);

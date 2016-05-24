@@ -1,52 +1,21 @@
 package ui;
 
-import javafx.scene.Node;
-import javafx.scene.Parent;
+import engine.Engine;
 import javafx.scene.layout.StackPane;
 import ui.island.IslandView;
 
 public class GameView extends StackPane {
-    IslandView islandView;
-    Hud hud;
 
-    public GameView(IslandView islandView, Hud hud) {
-        this.islandView = islandView;
-        this.hud = hud;
+    private final Engine engine;
+    private final IslandView islandView;
+    private final Hud hud;
 
-        this.getChildren().add(islandView);
-        this.getChildren().add(hud);
-        turnOffPickOnBoundsFor(hud, true);
-    }
+    public GameView(Engine engine) {
+        this.engine = engine;
+        this.islandView = new IslandView(engine.getIsland(), false);
+        this.hud = new Hud(engine);
 
-    private boolean turnOffPickOnBoundsFor(Node n, boolean plotContent) {
-        boolean result = false;
-        boolean plotContentFound = false;
-        n.setPickOnBounds(false);
-        if(!plotContent){
-            if(containsStyle(n)){
-                plotContentFound = true;
-                result=true;
-            }
-            if (n instanceof Parent) {
-                for (Node c : ((Parent) n).getChildrenUnmodifiable()) {
-                    if(turnOffPickOnBoundsFor(c,plotContentFound)){
-                        result = true;
-                    }
-                }
-            }
-            n.setMouseTransparent(!result);
-        }
-        return result;
-    }
-
-    private boolean containsStyle(Node node){
-        boolean result = false;
-        for (String object : node.getStyleClass()) {
-            if(object.equals("plot-content")){
-                result = true;
-                break;
-            }
-        }
-        return result;
+        hud.setPickOnBounds(false);
+        getChildren().addAll(islandView, hud);
     }
 }

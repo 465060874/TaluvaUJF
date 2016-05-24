@@ -111,14 +111,14 @@ public class EngineVisu extends Application implements EngineObserver {
 
     private class UIPlayerHandlerWrapper implements PlayerHandler {
 
-        private final PlayerHandler playerHandler;
+        private final PlayerHandler wrapped;
         private final EventHandler<MouseEvent> startWrappedTileStep;
         private final EventHandler<MouseEvent> startWrappedBuildStep;
 
-        private UIPlayerHandlerWrapper(PlayerHandler subHandler) {
+        private UIPlayerHandlerWrapper(PlayerHandler wrapped) {
             this.startWrappedTileStep = this::startWrappedTileStep;
             this.startWrappedBuildStep = this::startWrappedBuildStep;
-            this.playerHandler = subHandler;
+            this.wrapped = wrapped;
         }
 
         @Override
@@ -129,7 +129,7 @@ public class EngineVisu extends Application implements EngineObserver {
         private void startWrappedTileStep(MouseEvent event) {
             if (event.getButton() == MouseButton.PRIMARY && !event.isControlDown()) {
                 scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedTileStep);
-                playerHandler.startTileStep();
+                wrapped.startTileStep();
             }
         }
 
@@ -141,13 +141,13 @@ public class EngineVisu extends Application implements EngineObserver {
         private void startWrappedBuildStep(MouseEvent event) {
             if (event.getButton() == MouseButton.PRIMARY && !event.isControlDown()) {
                 scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedBuildStep);
-                playerHandler.startBuildStep();
+                wrapped.startBuildStep();
             }
         }
 
         @Override
         public void cancel() {
-            playerHandler.cancel();
+            wrapped.cancel();
             scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedTileStep);
             scene.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedBuildStep);
         }
