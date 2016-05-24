@@ -87,7 +87,7 @@ class EngineImpl implements Engine {
 
         this.actionSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
         actionSaves.addAll(engine.actionSaves);
-        this.actions = new EngineActions(engine.actions);
+        this.actions = new EngineActions(this, engine.actions);
     }
 
     @Override

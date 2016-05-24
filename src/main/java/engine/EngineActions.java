@@ -38,8 +38,8 @@ class EngineActions {
         this.expandVillages = ImmutableList.of();
     }
 
-    EngineActions(EngineActions actions) {
-        this.engine = actions.engine;
+    EngineActions(Engine engine, EngineActions actions) {
+        this.engine = engine;
 
         this.seaTiles = actions.seaTiles;
         this.volcanosTiles = actions.volcanosTiles;

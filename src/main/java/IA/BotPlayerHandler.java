@@ -19,7 +19,7 @@ public class BotPlayerHandler implements PlayerHandler {
     @Override
     public void startTileStep() {
         long startTime = System.nanoTime();
-        move = bot.play(1);
+        move = bot.play(3);
         engine.logger().info("[IA] {0}ms pour determiner le coup à jouer",
                 TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
         engine.action(move.tileAction);
