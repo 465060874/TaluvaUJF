@@ -1,5 +1,6 @@
 package engine;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -509,6 +510,34 @@ class EngineImpl implements Engine {
         action(action);
 
         ImmutableList.Builder<ExpandVillageAction> builder = ImmutableList.builder();
+
+        PlayerColor color = getCurrentPlayer().getColor();
+        Hex leftHex = action.getLeftHex();
+        Hex rightHex = action.getLeftHex();
+        FieldType leftFieldType = action.getLeftFieldType();
+        FieldType rightFieldType = action.getRightFieldType();
+
+        // NB: Village do not implements hashCode/equals
+        // This store them by identity instead of equality, which is what we want
+        HashMultimap<Village, FieldType> villageExpansion = HashMultimap.create();
+        for (Hex hex : leftHex.getNeighborhood()) {
+            FieldBuilding building = island.getField(hex).getBuilding();
+            if (building.getType() != BuildingType.NONE
+                    && building.getColor() == color) {
+                villageExpansion.put(island.getVillage(hex), leftFieldType);
+            }
+        }
+        for (Hex hex : rightHex.getNeighborhood()) {
+            FieldBuilding building = island.getField(hex).getBuilding();
+            if (building.getType() != BuildingType.NONE
+                    && building.getColor() == color) {
+                villageExpansion.put(island.getVillage(hex), rightFieldType);
+            }
+        }
+
+        for (Map.Entry<Village, FieldType> entry : villageExpansion.entries()) {
+            builder.add(new ExpandVillageAction(entry.getKey(), entry.getValue()));
+        }
 
         save.revert(this);
         return builder.build();

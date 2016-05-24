@@ -2,6 +2,7 @@ package engine.action;
 
 import data.FieldType;
 import map.Hex;
+import map.Village;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +12,10 @@ public class ExpandVillageAction implements BuildingAction {
 
     private final Hex villageHex;
     private final FieldType fieldType;
+
+    public ExpandVillageAction(Village village, FieldType fieldType) {
+        this(village.getHexes().iterator().next(), fieldType);
+    }
 
     public ExpandVillageAction(Hex villageHex, FieldType fieldType) {
         this.villageHex = villageHex;
