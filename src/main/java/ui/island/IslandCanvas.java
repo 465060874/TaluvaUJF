@@ -18,8 +18,10 @@ import ui.theme.PlacementState;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static data.FieldType.VOLCANO;
+import static java.awt.SystemColor.info;
 import static ui.shape.BuildingShapes.drawBuilding;
 
 class IslandCanvas extends Canvas {
@@ -100,11 +102,15 @@ class IslandCanvas extends Canvas {
             info.fieldType = field.getType();
             info.orientation = field.getOrientation();
             info.building = field.getBuilding();
-            infos.add(info);
+            if (!isOutside(info)) {
+                infos.add(info);
+            }
         }
 
         if (placement.valid && placement.mode == Placement.Mode.TILE) {
-            infos.addAll(placedInfos(centerX, centerY));
+            placedInfos(centerX, centerY).stream()
+                    .filter(info -> !isOutside(info))
+                    .forEach(infos::add);
         }
 
         // Affichage de la map
@@ -150,5 +156,13 @@ class IslandCanvas extends Canvas {
 
         setTranslateX(-getWidth() / 3);
         setTranslateY(-getHeight() / 3);
+    }
+
+    private boolean isOutside(HexShapeInfo info) {
+        double minX = info.x - grid.getHexRadiusX();
+        double minY = info.y - grid.getHexRadiusY();
+        double maxX = info.x - grid.getHexRadiusX();
+        double maxY = info.y - grid.getHexRadiusY();
+        return maxX < 0 || maxY < 0 || minX > getWidth() || minY > getHeight();
     }
 }

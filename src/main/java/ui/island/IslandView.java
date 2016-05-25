@@ -16,18 +16,21 @@ public class IslandView extends StackPane {
     final IslandCanvas islandCanvas;
     private final PlacementOverlay placementOverlay;
 
+    private boolean mousePressed;
     private double mouseXBeforeDrag;
     private double mouseYBeforeDrag;
     private double mouseX;
     private double mouseY;
 
     public IslandView(Island island, boolean debug) {
-        this.grid = new Grid(0.0, 0.0, 1);
+        this.grid = new Grid(this, 0.0, 0.0, 1);
         this.placement = new Placement(island, grid);
         this.placementOverlay = new PlacementOverlay(island, grid, placement);
         this.islandCanvas = new IslandCanvas(island, grid, placement, debug);
         placement.placementOverlay = placementOverlay;
         placement.islandCanvas = islandCanvas;
+
+        this.mousePressed = false;
         this.mouseX = 0;
         this.mouseY = 0;
 
@@ -92,6 +95,7 @@ public class IslandView extends StackPane {
     }
 
     private void mousePressed(MouseEvent event) {
+        mousePressed = true;
         if (event.getButton() == MouseButton.PRIMARY) {
             mouseXBeforeDrag = mouseX = event.getX();
             mouseYBeforeDrag = mouseY = event.getY();
@@ -127,6 +131,7 @@ public class IslandView extends StackPane {
     }
 
     private void mouseReleased(MouseEvent event) {
+        mousePressed = false;
         if (event.getButton() != MouseButton.PRIMARY) {
             return;
         }
@@ -136,9 +141,13 @@ public class IslandView extends StackPane {
     }
 
     private void scroll(ScrollEvent event) {
-        grid.scale(event.getDeltaY() > 0 ? 1.1 : 1 / 1.1);
-        islandCanvas.redraw();
-        placementOverlay.redraw();
+        if (mousePressed) {
+            return;
+        }
+
+        if (grid.scale(event.getDeltaY() > 0 ? 1.1 : 1 / 1.1)) {
+            islandCanvas.redraw();
+        }
     }
 
     public void redrawIsland() {
