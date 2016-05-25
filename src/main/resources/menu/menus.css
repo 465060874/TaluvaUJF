@@ -43,6 +43,12 @@
     -fx-text-fill: white;
 }
 
+.buttonjoueur:focused {
+    -fx-color: white;
+    -fx-background-color: #4CAF50;
+    -fx-background-radius: 0;
+    -fx-text-fill: white;
+}
 
 .buttonniveaux1{
     -fx-background-color: white;
@@ -57,6 +63,12 @@
     -fx-text-fill: white;
 }
 
+.buttonniveaux1:focused {
+    -fx-color: white;
+    -fx-background-color: #FF9966;
+    -fx-background-radius: 0;
+    -fx-text-fill: white;
+}
 
 .buttonniveaux2{
     -fx-background-color: white;
@@ -71,6 +83,12 @@
     -fx-text-fill: white;
 }
 
+.buttonniveaux2:focused {
+    -fx-color: white;
+    -fx-background-color: #FF6666;
+    -fx-background-radius: 0;
+    -fx-text-fill: white;
+}
 
 .buttonniveaux3{
     -fx-background-color: white;
@@ -85,6 +103,12 @@
     -fx-text-fill: white;
 }
 
+.buttonniveaux3:focused {
+    -fx-color: white;
+    -fx-background-color: #CC0066;
+    -fx-background-radius: 0;
+    -fx-text-fill: white;
+}
 
 .buttonniveaux4{
     -fx-background-color: #F337A8;
@@ -101,6 +125,12 @@
     -fx-background-radius: 0 0 0 0;
 }
 
+.buttonniveaux4:focused {
+    -fx-color: white;
+    -fx-background-color: #CB2D8C;
+    -fx-background-radius: 0;
+    -fx-text-fill: white;
+}
 
 .bin{
     -fx-background-color:#B9121B;
