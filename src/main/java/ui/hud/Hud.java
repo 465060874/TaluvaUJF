@@ -1,4 +1,4 @@
-package ui;
+package ui.hud;
 
 import data.ChoosenColors;
 import data.PlayerColor;

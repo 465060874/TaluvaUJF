@@ -72,7 +72,7 @@ public class Placement {
         }
     }
 
-    public void cycleTileOrientationOrBuildingTypeAndColor() {
+    void cycleTileOrientationOrBuildingTypeAndColor() {
         if (mode == Mode.TILE) {
             tileOrientation = tileOrientation.clockWise();
             updateValidTile();
@@ -93,11 +93,11 @@ public class Placement {
         }
     }
 
-    public void updateMouse(double x, double y, double width, double height) {
+    void updateMouse(double x, double y, double width, double height) {
         this.mouseX = x;
         this.mouseY = y;
 
-        Hex newHex = grid.getHex(x, y, width, height);
+        Hex newHex = grid.xyToHex(x, y, width, height);
 
         if (newHex.equals(hex)) {
             if (!valid) {
@@ -138,14 +138,19 @@ public class Placement {
         placementOverlay.redraw();
     }
 
-    public void saveMode() {
+    void saveMode() {
         saveMode = mode;
         mode = Mode.NONE;
         updateValidTile();
     }
 
-    public void restoreMode() {
+    void restoreMode() {
         mode = saveMode;
-        updateValidTile();
+        if (mode == Mode.TILE) {
+            updateValidTile();
+        }
+        else if (mode == Mode.BUILDING) {
+            updateValidBuilding();
+        }
     }
 }

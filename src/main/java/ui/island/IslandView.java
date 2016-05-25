@@ -131,14 +131,12 @@ public class IslandView extends StackPane {
             return;
         }
 
-        grid.setOx(grid.getOx() + mouseXBeforeDrag - event.getX());
-        grid.setOy(grid.getOy() + mouseYBeforeDrag - event.getY());
+        grid.translate(mouseXBeforeDrag - event.getX(), mouseYBeforeDrag - event.getY());
         islandCanvas.redraw();
     }
 
     private void scroll(ScrollEvent event) {
-        double factor = event.getDeltaY() > 0 ? 1.1 : 1 / 1.1;
-        grid.setScale(grid.getScale() * factor);
+        grid.scale(event.getDeltaY() > 0 ? 1.1 : 1 / 1.1);
         islandCanvas.redraw();
         placementOverlay.redraw();
     }

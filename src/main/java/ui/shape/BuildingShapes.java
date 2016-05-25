@@ -2,84 +2,74 @@ package ui.shape;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
-import map.FieldBuilding;
+import ui.island.Grid;
 import ui.theme.PlacementState;
 import ui.theme.Theme;
-
-import static ui.island.Grid.HEX_HEIGHT;
 
 public class BuildingShapes {
 
     private static final float STROKE_WIDTH = 1.2f;
 
-    public static void drawBuilding(GraphicsContext gc,
-            FieldBuilding building, int level, PlacementState placementState,
-             double scale, double x, double y, double hexSizeX, double hexSizeY) {
-        double hexHeight = HEX_HEIGHT * scale;
-        y -= (level - 1) * hexHeight;
+    public static void drawBuilding(GraphicsContext gc, Grid grid, HexShapeInfo info) {
+        double hexHeight = grid.getHexHeight();
+        int level = Math.max(1, info.level);
+        double y = info.y - (level - 1) * hexHeight;
 
-        switch (building.getType()) {
+        switch (info.building.getType()) {
             case HUT:
-                if (placementState == PlacementState.INVALID || level == 1) {
-                    drawHut(gc, building, placementState, x, y, hexSizeX, hexSizeY);
+                if (info.placementState == PlacementState.INVALID || level == 1) {
+                    drawHut(gc, grid, info, info.x, y);
                 } else if (level == 2) {
-                    drawHut(gc, building, placementState,
-                            x - hexSizeX / 3, y, hexSizeX, hexSizeY);
-                    drawHut(gc, building, placementState,
-                            x + hexSizeX / 3, y, hexSizeX, hexSizeY);
+                    drawHut(gc, grid, info, info.x - grid.getHexRadiusX() / 3, y);
+                    drawHut(gc, grid, info, info.x + grid.getHexRadiusX() / 3, y);
                 } else {
                     // TODO: More than 3
-                    drawHut(gc, building, placementState,
-                            x - hexSizeX / 3, y - hexSizeY / 4, hexSizeX, hexSizeY);
-                    drawHut(gc, building, placementState,
-                            x + hexSizeX / 3, y - hexSizeY / 4, hexSizeX, hexSizeY);
-                    drawHut(gc, building, placementState,
-                            x, y + hexSizeY / 2, hexSizeX, hexSizeY);
+                    drawHut(gc, grid, info, info.x - grid.getHexRadiusX() / 3, y - grid.getHexRadiusY() / 4);
+                    drawHut(gc, grid, info, info.x + grid.getHexRadiusX() / 3, y - grid.getHexRadiusY() / 4);
+                    drawHut(gc, grid, info, info.x, y + grid.getHexRadiusY() / 2);
                 }
                 break;
             case TEMPLE:
-                drawTemple(gc, building, placementState, x, y, hexSizeX, hexSizeY);
+                drawTemple(gc, grid, info, info.x, y);
                 break;
             case TOWER:
-                drawTower(gc, building, placementState, x, y, hexSizeX, hexSizeY);
+                drawTower(gc, grid, info, info.x, y);
                 break;
         }
     }
 
-    private static void drawHut(GraphicsContext gc,
-            FieldBuilding building, PlacementState placementState,
-            double x, double y, double hexSizeX, double hexSizeY) {
-        double x1 = x - hexSizeX / 7;
+    private static void drawHut(GraphicsContext gc, Grid grid, HexShapeInfo info, double x, double y) {
+        double hexRadiusX = grid.getHexRadiusX();
+        double hexRadiusY = grid.getHexRadiusY();
+        double x1 = x - hexRadiusX / 7;
         double x2 = x;
-        double x3 = x + hexSizeX / 7;
-        double y1 = y - hexSizeY / 4;
-        double y2 = y - hexSizeY / 10;
-        double y3 = y + hexSizeY / 10;
-        double y4 = y + hexSizeY / 4;
+        double x3 = x + hexRadiusX / 7;
+        double y1 = y - hexRadiusY / 4;
+        double y2 = y - hexRadiusY / 10;
+        double y3 = y + hexRadiusY / 10;
+        double y4 = y + hexRadiusY / 4;
 
-        drawTentShape(gc, building, placementState, x1, x2, x3, y1, y2, y3, y4);
+        drawTentShape(gc, info, x1, x2, x3, y1, y2, y3, y4);
     }
 
-    private static void drawTemple(GraphicsContext gc,
-            FieldBuilding building,
-            PlacementState placementState,
-            double x, double y, double hexSizeX, double hexSizeY) {
-        double x1 = x - hexSizeX / 4;
+    private static void drawTemple(GraphicsContext gc, Grid grid, HexShapeInfo info, double x, double y) {
+        double hexRadiusX = grid.getHexRadiusX();
+        double hexRadiusY = grid.getHexRadiusY();
+        double x1 = x - hexRadiusX / 4;
         double x2 = x;
-        double x3 = x + hexSizeX / 4;
-        double y1 = y - hexSizeY * 0.80 - hexSizeY / 4;
-        double y2 = y - hexSizeY * 0.80 + hexSizeY / 4;
-        double y3 = y + hexSizeY / 1.6 - hexSizeY / 2;
-        double y4 = y + hexSizeY / 1.6;
+        double x3 = x + hexRadiusX / 4;
+        double y1 = y - hexRadiusY * 0.80 - hexRadiusY / 4;
+        double y2 = y - hexRadiusY * 0.80 + hexRadiusY / 4;
+        double y3 = y + hexRadiusY / 1.6 - hexRadiusY / 2;
+        double y4 = y + hexRadiusY / 1.6;
 
-        drawTentShape(gc, building, placementState, x1, x2, x3, y1, y2, y3, y4);
+        drawTentShape(gc, info, x1, x2, x3, y1, y2, y3, y4);
     }
 
-    private static void drawTentShape(GraphicsContext gc,
-            FieldBuilding building, PlacementState placementState,
+    private static void drawTentShape(GraphicsContext gc, HexShapeInfo info,
             double x1, double x2, double x3, double y1, double y2, double y3, double y4) {
-        Paint facePaint = Theme.getCurrent().get().getBuildingFacePaint(building, placementState);
-        Paint topPaint = Theme.getCurrent().get().getBuildingTopPaint(building, placementState);
+        Paint facePaint = Theme.getCurrent().get().getBuildingFacePaint(info.building, info.placementState);
+        Paint topPaint = Theme.getCurrent().get().getBuildingTopPaint(info.building, info.placementState);
 
         double[] xpoints = new double[4];
         double[] ypoints = new double[4];
@@ -124,16 +114,18 @@ public class BuildingShapes {
         gc.strokePolygon(xpoints, ypoints, 4);
     }
 
-    private static void drawTower(GraphicsContext gc, FieldBuilding building, PlacementState placementState,
-              double x, double y, double hexSizeX, double hexSizeY) {
-        Paint facePaint = Theme.getCurrent().get().getBuildingFacePaint(building, placementState);
-        Paint topPaint = Theme.getCurrent().get().getBuildingTopPaint(building, placementState);
+    private static void drawTower(GraphicsContext gc, Grid grid, HexShapeInfo info, double x, double y) {
+        Paint facePaint = Theme.getCurrent().get().getBuildingFacePaint(info.building, info.placementState);
+        Paint topPaint = Theme.getCurrent().get().getBuildingTopPaint(info.building, info.placementState);
 
-        double width = hexSizeX / 2;
+        double hexRadiusX = grid.getHexRadiusX();
+        double hexRadiusY = grid.getHexRadiusY();
+
+        double width = hexRadiusX / 2;
         double xstart = x - width / 2;
 
-        double height = hexSizeY / 2;
-        double ytop = y - hexSizeY - hexSizeY / 3;
+        double height = hexRadiusY / 2;
+        double ytop = y - hexRadiusY - hexRadiusY / 3;
         double ybottom = y - height / 2;
 
         gc.setFill(facePaint);

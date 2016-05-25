@@ -3,7 +3,6 @@ package ui.island;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
 import data.BuildingType;
-import data.FieldType;
 import javafx.beans.Observable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -20,6 +19,7 @@ import ui.theme.PlacementState;
 import java.util.ArrayList;
 import java.util.List;
 
+import static data.FieldType.VOLCANO;
 import static ui.shape.BuildingShapes.drawBuilding;
 
 class IslandCanvas extends Canvas {
@@ -46,28 +46,34 @@ class IslandCanvas extends Canvas {
         HexShapeInfo info1 = new HexShapeInfo();
         HexShapeInfo info2 = new HexShapeInfo();
         HexShapeInfo info3 = new HexShapeInfo();
+
         info1.placementState = info2.placementState = info3.placementState = PlacementState.VALID;
-        info1.sizeX = info2.sizeX = info3.sizeX = Grid.HEX_SIZE_X * grid.getScale();
-        info1.sizeY = info2.sizeY = info3.sizeY = Grid.HEX_SIZE_Y * grid.getScale();
 
         int level = island.getField(placement.hex).getLevel() + 1;
-        Hex hex1 = placement.hex;
-        Hex hex2 = placement.hex.getLeftNeighbor(placement.tileOrientation);
-        Hex hex3 = placement.hex.getRightNeighbor(placement.tileOrientation);
-        info1.x = centerX + hex1.getDiag() * 2 * Grid.WEIRD_RATIO * info1.sizeX
-                + hex1.getLine() * Grid.WEIRD_RATIO * info1.sizeX;
-        info2.x = centerX + hex2.getDiag() * 2 * Grid.WEIRD_RATIO * info2.sizeX
-                + hex2.getLine() * Grid.WEIRD_RATIO * info2.sizeX;
-        info3.x = centerX + hex3.getDiag() * 2 * Grid.WEIRD_RATIO * info3.sizeX
-                + hex3.getLine() * Grid.WEIRD_RATIO * info3.sizeX;
-        info1.y = centerY + hex1.getLine() * info1.sizeY + hex1.getLine() * info1.sizeY / 2;
-        info2.y = centerY + hex2.getLine() * info2.sizeY + hex2.getLine() * info2.sizeY / 2;
-        info3.y = centerY + hex3.getLine() * info3.sizeY + hex3.getLine() * info3.sizeY / 2;
-        info1.scale = info2.scale = info3.scale = grid.getScale();
 
-        info1.field = Field.create(level, FieldType.VOLCANO, placement.tileOrientation);
-        info2.field = Field.create(level, placement.tileFields.getLeft(), placement.tileOrientation.leftRotation());
-        info3.field = Field.create(level, placement.tileFields.getRight(), placement.tileOrientation.rightRotation());
+        Hex hex1 = placement.hex;
+        info1.x = grid.hexToX(hex1, getWidth());
+        info1.y = grid.hexToY(hex1, getHeight());
+        info1.level = level;
+        info1.fieldType = VOLCANO;
+        info1.orientation = placement.tileOrientation;
+        info1.building = FieldBuilding.of(BuildingType.NONE, null);
+
+        Hex hex2 = placement.hex.getLeftNeighbor(placement.tileOrientation);
+        info2.x = grid.hexToX(hex2, getWidth());
+        info2.y = grid.hexToY(hex2, getHeight());
+        info2.level = level;
+        info2.fieldType = placement.tileFields.getLeft();
+        info2.orientation = placement.tileOrientation.leftRotation();
+        info2.building = FieldBuilding.of(BuildingType.NONE, null);
+
+        Hex hex3 = placement.hex.getRightNeighbor(placement.tileOrientation);
+        info3.x = grid.hexToX(hex3, getWidth());
+        info3.y = grid.hexToY(hex3, getHeight());
+        info3.level = level;
+        info3.fieldType = placement.tileFields.getRight();
+        info3.orientation = placement.tileOrientation.rightRotation();
+        info3.building = FieldBuilding.of(BuildingType.NONE, null);
 
         return ImmutableList.of(info1, info2, info3);
     }
@@ -80,23 +86,20 @@ class IslandCanvas extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         gc.clearRect(0, 0, getWidth(), getHeight());
 
-        double hexSizeX = Grid.HEX_SIZE_X * grid.getScale();
-        double hexSizeY = Grid.HEX_SIZE_Y * grid.getScale();
         double centerX = getWidth() / 2 - grid.getOx();
         double centerY = getHeight() / 2 - grid.getOy();
 
         List<HexShapeInfo> infos = new ArrayList<>();
         for (Hex hex : island.getFields()) {
             HexShapeInfo info = new HexShapeInfo();
-            int line = hex.getLine();
-            int diag = hex.getDiag();
-            info.sizeX = hexSizeX;
-            info.sizeY = hexSizeY;
-            info.x = centerX + diag * 2 * Grid.WEIRD_RATIO * info.sizeX + line * Grid.WEIRD_RATIO * info.sizeX;
-            info.y = centerY + line * info.sizeY + line * info.sizeY / 2;
+            info.x = grid.hexToX(hex, getWidth());
+            info.y = grid.hexToY(hex, getHeight());
             info.placementState = PlacementState.NONE;
-            info.field = island.getField(hex);
-            info.scale = grid.getScale();
+            Field field = island.getField(hex);
+            info.level = field.getLevel();
+            info.fieldType = field.getType();
+            info.orientation = field.getOrientation();
+            info.building = field.getBuilding();
             infos.add(info);
         }
 
@@ -106,14 +109,12 @@ class IslandCanvas extends Canvas {
 
         // Affichage de la map
         for (HexShapeInfo info : Ordering.natural().sortedCopy(infos)) {
-            hexShape.draw(gc, info);
+            hexShape.draw(gc, grid, info);
 
-            FieldBuilding building = info.field.getBuilding();
+            FieldBuilding building = info.building;
             if (building.getType() != BuildingType.NONE) {
-                drawBuilding(gc, building, info.field.getLevel(), PlacementState.NONE,
-                        grid.scale,
-                        info.x, info.y - info.sizeY / 6,
-                        info.sizeX, info.sizeY);
+                //info.y -= grid.getHexRadiusY();
+                drawBuilding(gc, grid, info);
             }
         }
 
@@ -136,8 +137,9 @@ class IslandCanvas extends Canvas {
             maxDiag += 3;
             for (int line = minLine; line <= maxLine; line++) {
                 for (int diag = minDiag; diag <= maxDiag; diag++) {
-                    double x = centerX + diag * 2 * Grid.WEIRD_RATIO * hexSizeX + line * Grid.WEIRD_RATIO * hexSizeX;
-                    double y = centerY + line * hexSizeY + line * hexSizeY / 2;
+                    Hex hex = Hex.at(line, diag);
+                    double x = grid.hexToX(hex, getWidth());
+                    double y = grid.hexToY(hex, getHeight());
                     String hexStr = line + "," + diag;
                     gc.setTextAlign(TextAlignment.CENTER);
                     gc.setFill(Color.BLACK);

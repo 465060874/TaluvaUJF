@@ -1,17 +1,18 @@
 package ui.island;
 
 import map.Hex;
+import map.Neighbor;
 
 public class Grid {
 
-    public static final double HEX_SIZE_X = 60d;
-    public static final double HEX_SIZE_Y = 60d * 0.8d;
-    public static final double HEX_HEIGHT = 10d;
-    public static final double WEIRD_RATIO = Math.cos(Math.toRadians(30d));
+    private static final double HEX_RADIUS_X = 60d;
+    private static final double HEX_RADIUS_Y = 60d * 0.8d;
+    private static final double HEX_HEIGHT = 10d;
+    private static final double WEIRD_RATIO = Math.cos(Math.toRadians(30d));
 
-    double ox;
-    double oy;
-    double scale;
+    private double ox;
+    private double oy;
+    private double scale;
 
     Grid(double ox, double oy, double scale) {
         this.ox = ox;
@@ -19,46 +20,86 @@ public class Grid {
         this.scale = scale;
     }
 
-    private Hex pointToHex(double x, double y) {
-        double hexWidth = HEX_SIZE_X * scale * WEIRD_RATIO;
-        double hexHeight = HEX_SIZE_Y * scale;
+    public double getOx() {
+        return ox;
+    }
 
-        x = x / (hexWidth * 2);
-        double t1 = (y + hexHeight) / hexHeight;
-        double t2 = Math.floor(x + t1);
-        double line = Math.floor((Math.floor(t1 - x) + t2) / 3);
-        double diag = Math.floor((Math.floor(2 * x + 1) + t2) / 3) - line;
+    public double getOy() {
+        return oy;
+    }
+
+    void translate(double ox, double oy) {
+        this.ox += ox;
+        this.oy += oy;
+    }
+
+    public double getScale() {
+        return scale;
+    }
+
+    void scale(double factor) {
+        this.scale *= factor;
+    }
+
+    public double getHexRadiusX() {
+        return HEX_RADIUS_X * scale;
+    }
+
+    public double getHexHalfWidth() {
+        return getHexRadiusX() * WEIRD_RATIO;
+    }
+
+    public double getHexRadiusY() {
+        return HEX_RADIUS_Y * scale;
+    }
+
+    public double getHexHeight() {
+        return HEX_HEIGHT * scale;
+    }
+
+    Hex xyToHex(double x, double y, double width, double height) {
+        double x2 = x - (width / 2 - ox);
+        double y2 = y - (height / 2 - oy);
+        double hexHalfSizeY = getHexRadiusY();
+
+        x2 = x2 / (getHexHalfWidth() * 2);
+        double t1 = (y2 + hexHalfSizeY) / hexHalfSizeY;
+        double t2 = Math.floor(x2 + t1);
+        double line = Math.floor((Math.floor(t1 - x2) + t2) / 3);
+        double diag = Math.floor((Math.floor(2 * x2 + 1) + t2) / 3) - line;
 
         return Hex.at((int) line, (int) diag);
     }
 
-    public Hex getHex(double mx, double my, double width, double height) {
-        double x = mx - (width / 2 - ox);
-        double y = my - (height / 2 - oy);
-        return  pointToHex(x, y);
+    double hexToX(Hex hex, double width) {
+        int diag = hex.getDiag();
+        int line = hex.getLine();
+        double centerX = width / 2 - ox;
+        return centerX + lineDiagToX(line, diag);
     }
 
-    double getOx() {
-        return ox;
+    double neighborToXOffset(Neighbor neighbor) {
+        return lineDiagToX(neighbor.getLineOffset(), neighbor.getDiagOffset());
     }
 
-    void setOx(double ox) {
-        this.ox = ox;
+    private double lineDiagToX(int line, int diag) {
+        double hexHalfWidth = getHexHalfWidth();
+        return diag * 2 * hexHalfWidth + line * hexHalfWidth;
     }
 
-    double getOy() {
-        return oy;
+    double hexToY(Hex hex, double height) {
+        int line = hex.getLine();
+        double centerY = height / 2 - oy;
+        return centerY + lineToY(line);
     }
 
-    void setOy(double oy) {
-        this.oy = oy;
+    double neighborToYOffset(Neighbor neighbor) {
+        return lineToY(neighbor.getLineOffset());
     }
 
-    double getScale() {
-        return scale;
+    private double lineToY(int line) {
+        double hexSizeY = getHexRadiusY();
+        return line * hexSizeY + line * hexSizeY / 2;
     }
 
-    void setScale(double scale) {
-        this.scale = scale;
-    }
 }
