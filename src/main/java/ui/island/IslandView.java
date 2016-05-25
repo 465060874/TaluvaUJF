@@ -147,6 +147,7 @@ public class IslandView extends StackPane {
 
         if (grid.scale(event.getDeltaY() > 0 ? 1.1 : 1 / 1.1)) {
             islandCanvas.redraw();
+            placementOverlay.redraw();
         }
     }
 
