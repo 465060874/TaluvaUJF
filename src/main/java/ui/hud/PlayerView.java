@@ -42,7 +42,6 @@ public class PlayerView extends AnchorPane {
 
         this.buildingsPane = new HBox(20);
         buildingsPane.setAlignment(Pos.CENTER);
-        buildingsPane.setNodeOrientation(corner().nodeOrientation());
         this.buildingTexts = new Text[BuildingType.values().length];
         for (BuildingType type : BuildingType.values()) {
             if (type == BuildingType.NONE) {
@@ -53,8 +52,8 @@ public class PlayerView extends AnchorPane {
             buildingTexts[type.ordinal()].setFont(new Font(14));
             BuildingCanvas buildingCanvas = new BuildingCanvas(FieldBuilding.of(type, player().getColor()));
             buildingsPane.getChildren().addAll(
-                    buildingTexts[type.ordinal()],
-                    buildingCanvas);
+                    buildingCanvas,
+                    buildingTexts[type.ordinal()]);
         }
         buildingsPane.setBackground(createBackground(corner().buildingsRadii()));
         buildingsPane.setBorder(createBorder(corner().buildingsRadii()));

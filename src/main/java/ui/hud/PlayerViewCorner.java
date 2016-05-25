@@ -1,6 +1,5 @@
 package ui.hud;
 
-import javafx.geometry.NodeOrientation;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.CornerRadii;
@@ -23,11 +22,6 @@ public enum PlayerViewCorner {
         CornerRadii buildingsRadii() {
             return new CornerRadii(0, 0, 20, 0, false);
         }
-
-        @Override
-        NodeOrientation nodeOrientation() {
-            return NodeOrientation.LEFT_TO_RIGHT;
-        }
     },
 
     TOP_RIGHT {
@@ -44,12 +38,7 @@ public enum PlayerViewCorner {
 
         @Override
         CornerRadii buildingsRadii() {
-            return new CornerRadii(0, 0, 20, 0, false);
-        }
-
-        @Override
-        NodeOrientation nodeOrientation() {
-            return NodeOrientation.RIGHT_TO_LEFT;
+            return new CornerRadii(0, 0, 0, 20, false);
         }
     },
 
@@ -69,11 +58,6 @@ public enum PlayerViewCorner {
         CornerRadii buildingsRadii() {
             return new CornerRadii(0, 20, 0, 0, false);
         }
-
-        @Override
-        NodeOrientation nodeOrientation() {
-            return NodeOrientation.LEFT_TO_RIGHT;
-        }
     },
 
     BOTTOM_RIGHT {
@@ -90,12 +74,7 @@ public enum PlayerViewCorner {
 
         @Override
         CornerRadii buildingsRadii() {
-            return new CornerRadii(0, 20, 0, 0, false);
-        }
-
-        @Override
-        NodeOrientation nodeOrientation() {
-            return NodeOrientation.RIGHT_TO_LEFT;
+            return new CornerRadii(20, 0, 0, 0, false);
         }
     };
 
@@ -109,6 +88,4 @@ public enum PlayerViewCorner {
     abstract CornerRadii faceRadii();
 
     abstract CornerRadii buildingsRadii();
-
-    abstract NodeOrientation nodeOrientation();
 }
