@@ -41,7 +41,8 @@ public class Home4 extends Application {
         //scene.setFill(Color.rgb(169, 234, 254));
         scene.getStylesheets().add("/menu/menus.css");
 
-        int lv = largeurScene/2;
+        double lv = largeurScene/3;
+        double hv = hauteurScene/3;
 
         VBox vBoxScene = new VBox();
         vBoxScene.setAlignment(Pos.CENTER);
@@ -67,6 +68,7 @@ public class Home4 extends Application {
         VBox vBoxsolo = new VBox();
         VBox vBoxmulti = new VBox();
         VBox vBoxcharger = new VBox();
+        VBox vBoxreprendre = new VBox();
         VBox vBoxnulle1 = new VBox();
         VBox vBoxnulle2 = new VBox();
         VBox vBoxnulle3 = new VBox();
@@ -74,16 +76,21 @@ public class Home4 extends Application {
         VBox vBoxmillieu = new VBox();
         VBox vBoxdroite = new VBox();
 
-        vBoxsolo.setPrefHeight(hauteurScene*2/9);
-        vBoxmulti.setPrefHeight(hauteurScene*2/9);
-        vBoxcharger.setPrefHeight(hauteurScene*2/9);
-        vBoxnulle1.setPrefHeight(hauteurScene*1/9);
-        vBoxnulle2.setPrefHeight(hauteurScene*1/9);
-        vBoxnulle3.setPrefHeight(hauteurScene*1/9);
-        vBoxgauche.setPrefWidth(largeurScene/3-15);
-        vBoxmillieu.setPrefWidth(largeurScene/3-15);
-        vBoxdroite.setPrefWidth(largeurScene/3-15);
+        vBoxreprendre.setAlignment(Pos.CENTER);
+        vBoxnulle3.setAlignment(Pos.CENTER);
 
+        vBoxsolo.setPrefHeight(lv-40);
+        vBoxmulti.setPrefHeight(lv-40);
+        vBoxcharger.setPrefHeight(lv-40);
+        vBoxreprendre.setPrefSize(lv-50,lv-50);
+        vBoxnulle1.setPrefHeight(hv*2/5);
+        vBoxnulle2.setPrefHeight(hv*2/5);
+        vBoxnulle3.setPrefHeight(hv*2/5);
+        vBoxgauche.setPrefWidth(lv-40);
+        vBoxmillieu.setPrefWidth(lv-40);
+        vBoxdroite.setPrefWidth(lv-40);
+
+        vBoxnulle3.getChildren().add(vBoxreprendre);
         vBoxgauche.getChildren().addAll(vBoxsolo,vBoxnulle1);
         vBoxmillieu.getChildren().addAll(vBoxnulle2,vBoxmulti);
         vBoxdroite.getChildren().addAll(vBoxcharger,vBoxnulle3);
@@ -92,9 +99,11 @@ public class Home4 extends Application {
         Button bsolo = new Button("SOLO");
         Button bmulti = new Button("MULTI");
         Button bcharger = new Button("CHARGER");
+        Button breprendre = new Button("->");
         bsolo.setPrefSize(largeurScene/3,hauteurScene*2/9);
         bmulti.setPrefSize(largeurScene/3,hauteurScene*2/9);
         bcharger.setPrefSize(largeurScene/3,hauteurScene*2/9);
+        breprendre.setPrefSize(lv-100,lv-100);
 
         double[] path = new double[100];
         for (int q = 0; q < 24; q++) {
@@ -108,124 +117,37 @@ public class Home4 extends Application {
         bsolo.setShape(aPoly);
         bmulti.setShape(aPoly);
         bcharger.setShape(aPoly);
-
+        breprendre.setShape(aPoly);
         vBoxsolo.getChildren().add(bsolo);
         vBoxmulti.getChildren().add(bmulti);
         vBoxcharger.getChildren().add(bcharger);
-        /*
-        //vBoxHaut : logo
+        vBoxreprendre.getChildren().add(breprendre);
 
-        //hBoxMillieu
-
-        //Button lancer
-        Image lancer = new Image(getClass().getResourceAsStream("l.png"));
-        Button blancer = new Button("", new ImageView(lancer));
-        blancer.setPadding(new Insets(0, 0, 0, 0));
-        Arc arc = new Arc();
-        arc.setRadiusX(30.0f);
-        arc.setRadiusY(30.0f);
-        arc.setStartAngle(45.0f);
-        arc.setLength(360.0f);
-        arc.setType(ArcType.ROUND);
-        blancer.setShape(arc);
-        //Button redemarrrer;
-        Image red = new Image(getClass().getResourceAsStream("red.png"));
-        Button bred = new Button("", new ImageView(red));
-        bred.setPadding(new Insets(0,0,0,0));
-        //vBoxa : vide
-        VBox vBoxa = new VBox();
-        vBoxa.setPrefWidth(largeurScene*2/5);
-        //vBoxb : Button lancer
-        VBox vBoxb = new VBox();
-        vBoxb.setAlignment(Pos.CENTER);
-        vBoxb.setPrefWidth(largeurScene/5);
-        //vBoxc : Button redemarrer
-        VBox vBoxc = new VBox();
-        vBoxc.setAlignment(Pos.CENTER_LEFT);
-        vBoxc.setPrefWidth(largeurScene*2/5);
-
-
-
-
-
-
-        vBoxb.getChildren().add(blancer);
-        vBoxc.getChildren().add(bred);
-
-        hBoxMillieu.getChildren().addAll(vBoxa,vBoxb,vBoxc);
-
-
-
-        //vBoxBas
-        //hBoxi : Button solo/multijoueurs/charger
-        HBox hBoxi = new HBox();
-        hBoxi.setAlignment(Pos.CENTER);
-        hBoxi.setPrefWidth(largeurScene);
-        hBoxi.setPrefHeight(hauteurScene/13);
-        //hBoxc : StackPane
-        HBox hBoxc = new HBox();
-        hBoxc.setPrefHeight(hauteurScene/2-hauteurScene/13);
-        hBoxc.setAlignment(Pos.CENTER);
-        hBoxc.setPrefWidth(largeurScene);
-        VBox vBoxbg = new VBox();
-        int largeurBoder = (int) largeurScene/10;
-        vBoxbg.setPrefSize(largeurScene-largeurBoder,50);
-
-
-
-
-
-        hBoxc.getChildren().add(vBoxbg);
-        vBoxbg.setAlignment(Pos.CENTER);
-        VBox vBoxbgf = new VBox();
-        vBoxbgf.setAlignment(Pos.CENTER);
-        vBoxbg.getChildren().add(vBoxbgf);
-        vBoxbgf.setPrefSize(largeurScene-largeurBoder,(hauteurScene/2)-(hauteurScene/6)-largeurBoder);
-        vBoxBas.getChildren().addAll(hBoxc,hBoxi);
-
-
-
-
-
-
-
-
-
-
-        Button solo= new Button("SOLO");
-        Button multijoueurs= new Button("MULTIJOUEURS");
-        Button charger= new Button("CHARGER");
-        solo.setPrefWidth(largeurScene/3);
-        multijoueurs.setPrefWidth(largeurScene/3);
-        charger.setPrefWidth(largeurScene/3);
-        solo.setPrefHeight(hauteurScene/10);
-        multijoueurs.setPrefHeight(hauteurScene/10);
-        charger.setPrefHeight(hauteurScene/10);
-        hBoxi.getChildren().addAll(solo,multijoueurs,charger);
 
         StackPane stackPane = new StackPane();
-        vBoxbgf.getChildren().add(stackPane);
+        hBoxMillieu.getChildren().add(stackPane);
 
 
-
-        VBox vBoxSolo = new VBox(1);
-        vBoxSolo.setAlignment(Pos.CENTER);
-        VBox vBoxMultiJeurs = new VBox(5);
-        vBoxMultiJeurs.setAlignment(Pos.CENTER);
-        vBoxMultiJeurs.setPrefWidth(largeurScene);
-        HBox hBoxCharger = new HBox();
-        hBoxCharger.setAlignment(Pos.CENTER);
-        hBoxCharger.setPrefWidth(largeurScene*2/3);
+        VBox vBoxS = new VBox(1);
+        vBoxS.setAlignment(Pos.CENTER);
+        VBox vBoxM = new VBox(5);
+        vBoxM.setAlignment(Pos.CENTER);
+        vBoxM.setPrefWidth(largeurScene);
+        HBox hBoxC = new HBox();
+        hBoxC.setAlignment(Pos.CENTER);
+        hBoxC.setPrefWidth(largeurScene*2/3);
+        hBoxC.setPadding(new Insets(10,10,10,10));
 
 
         //pane de button solo
         //deux buttons : icone /difficulte
 
-
+        double largeurBoder = largeurScene/10;
         HBox hBoxI = new HBox(3);
-        hBoxI.setAlignment(Pos.CENTER);
         HBox hBoxII = new HBox(3);
+        hBoxI.setAlignment(Pos.CENTER);
         hBoxII.setAlignment(Pos.CENTER);
+
         VBox vBoxg1 = new VBox();
         VBox vBoxm1 = new VBox();
         VBox vBoxd1 = new VBox();
@@ -235,6 +157,7 @@ public class Home4 extends Application {
         vBoxg1.setPrefWidth((largeurScene-25-largeurBoder)/2);
         vBoxm1.setPrefWidth(25);
         vBoxd1.setPrefWidth((largeurScene-25-largeurBoder)/2);
+
         VBox vBoxg2 = new VBox();
         VBox vBoxm2 = new VBox();
         VBox vBoxd2 = new VBox();
@@ -247,7 +170,7 @@ public class Home4 extends Application {
 
         hBoxI.getChildren().addAll(vBoxg1,vBoxm1,vBoxd1);
         hBoxII.getChildren().addAll(vBoxg2,vBoxm2,vBoxd2);
-        vBoxSolo.getChildren().addAll(hBoxI,hBoxII);
+        vBoxS.getChildren().addAll(hBoxI,hBoxII);
 
         Label icone = new Label("VOTRE ICONE");
         Label niveaux = new Label("DIFFICULTE");
@@ -279,10 +202,14 @@ public class Home4 extends Application {
         vBoxm2.getChildren().add(iv1);
         vBoxd2.getChildren().add(vBoxNiveaux);
 
-        solo.setOnAction(e -> {
+        bsolo.setOnAction(e -> {
             stackPane.getChildren().clear();
-            stackPane.getChildren().add(vBoxSolo);
+            stackPane.getChildren().add(vBoxS);
         });
+
+
+
+
 
 
         //pane button multijoueurs
@@ -310,33 +237,33 @@ public class Home4 extends Application {
         vBoxRect.getChildren().addAll(rec1,rec2,rec3,rec4,rec5,rec6,rec7);
         sp.hbarPolicyProperty().set(ScrollPane.ScrollBarPolicy.NEVER);
         sp.setContent(vBoxRect);
-        hBoxCharger.getChildren().add(sp);
-        hBoxCharger.setPrefHeight(100);
+        hBoxC.getChildren().add(sp);
+        hBoxC.setPrefHeight(100);
         //hBoxCharger.setPadding(new Insets(20,0,30,0));
-        charger.setOnAction(e -> {
+        bcharger.setOnAction(e -> {
             stackPane.getChildren().clear();
-            stackPane.getChildren().add(hBoxCharger);
+            stackPane.getChildren().add(hBoxC);
         });
 
 
 
 
-        vBoxMultiJeurs.getChildren().addAll(deuxjoueurs,troisjoueurs,quatrejoueurs1,quatrejoueurs2);
-        multijoueurs.setOnAction(e -> {
+        vBoxM.getChildren().addAll(deuxjoueurs,troisjoueurs,quatrejoueurs1,quatrejoueurs2);
+        bmulti.setOnAction(e -> {
             stackPane.getChildren().clear();
-            stackPane.getChildren().add(vBoxMultiJeurs);
+            stackPane.getChildren().add(vBoxM);
         });
 
-*/
 
 
 
-//CSS
 
-        /*
-        solo.getStyleClass().add("buttonniveaux4");
-        multijoueurs.getStyleClass().add("buttonniveaux4");
-        charger.getStyleClass().add("buttonniveaux4");
+        vBoxScene.getStyleClass().add("svBoxScene");
+        bsolo.getStyleClass().add("buttonniveaux4");
+        bmulti.getStyleClass().add("buttonniveaux4");
+        bcharger.getStyleClass().add("buttonniveaux4");
+        breprendre.getStyleClass().add("buttonniveaux4");
+
         icone.getStyleClass().add("bin");
         niveaux.getStyleClass().add("bin");
         simple.getStyleClass().add("buttonniveaux1");
@@ -345,49 +272,13 @@ public class Home4 extends Application {
         deuxjoueurs.getStyleClass().add("buttonjoueur");
         troisjoueurs.getStyleClass().add("buttonjoueur");
         quatrejoueurs1.getStyleClass().add("buttonjoueur");
-        quatrejoueurs2.getStyleClass().add("buttonjoueur");*/
-        //vBoxbgf.getStyleClass().add("b4");
-        // stackPane.getStyleClass().add("b5");
+        quatrejoueurs2.getStyleClass().add("buttonjoueur");
 
-        //hBoxi.getStyleClass().add("b2");
 /*
-        //CSS contour des box
-
-
-        vBoxa.getStyleClass().add("b1");
-        vBoxb.getStyleClass().add("b1");
-        vBoxc.getStyleClass().add("b1");
-
-        hBoxi.getStyleClass().add("b2");
-        hBoxc.getStyleClass().add("b2");
-        vBoxbg.getStyleClass().add("b1");
-
-
-        hBoxI.getStyleClass().add("b3");
-        hBoxII.getStyleClass().add("b3");
-        vBoxg1.getStyleClass().add("b3");
-        vBoxm1.getStyleClass().add("b3");
-        vBoxd1.getStyleClass().add("b3");
-        vBoxg2.getStyleClass().add("b1");
-        vBoxm2.getStyleClass().add("b1");
-        vBoxd2.getStyleClass().add("b1");
-        //vBoxNiveaux.getStyleClass().add("b2");
-        vBoxSolo.getStyleClass().add("b2");
-        vBoxMultiJeurs.getStyleClass().add("b2");
-        hBoxCharger.getStyleClass().add("b2");
-
-*/
-        vBoxScene.getStyleClass().add("svBoxScene");
-        bsolo.getStyleClass().add("buttonniveaux4");
-        bmulti.getStyleClass().add("buttonniveaux4");
-        bcharger.getStyleClass().add("buttonniveaux4");
-
-
-
         vBoxScene.getStyleClass().add("b1");
         hBoxBas.getStyleClass().add("b3");
         vBoxHaut.getStyleClass().add("b1");
-        hBoxMillieu.getStyleClass().add("b2");
+        //hBoxMillieu.getStyleClass().add("b2");
         vBoxgauche.getStyleClass().add("b2");
         vBoxmillieu.getStyleClass().add("b2");
         vBoxdroite.getStyleClass().add("b2");
@@ -397,7 +288,7 @@ public class Home4 extends Application {
         vBoxnulle1.getStyleClass().add("b1");
         vBoxnulle2.getStyleClass().add("b1");
         vBoxnulle3.getStyleClass().add("b1");
-
+*/
         root.getChildren().add(vBoxScene);
         stage.setScene(scene);
         stage.show();

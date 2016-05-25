@@ -5,9 +5,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -143,9 +141,9 @@ public class Home3 extends Application {
 
 
 
-        Button solo= new Button("SOLO");
-        Button multijoueurs= new Button("MULTIJOUEURS");
-        Button charger= new Button("CHARGER");
+        ToggleButton solo= new ToggleButton("SOLO");
+        ToggleButton multijoueurs= new ToggleButton("MULTIJOUEURS");
+        ToggleButton charger= new ToggleButton("CHARGER");
         solo.setPrefWidth(largeurScene/3);
         multijoueurs.setPrefWidth(largeurScene/3);
         charger.setPrefWidth(largeurScene/3);
@@ -154,12 +152,18 @@ public class Home3 extends Application {
         charger.setPrefHeight(hauteurScene/10);
         hBoxi.getChildren().addAll(solo,multijoueurs,charger);
 
+        ToggleGroup group = new ToggleGroup();
+        solo.setToggleGroup(group);
+        multijoueurs.setToggleGroup(group);
+        charger.setToggleGroup(group);
+        solo.setSelected(true);
+
         StackPane stackPane = new StackPane();
         vBoxbgf.getChildren().add(stackPane);
 
 
 
-        VBox vBoxSolo = new VBox(1);
+        VBox vBoxSolo = new VBox(5);
         vBoxSolo.setAlignment(Pos.CENTER);
         VBox vBoxMultiJeurs = new VBox(5);
         vBoxMultiJeurs.setAlignment(Pos.CENTER);
