@@ -1,5 +1,6 @@
 package menu;
 
+import data.ChoosenColors;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -24,16 +25,28 @@ import javafx.stage.Stage;
  */
 public class Home4 extends Application {
 
-    double size_ratio = 580.0 / 800.;
+    final String[] nomdimage = new String[]{"w.png", "r.png", "y.png","b.png"};
+    final Image[] images = new Image[nomdimage.length];
+    final ImageView[] pics = new ImageView[nomdimage.length];
+
+    final String[] couleur = new String[]{
+            ChoosenColors.WHITE.cssDefinition(),
+            ChoosenColors.RED.cssDefinition(),
+            ChoosenColors.YELLOW.cssDefinition(),
+            ChoosenColors.BROWN.cssDefinition()
+    };
+
+    double size_ratio = 580.0 / 800.0;
     int hauteurScene = 600;
     int largeurScene = (int) (hauteurScene * size_ratio);
+    int iterateurIcone = 0;
 
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override public void start(Stage stage) {
-
+        //System.out.println(ChoosenColors.BROWN);
         //scene
         stage.setTitle("TALUVA_V3");
         Group root = new Group();
@@ -61,7 +74,9 @@ public class Home4 extends Application {
 
         vBoxScene.getChildren().addAll(vBoxHaut,hBoxMillieu,hBoxBas);
 
-
+        // Tableau des images
+        for (int i = 0; i < nomdimage.length; i++)
+            images[i] = new Image(getClass().getResourceAsStream(nomdimage[i]));
 
         //vBoxBas
 
@@ -128,7 +143,7 @@ public class Home4 extends Application {
         hBoxMillieu.getChildren().add(stackPane);
 
 
-        VBox vBoxS = new VBox(1);
+        VBox vBoxS = new VBox(5);
         vBoxS.setAlignment(Pos.CENTER);
         VBox vBoxM = new VBox(5);
         vBoxM.setAlignment(Pos.CENTER);
@@ -182,8 +197,12 @@ public class Home4 extends Application {
         vBoxd1.getChildren().add(niveaux);
 
         Button bicone = new Button();
-        Image imageDecline = new Image(getClass().getResourceAsStream("icone1.jpg"));
+        Image imageDecline = new Image(getClass().getResourceAsStream(nomdimage[1]));
+        bicone.setPadding(new Insets(0,0,0,0));
         bicone.setGraphic(new ImageView(imageDecline));
+        bicone.setStyle("-fx-background-color: " + couleur[1] +";");
+
+
         bicone.setPrefWidth(largeurScene/3);
         Image vs = new Image(getClass().getResourceAsStream("vs.png"));
         ImageView iv1 = new ImageView();
@@ -202,11 +221,25 @@ public class Home4 extends Application {
         vBoxm2.getChildren().add(iv1);
         vBoxd2.getChildren().add(vBoxNiveaux);
 
+
+
         bsolo.setOnAction(e -> {
             stackPane.getChildren().clear();
             stackPane.getChildren().add(vBoxS);
         });
 
+        bicone.setOnAction(e->{
+            if(iterateurIcone==nomdimage.length-1) {
+                setIterateurIcone(0);
+                bicone.setStyle("-fx-background-color: " + couleur[0] +";");
+            }
+            else if((iterateurIcone >= 0) && ( iterateurIcone < nomdimage.length)){
+                setIterateurIcone(iterateurIcone + 1 % 4);
+                bicone.setStyle("-fx-background-color: " + couleur[iterateurIcone] +";");
+            }
+            bicone.setGraphic(new ImageView(images[iterateurIcone]));
+
+        });
 
 
 
@@ -262,7 +295,7 @@ public class Home4 extends Application {
         bsolo.getStyleClass().add("buttonniveaux4");
         bmulti.getStyleClass().add("buttonniveaux4");
         bcharger.getStyleClass().add("buttonniveaux4");
-        breprendre.getStyleClass().add("buttonniveaux4");
+        breprendre.getStyleClass().add("buttonniveaux5");
 
         icone.getStyleClass().add("bin");
         niveaux.getStyleClass().add("bin");
@@ -293,6 +326,10 @@ public class Home4 extends Application {
         stage.setScene(scene);
         stage.show();
 
+    }
+
+    private void setIterateurIcone( int val ){
+        iterateurIcone = val;
     }
 
 }

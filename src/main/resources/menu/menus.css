@@ -111,6 +111,52 @@
 }
 
 .buttonniveaux4{
+    -fx-background-color: #EFB068;
+    -fx-color: white;
+    -fx-text-fill: white;
+    -fx-outer-border: #EFB068;
+    -fx-background-radius: 0 0 0 0;
+}
+
+.buttonniveaux4: hover{
+    -fx-background-color: #AB8152;
+    -fx-color: white;
+    -fx-text-fill: white;
+    -fx-background-radius: 0 0 0 0;
+}
+
+.buttonniveaux4:focused {
+    -fx-color: white;
+    -fx-background-color: #AB8152;
+    -fx-background-radius: 0;
+    -fx-text-fill: white;
+}
+
+
+.buttonniveaux5{
+    -fx-background-color: #00D507;
+    -fx-color: white;
+    -fx-text-fill: white;
+    -fx-outer-border: #00D507;
+    -fx-background-radius: 0 0 0 0;
+}
+
+.buttonniveaux5: hover{
+    -fx-background-color: #00B506;
+    -fx-color: white;
+    -fx-text-fill: white;
+    -fx-background-radius: 0 0 0 0;
+}
+
+.buttonniveaux5:focused {
+    -fx-color: white;
+    -fx-background-color: #00B506;
+    -fx-background-radius: 0;
+    -fx-text-fill: white;
+}
+
+/*
+.buttonniveaux4{
     -fx-background-color: #F337A8;
     -fx-color: white;
     -fx-text-fill: white;
@@ -131,7 +177,7 @@
     -fx-background-radius: 0;
     -fx-text-fill: white;
 }
-
+*/
 .bin{
     -fx-background-color:#B9121B;
     -fx-text-fill: white;
