@@ -23,7 +23,7 @@ public class IslandView extends StackPane {
     private double mouseY;
 
     public IslandView(Island island, boolean debug) {
-        this.grid = new Grid(this, 0.0, 0.0, 1);
+        this.grid = new Grid(0.0, 0.0, 1);
         this.placement = new Placement(island, grid);
         this.placementOverlay = new PlacementOverlay(island, grid, placement);
         this.islandCanvas = new IslandCanvas(island, grid, placement, debug);

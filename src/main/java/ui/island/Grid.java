@@ -10,14 +10,11 @@ public class Grid {
     private static final double HEX_HEIGHT = 10d;
     private static final double WEIRD_RATIO = Math.cos(Math.toRadians(30d));
 
-    private final IslandView islandView;
-
     private double ox;
     private double oy;
     private double scale;
 
-    Grid(IslandView islandView, double ox, double oy, double scale) {
-        this.islandView = islandView;
+    public Grid(double ox, double oy, double scale) {
         this.ox = ox;
         this.oy = oy;
         this.scale = scale;
@@ -40,7 +37,7 @@ public class Grid {
         return scale;
     }
 
-    boolean scale(double factor) {
+    public boolean scale(double factor) {
         double newScale = scale * factor;
         if (newScale > 8) {
             newScale = 8;
