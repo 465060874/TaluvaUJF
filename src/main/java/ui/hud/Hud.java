@@ -1,5 +1,6 @@
 package ui.hud;
 
+import data.PlayerColor;
 import engine.Engine;
 import engine.EngineObserver;
 import engine.EngineStatus;
@@ -18,6 +19,8 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 
 import java.util.List;
+
+import static java.util.stream.Collectors.joining;
 
 public class Hud extends AnchorPane implements EngineObserver {
 
@@ -46,7 +49,7 @@ public class Hud extends AnchorPane implements EngineObserver {
         leftButtons.getChildren().addAll(left1, left2);
 
         Font font = new Font(18);
-        this.textLine = new Text("Text goes here !");
+        this.textLine = new Text("");
         textLine.setFont(font);
         this.textBottom = new TextFlow(textLine);
         textBottom.setTextAlignment(TextAlignment.CENTER);
@@ -125,6 +128,14 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     @Override
     public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
-
+        if (winners.size() == 1) {
+            textLine.setText("Le joueur " + winners.get(0).getColor() + " a gagné !");
+        }
+        else {
+            textLine.setText(winners.stream()
+                    .map(Player::getColor)
+                    .map(PlayerColor::name)
+                    .collect(joining(", ", "Les joueurs ", " ont gagné !")));
+        }
     }
 }
