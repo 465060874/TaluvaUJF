@@ -28,13 +28,28 @@ public class Home4 extends Application {
     final String[] nomdimage = new String[]{"w.png", "r.png", "y.png","b.png"};
     final Image[] images = new Image[nomdimage.length];
     final ImageView[] pics = new ImageView[nomdimage.length];
-
     final String[] couleur = new String[]{
             ChoosenColors.WHITE.cssDefinition(),
             ChoosenColors.RED.cssDefinition(),
             ChoosenColors.YELLOW.cssDefinition(),
             ChoosenColors.BROWN.cssDefinition()
     };
+
+    boolean bsoloselected = false;
+    boolean bmultiselected = false;
+    boolean bchargersemected = false;
+    boolean breprendreselected = false;
+    boolean biconeselected = false;
+    boolean bfacileselected = false;
+    boolean bmoyensemected = false;
+    boolean bdifficileselected = false;
+    boolean bdeuxjoueursselected = false;
+    boolean btroisjoueursselected = false;
+    boolean bquatrejoueurs1selected = false;
+    boolean bquatrejoueurs2selected = false;
+    boolean soloselected = false;
+    boolean bnselected = false;
+    boolean njselected = false;
 
     double size_ratio = 580.0 / 800.0;
     int hauteurScene = 600;
@@ -136,7 +151,7 @@ public class Home4 extends Application {
         vBoxsolo.getChildren().add(bsolo);
         vBoxmulti.getChildren().add(bmulti);
         vBoxcharger.getChildren().add(bcharger);
-        vBoxreprendre.getChildren().add(breprendre);
+        //vBoxreprendre.getChildren().add(breprendre);
 
 
         StackPane stackPane = new StackPane();
@@ -223,23 +238,7 @@ public class Home4 extends Application {
 
 
 
-        bsolo.setOnAction(e -> {
-            stackPane.getChildren().clear();
-            stackPane.getChildren().add(vBoxS);
-        });
 
-        bicone.setOnAction(e->{
-            if(iterateurIcone==nomdimage.length-1) {
-                setIterateurIcone(0);
-                bicone.setStyle("-fx-background-color: " + couleur[0] +";");
-            }
-            else if((iterateurIcone >= 0) && ( iterateurIcone < nomdimage.length)){
-                setIterateurIcone(iterateurIcone + 1 % 4);
-                bicone.setStyle("-fx-background-color: " + couleur[iterateurIcone] +";");
-            }
-            bicone.setGraphic(new ImageView(images[iterateurIcone]));
-
-        });
 
 
 
@@ -254,6 +253,7 @@ public class Home4 extends Application {
         troisjoueurs.setPrefWidth(largeurScene/2);
         quatrejoueurs1.setPrefWidth(largeurScene/2);
         quatrejoueurs2.setPrefWidth(largeurScene/2);
+        vBoxM.getChildren().addAll(deuxjoueurs,troisjoueurs,quatrejoueurs1,quatrejoueurs2);
 
         //pane charger
         ScrollPane sp = new ScrollPane();
@@ -273,23 +273,116 @@ public class Home4 extends Application {
         hBoxC.getChildren().add(sp);
         hBoxC.setPrefHeight(100);
         //hBoxCharger.setPadding(new Insets(20,0,30,0));
+
+
+
+
+
+
+
+//integration
+        bicone.setOnAction(e->{
+            biconeselected = true;
+        });
+
+        simple.setOnAction(e->{
+            bfacileselected = true;
+            bmoyensemected = false;
+            bdifficileselected = false;
+        });
+
+        moyen.setOnAction(e->{
+            bfacileselected = false;
+            bmoyensemected = true;
+            bdifficileselected = false;
+        });
+
+        difficile.setOnAction(e->{
+            bfacileselected = false;
+            bmoyensemected = false;
+            bdifficileselected = true;
+        });
+
+        deuxjoueurs.setOnAction(e->{
+            bdeuxjoueursselected = true;
+            btroisjoueursselected = false;
+            bquatrejoueurs1selected = false;
+            bquatrejoueurs2selected = false;
+        });
+
+        troisjoueurs.setOnAction(e->{
+            bdeuxjoueursselected = false;
+            btroisjoueursselected = true;
+            bquatrejoueurs1selected = false;
+            bquatrejoueurs2selected = false;
+        });
+        quatrejoueurs1.setOnAction(e->{
+            bdeuxjoueursselected = false;
+            btroisjoueursselected = false;
+            bquatrejoueurs1selected = true;
+            bquatrejoueurs2selected = false;
+        });
+        quatrejoueurs2.setOnAction(e->{
+            bdeuxjoueursselected = false;
+            btroisjoueursselected = false;
+            bquatrejoueurs1selected = false;
+            bquatrejoueurs2selected = true;
+        });
+
+
+        if(bfacileselected||bmoyensemected||bdifficileselected){
+            bnselected = true;}
+
+
+        if(bdeuxjoueursselected||btroisjoueursselected||bquatrejoueurs1selected||bquatrejoueurs2selected){
+            njselected = true;}
+
+
+
+        if(biconeselected && bnselected)
+            soloselected = true;
+
+
+        bsolo.setOnAction(e -> {
+            stackPane.getChildren().clear();
+            stackPane.getChildren().add(vBoxS);
+            bsoloselected = true;
+            soloselected = false;
+        });
+
+
+        bmulti.setOnAction(e -> {
+            stackPane.getChildren().clear();
+            stackPane.getChildren().add(vBoxM);
+            bmultiselected = true;
+            njselected = false;
+        });
+
+
         bcharger.setOnAction(e -> {
             stackPane.getChildren().clear();
             stackPane.getChildren().add(hBoxC);
         });
+        bicone.setOnAction(e->{
+            if(iterateurIcone==nomdimage.length-1) {
+                setIterateurIcone(0);
+                bicone.setStyle("-fx-background-color: " + couleur[0] +";");
+            }
+            else if((iterateurIcone >= 0) && ( iterateurIcone < nomdimage.length)){
+                setIterateurIcone(iterateurIcone + 1 % 4);
+                bicone.setStyle("-fx-background-color: " + couleur[iterateurIcone] +";");
+            }
+            bicone.setGraphic(new ImageView(images[iterateurIcone]));
 
-
-
-
-        vBoxM.getChildren().addAll(deuxjoueurs,troisjoueurs,quatrejoueurs1,quatrejoueurs2);
-        bmulti.setOnAction(e -> {
-            stackPane.getChildren().clear();
-            stackPane.getChildren().add(vBoxM);
         });
 
 
+        System.out.println(soloselected);
+        System.out.println(njselected);
+        if(soloselected||bmultiselected)
+            vBoxreprendre.getChildren().add(breprendre);
 
-
+        //css
 
         vBoxScene.getStyleClass().add("svBoxScene");
         bsolo.getStyleClass().add("buttonniveaux4");
