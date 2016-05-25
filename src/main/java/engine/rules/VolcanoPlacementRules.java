@@ -80,7 +80,7 @@ public class VolcanoPlacementRules {
         else {
             Village leftVillage = island.getVillage(leftHex);
             Village rightVillage = island.getVillage(rightHex);
-            if (leftVillage.getHexes().size() == 1 || rightVillage.getHexes().size() > 1) {
+            if (leftVillage.getHexes().size() == 1 || rightVillage.getHexes().size() == 1) {
                 problems.add(Problem.CANT_DESTROY_VILLAGE);
             }
         }
