@@ -25,6 +25,11 @@ class  IslandImpl implements Island {
     }
 
     @Override
+    public boolean isEmpty() {
+        return map.size() == 0;
+    }
+
+    @Override
     public Field getField(Hex hex) {
         return map.getOrDefault(hex, SEA);
     }

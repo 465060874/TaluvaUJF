@@ -9,6 +9,8 @@ public interface Island {
         return new IslandImpl();
     }
 
+    boolean isEmpty();
+
     Field getField(Hex hex);
 
     Iterable<Hex> getCoast();

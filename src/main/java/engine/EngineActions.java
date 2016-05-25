@@ -52,7 +52,7 @@ class EngineActions {
     }
 
     void updateAll() {
-        if (engine.getStatus().getTurn() == 0) {
+        if (engine.getIsland().isEmpty()) {
             VolcanoTile tile = engine.getVolcanoTileStack().current();
             Hex originHex = Hex.at(0, 0);
             this.seaTiles = ImmutableList.of(new SeaTileAction(tile, originHex, Orientation.NORTH));
