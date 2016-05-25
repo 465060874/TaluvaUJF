@@ -70,7 +70,7 @@ public class Home extends Application{
         arc.setRadiusX(25.0f);
         arc.setRadiusY(25.0f);
         arc.setStartAngle(45.0f);
-        arc.setLength(270.0f);
+        arc.setLength(360.0f);
         arc.setType(ArcType.ROUND);
 
         /*double[] path = new double[48];

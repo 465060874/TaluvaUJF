@@ -24,14 +24,17 @@ import javafx.stage.Stage;
  */
 public class Home2 extends Application{
 
-    int largeurs = 800;
+    double size_ratio = 580.0 / 800.;
     int hauteurs = 600;
+    int largeurs = (int) (hauteurs * size_ratio);
 
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override public void start(Stage stage) {
+
+        //scene
         stage.setTitle("TALUVA");
         Group root = new Group();
         Scene scene = new Scene(root, largeurs, hauteurs);
@@ -41,33 +44,52 @@ public class Home2 extends Application{
 
         int lv = largeurs/2;
 
-        VBox vBox = new VBox();
-        vBox.setAlignment(Pos.CENTER);
-        vBox.setPrefSize(largeurs,hauteurs);
 
-        VBox vBoxnull = new VBox();
-        vBoxnull.setPrefSize(largeurs,hauteurs/3);
+
+        VBox vBoxScene = new VBox();
+        vBoxScene.setAlignment(Pos.CENTER);
+        vBoxScene.setPrefSize(largeurs,hauteurs);
+        //vBox.setStyle("-fx-border-color: pink;" +
+        //"-fx-border-style: solid;-fx-border-width: 1;");
+
+        VBox vBoxHaut = new VBox();
+        vBoxHaut.setPrefSize(largeurs,hauteurs/3);
         //vBoxnull.setStyle("-fx-border-color: pink;" +
                 //"-fx-border-style: solid;-fx-border-width: 1;");
-        HBox hBoxb= new HBox(5);
-        hBoxb.setAlignment(Pos.CENTER);
-        hBoxb.setPrefSize(largeurs,hauteurs/6);
+        HBox hBoxMillieu= new HBox(5);
+        hBoxMillieu.setAlignment(Pos.CENTER);
+        hBoxMillieu.setPrefSize(largeurs,hauteurs/6);
         //vBoxb.setStyle("-fx-border-color: pink;" +
          //       "-fx-border-style: solid;-fx-border-width: 1;");
-        VBox vBoxtab = new VBox();
-        vBoxtab.setAlignment(Pos.CENTER);
-        vBoxtab.setPrefSize(largeurs,hauteurs/2);
-        //vBoxtab.setStyle("-fx-border-color: pink;" +
-         //       "-fx-border-style: solid;-fx-border-width: 1;");
+        VBox vBoxBas = new VBox();
+        vBoxBas.setAlignment(Pos.CENTER);
+        vBoxBas.setPrefSize(largeurs,hauteurs/2);
+       // vBoxp.setStyle("-fx-border-color: pink;" +
+        //                 "-fx-border-style: solid;-fx-border-width: 1;");
 
-        vBox.getChildren().addAll(vBoxnull,hBoxb,vBoxtab);
-
+        vBoxScene.getChildren().addAll(vBoxHaut,hBoxMillieu,vBoxBas);
+        vBoxScene.getStyleClass().add("d");
+        /*
         //boutton démerrer
 
-        Image lancer = new Image(getClass().getResourceAsStream("d.png"));
+        Image lancer = new Image(getClass().getResourceAsStream("l.png"));
         Button blancer = new Button("", new ImageView(lancer));
+        blancer.setPadding(new Insets(0, 0, 0, 0));
+
+        Arc arc = new Arc();
+       // arc.setCenterX(40.0f);
+       // arc.setCenterY(40.0f);
+        arc.setRadiusX(30.0f);
+        arc.setRadiusY(30.0f);
+        arc.setStartAngle(45.0f);
+        arc.setLength(360.0f);
+        arc.setType(ArcType.ROUND);
+
+        blancer.setShape(arc);
+
         Image red = new Image(getClass().getResourceAsStream("red.png"));
         Button bred = new Button("", new ImageView(red));
+        bred.setPadding(new Insets(0,0,0,0));
 
         VBox vBoxa = new VBox();
         VBox vBoxb = new VBox();
@@ -79,6 +101,7 @@ public class Home2 extends Application{
         vBoxb.setPrefWidth(largeurs/3);
         vBoxc.setPrefWidth(largeurs/3);
 */
+        /*
         vBoxa.setPrefWidth(largeurs*2/5);
         vBoxb.setPrefWidth(largeurs/5);
         vBoxc.setPrefWidth(largeurs*2/5);
@@ -88,42 +111,78 @@ public class Home2 extends Application{
 
         hBoxb.getChildren().addAll(vBoxa,vBoxb,vBoxc);
 
+
+        HBox hBoxi = new HBox(10);
+        hBoxi.setAlignment(Pos.CENTER);
+        hBoxi.setPrefWidth(largeurs);
+       // hBoxi.setStyle("-fx-border-color: pink;" +
+       //         "-fx-border-style: solid;-fx-border-width: 1;");
+        HBox hBoxc = new HBox();
+        hBoxc.setPrefHeight(vBoxp.getPrefHeight()-50);
+        hBoxc.setAlignment(Pos.CENTER);
+        hBoxc.setPrefWidth(largeurs);
+        //hBoxc.setStyle("-fx-border-color: pink;" +
+        //        "-fx-border-style: solid;-fx-border-width: 1;");
+        vBoxp.getChildren().addAll(hBoxc,hBoxi);
+
+        Button solo= new Button("SOLO");
+
+        solo.setPrefWidth(largeurs/8);
+        Button multijoueurs= new Button("MULTIJOUEURS");
+        multijoueurs.setPrefWidth(largeurs/8);
+        Button charger= new Button("CHARGER");
+        charger.setPrefWidth(largeurs/8);
+        hBoxi.getChildren().addAll(solo,multijoueurs,charger);
+        //System.out.println(multijoueurs.getWidth());
+        //System.out.println(solo.getWidth());
+
+        StackPane stackPane = new StackPane();
+        hBoxc.getChildren().add(stackPane);
+
+        solo.getStyleClass().add("buttonniveaux4");
+        multijoueurs.getStyleClass().add("buttonniveaux4");
+        charger.getStyleClass().add("buttonniveaux4");
+        */
+        /*
         //tabpane
         TabPane tabPane = new TabPane();
+        tabPane.setSide(Side.BOTTOM);
+        System.out.println(tabPane.getStyleClass());
         BorderPane mainPane = new BorderPane();
+*/
 
-        //Create Tabs
-        Tab tabnulle = new Tab();
-        tabnulle.setText("                                                                                         ");
-        tabnulle.setClosable(false);
-        tabPane.getTabs().add(tabnulle);
-        tabnulle.setStyle("-fx-background-color: transparent;");
-
+        /*
         Tab tabA = new Tab();
-        tabA.setText("SOLO");
+
         tabA.setClosable(false);
         tabPane.getTabs().add(tabA);
-        tabA.setStyle("-fx-background-color: transparent;");
+       // tabA.setStyle("-fx-background-color: pink;");
 
         Tab tabB = new Tab();
-        tabB.setText("MULTI JOUEURS");
+
         tabB.setClosable(false);
         tabPane.getTabs().add(tabB);
-        tabB.setStyle("-fx-background-color: transparent;");
+        //tabB.setStyle("-fx-background-color: pink;");
 
         Tab tabC = new Tab();
+
+        tabA.setText("SOLO");
+        tabB.setText("MULTI JOUEURS");
         tabC.setText("CHARGER");
         tabC.setClosable(false);
         tabPane.getTabs().add(tabC);
-        tabC.setStyle("-fx-background-color: transparent;");
+        //tabC.setStyle("-fx-background-color: pink;");
 
-        tabPane.setSide(Side.BOTTOM);
+        tabPane.setSide(Side.TOP);
         //tabA.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("icone1.jpg"))));
         //tabB.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("icone1.jpg"))));
         //tabC.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("icone1.jpg"))));
-
+*/
+        /*
         VBox vBoxg = new VBox(1);
         vBoxg.setPrefWidth(lv);
+        vBoxg.setAlignment(Pos.CENTER);
+        //
         //vBoxg.setStyle("-fx-border-color: pink;" +
         //        "-fx-border-style: solid;-fx-border-width: 1;");
         HBox hBoxg = new HBox(2);
@@ -137,7 +196,7 @@ public class Home2 extends Application{
         hBoxh.setAlignment(Pos.CENTER);
         VBox vBoxhg = new VBox();
         //vBoxhg.setStyle("-fx-border-color: pink;" +
-         //       "-fx-border-style: solid;-fx-border-width: 1;");
+        //        "-fx-border-style: solid;-fx-border-width: 1;");
         vBoxhg.setPrefWidth(lv/2);
         vBoxhg.setAlignment(Pos.CENTER);
         Label icone = new Label("VOTRE ICONE");
@@ -162,6 +221,7 @@ public class Home2 extends Application{
         hBoxh.getChildren().addAll(vBoxhg,vBoxm,vBoxhd);
         vBoxg.getChildren().add(hBoxh);
 
+
         VBox vBoxgg = new VBox(5);
         // vBoxgg.setStyle("-fx-border-color: pink;" +
         //       "-fx-border-style: solid;-fx-border-width: 1;");
@@ -171,25 +231,25 @@ public class Home2 extends Application{
 
 
         Button bicone = new Button();
-        bicone.setPrefSize(lv/4,100);
+        bicone.setPrefSize(lv/2,100);
         Image imageDecline = new Image(getClass().getResourceAsStream("icone1.jpg"));
         bicone.setGraphic(new ImageView(imageDecline));
         vBoxgg.getChildren().addAll(bicone);
-        vBoxgg.setStyle("-fx-border-color: pink;" +
-                "-fx-border-style: solid;-fx-border-width: 1;");
+        //vBoxgg.setStyle("-fx-border-color: pink;" +
+        //        "-fx-border-style: solid;-fx-border-width: 1;");
         VBox vBoxgd = new VBox(5);
 
         vBoxgd.setPadding(new Insets(10, 10, 10, 10));
         vBoxgd.setPrefWidth(lv/2);
-        vBoxgd.setStyle("-fx-border-color: pink;" +
-                "-fx-border-style: solid;-fx-border-width: 1;");
+       // vBoxgd.setStyle("-fx-border-color: pink;" +
+       //         "-fx-border-style: solid;-fx-border-width: 1;");
         vBoxgd.setAlignment(Pos.CENTER);
         ToggleButton simple = new ToggleButton("SIMPLE");
-        simple.setPrefWidth(lv/4);
+        simple.setPrefWidth(lv/2);
         ToggleButton moyen = new ToggleButton("MOYEN");
-        moyen.setPrefWidth(lv/4);
+        moyen.setPrefWidth(lv/2);
         ToggleButton difficile = new ToggleButton("DIFFICILE");
-        difficile.setPrefWidth(lv/4);
+        difficile.setPrefWidth(lv/2);
 
         vBoxgd.getChildren().addAll(simple,moyen,difficile);
 
@@ -207,21 +267,25 @@ public class Home2 extends Application{
 
         hBoxg.getChildren().addAll(vBoxgg,vBoxm2,vBoxgd);
         vBoxg.getChildren().add(hBoxg);
-        tabA.setContent(vBoxg);
+        solo.setOnAction(e -> {
+            stackPane.getChildren().clear();
+            stackPane.getChildren().add(hBoxg);
+        });
+      //  tabA.setContent(vBoxg);
 
         VBox vBox2 = new VBox(5);
         vBox2.setAlignment(Pos.CENTER);
-        vBox2.setPrefWidth(lv);
+        vBox2.setPrefWidth(largeurs);
         //Button unjoueur = new Button("[JOUEUR1]");
         //unjoueur.setPrefWidth(lv);
-        Button deuxjoueurs = new Button("[JOUEUR1]  [JOUEUR2]");
-        deuxjoueurs.setPrefWidth(lv);
-        Button troisjoueurs = new Button("[JOUEUR1]  [JOUEUR2]  [JOUEUR3]");
-        troisjoueurs.setPrefWidth(lv);
-        Button quatrejoueurs1 = new Button("[JOUEUR1]  [JOUEUR2]  [JOUEUR3]  [JOUEUR4]");
-        quatrejoueurs1.setPrefWidth(lv);
-        Button quatrejoueurs2 = new Button("[JOUEUR1 / JOUEUR2]     [JOUEUR3 / JOUEUR4]");
-        quatrejoueurs2.setPrefWidth(lv);
+        Button deuxjoueurs = new Button("2 JOUEURS");
+        deuxjoueurs.setPrefWidth(lv/2);
+        Button troisjoueurs = new Button("3 JOUEURS");
+        troisjoueurs.setPrefWidth(lv/2);
+        Button quatrejoueurs1 = new Button("4 JOUEURS");
+        quatrejoueurs1.setPrefWidth(lv/2);
+        Button quatrejoueurs2 = new Button("2 JOUEURS   VS  2 JOUEURS");
+        quatrejoueurs2.setPrefWidth(lv/2);
 
        // unjoueur.getStyleClass().add("buttonjoueur");
         deuxjoueurs.getStyleClass().add("buttonjoueur");
@@ -232,18 +296,22 @@ public class Home2 extends Application{
 
 
         vBox2.getChildren().addAll(deuxjoueurs,troisjoueurs,quatrejoueurs1,quatrejoueurs2);
-        tabB.setContent(vBox2);
+        multijoueurs.setOnAction(e -> {
+            stackPane.getChildren().clear();
+            stackPane.getChildren().add(vBox2);
+        });
+        //tabB.setContent(vBox2);
         ScrollPane sp = new ScrollPane();
         //sp.setPrefHeight(100);
 
         //ScrollBar sc = new ScrollBar();
-        Rectangle rec1 =  new Rectangle(lv/2, 50);
-        Rectangle rec2 =  new Rectangle(lv/2, 50);
-        Rectangle rec3 =  new Rectangle(lv/2, 50);
-        Rectangle rec4 =  new Rectangle(lv/2, 50);
-        Rectangle rec5 =  new Rectangle(lv/2, 50);
-        Rectangle rec6 =  new Rectangle(lv/2, 50);
-        Rectangle rec7 =  new Rectangle(lv/2, 50);
+        Rectangle rec1 =  new Rectangle(lv, 50);
+        Rectangle rec2 =  new Rectangle(lv, 50);
+        Rectangle rec3 =  new Rectangle(lv, 50);
+        Rectangle rec4 =  new Rectangle(lv, 50);
+        Rectangle rec5 =  new Rectangle(lv, 50);
+        Rectangle rec6 =  new Rectangle(lv, 50);
+        Rectangle rec7 =  new Rectangle(lv, 50);
 
         rec1.setStyle("-fx-background-color: pink;"+
                 "-fx-text-fill: white;");
@@ -263,23 +331,36 @@ public class Home2 extends Application{
         hb1.getChildren().addAll(sp);
         hb1.setPrefHeight(100);
         hb1.setPadding(new Insets(20,0,30,0));
-        tabC.setContent(hb1);
-        //DropShadow shadow = new DropShadow();
+        charger.setOnAction(e -> {
+            stackPane.getChildren().clear();
+            stackPane.getChildren().add(hb1);
+        });
 
+
+
+        //tabC.setContent(hb1);
+        //DropShadow shadow = new DropShadow();
+*/
 
         //tabC.setContent();
-
+/*
         mainPane.setCenter(tabPane);
 
         mainPane.prefHeightProperty().bind(vBoxtab.heightProperty());
         mainPane.prefWidthProperty().bind(vBoxtab.widthProperty());
         vBoxtab.getChildren().add(mainPane);
-        vBox.setStyle("-fx-background-image: url(menu/bg1.jpg);"+
-                "-fx-background-repeat: stretch;"+
-                "-fx-background-position: center;"+
-                "-fx-background-size: 120% 120%;");
 
-        root.getChildren().add(vBox);
+
+        */
+
+
+
+        vBoxScene.setStyle("-fx-background-image: url(menu/bg2.jpg);"+
+                "-fx-background-repeat: stretch;"+
+                "-fx-background-position: top;"+
+                "-fx-background-size: 100% 100%;");
+
+        root.getChildren().add(vBoxScene);
         stage.setScene(scene);
         stage.show();
 
