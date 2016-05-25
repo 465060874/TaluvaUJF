@@ -36,9 +36,11 @@ class BotPlayer {
     // Jouer un coup
     Move play(int depth) {
         Engine engineCopy = realEngine.copyWithoutObservers();
-        return realEngine.getStatus().getTurn() == 0
+        Move m =  realEngine.getStatus().getTurn() == 0
                 ? doFirstPlay(engineCopy)
                 : doPlay(engineCopy, depth);
+        realEngine.logger().info("[play] Choosed move with {0} points ", m.points);
+        return m;
     }
 
     private Move doFirstPlay(Engine engineCopy){
@@ -85,9 +87,10 @@ class BotPlayer {
         // Et de choisir le meilleur choix
         Move bestMove = null;
         int bestPoints = Integer.MAX_VALUE;
-        int bestConfigPoints = Integer.MIN_VALUE;
+        int bestConfigPoints = Integer.MAX_VALUE;
         int p;
         for (int i = 0; i < branchNb; i++) {
+            engine.logger().info("[eval] Placement with {0} points ", branchMoves[i].points);
             engine.action(branchMoves[i].tileAction);
             engine.action(branchMoves[i].buildingAction);
             if( engine.getStatus() instanceof EngineStatus.Finished ){
@@ -102,7 +105,8 @@ class BotPlayer {
                     bestMove = branchMoves[i];
                 }
             }else{
-                if( (p = heuristics.evaluateConfiguration(engine)) > bestConfigPoints ){
+                // On evalue la config de l'adversaire donc on prend sa moins bonne configuration !!!
+                if( (p = heuristics.evaluateConfiguration(engine)) < bestConfigPoints ){
                     bestMove = new Move(branchMoves[i].buildingAction, branchMoves[i].tileAction, p);
                     bestConfigPoints = p;
                 }
@@ -127,19 +131,19 @@ class BotPlayer {
             strategiesQueues[i] = new PriorityQueue<>((a,b) -> Integer.compare( b.points, a.points));
 
         // Pour tout tileAction dans la mer
-        engine.logger().fine("[Sort] Begin seaPlacements : {0}", engine.getSeaTileActions().size());
+        engine.logger().finer("[Sort] Begin seaPlacements : {0}", engine.getSeaTileActions().size());
         for (SeaTileAction tileAction : engine.getSeaTileActions()) {
             int points = heuristics.evaluateSeaPlacement(engine, tileAction);
             engine.placeOnSea(tileAction);
 
             // Pour toute construction :
-            engine.logger().finer("    [Sort] Begin buildActions : {0}", engine.getPlaceBuildingActions().size());
+            engine.logger().finest("    [Sort] Begin buildActions : {0}", engine.getPlaceBuildingActions().size());
             for (PlaceBuildingAction buildingAction : engine.getPlaceBuildingActions()) {
                 heuristics.evaluateBuildAction(engine, tileAction, buildingAction, points, strategiesQueues);
                 comp++;
             }
 
-            engine.logger().finer("    [Sort] Begin expandActions : {0}", engine.getExpandVillageActions().size());
+            engine.logger().finest("    [Sort] Begin expandActions : {0}", engine.getExpandVillageActions().size());
             for (ExpandVillageAction buildingAction : engine.getExpandVillageActions()) {
                 heuristics.evaluateExpandAction(engine, tileAction, buildingAction, points, strategiesQueues);
                 comp++;
@@ -147,7 +151,7 @@ class BotPlayer {
             engine.cancelLastStep();
         }
 
-        engine.logger().fine("[Sort] Begin volcanoPlacements : {0}", engine.getVolcanoTileActions().size());
+        engine.logger().finer("[Sort] Begin volcanoPlacements : {0}", engine.getVolcanoTileActions().size());
         // Pour tout tileAction sur la terre
         for (VolcanoTileAction tileActions  : engine.getVolcanoTileActions()) {
             int points = heuristics.evaluateVolcanoPlacement(engine, tileActions);
@@ -165,7 +169,7 @@ class BotPlayer {
             }
             engine.cancelLastStep();
         }
-        engine.logger().info("[Sort] {0} evaluations made", comp);
+        engine.logger().fine("[Sort] {0} evaluations made", comp);
 
         // On choisit les meilleurs coups
         int ind = 0;
@@ -205,7 +209,7 @@ class BotPlayer {
         }
 
         // Evaluation des seaPlacements + moves entiers a la volee
-        engine.logger().fine("[Sort] Begin seaPlacements : {0}", engine.getSeaTileActions().size());
+        engine.logger().finer("[Sort] Begin seaPlacements : {0}", engine.getSeaTileActions().size());
         for (SeaTileAction tileAction : engine.getSeaTileActions()) {
             int points = heuristics.evaluateSeaPlacement(engine, tileAction);
             // Ajout du placement seul
@@ -225,7 +229,7 @@ class BotPlayer {
         }
 
         // Evaluation des placements sur la terre + moves entiers a la volee
-        engine.logger().fine("[Sort] Begin volcanoPlacements : {0}", engine.getVolcanoTileActions().size());
+        engine.logger().finer("[Sort] Begin volcanoPlacements : {0}", engine.getVolcanoTileActions().size());
         for (VolcanoTileAction tileAction : engine.getVolcanoTileActions()) {
             int points = heuristics.evaluateVolcanoPlacement(engine, tileAction);
             placements.add( new Move(null, tileAction, points));
@@ -260,7 +264,7 @@ class BotPlayer {
         for(int i = 0; i < NB_STRATEGIES; i++ )
             ind += combine(engine, placements, building[i], branchMoves, ind, strategyPoints[i], moves[i]);
 
-        engine.logger().info("[Sort] {0} evaluations", comp);
+        engine.logger().fine("[Sort] {0} evaluations", comp);
         return ind;
     }
 
@@ -376,7 +380,7 @@ class BotPlayer {
                             && placement.getRightHex() != ((PlaceBuildingAction) build).getHex());
                 }
             }else {
-                // On vérifie que le palcement ne modifie pas l'extension :
+                // On vérifie que le placement ne modifie pas l'extension :
                 if( placement.getLeftFieldType() == ((ExpandVillageAction)build).getFieldType() ){
                     for(Hex neighbor : placement.getLeftHex().getNeighborhood() )
                         if( engine.getIsland().getField(neighbor).getBuilding().getType() != BuildingType.NONE)

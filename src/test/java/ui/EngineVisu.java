@@ -32,7 +32,7 @@ public class EngineVisu extends Application implements EngineObserver {
                 .logLevel(Level.INFO)
                 //.seed(8006695491958633869)
                 .player(PlayerColor.RED, uiWrap(PlayerHandler.dumbFactory()))
-                .player(PlayerColor.WHITE, uiWrap(BotPlayerHandler.factory(16, 2)))
+                .player(PlayerColor.WHITE, uiWrap(BotPlayerHandler.factory(16, 1)))
                 .build();
         engine.registerObserver(new EngineLoggerObserver(engine));
         engine.registerObserver(this);

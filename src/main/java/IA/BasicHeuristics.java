@@ -1,5 +1,7 @@
 package IA;
+import com.google.common.collect.SetMultimap;
 import data.BuildingType;
+import data.FieldType;
 import engine.*;
 import engine.action.*;
 import map.*;
@@ -103,8 +105,8 @@ class BasicHeuristics implements Heuristics {
     }
 
     public int evaluateSeaPlacement(Engine e, SeaTileAction move){
-        int tower = 0, temple = 0, hut = 0, counter = 0;
-        int scale = 2;
+        int points = 0;
+        int scale = 1;
         Island island = e.getIsland();
         Hex hex = move.getVolcanoHex();
         int bonus;
@@ -119,12 +121,11 @@ class BasicHeuristics implements Heuristics {
                     bonus = -1;
                 Village village = island.getVillage(adjacent);
                 if( !village.hasTemple()) {
-                    temple -= bonus; // Ecraser une de ses propres villes pourrait faire perdre des points pour temple
+                    points -= bonus; // Ecraser une de ses propres villes pourrait faire perdre des points pour temple
                     if (village.getHexes().size() < 3)
-                        hut -= 2*bonus; // Ecraser un petit village ( i.e l'annihiler ) est mauvais pour la strategie hutte
+                        points -= bonus; // Ecraser un petit village ( i.e l'annihiler ) est mauvais pour la strategie hutte
                 }
                 // Peut être tester si on peut accéder à un espace haut de 3 du haut
-                counter -= bonus;
             }
         }
 
@@ -139,10 +140,8 @@ class BasicHeuristics implements Heuristics {
                     bonus = -1;
                 Village village = island.getVillage(adjacent);
                 if( !village.hasTemple()) {
-                    temple += bonus*( village.getHexes().size() > 3 ? 3 : village.getHexes().size());
-                    hut += 2*bonus;
+                    points += bonus;
                 }
-                counter += bonus;
             }
         }
 
@@ -157,18 +156,16 @@ class BasicHeuristics implements Heuristics {
                     bonus = -1;
                 Village village = island.getVillage(adjacent);
                 if( !village.hasTemple()) {
-                    temple += bonus*( village.getHexes().size() > 3 ? 3 : village.getHexes().size());
-                    hut += 2*bonus;
+                    points += bonus;
                 }
-                counter += bonus;
             }
         }
-        return scale * (temple + tower + hut + counter );
+        return scale * points;
     }
 
     public int evaluateVolcanoPlacement(Engine e, VolcanoTileAction move){
-        int tower = 0, temple = 0, hut = 0, counter = 0;
-        int scale = 1;
+        int points = 0;
+        int scale = 2;
         int res = 0;
         Island island = e.getIsland();
         Hex hex = move.getVolcanoHex();
@@ -183,17 +180,12 @@ class BasicHeuristics implements Heuristics {
                 else
                     bonus = -1;
                 Village village = island.getVillage(adjacent);
-                if( !village.hasTemple()) {
-                    temple -= bonus; // Ecraser une de ses propres villes pourrait faire perdre des points pour temple
-                    if (village.getHexes().size() < 3)
-                        hut -= 2*bonus; // Ecraser un petit village ( i.e l'annihiler ) est mauvais pour la strategie hutte
-                }
-                // Peut être tester si on peut accéder à un espace haut de 3 du haut
-                counter -= bonus;
+                if( !village.hasTemple())
+                    points -= bonus; // Ecraser une de ses propres villes pourrait faire perdre des points pour temple
             }
         }
 
-        // Etude des hex qu'on va écraser
+        // Etude des hex qu'on va écraser avec le gauche
         hex = move.getLeftHex();
         BuildingType building = island.getField(hex).getBuilding().getType();
         if( building != BuildingType.NONE ){
@@ -203,12 +195,39 @@ class BasicHeuristics implements Heuristics {
                 bonus = -2;
             Village village = island.getVillage(hex);
             if( !village.hasTemple()) {
-                temple -= bonus*( village.getHexes().size() > 3 ? 3 : village.getHexes().size());
+                points -= bonus;
+                // Si on réduit un village sans temple à moins de 3 hexs...
+                if( village.getHexes().size() == 3 || village.getHexes().size() == 4)
+                    if (island.getField(move.getRightHex()).getBuilding().getType() != BuildingType.NONE )
+                        if( island.getField(move.getRightHex()).getBuilding().getColor() != e.getCurrentPlayer().getColor() )
+                            points += 2;
+
             }
-            if( !village.hasTower())
-                tower -= bonus*( village.getHexes().size() > 2 ? 2 : village.getHexes().size());
-            counter -= 2*bonus;
-            res -= scale*bonus;
+            /* CAs tour a gérer plus tard if( !village.hasTower() )
+                points -= bonus; */
+            points -= bonus;
+        }
+        // Et si on permet de s'étendre
+        for (Neighbor neighbor : Neighbor.values()) {
+            Hex adjacent = hex.getNeighbor(neighbor);
+            building = island.getField(adjacent).getBuilding().getType();
+            // On donne la possibilité de s'étendre notamment à une ville sans temple
+            if( !adjacent.equals( move.getRightHex() ) && building != BuildingType.NONE  ){
+                if( island.getField(adjacent).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+                    bonus = 2;
+                else
+                    bonus = -2;
+                Village village = island.getVillage(adjacent);
+                if( !village.hasTemple()) {
+                    points += bonus;
+                }
+                /* if( !village.hasTower()) {
+                    points += bonus * (village.getHexes().size() > 2 ? 2 : village.getHexes().size());
+                    if( island.getField( hex ).getLevel() == 2)
+                        points += 4*bonus;
+                } */
+                points += bonus;
+            }
         }
 
 
@@ -221,42 +240,137 @@ class BasicHeuristics implements Heuristics {
                 bonus = -2;
             Village village = island.getVillage(hex);
             if( !village.hasTemple()) {
-                temple -= bonus*( village.getHexes().size() > 3 ? 3 : village.getHexes().size());
+                points -= bonus;
+                // Si on réduit un village sans temple à moins de 3 hexs...
+                if( village.getHexes().size() == 3 || village.getHexes().size() == 4)
+                    if (island.getField(move.getLeftHex()).getBuilding().getType() != BuildingType.NONE )
+                        if( island.getField(move.getLeftHex()).getBuilding().getColor() != e.getCurrentPlayer().getColor() )
+                            points += 2;
+
             }
-            if( !village.hasTower())
-                tower -= bonus*( village.getHexes().size() > 2 ? 2 : village.getHexes().size());
-            counter -= 2*bonus;
-            res -= scale*bonus;
+            /* CAs tour a gérer plus tard if( !village.hasTower() )
+                points -= bonus; */
+            points -= bonus;
         }
-        return res*40;
+        for (Neighbor neighbor : Neighbor.values()) {
+            Hex adjacent = hex.getNeighbor(neighbor);
+            building = island.getField(adjacent).getBuilding().getType();
+            // On donne la possibilité de s'étendre notamment à une ville sans temple
+            if( !adjacent.equals( move.getLeftHex() ) && building != BuildingType.NONE  ){
+                if( island.getField(adjacent).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+                    bonus = 2;
+                else
+                    bonus = -2;
+                Village village = island.getVillage(adjacent);
+                if( !village.hasTemple()) {
+                    points += bonus;
+                }
+                /* if( !village.hasTower()) {
+                    points += bonus * (village.getHexes().size() > 2 ? 2 : village.getHexes().size());
+                    if( island.getField( hex ).getLevel() == 2)
+                        points += 4*bonus;
+                } */
+                points += bonus;
+            }
+        }
+        return points*scale;
     }
 
     public int evaluateBuildAction(Engine e, TileAction tileAction, PlaceBuildingAction move, int pointsPlacement, PriorityQueue<Move>[] strategiesQueues){
-        Move m;
-        Random r = e.getRandom();
-        long t = System.nanoTime() + TimeUnit.MICROSECONDS.toNanos(50);
-        while (System.nanoTime() < t) { }
-        for (int i = 0; i < nbStrategies; i++) {
-            m = new Move( move, tileAction, pointsPlacement);
-            strategiesQueues[i].add(m);
+        int temple = 0, tower = 0, huts = 0, counter = 0;
+        int general = 0;
+        int scale = 2;
+        Hex hex = move.getHex();
+        BuildingType type = move.getType();
+        if( type == BuildingType.TEMPLE ){
+            temple += 10;
+        }else if( type == BuildingType.TOWER){
+            tower += 10;
+        }else{ // type == HUT
+            temple += 2;
+            huts += 1;
+            for (Neighbor neighbor : Neighbor.values()) {
+                Hex adjacent = hex.getNeighbor(neighbor);
+                if( e.getIsland().getField( adjacent).getLevel() >= 3 && e.getIsland().getField( adjacent).getBuilding().getType() == BuildingType.NONE )
+                    tower += 5;
+            }
         }
+        for (Neighbor neighbor : Neighbor.values()) {
+            Hex adjacent = hex.getNeighbor(neighbor);
+            FieldBuilding building = e.getIsland().getField(adjacent).getBuilding();
+            if( building.getType() != BuildingType.NONE && building.getColor() != e.getCurrentPlayer().getColor() ) {
+                if( !e.getIsland().getVillage(adjacent).hasTemple()) {
+                    general += 1;
+                    counter += 2;
+                }
+            }
+        }
+        strategiesQueues[TEMPLESTRATEGY].add( new Move( move, tileAction, scale*(temple + general) ));
+        strategiesQueues[TOWERSTRATEGY].add( new Move( move, tileAction, scale*(tower + general) ));
+        strategiesQueues[HUTSTRATEGY].add( new Move( move, tileAction, scale*(huts + general) ));
+        strategiesQueues[COUNTERSTRATEGY].add( new Move( move, tileAction, scale*(counter + general) ));
         return 0;
     }
 
     public int evaluateExpandAction(Engine e, TileAction tileAction, ExpandVillageAction move, int pointsPlacement, PriorityQueue<Move>[] strategiesQueues){
-        Move m;
-        Random r = e.getRandom();
-        long t = System.nanoTime() + TimeUnit.MICROSECONDS.toNanos(50);
-        while (System.nanoTime() < t) { }
-        for (int i = 0; i < nbStrategies; i++) {
-            m = new Move( move, tileAction, pointsPlacement );
-            strategiesQueues[i].add(m);
+        int temple = 0, tower = 0, huts = 0, counter = 0;
+        int general = 0;
+        int scale = 2;
+        int newHexes = 0;
+        Village village = move.getVillage(e.getIsland());
+        FieldType field = move.getFieldType();
+        SetMultimap<FieldType, Hex> m = village.getExpandableHexes();
+        for( Hex hex : m.get(field) ){
+            for (Neighbor neighbor : Neighbor.values()) {
+                Hex adjacent = hex.getNeighbor(neighbor);
+                // COnstruire a la place de l'autre
+                if( e.getIsland().getField(adjacent).getBuilding().getType() != BuildingType.NONE
+                        && e.getIsland().getField(adjacent).getBuilding().getColor() != e.getCurrentPlayer().getColor() )
+                        if( ! e.getIsland().getVillage(adjacent).hasTemple()) {
+                            general += 1;
+                            counter += 2;
+                        }
+                // Construire à côté d'une hauteur 3 sans tour
+               if( !village.hasTower() && e.getIsland().getField(adjacent).getBuilding().getType() == BuildingType.NONE)
+                    if( e.getIsland().getField( adjacent ).getLevel() >= 3 )
+                        tower += 5;
+            }
+            // Nombre de huttes rajoutées
+            huts += e.getIsland().getField(hex).getLevel();
+            temple += 2;
+            newHexes++;
         }
+        // Si on a agrandi sa cité de plus de trois pour construire un temps
+        if( newHexes + village.getHexes().size() >= 3 && village.getHexes().size() < 3 && !village.hasTemple())
+            temple += 5;
+
+        strategiesQueues[TEMPLESTRATEGY].add( new Move( move, tileAction, scale*(temple + general) ));
+        strategiesQueues[TOWERSTRATEGY].add( new Move( move, tileAction, scale*(tower + general) ));
+        strategiesQueues[HUTSTRATEGY].add( new Move( move, tileAction, scale*(huts + general) ));
+        strategiesQueues[COUNTERSTRATEGY].add( new Move( move, tileAction, scale*(counter + general) ));
         return 0;
     }
 
     @Override
     public int evaluateConfiguration(Engine engine) {
-        return 0;
+        int score = 0;
+        int i = 0;
+        int nbVillages = 0;
+        List<Player> players = engine.getPlayers();
+        Player player = engine.getCurrentPlayer();
+
+        Iterable<Village> villages = engine.getIsland().getVillages( player.getColor());
+        for( Village village : villages) {
+            score += village.hasTemple() ? 1 : 0;
+            nbVillages++;
+        }
+        while( (player =  players.get(i++)) !=  engine.getCurrentPlayer()){}
+        villages = engine.getIsland().getVillages( player.getColor());
+        for(  Village village : villages){
+            score -= village.hasTemple() ? 1 : 0 ;
+        }
+        engine.logger().info("[!!!!]Player {0}, villages : {1} villages", player.getColor(), nbVillages);
+        engine.logger().info("[Eval] {0} points config ", score);
+        return score;
     }
 }
