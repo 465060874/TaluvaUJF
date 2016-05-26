@@ -42,24 +42,6 @@ public enum PlayerViewCorner {
         }
     },
 
-    BOTTOM_LEFT {
-        @Override
-        void anchor(Node node, double horizontalOffset) {
-            AnchorPane.setLeftAnchor(node, horizontalOffset);
-            AnchorPane.setBottomAnchor(node, 0.0);
-        }
-
-        @Override
-        CornerRadii faceRadii() {
-            return new CornerRadii(100, 100, 100, 0, true);
-        }
-
-        @Override
-        CornerRadii buildingsRadii() {
-            return new CornerRadii(0, 20, 0, 0, false);
-        }
-    },
-
     BOTTOM_RIGHT {
         @Override
         void anchor(Node node, double horizontalOffset) {
@@ -75,6 +57,24 @@ public enum PlayerViewCorner {
         @Override
         CornerRadii buildingsRadii() {
             return new CornerRadii(20, 0, 0, 0, false);
+        }
+    },
+
+    BOTTOM_LEFT {
+        @Override
+        void anchor(Node node, double horizontalOffset) {
+            AnchorPane.setLeftAnchor(node, horizontalOffset);
+            AnchorPane.setBottomAnchor(node, 0.0);
+        }
+
+        @Override
+        CornerRadii faceRadii() {
+            return new CornerRadii(100, 100, 100, 0, true);
+        }
+
+        @Override
+        CornerRadii buildingsRadii() {
+            return new CornerRadii(0, 20, 0, 0, false);
         }
     };
 
