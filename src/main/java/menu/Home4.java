@@ -13,9 +13,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by zhaon on 25/05/16.
@@ -52,6 +56,11 @@ public class Home4 extends Application {
 
     private ToggleGroup mode;
     private ToggleButton[] optionsMode;
+
+    private ToggleGroup historyChoice;
+    private List<ToggleButton> optionsHistory;
+    private List<Node> capture;
+    private VBox vBoxCapture = new VBox();
 
     @Override public void start(Stage stage) {
         //System.out.println(ChoosenColors.BROWN);
@@ -279,120 +288,70 @@ public class Home4 extends Application {
         multiOptions.getChildren().addAll(md,mt,mq1,mq2);
 
         //pane charger
+        int kkk = 170;
+        Rectangle carre1 = new Rectangle(kkk,kkk, Color.AZURE);
+        Rectangle carre2 = new Rectangle(kkk,kkk, Color.DARKBLUE);
+        Rectangle carre3 = new Rectangle(kkk,kkk, Color.BLUEVIOLET);
+        this.capture = new ArrayList<Node>();
+        for(int i = 0;i< 3; i++){
+            for(int j = 0;j<3;j++){
+                capture.add(carre1);
+                capture.add(carre2);
+                capture.add(carre3);
+            }
+        }
+
+
+
+        VBox vBoxoptionsCharger = new VBox(8);
+
+        chargerList.setAlignment(Pos.CENTER);
+        vBoxCapture.setAlignment(Pos.CENTER);
+        vBoxoptionsCharger.setAlignment(Pos.CENTER);
+        chargerList.setPrefWidth(largeurScene);
+        vBoxoptionsCharger.setPrefWidth(120);
+        vBoxoptionsCharger.setPrefHeight(kkk);
+
+
+        //vBoxCapture.setPrefHeight(100);
+        //vBoxoptionsCharger.setPrefHeight(100);
+
+        this.optionsHistory = new ArrayList<ToggleButton>();
+        this.historyChoice = new ToggleGroup();
+        for (int i = 1; i < 10;i++) {
+;           ToggleButton num = new ToggleButton("NUM " + i);
+            num.setPrefWidth(100);
+            optionsHistory.add(num);
+            num.setToggleGroup(historyChoice);
+
+        }
+        historyChoice.selectToggle(optionsHistory.get(2));
+        historyChoice.selectedToggleProperty().addListener(e -> updateCapture());
+
+        vBoxoptionsCharger.getChildren().addAll(optionsHistory);
         ScrollPane sp = new ScrollPane();
-        Rectangle rec1 =  new Rectangle(largeurScene*2/3, 50);
-        Rectangle rec2 =  new Rectangle(largeurScene*2/3, 50);
-        Rectangle rec3 =  new Rectangle(largeurScene*2/3, 50);
-        Rectangle rec4 =  new Rectangle(largeurScene*2/3, 50);
-        Rectangle rec5 =  new Rectangle(largeurScene*2/3, 50);
-        Rectangle rec6 =  new Rectangle(largeurScene*2/3, 50);
-        Rectangle rec7 =  new Rectangle(largeurScene*2/3, 50);
-        VBox vBoxRect = new VBox(2);
-        vBoxRect.setPrefHeight(100);
-        vBoxRect.setAlignment(Pos.CENTER);
-        vBoxRect.getChildren().addAll(rec1,rec2,rec3,rec4,rec5,rec6,rec7);
+        VBox v = new VBox();
+        v.getChildren().add(sp);
+        //v.setPrefSize(120,100);
+
         sp.hbarPolicyProperty().set(ScrollPane.ScrollBarPolicy.NEVER);
-        sp.setContent(vBoxRect);
-        chargerList.getChildren().add(sp);
-        chargerList.setPrefHeight(100);
+        vBoxoptionsCharger.setAlignment(Pos.CENTER_LEFT);
+        sp.setContent(vBoxoptionsCharger);
+        vBoxCapture.getChildren().add(carre1);
+
+        chargerList.getChildren().addAll(vBoxCapture,v);
+        chargerList.setPrefHeight(80);
+
+        v.setAlignment(Pos.CENTER);
+        vBoxCapture.setAlignment(Pos.CENTER);
+        //vBoxCapture.getStyleClass().add("b2");
+        //v.getStyleClass().add("b2");
 
 
 
 
 
 
-
-
-//integration
-        /*
-        bicone.setOnAction(e->{
-            biconeselected = true;
-        });
-
-        simple.setOnAction(e->{
-            bfacileselected = true;
-            bmoyensemected = false;
-            bdifficileselected = false;
-        });
-
-        moyen.setOnAction(e->{
-            bfacileselected = false;
-            bmoyensemected = true;
-            bdifficileselected = false;
-        });
-
-        difficile.setOnAction(e->{
-            bfacileselected = false;
-            bmoyensemected = false;
-            bdifficileselected = true;
-        });
-
-        deuxjoueurs.setOnAction(e->{
-            bdeuxjoueursselected = true;
-            btroisjoueursselected = false;
-            bquatrejoueurs1selected = false;
-            bquatrejoueurs2selected = false;
-        });
-
-        troisjoueurs.setOnAction(e->{
-            bdeuxjoueursselected = false;
-            btroisjoueursselected = true;
-            bquatrejoueurs1selected = false;
-            bquatrejoueurs2selected = false;
-        });
-        quatrejoueurs1.setOnAction(e->{
-            bdeuxjoueursselected = false;
-            btroisjoueursselected = false;
-            bquatrejoueurs1selected = true;
-            bquatrejoueurs2selected = false;
-        });
-        quatrejoueurs2.setOnAction(e->{
-            bdeuxjoueursselected = false;
-            btroisjoueursselected = false;
-            bquatrejoueurs1selected = false;
-            bquatrejoueurs2selected = true;
-        });
-
-
-        if(bfacileselected||bmoyensemected||bdifficileselected){
-            bnselected = true;}
-
-
-        if(bdeuxjoueursselected||btroisjoueursselected||bquatrejoueurs1selected||bquatrejoueurs2selected){
-            njselected = true;}
-
-
-
-        if(biconeselected && bnselected)
-            soloselected = true;
-*/
-
-        /*bsolo.setOnAction(e -> {
-            options.getChildren().clear();
-            options.getChildren().add(optionsContent);
-            //bsoloselected = true;
-            //soloselected = false;
-        });
-
-
-        bmulti.setOnAction(e -> {
-            options.getChildren().clear();
-            options.getChildren().add(multiOptions);
-            //bmultiselected = true;
-            //njselected = false;
-        });
-
-
-        bcharger.setOnAction(e -> {
-            options.getChildren().clear();
-            options.getChildren().add(chargerList);
-        });*/
-
-
-        //System.out.println(soloselected);
-        //System.out.println(njselected);
-        //if(soloselected||njselected)
-        //    vBoxreprendre.getChildren().add(breprendre);
 
         bicone.setOnAction(e->{
             if(iterateurIcone==nomdimage.length-1) {
@@ -427,8 +386,24 @@ public class Home4 extends Application {
         mt.getStyleClass().add("buttonjoueur");
         mq1.getStyleClass().add("buttonjoueur");
         mq2.getStyleClass().add("buttonjoueur");
+        /*
+        sp.getStyleClass().add("s");
+        v.getStyleClass().add("b4");
+        vBoxoptionsCharger.getStyleClass().add("b4");
+        */
+        for(int i = 0;i < optionsHistory.size(); i++){
+            optionsHistory.get(i).getStyleClass().add("buttonjoueur");
+        }
+
+/*
+        hBoxMillieu.getStyleClass().add("b2");
+        chargerList.getStyleClass().add("b1");
+*/
+
+
 
         updateSelectedTab();
+        updateCapture();
 /*
         vBoxScene.getStyleClass().add("b1");
         hBoxBas.getStyleClass().add("b3");
@@ -456,6 +431,18 @@ public class Home4 extends Application {
         for (int i = 0; i < optionsButton.length; i++) {
             if (selected == optionsButton[i]) {
                 options.getChildren().setAll(optionsContent[i]);
+            }
+        }
+    }
+
+
+    private void updateCapture() {
+        Toggle selected = historyChoice.getSelectedToggle();
+        //System.out.println(historyChoice.getSelectedToggle());
+        for (int i = 0; i < optionsHistory.size(); i++) {
+            if (selected == optionsHistory.get(i)) {
+                //vBoxCapture.
+                vBoxCapture.getChildren().setAll(capture.get(i));
             }
         }
     }

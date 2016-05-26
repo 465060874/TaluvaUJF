@@ -46,14 +46,12 @@
 .buttonjoueur:armed {
     -fx-color: white;
     -fx-background-color: #4CAF50;
-    -fx-background-radius: 0;
     -fx-text-fill: white;
 }
 
 .buttonjoueur:selected {
     -fx-color: white;
     -fx-background-color: #4CAF50;
-    -fx-background-radius: 0;
     -fx-text-fill: white;
 }
 
@@ -73,14 +71,12 @@
 .buttonniveaux1:armed {
     -fx-color: white;
     -fx-background-color: #FF9966;
-    -fx-background-radius: 0;
     -fx-text-fill: white;
 }
 
 .buttonniveaux1:selected {
     -fx-color: white;
     -fx-background-color: #FF9966;
-    -fx-background-radius: 0;
     -fx-text-fill: white;
 }
 
@@ -100,14 +96,12 @@
 .buttonniveaux2:armed{
     -fx-color: white;
     -fx-background-color: #FF6666;
-    -fx-background-radius: 0;
     -fx-text-fill: white;
 }
 
 .buttonniveaux2:selected{
     -fx-color: white;
     -fx-background-color: #FF6666;
-    -fx-background-radius: 0;
     -fx-text-fill: white;
 }
 
@@ -127,14 +121,14 @@
 .buttonniveaux3:armed {
     -fx-color: white;
     -fx-background-color: #CC0066;
-    -fx-background-radius: 0;
+
     -fx-text-fill: white;
 }
 
 .buttonniveaux3:selected {
     -fx-color: white;
     -fx-background-color: #CC0066;
-    -fx-background-radius: 0;
+
     -fx-text-fill: white;
 }
 
@@ -144,14 +138,14 @@
     -fx-color: white;
     -fx-text-fill: white;
     -fx-outer-border: #EFB068;
-    -fx-background-radius: 0 0 0 0;
+
 }
 
 .buttonniveaux4: hover{
     -fx-background-color: #AB8152;
     -fx-color: white;
     -fx-text-fill: white;
-    -fx-background-radius: 0 0 0 0;
+
 }
 /*
 .buttonniveaux4:armed {
@@ -164,7 +158,7 @@
 .buttonniveaux4:selected {
     -fx-color: white;
     -fx-background-color: #AB8152;
-    -fx-background-radius: 0;
+
     -fx-text-fill: white;
 }
 
@@ -173,20 +167,19 @@
     -fx-color: white;
     -fx-text-fill: white;
     -fx-outer-border: #00D507;
-    -fx-background-radius: 0 0 0 0;
+
 }
 
 .buttonniveaux5: hover{
     -fx-background-color: #00B506;
     -fx-color: white;
     -fx-text-fill: white;
-    -fx-background-radius: 0 0 0 0;
+
 }
 
 .buttonniveaux5:focused {
     -fx-color: white;
     -fx-background-color: #00B506;
-    -fx-background-radius: 0;
     -fx-text-fill: white;
 }
 
@@ -301,4 +294,14 @@
     /*-fx-background-color: white;*/
     -fx-opacity: 1.3;
     -fx-background-radius: 30 30 30 30
+}
+
+.s > pane-container{
+    -fx-opacity: 0.3;
+    -fx-border-color:black;
+}
+
+.s2 >{
+    -fx-opacity: 1.0;
+    -fx-border-color:blue;
 }
