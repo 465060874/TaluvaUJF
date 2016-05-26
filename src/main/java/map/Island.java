@@ -30,4 +30,6 @@ public interface Island {
     void putBuilding(Hex hex, Building building);
 
     Island copy();
+
+    double getHashFactor();
 }

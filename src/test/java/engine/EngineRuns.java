@@ -1,8 +1,8 @@
 package engine;
 
-import IA.BotPlayerHandler;
 import data.PlayerColor;
 
+import java.text.DecimalFormat;
 import java.util.logging.Level;
 
 /**
@@ -15,21 +15,24 @@ public class EngineRuns {
     public static void main(String[] args) {
         for (int i = 0; i < COUNT; i++) {
             Engine engine = EngineBuilder.allVsAll()
-                    .logLevel(Level.INFO)
+                    .logLevel(Level.WARNING)
                     .player(PlayerColor.RED, PlayerHandler.dumbFactory())
-                    .player(PlayerColor.WHITE, BotPlayerHandler.factory(16, 2))
+                    .player(PlayerColor.WHITE, PlayerHandler.dumbFactory())
                     .build();
 
-            engine.logger().info("* Starting game seeded with {0}", Long.toString(engine.getSeed()));
+            engine.logger().warning("* Starting game seeded with {0}", Long.toString(engine.getSeed()));
             engine.start();
 
+            while (!(engine.getStatus() instanceof EngineStatus.Finished));
 
-            while (!(engine.getStatus() instanceof EngineStatus.Finished)) {
-                continue;
-            }
-
-            engine.logger().info("  Finished because of {0}",
+            engine.logger().warning("  Etalement de la table de hachage : {0}",
+                    percent(engine.getIsland().getHashFactor()));
+            engine.logger().warning("  Finished because of {0}",
                     ((EngineStatus.Finished) engine.getStatus()).getWinReason());
         }
+    }
+
+    private static String percent(double hashFactor) {
+        return new DecimalFormat("0.00 %").format(hashFactor);
     }
 }

@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static map.Field.SEA;
 
-class  IslandImpl implements Island {
+class IslandImpl implements Island {
 
-    private final HexMap<Field> map;
+    final HexMap<Field> map;
     final Villages villages;
 
     IslandImpl() {
@@ -118,5 +118,10 @@ class  IslandImpl implements Island {
     @Override
     public Island copy() {
         return new IslandImpl(this);
+    }
+
+    @Override
+    public double getHashFactor() {
+        return map.getHashFactor();
     }
 }

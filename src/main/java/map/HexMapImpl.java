@@ -11,12 +11,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 class HexMapImpl<E> implements HexMap<E> {
 
-    static final int INITIAL_CAPACITY = (1 << 9);
-
     private final Map<Hex, E> map;
 
     HexMapImpl() {
-        this.map = new HashMap<>(INITIAL_CAPACITY);
+        this.map = new HashMap<>(1 << 9);
     }
 
     private HexMapImpl(HexMapImpl<E> hexMap) {
@@ -72,5 +70,29 @@ class HexMapImpl<E> implements HexMap<E> {
     @Override
     public HexMap<E> copy() {
         return new HexMapImpl<>(this);
+    }
+
+    private static java.lang.reflect.Field TABLE_FIELD = null;
+
+    @Override
+    public double getHashFactor() {
+        try {
+            if (TABLE_FIELD == null) {
+                TABLE_FIELD = HashMap.class.getDeclaredField("table");
+                TABLE_FIELD.setAccessible(true);
+            }
+
+            Object[] table = (Object[]) TABLE_FIELD.get(map);
+            int occupiedBuckets = 0;
+            for (Object o : table) {
+                if (o != null) {
+                    occupiedBuckets++;
+                }
+            }
+            return ((double) occupiedBuckets) / ((double) map.size());
+        }
+        catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
