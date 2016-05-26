@@ -19,7 +19,7 @@ public class IslandVisu extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        URL rsc = Engine.class.getResource("EngineTest3.island");
+        URL rsc = Engine.class.getResource("EngineTest4.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
         IslandView islandView = new IslandView(island, true);
