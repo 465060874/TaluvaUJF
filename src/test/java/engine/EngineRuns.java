@@ -3,6 +3,7 @@ package engine;
 import data.PlayerColor;
 
 import java.text.DecimalFormat;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 /**
@@ -13,23 +14,39 @@ public class EngineRuns {
     private static final int COUNT = 500;
 
     public static void main(String[] args) {
+        double hashFactorSum = 0;
+        double durationSum = 0;
+        Engine engine = null;
         for (int i = 0; i < COUNT; i++) {
-            Engine engine = EngineBuilder.allVsAll()
-                    .logLevel(Level.WARNING)
+            engine = EngineBuilder.allVsAll()
+                    .logLevel(Level.INFO)
                     .player(PlayerColor.RED, PlayerHandler.dumbFactory())
                     .player(PlayerColor.WHITE, PlayerHandler.dumbFactory())
+                    .player(PlayerColor.BROWN, PlayerHandler.dumbFactory())
+                    .player(PlayerColor.YELLOW, PlayerHandler.dumbFactory())
                     .build();
 
-            engine.logger().warning("* Starting game seeded with {0}", Long.toString(engine.getSeed()));
+            engine.logger().info("* Début de la partie avec la graine {0}", Long.toString(engine.getSeed()));
+            long startTime = System.nanoTime();
             engine.start();
 
             while (!(engine.getStatus() instanceof EngineStatus.Finished));
+            long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+            // Skip the X first runs to account for when the JIT kicks in
+            if (i >= 20) {
+                durationSum += duration;
+            }
 
-            engine.logger().warning("  Etalement de la table de hachage : {0}",
-                    percent(engine.getIsland().getHashFactor()));
-            engine.logger().warning("  Finished because of {0}",
-                    ((EngineStatus.Finished) engine.getStatus()).getWinReason());
+            hashFactorSum += engine.getIsland().getHashFactor();
+            engine.logger().info("  Fini ({0}) après {1}ms",
+                    ((EngineStatus.Finished) engine.getStatus()).getWinReason(),
+                    duration);
         }
+
+        if (COUNT > 20) {
+            engine.logger().info("Temps moyen d''execution : {0} ms", durationSum / COUNT);
+        }
+        engine.logger().info("Etalement moyen de la table de hachage : {0}", percent(hashFactorSum / COUNT));
     }
 
     private static String percent(double hashFactor) {
