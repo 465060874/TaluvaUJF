@@ -1,5 +1,7 @@
 package engine.log;
 
+import engine.Engine;
+
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -15,10 +17,20 @@ import java.util.logging.Logger;
  */
 public class EngineLogger {
 
+    static {
+        // Force initialisation of base logger
+        EngineLoggerSetup.BASE_LOGGER.getLevel();
+    }
+
     final Logger javaLogger;
 
-    EngineLogger() {
-        this.javaLogger = Logger.getLogger(Long.toString(System.nanoTime()));
+    public static EngineLogger create(Level level) {
+        return new EngineLogger(level);
+    }
+
+    EngineLogger(Level level) {
+        this.javaLogger = Logger.getLogger(Engine.class.getCanonicalName() + "." + Long.toString(System.nanoTime()));
+        javaLogger.setLevel(level);
     }
 
     public void log(Level level, Throwable thrown, String message, Object... parameters) {

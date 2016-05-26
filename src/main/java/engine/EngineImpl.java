@@ -7,7 +7,6 @@ import data.BuildingType;
 import data.PlayerColor;
 import engine.action.*;
 import engine.log.EngineLogger;
-import engine.log.EngineLoggerSetup;
 import map.*;
 
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ class EngineImpl implements Engine {
      * Package-protected, voir la classe EngineBuilder
      */
     EngineImpl(EngineBuilder<?> builder) {
-        this.logger = EngineLoggerSetup.setup(builder.logLevel);
+        this.logger = EngineLogger.create(builder.logLevel);
         this.seed = builder.seed;
         this.random = new Random(builder.seed);
 

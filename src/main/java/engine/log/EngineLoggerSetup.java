@@ -1,6 +1,7 @@
 package engine.log;
 
 import engine.Engine;
+import sun.rmi.runtime.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,36 +11,33 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class EngineLoggerSetup {
+class EngineLoggerSetup {
 
-    private static final DateFormat LOG_FILE_DATE_FORMAT = new SimpleDateFormat("yyMMdd_HHmmss_SSS");
+    private static final DateFormat LOG_FILE_DATE_FORMAT = new SimpleDateFormat("yyMMdd");
+    static final Logger BASE_LOGGER;
 
-    public static EngineLogger setup(Level level) {
-        EngineLogger logger = new EngineLogger();
-        logger.javaLogger.setLevel(level);
-        logger.javaLogger.setUseParentHandlers(false);
-        logger.javaLogger.addHandler(new SystemLoggerHandler(new OneLineLoggerFormatter(false)));
+    static {
+        BASE_LOGGER = Logger.getLogger(Engine.class.getCanonicalName());
+        BASE_LOGGER.setUseParentHandlers(false);
+        BASE_LOGGER.addHandler(new SystemLoggerHandler(new OneLineLoggerFormatter(false)));
 
         try {
             File sourceFile = new File(Engine.class.getProtectionDomain().getCodeSource().getLocation().toURI());
             File logDir = new File(sourceFile.getParent(), "../logs");
             if (!logDir.mkdirs() && !logDir.exists()) {
-                logger.severe("Can't initialize log file (Creating logs dir failed)");
-                return logger;
+                BASE_LOGGER.severe("Can't initialize log file (Creating logs dir failed)");
             }
 
             String logFilename = new File(logDir, LOG_FILE_DATE_FORMAT.format(new Date()) + ".log").toString();
             FileHandler fileHandler = new FileHandler(logFilename, true);
             fileHandler.setFormatter(new OneLineLoggerFormatter(false));
             fileHandler.setLevel(Level.ALL);
-            logger.javaLogger.addHandler(fileHandler);
+            BASE_LOGGER.addHandler(fileHandler);
         }
         catch (URISyntaxException | IOException exc) {
-            logger.severe(exc, "Can't initialize log file");
+            BASE_LOGGER.log(Level.SEVERE, "Can't initialize log file", exc);
         }
-
-        return logger;
-
     }
 }
