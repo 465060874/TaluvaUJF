@@ -43,7 +43,14 @@
     -fx-text-fill: white;
 }
 
-.buttonjoueur:focused {
+.buttonjoueur:armed {
+    -fx-color: white;
+    -fx-background-color: #4CAF50;
+    -fx-background-radius: 0;
+    -fx-text-fill: white;
+}
+
+.buttonjoueur:selected {
     -fx-color: white;
     -fx-background-color: #4CAF50;
     -fx-background-radius: 0;
@@ -63,7 +70,14 @@
     -fx-text-fill: white;
 }
 
-.buttonniveaux1:focused {
+.buttonniveaux1:armed {
+    -fx-color: white;
+    -fx-background-color: #FF9966;
+    -fx-background-radius: 0;
+    -fx-text-fill: white;
+}
+
+.buttonniveaux1:selected {
     -fx-color: white;
     -fx-background-color: #FF9966;
     -fx-background-radius: 0;
@@ -83,7 +97,14 @@
     -fx-text-fill: white;
 }
 
-.buttonniveaux2:focused {
+.buttonniveaux2:armed{
+    -fx-color: white;
+    -fx-background-color: #FF6666;
+    -fx-background-radius: 0;
+    -fx-text-fill: white;
+}
+
+.buttonniveaux2:selected{
     -fx-color: white;
     -fx-background-color: #FF6666;
     -fx-background-radius: 0;
@@ -103,7 +124,14 @@
     -fx-text-fill: white;
 }
 
-.buttonniveaux3:focused {
+.buttonniveaux3:armed {
+    -fx-color: white;
+    -fx-background-color: #CC0066;
+    -fx-background-radius: 0;
+    -fx-text-fill: white;
+}
+
+.buttonniveaux3:selected {
     -fx-color: white;
     -fx-background-color: #CC0066;
     -fx-background-radius: 0;
@@ -111,6 +139,7 @@
 }
 
 .buttonniveaux4{
+    -fx-font: 16px "Avantgarde, sans-serif";
     -fx-background-color: #EFB068;
     -fx-color: white;
     -fx-text-fill: white;
@@ -124,14 +153,20 @@
     -fx-text-fill: white;
     -fx-background-radius: 0 0 0 0;
 }
-
-.buttonniveaux4:focused {
+/*
+.buttonniveaux4:armed {
     -fx-color: white;
     -fx-background-color: #AB8152;
     -fx-background-radius: 0;
     -fx-text-fill: white;
 }
-
+*/
+.buttonniveaux4:selected {
+    -fx-color: white;
+    -fx-background-color: #AB8152;
+    -fx-background-radius: 0;
+    -fx-text-fill: white;
+}
 
 .buttonniveaux5{
     -fx-background-color: #00D507;
@@ -179,7 +214,7 @@
 }
 */
 .bin{
-    -fx-background-color:#B9121B;
+    -fx-background-color:#FF9966;
     -fx-text-fill: white;
 }
 
