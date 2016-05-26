@@ -1,12 +1,14 @@
 package ui;
 
 import IA.BotPlayerHandler;
+import com.google.common.io.Files;
 import data.PlayerColor;
 import engine.*;
 import engine.action.ExpandVillageAction;
 import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
+import engine.tilestack.VolcanoTileStack;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -17,6 +19,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import ui.island.IslandView;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -28,8 +32,11 @@ public class EngineVisu extends Application implements EngineObserver {
 
     @Override
     public void start(Stage stage) throws Exception {
+        VolcanoTileStack.Factory stackFactory = VolcanoTileStack.read(
+                Files.asCharSource(new File("stack"), StandardCharsets.UTF_8));
         this.engine = EngineBuilder.allVsAll()
                 .logLevel(Level.INFO)
+                .tileStack(stackFactory)
                 .seed(8006646545592930086L)
                 .player(PlayerColor.RED, uiWrap(BotPlayerHandler.factory(16, 1)))
                 .player(PlayerColor.WHITE, uiWrap(BotPlayerHandler.factory(16, 2)))

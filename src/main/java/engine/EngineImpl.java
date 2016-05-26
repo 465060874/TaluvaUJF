@@ -7,6 +7,7 @@ import data.BuildingType;
 import data.PlayerColor;
 import engine.action.*;
 import engine.log.EngineLogger;
+import engine.tilestack.VolcanoTileStack;
 import map.*;
 
 import java.util.ArrayList;

@@ -10,6 +10,7 @@ import data.PlayerColor;
 import data.VolcanoTile;
 import engine.*;
 import engine.action.Action;
+import engine.tilestack.VolcanoTileStack;
 
 import java.io.BufferedReader;
 import java.io.IOException;

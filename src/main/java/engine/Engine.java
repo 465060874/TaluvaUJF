@@ -2,6 +2,7 @@ package engine;
 
 import engine.action.*;
 import engine.log.EngineLogger;
+import engine.tilestack.VolcanoTileStack;
 import map.Island;
 
 import java.util.List;

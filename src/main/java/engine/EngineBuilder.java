@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import data.PlayerColor;
 import data.StandardVolcanoTiles;
+import engine.tilestack.VolcanoTileStack;
 import map.Island;
 
 import java.util.ArrayList;

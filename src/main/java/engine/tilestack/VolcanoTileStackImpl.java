@@ -1,7 +1,8 @@
-package engine;
+package engine.tilestack;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.io.CharSink;
 import data.VolcanoTile;
 
 import java.util.ArrayList;
@@ -10,37 +11,6 @@ import java.util.List;
 import java.util.Random;
 
 import static com.google.common.base.Preconditions.checkState;
-
-/**
- * Represente la pioche du jeu
- */
-public interface VolcanoTileStack {
-
-    static VolcanoTileStack.Factory randomFactory(Iterable<VolcanoTile> tiles) {
-        return new VolcanoTileStackImpl.RandomFactory(tiles);
-    }
-
-    static VolcanoTileStack.Factory predefinedFactory(Iterable<VolcanoTile> tiles) {
-        return new VolcanoTileStackImpl.PredefinedFactory(tiles);
-    }
-
-    int size();
-
-    boolean isEmpty();
-
-    VolcanoTile current();
-
-    void next();
-
-    VolcanoTileStack copyShuffled(Random random);
-
-    void previous();
-
-    interface Factory {
-
-        VolcanoTileStack create(int count, Random random);
-    }
-}
 
 class VolcanoTileStackImpl implements VolcanoTileStack {
 
@@ -55,6 +25,11 @@ class VolcanoTileStackImpl implements VolcanoTileStack {
     private VolcanoTileStackImpl(ImmutableList<VolcanoTile> tiles, int index) {
         this.tiles = tiles;
         this.index = index;
+    }
+
+    @Override
+    public void saveAll(CharSink sink) {
+        VolcanoTileStackIO.write(sink, tiles);
     }
 
     @Override
@@ -90,7 +65,7 @@ class VolcanoTileStackImpl implements VolcanoTileStack {
         return new VolcanoTileStackImpl(ImmutableList.copyOf(copyTiles), index);
     }
 
-    static class RandomFactory implements VolcanoTileStack.Factory {
+    static class RandomFactory implements Factory {
 
         private final List<VolcanoTile> roulette;
 
@@ -110,7 +85,7 @@ class VolcanoTileStackImpl implements VolcanoTileStack {
         }
     }
 
-    static class PredefinedFactory implements VolcanoTileStack.Factory {
+    static class PredefinedFactory implements Factory {
 
         private final ImmutableList<VolcanoTile> tiles;
 
