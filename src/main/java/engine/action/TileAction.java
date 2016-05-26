@@ -5,9 +5,9 @@ import data.VolcanoTile;
 import map.Hex;
 import map.Orientation;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Objects;
 
 public abstract class TileAction implements Action {
 
@@ -59,5 +59,28 @@ public abstract class TileAction implements Action {
         writer.write('\n');
         writer.write(orientation.name());
         writer.write('\n');
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tile, volcanoHex, orientation);
+    }
+
+
+    @Override
+    public boolean equals(Object obj){
+        if (!(obj instanceof TileAction)) {
+            return false;
+        }
+
+        TileAction other = (TileAction) obj;
+        return this.tile.equals(other.tile)
+                && this.volcanoHex.equals(other.volcanoHex)
+                && this.orientation == other.orientation;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + tile.toString() + ", " +  volcanoHex.toString() + ", " + orientation.toString() + "]";
     }
 }

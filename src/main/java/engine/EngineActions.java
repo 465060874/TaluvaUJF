@@ -7,13 +7,14 @@ import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
 import engine.action.*;
-import engine.rules.PlaceBuildingRules;
 import engine.rules.ExpandVillageRules;
+import engine.rules.PlaceBuildingRules;
 import engine.rules.SeaTileRules;
 import engine.rules.VolcanoTileRules;
 import map.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -82,27 +83,25 @@ class EngineActions {
         Island island = engine.getIsland();
         VolcanoTile tile = engine.getVolcanoTileStack().current();
 
-        HexMap<List<SeaTileAction>> seaTilesMap = HexMap.create();
+        HashSet<SeaTileAction> seaTilesMap = new HashSet<>();
+
         for (Hex hex : island.getCoast()) {
             for (Orientation orientation : Orientation.values()) {
                 if (!SeaTileRules.validate(island, tile, hex, orientation).isValid()) {
                     continue;
                 }
 
-                List<SeaTileAction> list = seaTilesMap.getOrDefault(hex, null);
-                if (list == null) {
-                    list = new ArrayList<>();
-                    seaTilesMap.put(hex, list);
+                for (int rotation = 0; rotation < 3; rotation++) {
+                    seaTilesMap.add(new SeaTileAction(tile, hex, orientation));
+                    hex = hex.getLeftNeighbor(orientation);
+                    orientation = orientation.leftRotation();
                 }
-
-                list.add(new SeaTileAction(tile, hex, orientation));
             }
         }
 
         ImmutableList.Builder<SeaTileAction> builder = ImmutableList.builder();
-        for (List<SeaTileAction> actions : seaTilesMap.values()) {
-            builder.addAll(actions);
-        }
+        builder.addAll(seaTilesMap);
+
         this.seaTiles = builder.build();
     }
 

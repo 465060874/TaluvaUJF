@@ -2,6 +2,7 @@
 package ui;
 
 import com.google.common.io.Resources;
+import engine.Engine;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
@@ -18,10 +19,10 @@ public class IslandVisu extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        URL rsc = IslandVisu.class.getResource("test.island");
+        URL rsc = Engine.class.getResource("EngineTest1.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
-        IslandView islandView = new IslandView(island, false);
+        IslandView islandView = new IslandView(island, true);
         BorderPane mainPane = new BorderPane();
         mainPane.setCenter(islandView);
 

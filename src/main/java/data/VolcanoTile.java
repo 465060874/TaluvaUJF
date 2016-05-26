@@ -1,5 +1,7 @@
 package data;
 
+import java.util.Objects;
+
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
@@ -24,5 +26,25 @@ public class VolcanoTile {
 
     public FieldType getRight() {
         return right;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(left, right);
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if (!(obj instanceof VolcanoTile)) {
+            return false;
+        }
+
+        VolcanoTile other = (VolcanoTile) obj;
+        return this.left == other.left && this.right == other.right;
+    }
+
+    @Override
+    public String toString() {
+        return "VolcanoTile(" + this.left + ", " + this.right + ")";
     }
 }
