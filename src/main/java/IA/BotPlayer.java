@@ -89,19 +89,21 @@ class BotPlayer {
         int bestConfigPoints = Integer.MAX_VALUE;
         int p;
         for (int i = 0; i < branchNb; i++) {
-            engine.logger().info("[eval] Placement with {0} points ", branchMoves[i].points);
             engine.action(branchMoves[i].tileAction);
             engine.action(branchMoves[i].buildingAction);
             if( engine.getStatus() instanceof EngineStatus.Finished ){
                 if( ((EngineStatus.Finished) engine.getStatus()).getWinners().contains( engine.getCurrentPlayer()))
-                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MAX_VALUE);
-                else
                     return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MIN_VALUE);
+                else
+                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MAX_VALUE);
             }else if (depth > 0) {
                 Move m = doPlay(engine, depth - 1);
+                // Pour inverser entre min et max
+                m.points *= -1;
                 if (m.points < bestPoints) {
                     bestPoints = m.points;
-                    bestMove = branchMoves[i];
+                    bestMove = new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, bestPoints );
+                    engine.logger().fine("[Choice] Found opponent best choice only : {0}", m.points);
                 }
             }else{
                 // On evalue la config de l'adversaire donc on prend sa moins bonne configuration !!!
@@ -113,7 +115,8 @@ class BotPlayer {
             engine.cancelLastStep();
             engine.cancelLastStep();
         }
-
+        if( depth > 0 )
+            engine.logger().fine("[Choice] Best move choosen, opponent best branch was {0}", bestMove.points);
         return bestMove;
     }
 

@@ -30,14 +30,14 @@ public class EngineVisu extends Application implements EngineObserver {
     public void start(Stage stage) throws Exception {
         this.engine = EngineBuilder.allVsAll()
                 .logLevel(Level.INFO)
-                //.seed(8006695491958633869)
-                .player(PlayerColor.RED, uiWrap(PlayerHandler.dumbFactory()))
-                .player(PlayerColor.WHITE, uiWrap(BotPlayerHandler.factory(16, 1)))
+                .seed(8006646545592930086L)
+                .player(PlayerColor.RED, uiWrap(BotPlayerHandler.factory(16, 1)))
+                .player(PlayerColor.WHITE, uiWrap(BotPlayerHandler.factory(16, 2)))
                 .build();
         engine.registerObserver(new EngineLoggerObserver(engine));
         engine.registerObserver(this);
 
-        this.islandView = new IslandView(engine.getIsland(), false);
+        this.islandView = new IslandView(engine.getIsland(), true);
         BorderPane mainPane = new BorderPane();
         mainPane.setCenter(islandView);
 

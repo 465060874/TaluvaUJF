@@ -6,8 +6,8 @@ import engine.*;
 import engine.action.*;
 import map.*;
 
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.sleep;
 
@@ -15,11 +15,8 @@ class BasicHeuristics implements Heuristics {
     // Critères d'évaluation pondérés
     int echelle = 100 ;
     int nbStrategies = 4;
-    int templePlacedPts, towerPlacedPts, hutPlacedPts;
-    int templeGapPts, towerGapPts, hutGapPts;
-    int templeTimeOut, towerTimeOut;
-    int notEnoughHutsForTemple, notEnoughHutsForTower;
-    int templeFreeCity, towerFreeCity; // Citée dans laquelle on peut construire un temple ( 3+ huttes ) ou une tour ( niveau 3+ adjacent ).
+    int [] pointsVillageSize;
+    int pointsVillageWithTemple;
 
     // Critères de choix de pondération
     int mintimeFinishTowers; // Temps min après lequel le joueur décide de privilégier temples à tours si il a une tour manquante et moins de temples que l'autre
@@ -30,7 +27,8 @@ class BasicHeuristics implements Heuristics {
     final static int COUNTERSTRATEGY = 3;
 
     BasicHeuristics() {
-
+        pointsVillageSize = new int[]{0,5,15,30,40,50};
+        pointsVillageWithTemple = 100;
     }
 
     public void chooseStrategies (Engine e , int [] StrategyValues, int BranchingFactor ){
@@ -93,6 +91,12 @@ class BasicHeuristics implements Heuristics {
                     StrategyValues[TEMPLESTRATEGY] += 2*pas*templesPlaced - pas*towersPlaced;
                     StrategyValues[TOWERSTRATEGY] += -pas*templesPlaced + 2*pas*towersPlaced;
                     StrategyValues[COUNTERSTRATEGY] += -pas*templesPlaced -pas*towersPlaced;
+                    if( StrategyValues[COUNTERSTRATEGY] < 0 ){
+                        int correction = StrategyValues[COUNTERSTRATEGY] / 2;
+                        StrategyValues[TEMPLESTRATEGY] += correction;
+                        StrategyValues[TOWERSTRATEGY] += ( StrategyValues[COUNTERSTRATEGY] - correction );
+                        StrategyValues[COUNTERSTRATEGY] = 0;
+                    }
             }else{
                 if( templesPlaced < templesPlacedOpponent ){
                     StrategyValues[TEMPLESTRATEGY] += StrategyValues[TOWERSTRATEGY]/2;
@@ -351,24 +355,41 @@ class BasicHeuristics implements Heuristics {
 
     @Override
     public int evaluateConfiguration(Engine engine) {
-        int score = 0;
-        int i = 0;
-        int nbVillages = 0;
+        int score = 0, tmpScore;
+        int bonus;
+        int nbVillages = 0, nbVIllagesOpponent = 0;
         List<Player> players = engine.getPlayers();
         Player player = engine.getCurrentPlayer();
 
+        /*Set<Village> villages = new HashSet<>();
+        for (Hex hex : engine.getIsland().getFields()) {
+            if( engine.getIsland().getField(hex).getBuilding().getType() != BuildingType.NONE )
+                villages.add(engine.getIsland().getVillage(hex));
+        }*/
+
         Iterable<Village> villages = engine.getIsland().getVillages( player.getColor());
         for( Village village : villages) {
-            score += village.hasTemple() ? 1 : 0;
-            nbVillages++;
+            tmpScore = 0;
+            if( !village.hasTemple())
+                tmpScore += village.getHexes().size() > 5 ? pointsVillageSize[5] : pointsVillageSize[village.getHexes().size()];
+            else
+                tmpScore += pointsVillageWithTemple;
+            engine.logger().finer("[Eval] {0} Village : {1} ", player.getColor(), tmpScore);
+            score += tmpScore;
         }
-        while( (player =  players.get(i++)) !=  engine.getCurrentPlayer()){}
+        int i = 0;
+        while( (player = players.get(i++)) == engine.getCurrentPlayer() ){}
         villages = engine.getIsland().getVillages( player.getColor());
-        for(  Village village : villages){
-            score -= village.hasTemple() ? 1 : 0 ;
+        for( Village village : villages) {
+            tmpScore = 0;
+            if( !village.hasTemple())
+                tmpScore += village.getHexes().size() > 5 ? pointsVillageSize[5] : pointsVillageSize[village.getHexes().size()];
+            else
+                tmpScore += pointsVillageWithTemple;
+            engine.logger().finer("[Eval] {0} Village : {1} ", player.getColor(), tmpScore);
+            score -= tmpScore;
         }
-        engine.logger().info("[!!!!]Player {0}, villages : {1} villages", player.getColor(), nbVillages);
-        engine.logger().info("[Eval] {0} points config ", score);
+        engine.logger().fine("[Eval] {0} Config with {1} points ", engine.getCurrentPlayer().getColor(), score);
         return score;
     }
 }
