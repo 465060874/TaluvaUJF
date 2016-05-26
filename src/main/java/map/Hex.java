@@ -57,7 +57,7 @@ public class Hex {
 
     @Override
     public int hashCode() {
-        return 961 + 31 * line + diag;
+        return 17*17 + 17 * line + diag;
     }
 
     @Override

@@ -11,7 +11,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 class HexMapImpl<E> implements HexMap<E> {
 
-    static final int INITIAL_CAPACITY = (1 << 9);
+    static final int INITIAL_CAPACITY = (1 << 8);
 
     private final Map<Hex, E> map;
 
