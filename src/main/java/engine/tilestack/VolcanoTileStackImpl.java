@@ -44,7 +44,7 @@ class VolcanoTileStackImpl implements VolcanoTileStack {
 
     @Override
     public VolcanoTile current() {
-        return tiles.get(index);
+        return index >= 0 ? tiles.get(index) : null;
     }
 
     @Override
