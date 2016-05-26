@@ -1,14 +1,16 @@
 package ui.island;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimaps;
 import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
 import engine.rules.TileRules;
-import map.Field;
-import map.Hex;
-import map.Island;
-import map.Orientation;
+import map.*;
+
+import java.util.Map;
+import java.util.Set;
 
 public class Placement {
 
@@ -17,7 +19,8 @@ public class Placement {
     public enum Mode {
         NONE,
         TILE,
-        BUILDING;
+        BUILDING,
+        EXPAND_VILLAGE;
     }
 
     private final Island island;
@@ -38,6 +41,10 @@ public class Placement {
 
     BuildingType buildingType;
     PlayerColor buildingColor;
+
+    Village expansionVillage;
+    FieldType expansionFieldType;
+    Set<Hex> expansionHexes;
 
     public Placement(Island island, Grid grid) {
         this.island = island;
@@ -66,10 +73,25 @@ public class Placement {
             islandCanvas.redraw();
         }
         else {
-            mode = Mode.NONE;
-            islandCanvas.redraw();
-            placementOverlay.redraw();
+            if (mode == Mode.BUILDING && island.getField(hex).getBuilding().getType() != BuildingType.NONE) {
+                expand(island.getVillage(hex));
+            }
+            else {
+                mode = Mode.NONE;
+                islandCanvas.redraw();
+                placementOverlay.redraw();
+            }
         }
+    }
+
+    public void expand(Village village) {
+        this.mode = Mode.EXPAND_VILLAGE;
+        this.expansionFieldType = null;
+        this.expansionVillage = village;
+        this.expansionHexes = ImmutableSet.of();
+
+        placementOverlay.redraw();
+        islandCanvas.redraw();
     }
 
     void cycleTileOrientationOrBuildingTypeAndColor() {
@@ -113,12 +135,28 @@ public class Placement {
         else if (mode == Mode.BUILDING) {
             updateValidBuilding();
         }
+        else if (mode == Mode.EXPAND_VILLAGE) {
+            updateExpandedHexes();
+        }
     }
 
     private void updateValidTile() {
         boolean wasValid = valid;
         this.valid = TileRules.validate(island, tileFields, hex, tileOrientation).isValid();
 
+        redrawWhatsNecessary(wasValid);
+    }
+
+    private void updateValidBuilding() {
+        boolean wasValid = valid;
+        Field field = island.getField(hex);
+        this.valid = field != Field.SEA
+                && field.getBuilding().getType() == BuildingType.NONE;
+
+        redrawWhatsNecessary(wasValid);
+    }
+
+    private void redrawWhatsNecessary(boolean wasValid) {
         if (wasValid != valid) {
             placementOverlay.redraw();
             islandCanvas.redraw();
@@ -131,11 +169,23 @@ public class Placement {
         }
     }
 
-    private void updateValidBuilding() {
-        Field field = island.getField(hex);
-        this.valid = field != Field.SEA
-                && field.getBuilding().getType() == BuildingType.NONE;
-        placementOverlay.redraw();
+    private void updateExpandedHexes() {
+        for (Map.Entry<FieldType, Set<Hex>> entry : Multimaps.asMap(expansionVillage.getExpandableHexes()).entrySet()) {
+            if (entry.getValue().contains(hex)) {
+                if (expansionFieldType == entry.getKey()) {
+                    return;
+                }
+
+                expansionFieldType = entry.getKey();
+                expansionHexes = ImmutableSet.copyOf(entry.getValue());
+                islandCanvas.redraw();
+                return;
+            }
+        }
+
+        expansionFieldType = null;
+        expansionHexes = ImmutableSet.of();
+        islandCanvas.redraw();
     }
 
     void saveMode() {

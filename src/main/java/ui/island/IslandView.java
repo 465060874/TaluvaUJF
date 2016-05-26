@@ -115,15 +115,11 @@ public class IslandView extends StackPane {
             return;
         }
 
-        islandCanvas.setTranslateX(islandCanvas.getTranslateX()
-                + event.getX() - mouseX);
-        islandCanvas.setTranslateY(islandCanvas.getTranslateY()
-                + event.getY() - mouseY);
+        islandCanvas.setTranslateX(islandCanvas.getTranslateX() + event.getX() - mouseX);
+        islandCanvas.setTranslateY(islandCanvas.getTranslateY() + event.getY() - mouseY);
 
-        placementOverlay.setTranslateX(placementOverlay.getTranslateX()
-                + event.getX() - mouseX);
-        placementOverlay.setTranslateY(placementOverlay.getTranslateY()
-                + event.getY() - mouseY);
+        placementOverlay.setTranslateX(placementOverlay.getTranslateX() + event.getX() - mouseX);
+        placementOverlay.setTranslateY(placementOverlay.getTranslateY() + event.getY() - mouseY);
 
         mouseX = event.getX();
         mouseY = event.getY();

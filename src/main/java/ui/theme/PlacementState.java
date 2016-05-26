@@ -4,6 +4,8 @@ public enum PlacementState {
 
     NONE,
 
+    FLOATING,
+
     INVALID,
 
     VALID;

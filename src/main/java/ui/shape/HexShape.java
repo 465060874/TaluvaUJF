@@ -1,9 +1,6 @@
 package ui.shape;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.Light;
-import javafx.scene.effect.Lighting;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import map.Orientation;
@@ -159,13 +156,14 @@ public class HexShape {
         update(grid, info);
 
         // Fill shape
-        gc.setEffect(new Lighting(new Light.Point(0, 0, grid.getScale() * 150, Color.WHITE)));
+        gc.setEffect(Theme.getCurrent().getTileTopEffect(grid, info.placementState));
         gc.setFill(Theme.getCurrent().getTileTopPaint(info.fieldType, info.placementState));
         gc.fillPolygon(hexagonX, hexagonY, HEXAGON_POINTS);
-        gc.setEffect(null);
 
+        gc.setEffect(Theme.getCurrent().getTileBottomEffect(grid, info.placementState));
         gc.setFill(Theme.getCurrent().getTileBottomPaint(info.placementState));
         gc.fillPolygon(bottomX, bottomY, HEXAGON_POINTS);
+        gc.setEffect(null);
 
         // Draw borders
         gc.setStroke(Theme.getCurrent().getTileBorderPaint(info.placementState));

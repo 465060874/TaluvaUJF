@@ -1,6 +1,7 @@
 package ui.shape;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.Effect;
 import javafx.scene.paint.Paint;
 import ui.island.Grid;
 import ui.theme.PlacementState;
@@ -17,7 +18,7 @@ public class BuildingShapes {
 
         switch (info.building.getType()) {
             case HUT:
-                if (info.placementState == PlacementState.INVALID || level == 1) {
+                if (info.placementState == PlacementState.FLOATING || level == 1) {
                     drawHut(gc, grid, info, info.x, y);
                 } else if (level == 2) {
                     drawHut(gc, grid, info, info.x - grid.getHexRadiusX() / 3, y);
@@ -49,7 +50,7 @@ public class BuildingShapes {
         double y3 = y + hexRadiusY / 10;
         double y4 = y + hexRadiusY / 4;
 
-        drawTentShape(gc, info, x1, x2, x3, y1, y2, y3, y4);
+        drawTentShape(gc, grid, info, x1, x2, x3, y1, y2, y3, y4);
     }
 
     private static void drawTemple(GraphicsContext gc, Grid grid, HexShapeInfo info, double x, double y) {
@@ -63,13 +64,15 @@ public class BuildingShapes {
         double y3 = y + hexRadiusY / 1.6 - hexRadiusY / 2;
         double y4 = y + hexRadiusY / 1.6;
 
-        drawTentShape(gc, info, x1, x2, x3, y1, y2, y3, y4);
+        drawTentShape(gc, grid, info, x1, x2, x3, y1, y2, y3, y4);
     }
 
-    private static void drawTentShape(GraphicsContext gc, HexShapeInfo info,
+    private static void drawTentShape(GraphicsContext gc, Grid grid, HexShapeInfo info,
             double x1, double x2, double x3, double y1, double y2, double y3, double y4) {
         Paint facePaint = Theme.getCurrent().getBuildingFacePaint(info.building, info.placementState);
         Paint topPaint = Theme.getCurrent().getBuildingTopPaint(info.building, info.placementState);
+        Effect faceEffect = Theme.getCurrent().getBuildingFaceEffect(grid, info.building, info.placementState);
+        Effect topEffect = Theme.getCurrent().getBuildingTopEffect(grid, info.building, info.placementState);
 
         double[] xpoints = new double[4];
         double[] ypoints = new double[4];
@@ -79,8 +82,10 @@ public class BuildingShapes {
         ypoints[1] = y3;
         xpoints[2] = x3;
         ypoints[2] = y4;
+        gc.setEffect(faceEffect);
         gc.setFill(facePaint);
         gc.fillPolygon(xpoints, ypoints, 3);
+        gc.setEffect(null);
         gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 3);
@@ -93,8 +98,10 @@ public class BuildingShapes {
         ypoints[2] = y1;
         xpoints[3] = x1;
         ypoints[3] = y2;
+        gc.setEffect(topEffect);
         gc.setFill(topPaint);
         gc.fillPolygon(xpoints, ypoints, 4);
+        gc.setEffect(null);
         gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 4);
@@ -107,8 +114,10 @@ public class BuildingShapes {
         ypoints[2] = y1;
         xpoints[3] = x3;
         ypoints[3] = y2;
+        gc.setEffect(topEffect);
         gc.setFill(topPaint);
         gc.fillPolygon(xpoints, ypoints, 4);
+        gc.setEffect(null);
         gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 4);
@@ -117,6 +126,8 @@ public class BuildingShapes {
     private static void drawTower(GraphicsContext gc, Grid grid, HexShapeInfo info, double x, double y) {
         Paint facePaint = Theme.getCurrent().getBuildingFacePaint(info.building, info.placementState);
         Paint topPaint = Theme.getCurrent().getBuildingTopPaint(info.building, info.placementState);
+        Effect faceEffect = Theme.getCurrent().getBuildingFaceEffect(grid, info.building, info.placementState);
+        Effect topEffect = Theme.getCurrent().getBuildingTopEffect(grid, info.building, info.placementState);
 
         double hexRadiusX = grid.getHexRadiusX();
         double hexRadiusY = grid.getHexRadiusY();
@@ -128,21 +139,27 @@ public class BuildingShapes {
         double ytop = y - hexRadiusY - hexRadiusY / 3;
         double ybottom = y - height / 2;
 
+        gc.setEffect(faceEffect);
         gc.setFill(facePaint);
         gc.fillOval(xstart, ybottom, width, height);
+        gc.setEffect(null);
         gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokeOval(xstart, ybottom, width, height);
 
+        gc.setEffect(faceEffect);
         gc.setFill(facePaint);
         gc.fillRect(xstart, ytop + height/2, width, ybottom - ytop);
+        gc.setEffect(null);
         gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokeLine(xstart, ytop + height/2, xstart, ybottom + height/2);
         gc.strokeLine(xstart + width, ytop + height/2, xstart + width, ybottom + height/2);
 
+        gc.setEffect(topEffect);
         gc.setFill(topPaint);
         gc.fillOval(xstart, ytop, width, height);
+        gc.setEffect(null);
         gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokeOval(xstart, ytop, width, height);

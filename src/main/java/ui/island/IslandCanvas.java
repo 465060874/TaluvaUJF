@@ -99,7 +99,36 @@ class IslandCanvas extends Canvas {
             info.level = field.getLevel();
             info.fieldType = field.getType();
             info.orientation = field.getOrientation();
-            info.building = field.getBuilding();
+            if (placement.mode == Placement.Mode.EXPAND_VILLAGE) {
+                if (placement.expansionHexes.contains(hex)) {
+                    info.building = Building.of(BuildingType.HUT, placement.expansionVillage.getColor());
+                    info.placementState = PlacementState.VALID;
+                }
+                else if (placement.expansionVillage.getHexes().contains(hex)
+                        || placement.expansionVillage.getExpandableHexes().containsValue(hex)) {
+                    info.building = field.getBuilding();
+                    info.placementState = PlacementState.NONE;
+                }
+                else {
+                    info.building = field.getBuilding();
+                    info.placementState = PlacementState.INVALID;
+                }
+            }
+            else if (placement.valid && placement.mode == Placement.Mode.BUILDING) {
+                if (placement.hex.equals(hex)) {
+                    info.placementState = PlacementState.VALID;
+                    info.building = Building.of(placement.buildingType, placement.buildingColor);
+                }
+                else {
+                    info.building = field.getBuilding();
+                    info.placementState = PlacementState.NONE;
+                }
+            }
+            else {
+                info.building = field.getBuilding();
+                info.placementState = PlacementState.NONE;
+            }
+
             if (!isOutside(info)) {
                 infos.add(info);
             }

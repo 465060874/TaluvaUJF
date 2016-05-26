@@ -59,9 +59,13 @@ class DumbPlayerHandler implements PlayerHandler {
 
     @Override
     public void startTileStep() {
-        List<TileAction> tileActions = new ArrayList<>();
-        tileActions.addAll(engine.getSeaTileActions());
-        tileActions.addAll(engine.getVolcanoTileActions());
+        List<? extends TileAction> tileActions;
+        if (engine.getVolcanoTileActions().isEmpty() || engine.getRandom().nextInt(3) == 2) {
+            tileActions = engine.getSeaTileActions();
+        }
+        else {
+            tileActions = engine.getVolcanoTileActions();
+        }
 
         int choice = engine.getRandom().nextInt(tileActions.size());
         TileAction tileAction = tileActions.get(choice);
@@ -72,8 +76,7 @@ class DumbPlayerHandler implements PlayerHandler {
     public void startBuildStep() {
         List<BuildingAction> buildTowerOrTemple = new ArrayList<>();
         List<BuildingAction> buildHut = new ArrayList<>();
-        for (PlaceBuildingAction action :
-                Iterables.concat(engine.getPlaceBuildingActions(), engine.getNewPlaceBuildingActions())) {
+        for (PlaceBuildingAction action : engine.getPlaceBuildingActions()) {
             if (action.getType() == BuildingType.HUT) {
                 buildHut.add(action);
             }

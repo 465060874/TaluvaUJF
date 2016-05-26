@@ -3,12 +3,16 @@ package ui.theme;
 import data.ChoosenColors;
 import data.FieldType;
 import javafx.geometry.Insets;
+import javafx.scene.effect.Effect;
+import javafx.scene.effect.Light;
+import javafx.scene.effect.Lighting;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import map.Building;
+import ui.island.Grid;
 
 public class BasicTheme implements Theme {
 
@@ -24,16 +28,9 @@ public class BasicTheme implements Theme {
     private final Color tileSandColor = Color.web("EFDD6F");
     private final Color tileRockColor = Color.web("C2D0D1");
     private final Color tileLakeColor = Color.web("8BE1EB");
-
-    private Paint deriveColor(PlacementState placementState, Color color) {
-        switch (placementState) {
-            case NONE: return color;
-            case INVALID: return color.deriveColor(1, 1, 1, 0.5);
-            case VALID: return color.deriveColor(1, 1, 1, 0.75);
-        }
-
-        throw new IllegalStateException();
-    }
+    private final Lighting lighting = new Lighting(new Light.Point(0, 0, 0, Color.WHITE));
+    private final Lighting lightingValid = new Lighting(new Light.Point(0, 0, 0, Color.WHITE));
+    private final Lighting lightingInvalid = new Lighting(new Light.Point(0, 0, 0, Color.GRAY));
 
     @Override
     public Background getIslandBackground() {
@@ -47,10 +44,16 @@ public class BasicTheme implements Theme {
 
     @Override
     public Paint getTileBottomPaint(PlacementState placementState) {
-        return deriveColor(placementState, tileBottomColor);
+        return tileBottomColor;
     }
 
-    private Color doGetTileTopPaint(FieldType type) {
+    @Override
+    public Effect getTileBottomEffect(Grid grid, PlacementState placementState) {
+        return null;
+    }
+
+    @Override
+    public Paint getTileTopPaint(FieldType type, PlacementState placementState) {
         switch (type) {
             case VOLCANO:  return tileVolcanoColor;
             case JUNGLE:   return tileJungleColor;
@@ -64,8 +67,18 @@ public class BasicTheme implements Theme {
     }
 
     @Override
-    public Paint getTileTopPaint(FieldType type, PlacementState placementState) {
-        return deriveColor(placementState, doGetTileTopPaint(type));
+    public Effect getTileTopEffect(Grid grid, PlacementState placementState) {
+        ((Light.Point) lighting.getLight()).setZ(grid.getScale() * 150);
+        ((Light.Point) lightingValid.getLight()).setZ(grid.getScale() * 1000);
+        ((Light.Point) lightingInvalid.getLight()).setZ(grid.getScale() * 150);
+        switch (placementState) {
+            case NONE:     return lighting;
+            case FLOATING: return lighting;
+            case INVALID:  return lightingInvalid;
+            case VALID:    return lightingValid;
+        }
+
+        throw new IllegalStateException();
     }
 
     @Override
@@ -73,20 +86,23 @@ public class BasicTheme implements Theme {
         return tileBorderColor;
     }
 
-    private Color getBuildingFaceColor(Building building) {
-        switch (building.getColor()) {
-            case RED: return ChoosenColors.RED.color().darker();
-            case WHITE: return ChoosenColors.WHITE.color().darker();
-            case BROWN: return ChoosenColors.BROWN.color().darker();
-            case YELLOW: return ChoosenColors.YELLOW.color().darker();
-        }
-
-        throw new IllegalStateException();
+    @Override
+    public Paint getBuildingFacePaint(Building building, PlacementState placementState) {
+        return getBuildingTopPaint(building, placementState);
     }
 
     @Override
-    public Paint getBuildingFacePaint(Building building, PlacementState placementState) {
-        return deriveColor(placementState, getBuildingFaceColor(building));
+    public Effect getBuildingFaceEffect(Grid grid, Building building, PlacementState placementState) {
+        return getBuildingTopEffect(grid, building, placementState);
+    }
+
+    @Override
+    public Paint getBuildingTopPaint(Building building, PlacementState placementState) {
+        Color color = getBuildingTopColor(building);
+        if (placementState == PlacementState.INVALID) {
+            color = color.darker();
+        }
+        return color;
     }
 
     private Color getBuildingTopColor(Building building) {
@@ -101,7 +117,7 @@ public class BasicTheme implements Theme {
     }
 
     @Override
-    public Paint getBuildingTopPaint(Building building, PlacementState placementState) {
-        return deriveColor(placementState, getBuildingTopColor(building));
+    public Effect getBuildingTopEffect(Grid grid, Building building, PlacementState placementState) {
+        return null;
     }
 }
