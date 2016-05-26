@@ -1,6 +1,5 @@
 package ui.island;
 
-import javafx.beans.Observable;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -37,8 +36,8 @@ public class IslandView extends StackPane {
         getChildren().add(islandCanvas);
         getChildren().add(placementOverlay);
 
-        Theme.getCurrent().addListener(this::updateTheme);
-        updateTheme(null);
+        Theme.addListener(this::updateTheme);
+        updateTheme();
 
         setOnMouseMoved(this::mouseMoved);
         setOnMousePressed(this::mousePressed);
@@ -50,8 +49,8 @@ public class IslandView extends StackPane {
         setOnScroll(this::scroll);
     }
 
-    private void updateTheme(Observable observable) {
-        setBackground(Theme.getCurrent().get().getIslandBackground());
+    private void updateTheme() {
+        setBackground(Theme.getCurrent().getIslandBackground());
         islandCanvas.redraw();
         placementOverlay.redraw();
     }

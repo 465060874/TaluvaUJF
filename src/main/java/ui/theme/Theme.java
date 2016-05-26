@@ -1,16 +1,38 @@
 package ui.theme;
 
 import data.FieldType;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.layout.Background;
 import javafx.scene.paint.Paint;
 import map.Building;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public interface Theme {
 
-    static ObjectProperty<Theme> getCurrent() {
-        return CurrentThemeHolder.CURRENT_THEME;
+    static Theme getCurrent() {
+        return CurrentTheme.THEME;
+    }
+
+    static Theme change() {
+        if (CurrentTheme.THEME instanceof ImageTheme) {
+            CurrentTheme.THEME = new BasicTheme();
+        }
+        else {
+            CurrentTheme.THEME = new ImageTheme();
+        }
+
+        CurrentTheme.listeners.forEach(Runnable::run);
+
+        return CurrentTheme.THEME;
+    }
+
+    static void addListener(Runnable listener) {
+        CurrentTheme.listeners.add(listener);
+    }
+
+    static void removeListener(Runnable listener) {
+        CurrentTheme.listeners.remove(listener);
     }
 
     Background getIslandBackground();
@@ -27,9 +49,10 @@ public interface Theme {
 
     Paint getBuildingTopPaint(Building building, PlacementState placementState);
 
-    class CurrentThemeHolder {
+    class CurrentTheme {
 
-        private static ObjectProperty<Theme> CURRENT_THEME = new SimpleObjectProperty<>(new BasicTheme());
+        private static Theme THEME = new BasicTheme();
+        private static final List<Runnable> listeners = new ArrayList<>();
     }
 }
 

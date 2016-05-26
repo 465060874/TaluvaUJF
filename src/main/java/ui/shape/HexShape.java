@@ -160,15 +160,15 @@ public class HexShape {
 
         // Fill shape
         gc.setEffect(new Lighting(new Light.Point(0, 0, grid.getScale() * 150, Color.WHITE)));
-        gc.setFill(Theme.getCurrent().get().getTileTopPaint(info.fieldType, info.placementState));
+        gc.setFill(Theme.getCurrent().getTileTopPaint(info.fieldType, info.placementState));
         gc.fillPolygon(hexagonX, hexagonY, HEXAGON_POINTS);
         gc.setEffect(null);
 
-        gc.setFill(Theme.getCurrent().get().getTileBottomPaint(info.placementState));
+        gc.setFill(Theme.getCurrent().getTileBottomPaint(info.placementState));
         gc.fillPolygon(bottomX, bottomY, HEXAGON_POINTS);
 
         // Draw borders
-        gc.setStroke(Theme.getCurrent().get().getTileBorderPaint(info.placementState));
+        gc.setStroke(Theme.getCurrent().getTileBorderPaint(info.placementState));
         gc.setLineWidth(STROKE_WIDTH * grid.getScale());
         gc.setLineCap(StrokeLineCap.ROUND);
         gc.setLineJoin(StrokeLineJoin.ROUND);

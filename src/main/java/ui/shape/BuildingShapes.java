@@ -68,8 +68,8 @@ public class BuildingShapes {
 
     private static void drawTentShape(GraphicsContext gc, HexShapeInfo info,
             double x1, double x2, double x3, double y1, double y2, double y3, double y4) {
-        Paint facePaint = Theme.getCurrent().get().getBuildingFacePaint(info.building, info.placementState);
-        Paint topPaint = Theme.getCurrent().get().getBuildingTopPaint(info.building, info.placementState);
+        Paint facePaint = Theme.getCurrent().getBuildingFacePaint(info.building, info.placementState);
+        Paint topPaint = Theme.getCurrent().getBuildingTopPaint(info.building, info.placementState);
 
         double[] xpoints = new double[4];
         double[] ypoints = new double[4];
@@ -81,7 +81,7 @@ public class BuildingShapes {
         ypoints[2] = y4;
         gc.setFill(facePaint);
         gc.fillPolygon(xpoints, ypoints, 3);
-        gc.setStroke(Theme.getCurrent().get().getBuildingBorderPaint());
+        gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 3);
 
@@ -95,7 +95,7 @@ public class BuildingShapes {
         ypoints[3] = y2;
         gc.setFill(topPaint);
         gc.fillPolygon(xpoints, ypoints, 4);
-        gc.setStroke(Theme.getCurrent().get().getBuildingBorderPaint());
+        gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 4);
 
@@ -109,14 +109,14 @@ public class BuildingShapes {
         ypoints[3] = y2;
         gc.setFill(topPaint);
         gc.fillPolygon(xpoints, ypoints, 4);
-        gc.setStroke(Theme.getCurrent().get().getBuildingBorderPaint());
+        gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 4);
     }
 
     private static void drawTower(GraphicsContext gc, Grid grid, HexShapeInfo info, double x, double y) {
-        Paint facePaint = Theme.getCurrent().get().getBuildingFacePaint(info.building, info.placementState);
-        Paint topPaint = Theme.getCurrent().get().getBuildingTopPaint(info.building, info.placementState);
+        Paint facePaint = Theme.getCurrent().getBuildingFacePaint(info.building, info.placementState);
+        Paint topPaint = Theme.getCurrent().getBuildingTopPaint(info.building, info.placementState);
 
         double hexRadiusX = grid.getHexRadiusX();
         double hexRadiusY = grid.getHexRadiusY();
@@ -130,20 +130,20 @@ public class BuildingShapes {
 
         gc.setFill(facePaint);
         gc.fillOval(xstart, ybottom, width, height);
-        gc.setStroke(Theme.getCurrent().get().getBuildingBorderPaint());
+        gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokeOval(xstart, ybottom, width, height);
 
         gc.setFill(facePaint);
         gc.fillRect(xstart, ytop + height/2, width, ybottom - ytop);
-        gc.setStroke(Theme.getCurrent().get().getBuildingBorderPaint());
+        gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokeLine(xstart, ytop + height/2, xstart, ybottom + height/2);
         gc.strokeLine(xstart + width, ytop + height/2, xstart + width, ybottom + height/2);
 
         gc.setFill(topPaint);
         gc.fillOval(xstart, ytop, width, height);
-        gc.setStroke(Theme.getCurrent().get().getBuildingBorderPaint());
+        gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokeOval(xstart, ytop, width, height);
     }
