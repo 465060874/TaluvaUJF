@@ -11,10 +11,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 class HexMapImpl<E> implements HexMap<E> {
 
+    static final int INITIAL_CAPACITY = (1 << 9);
+
     private final Map<Hex, E> map;
 
     HexMapImpl() {
-        this.map = new HashMap<>(1 << 9);
+        this.map = new HashMap<>(INITIAL_CAPACITY);
     }
 
     private HexMapImpl(HexMapImpl<E> hexMap) {
