@@ -66,7 +66,7 @@ class BasicHeuristics implements Heuristics {
                 int ecart = StrategyValues[HUTSTRATEGY] - StrategyValues[HUTSTRATEGY]/2;
                 StrategyValues[HUTSTRATEGY] -= ecart;
                 StrategyValues[TOWERSTRATEGY] += ecart;
-            }else if( towersPlaced == 0 && (20-hutsPlaced)/turnsLeft <= 2 ){
+            }else if( towersPlaced == 0 && (20-hutsPlaced)/turnsLeft <= 2 ){ //TODO Division par ZERO
                 int ecart = StrategyValues[TOWERSTRATEGY] - StrategyValues[TOWERSTRATEGY]/2;
                 StrategyValues[TOWERSTRATEGY] -= ecart;
                 StrategyValues[HUTSTRATEGY] += ecart;
