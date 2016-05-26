@@ -38,13 +38,13 @@ public class Field {
     private final int level;
     private final FieldType type;
     private final Orientation orientation;
-    private final FieldBuilding building;
+    private final Building building;
 
     private Field(int level, FieldType type, Orientation orientation) {
-        this(level, type, orientation, FieldBuilding.of(BuildingType.NONE, null));
+        this(level, type, orientation, Building.of(BuildingType.NONE, null));
     }
 
-    private Field(int level, FieldType type, Orientation orientation, FieldBuilding building) {
+    private Field(int level, FieldType type, Orientation orientation, Building building) {
         this.level = level;
         this.type = type;
         this.orientation = orientation;
@@ -63,11 +63,11 @@ public class Field {
         return orientation;
     }
 
-    public FieldBuilding getBuilding() {
+    public Building getBuilding() {
         return building;
     }
 
-    public Field withBuilding(FieldBuilding building) {
+    public Field withBuilding(Building building) {
         return new Field(level, type, orientation, building);
     }
 }

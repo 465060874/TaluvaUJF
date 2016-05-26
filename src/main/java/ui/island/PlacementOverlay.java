@@ -6,7 +6,7 @@ import data.FieldType;
 import javafx.beans.Observable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import map.FieldBuilding;
+import map.Building;
 import map.Island;
 import map.Neighbor;
 import ui.shape.HexShape;
@@ -45,7 +45,7 @@ class PlacementOverlay extends Canvas {
         info1.level = 1;
         info1.fieldType = FieldType.VOLCANO;
         info1.orientation = placement.tileOrientation;
-        info1.building = FieldBuilding.of(BuildingType.NONE, null);
+        info1.building = Building.of(BuildingType.NONE, null);
 
         Neighbor leftNeighbor = Neighbor.leftOf(placement.tileOrientation);
         info2.x += grid.neighborToXOffset(leftNeighbor);
@@ -53,7 +53,7 @@ class PlacementOverlay extends Canvas {
         info2.level = 1;
         info2.fieldType = placement.tileFields.getLeft();
         info2.orientation = placement.tileOrientation.leftRotation();
-        info2.building = FieldBuilding.of(BuildingType.NONE, null);
+        info2.building = Building.of(BuildingType.NONE, null);
 
         Neighbor rightNeighbor = Neighbor.rightOf(placement.tileOrientation);
         info3.x += grid.neighborToXOffset(rightNeighbor);
@@ -61,7 +61,7 @@ class PlacementOverlay extends Canvas {
         info3.level = 1;
         info3.fieldType = placement.tileFields.getRight();
         info3.orientation = placement.tileOrientation.rightRotation();
-        info3.building = FieldBuilding.of(BuildingType.NONE, null);
+        info3.building = Building.of(BuildingType.NONE, null);
 
         return ImmutableList.of(info1, info2, info3);
     }
@@ -88,7 +88,7 @@ class PlacementOverlay extends Canvas {
 
             info.placementState = placement.valid ? PlacementState.VALID : PlacementState.INVALID;
             info.level = island.getField(placement.hex).getLevel();
-            info.building = FieldBuilding.of(placement.buildingType, placement.buildingColor);
+            info.building = Building.of(placement.buildingType, placement.buildingColor);
             drawBuilding(gc, grid, info);
         }
         else if (placement.mode == Placement.Mode.TILE && !placement.valid) {

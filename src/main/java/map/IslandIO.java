@@ -66,7 +66,7 @@ public class IslandIO {
         if (split.hasNext()) {
             BuildingType buildingType = BuildingType.valueOf(split.next());
             PlayerColor buildingColor = PlayerColor.valueOf(split.next());
-            FieldBuilding building = FieldBuilding.of(buildingType, buildingColor);
+            Building building = Building.of(buildingType, buildingColor);
             field = field.withBuilding(building);
         }
 
@@ -87,7 +87,7 @@ public class IslandIO {
 
     private static void writeHex(Island island, Writer writer, Hex hex) throws IOException {
         Field field = island.getField(hex);
-        FieldBuilding building = field.getBuilding();
+        Building building = field.getBuilding();
 
         ImmutableList.Builder<Object> builder = ImmutableList.builder()
                 .add(hex.getLine())

@@ -2,7 +2,7 @@ package ui.shape;
 
 import com.google.common.collect.ComparisonChain;
 import data.FieldType;
-import map.FieldBuilding;
+import map.Building;
 import map.Orientation;
 import ui.theme.PlacementState;
 
@@ -13,7 +13,7 @@ public class HexShapeInfo implements Comparable<HexShapeInfo> {
     public int level;
     public FieldType fieldType;
     public Orientation orientation;
-    public FieldBuilding building;
+    public Building building;
     public PlacementState placementState;
 
     @Override

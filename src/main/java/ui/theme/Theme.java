@@ -5,7 +5,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.layout.Background;
 import javafx.scene.paint.Paint;
-import map.FieldBuilding;
+import map.Building;
 
 public interface Theme {
 
@@ -23,9 +23,9 @@ public interface Theme {
 
     Paint getBuildingBorderPaint();
 
-    Paint getBuildingFacePaint(FieldBuilding building, PlacementState placementState);
+    Paint getBuildingFacePaint(Building building, PlacementState placementState);
 
-    Paint getBuildingTopPaint(FieldBuilding building, PlacementState placementState);
+    Paint getBuildingTopPaint(Building building, PlacementState placementState);
 
     class CurrentThemeHolder {
 

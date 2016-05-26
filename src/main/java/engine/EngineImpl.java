@@ -401,7 +401,7 @@ class EngineImpl implements Engine {
 
         actionSaves.add(new BuildActionSave(this, action));
         PlayerColor color = getCurrentPlayer().getColor();
-        island.putBuilding(action.getHex(), FieldBuilding.of(action.getType(), color));
+        island.putBuilding(action.getHex(), Building.of(action.getType(), color));
         int buildingCount = action.getType() == BuildingType.HUT
                 ? island.getField(action.getHex()).getLevel()
                 : 1;
@@ -419,7 +419,7 @@ class EngineImpl implements Engine {
 
         actionSaves.add(new BuildActionSave(this, action));
         PlayerColor color = getCurrentPlayer().getColor();
-        FieldBuilding building = FieldBuilding.of(BuildingType.HUT, color);
+        Building building = Building.of(BuildingType.HUT, color);
         int buildingCount = 0;
         Village village = getIsland().getVillage(action.getVillageHex());
         for (Hex hex : village.getExpandableHexes().get(action.getFieldType())) {

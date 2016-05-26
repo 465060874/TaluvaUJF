@@ -7,9 +7,7 @@ import engine.action.*;
 import map.*;
 
 import java.util.List;
-import java.util.Random;
 import java.util.PriorityQueue;
-import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.sleep;
 
@@ -297,7 +295,7 @@ class BasicHeuristics implements Heuristics {
         }
         for (Neighbor neighbor : Neighbor.values()) {
             Hex adjacent = hex.getNeighbor(neighbor);
-            FieldBuilding building = e.getIsland().getField(adjacent).getBuilding();
+            Building building = e.getIsland().getField(adjacent).getBuilding();
             if( building.getType() != BuildingType.NONE && building.getColor() != e.getCurrentPlayer().getColor() ) {
                 if( !e.getIsland().getVillage(adjacent).hasTemple()) {
                     general += 1;

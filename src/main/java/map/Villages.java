@@ -110,10 +110,10 @@ class Villages {
     }
 
     private void doUpdate(Hex hex) {
-        FieldBuilding building = island.getField(hex).getBuilding();
+        Building building = island.getField(hex).getBuilding();
         if (building.getType() != BuildingType.NONE) {
             for (Hex neighbor : hex.getNeighborhood()) {
-                FieldBuilding neighborBuilding = island.getField(neighbor).getBuilding();
+                Building neighborBuilding = island.getField(neighbor).getBuilding();
                 if (neighborBuilding.getType() != BuildingType.NONE
                         && building.getColor() == neighborBuilding.getColor()) {
                     union(hex, neighbor);
@@ -156,14 +156,14 @@ class Villages {
 
     void populate() {
         for (Hex existing : island.getFields()) {
-            FieldBuilding building = island.getField(existing).getBuilding();
+            Building building = island.getField(existing).getBuilding();
             if (building.getType() != BuildingType.NONE) {
                 create(existing);
             }
         }
 
         for (Hex existing : island.getFields()) {
-            FieldBuilding building = island.getField(existing).getBuilding();
+            Building building = island.getField(existing).getBuilding();
             if (building.getType() != BuildingType.NONE) {
                 doUpdate(existing);
             }

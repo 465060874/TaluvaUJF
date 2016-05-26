@@ -249,14 +249,14 @@ class EngineActions {
         // This store them by identity instead of equality, which is what we want
         HashMultimap<Village, FieldType> villageExpansion = HashMultimap.create();
         for (Hex hex : leftHex.getNeighborhood()) {
-            FieldBuilding building = island.getField(hex).getBuilding();
+            Building building = island.getField(hex).getBuilding();
             if (building.getType() != BuildingType.NONE
                     && building.getColor() == color) {
                 villageExpansion.put(island.getVillage(hex), leftFieldType);
             }
         }
         for (Hex hex : rightHex.getNeighborhood()) {
-            FieldBuilding building = island.getField(hex).getBuilding();
+            Building building = island.getField(hex).getBuilding();
             if (building.getType() != BuildingType.NONE
                     && building.getColor() == color) {
                 villageExpansion.put(island.getVillage(hex), rightFieldType);

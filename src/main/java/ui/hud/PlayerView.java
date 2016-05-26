@@ -12,7 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import map.FieldBuilding;
+import map.Building;
 
 public class PlayerView extends AnchorPane {
 
@@ -50,7 +50,7 @@ public class PlayerView extends AnchorPane {
 
             buildingTexts[type.ordinal()] = new Text(String.valueOf(player().getBuildingCount(type)));
             buildingTexts[type.ordinal()].setFont(new Font(14));
-            BuildingCanvas buildingCanvas = new BuildingCanvas(FieldBuilding.of(type, player().getColor()));
+            BuildingCanvas buildingCanvas = new BuildingCanvas(Building.of(type, player().getColor()));
             buildingsPane.getChildren().addAll(
                     buildingCanvas,
                     buildingTexts[type.ordinal()]);

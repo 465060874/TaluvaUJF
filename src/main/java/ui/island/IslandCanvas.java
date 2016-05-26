@@ -9,7 +9,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import map.Field;
-import map.FieldBuilding;
+import map.Building;
 import map.Hex;
 import map.Island;
 import ui.shape.HexShape;
@@ -18,10 +18,8 @@ import ui.theme.PlacementState;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static data.FieldType.VOLCANO;
-import static java.awt.SystemColor.info;
 import static ui.shape.BuildingShapes.drawBuilding;
 
 class IslandCanvas extends Canvas {
@@ -59,7 +57,7 @@ class IslandCanvas extends Canvas {
         info1.level = level;
         info1.fieldType = VOLCANO;
         info1.orientation = placement.tileOrientation;
-        info1.building = FieldBuilding.of(BuildingType.NONE, null);
+        info1.building = Building.of(BuildingType.NONE, null);
 
         Hex hex2 = placement.hex.getLeftNeighbor(placement.tileOrientation);
         info2.x = grid.hexToX(hex2, getWidth());
@@ -67,7 +65,7 @@ class IslandCanvas extends Canvas {
         info2.level = level;
         info2.fieldType = placement.tileFields.getLeft();
         info2.orientation = placement.tileOrientation.leftRotation();
-        info2.building = FieldBuilding.of(BuildingType.NONE, null);
+        info2.building = Building.of(BuildingType.NONE, null);
 
         Hex hex3 = placement.hex.getRightNeighbor(placement.tileOrientation);
         info3.x = grid.hexToX(hex3, getWidth());
@@ -75,7 +73,7 @@ class IslandCanvas extends Canvas {
         info3.level = level;
         info3.fieldType = placement.tileFields.getRight();
         info3.orientation = placement.tileOrientation.rightRotation();
-        info3.building = FieldBuilding.of(BuildingType.NONE, null);
+        info3.building = Building.of(BuildingType.NONE, null);
 
         return ImmutableList.of(info1, info2, info3);
     }
@@ -117,7 +115,7 @@ class IslandCanvas extends Canvas {
         for (HexShapeInfo info : Ordering.natural().sortedCopy(infos)) {
             hexShape.draw(gc, grid, info);
 
-            FieldBuilding building = info.building;
+            Building building = info.building;
             if (building.getType() != BuildingType.NONE) {
                 //info.y -= grid.getHexRadiusY();
                 drawBuilding(gc, grid, info);

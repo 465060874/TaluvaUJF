@@ -3,7 +3,7 @@ package ui.hud;
 import data.BuildingType;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import map.FieldBuilding;
+import map.Building;
 import ui.island.Grid;
 import ui.shape.BuildingShapes;
 import ui.shape.HexShapeInfo;
@@ -14,7 +14,7 @@ public class BuildingCanvas extends Canvas {
     public static final int WIDTH = 60;
     public static final int HEIGHT = 60;
 
-    public BuildingCanvas(FieldBuilding building) {
+    public BuildingCanvas(Building building) {
         super(WIDTH, HEIGHT);
 
         GraphicsContext gc = getGraphicsContext2D();

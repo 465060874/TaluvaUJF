@@ -44,7 +44,7 @@ public class BuildRules {
 
     static boolean isTempleInVillageOf3(Hex hex, Island island, PlayerColor color) {
         for (Hex neighbor : hex.getNeighborhood()) {
-            FieldBuilding neighborBuilding = island.getField(neighbor).getBuilding();
+            Building neighborBuilding = island.getField(neighbor).getBuilding();
             if (neighborBuilding.getType() != BuildingType.NONE
                     && neighborBuilding.getColor() == color) {
                 final Village village = island.getVillage(neighbor);
@@ -59,7 +59,7 @@ public class BuildRules {
 
     static boolean isTowerInVillage(Hex hex, Island island, PlayerColor color) {
         for (Hex neighbor : hex.getNeighborhood()) {
-            FieldBuilding neighborBuilding = island.getField(neighbor).getBuilding();
+            Building neighborBuilding = island.getField(neighbor).getBuilding();
             if (neighborBuilding.getType() != BuildingType.NONE
                     && neighborBuilding.getColor() == color) {
                 final Village village = island.getVillage(neighbor);

@@ -43,8 +43,8 @@ public class VolcanoPlacementRules {
 
     private static void checkFreeOfIndestructibleBuilding(Island island, Hex rightHex, Hex leftHex,
               Problems problems) {
-        FieldBuilding leftBuilding = island.getField(leftHex).getBuilding();
-        FieldBuilding rightBuilding = island.getField(rightHex).getBuilding();
+        Building leftBuilding = island.getField(leftHex).getBuilding();
+        Building rightBuilding = island.getField(rightHex).getBuilding();
 
         if (leftBuilding.getType() == BuildingType.NONE
                 && rightBuilding.getType() == BuildingType.NONE) {

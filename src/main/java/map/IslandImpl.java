@@ -110,7 +110,7 @@ class  IslandImpl implements Island {
     }
 
     @Override
-    public void putBuilding(Hex hex, FieldBuilding building) {
+    public void putBuilding(Hex hex, Building building) {
         if (map.contains(hex)) {
             Field fieldBefore = map.get(hex);
             map.put(hex, fieldBefore.withBuilding(building));

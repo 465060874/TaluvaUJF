@@ -8,7 +8,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import map.FieldBuilding;
+import map.Building;
 
 public class BasicTheme implements Theme {
 
@@ -73,7 +73,7 @@ public class BasicTheme implements Theme {
         return tileBorderColor;
     }
 
-    private Color getBuildingFaceColor(FieldBuilding building) {
+    private Color getBuildingFaceColor(Building building) {
         switch (building.getColor()) {
             case RED: return ChoosenColors.RED.color().darker();
             case WHITE: return ChoosenColors.WHITE.color().darker();
@@ -85,11 +85,11 @@ public class BasicTheme implements Theme {
     }
 
     @Override
-    public Paint getBuildingFacePaint(FieldBuilding building, PlacementState placementState) {
+    public Paint getBuildingFacePaint(Building building, PlacementState placementState) {
         return deriveColor(placementState, getBuildingFaceColor(building));
     }
 
-    private Color getBuildingTopColor(FieldBuilding building) {
+    private Color getBuildingTopColor(Building building) {
         switch (building.getColor()) {
             case RED:    return ChoosenColors.RED.color();
             case WHITE:  return ChoosenColors.WHITE.color();
@@ -101,7 +101,7 @@ public class BasicTheme implements Theme {
     }
 
     @Override
-    public Paint getBuildingTopPaint(FieldBuilding building, PlacementState placementState) {
+    public Paint getBuildingTopPaint(Building building, PlacementState placementState) {
         return deriveColor(placementState, getBuildingTopColor(building));
     }
 }

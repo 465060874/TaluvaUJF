@@ -6,6 +6,10 @@ import java.util.List;
 
 import static data.FieldType.*;
 
+/**
+ * Contient la liste des 48 tuiles standard du jeu
+ */
+
 public class StandardVolcanoTiles {
 
     public static final List<VolcanoTile> LIST;
