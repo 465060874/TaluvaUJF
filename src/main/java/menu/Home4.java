@@ -389,6 +389,7 @@ public class Home4 extends Application {
         mq2.getStyleClass().add("buttonjoueur");
 
         sp.getStyleClass().add("s");
+
         //v.getStyleClass().add("s2");
         //vBoxoptionsCharger.getStyleClass().add("s2");
 

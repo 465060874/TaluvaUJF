@@ -300,9 +300,28 @@
     -fx-background-color:transparent;
 }
 
-.s {
+.s{
 
     -fx-background-color:transparent;
 }
 
+.s .scroll-bar:vertical{
+    -fx-background-color:transparent;
 
+}
+.s .scroll-bar .thumb:hover{
+    -fx-background-color: #00D507;
+}
+.s .scroll-bar .thumb:pressed{
+    -fx-background-color: #4CAF50;
+}
+.s .scroll-bar .thumb{
+    -fx-background-color: green;
+}
+
+.s  .scroll-bar .increment-arrow {
+   -fx-background-color: #4CAF50;
+}
+.s  .scroll-bar .decrement-arrow{
+  -fx-background-color: #4CAF50;
+}
