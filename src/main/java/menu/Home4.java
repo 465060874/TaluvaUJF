@@ -175,7 +175,7 @@ public class Home4 extends Application {
         VBox multiOptions = new VBox(5);
         multiOptions.setAlignment(Pos.CENTER);
         multiOptions.setPrefWidth(largeurScene);
-        HBox chargerList = new HBox();
+        HBox chargerList = new HBox(10);
         chargerList.setAlignment(Pos.CENTER);
         chargerList.setPrefWidth(largeurScene*2/3);
         chargerList.setPadding(new Insets(10,10,10,10));
@@ -332,10 +332,11 @@ public class Home4 extends Application {
         ScrollPane sp = new ScrollPane();
         VBox v = new VBox();
         v.getChildren().add(sp);
-        //v.setPrefSize(120,100);
+        v.setPrefSize(120,100);
 
         sp.hbarPolicyProperty().set(ScrollPane.ScrollBarPolicy.NEVER);
         vBoxoptionsCharger.setAlignment(Pos.CENTER_LEFT);
+        vBoxoptionsCharger.setPadding(new Insets(2,1,0,1));
         sp.setContent(vBoxoptionsCharger);
         vBoxCapture.getChildren().add(carre1);
 
@@ -386,11 +387,11 @@ public class Home4 extends Application {
         mt.getStyleClass().add("buttonjoueur");
         mq1.getStyleClass().add("buttonjoueur");
         mq2.getStyleClass().add("buttonjoueur");
-        /*
+
         sp.getStyleClass().add("s");
-        v.getStyleClass().add("b4");
-        vBoxoptionsCharger.getStyleClass().add("b4");
-        */
+        //v.getStyleClass().add("s2");
+        //vBoxoptionsCharger.getStyleClass().add("s2");
+
         for(int i = 0;i < optionsHistory.size(); i++){
             optionsHistory.get(i).getStyleClass().add("buttonjoueur");
         }

@@ -38,7 +38,7 @@
 }
 
 .buttonjoueur: hover{
-    -fx-background-color: #4CAF50;
+    -fx-background-color: #00D507;
     -fx-color: white;
     -fx-text-fill: white;
 }
@@ -296,12 +296,13 @@
     -fx-background-radius: 30 30 30 30
 }
 
-.s > pane-container{
-    -fx-opacity: 0.3;
-    -fx-border-color:black;
+.s >.viewport{
+    -fx-background-color:transparent;
 }
 
-.s2 >{
-    -fx-opacity: 1.0;
-    -fx-border-color:blue;
+.s {
+
+    -fx-background-color:transparent;
 }
+
+
