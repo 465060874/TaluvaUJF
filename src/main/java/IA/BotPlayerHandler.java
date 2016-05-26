@@ -2,6 +2,9 @@ package IA;
 
 import engine.Engine;
 import engine.PlayerHandler;
+import engine.action.BuildingAction;
+import engine.action.TileAction;
+import javafx.application.Platform;
 
 import java.util.concurrent.TimeUnit;
 
@@ -13,8 +16,10 @@ public class BotPlayerHandler implements PlayerHandler {
 
     private final Engine engine;
     private final BotPlayer bot;
-    private Move move;
-    private int depth;
+    private final int depth;
+
+    private TileAction tileAction;
+    private BuildingAction buildingAction;
 
     public BotPlayerHandler(Engine engine, int branch, int depth) {
         this.engine = engine;
@@ -25,16 +30,29 @@ public class BotPlayerHandler implements PlayerHandler {
 
     @Override
     public void startTileStep() {
+        Thread thread = new Thread(this::doStartTileStep);
+        thread.start();
+    }
+
+    private void doStartTileStep() {
+        engine.logger().info("[IA] Starting");
         long startTime = System.nanoTime();
-        move = bot.play(depth);
-        engine.logger().info("[IA] {0}ms pour determiner le coup à jouer",
-                TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
-        engine.action(move.tileAction);
+        Move move = bot.play(depth);
+        long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+        engine.logger().info("[IA] {0}ms pour determiner le coup à jouer", duration);
+
+        this.tileAction = move.tileAction;
+        this.buildingAction = move.buildingAction;
+        Platform.runLater(this::finishTileStep);
+    }
+
+    private void finishTileStep() {
+        engine.action(tileAction);
     }
 
     @Override
     public void startBuildStep() {
-        engine.action(move.buildingAction);
+        engine.action(buildingAction);
     }
 
     @Override

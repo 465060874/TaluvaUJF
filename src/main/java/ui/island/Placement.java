@@ -113,6 +113,12 @@ public class Placement {
 
     public void cancel() {
         this.mode = Mode.NONE;
+        if (valid) {
+            islandCanvas.redraw();
+        }
+        else {
+            placementOverlay.redraw();
+        }
     }
 
     public void cycleTileOrientationOrBuildingType() {

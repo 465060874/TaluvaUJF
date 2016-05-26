@@ -1,5 +1,6 @@
 package ui;
 
+import IA.BotPlayerHandler;
 import data.BuildingType;
 import data.PlayerColor;
 import engine.Engine;
@@ -24,7 +25,7 @@ public class FXUI extends Application {
     public void start(Stage stage) throws Exception {
         this.engine = EngineBuilder.allVsAll()
                 .player(PlayerColor.BROWN, e -> new FXUIPlayerHandler())
-                .player(PlayerColor.WHITE, e -> new FXUIPlayerHandler())
+                .player(PlayerColor.WHITE, BotPlayerHandler.factory(16, 2))
                 .build();
 
         this.gameView = new GameView(engine);

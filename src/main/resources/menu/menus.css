@@ -24,7 +24,7 @@
     //-fx-background-image: url('/testing/background.png');
 }
 
-.breprendre: hover{
+.breprendre:hover{
     -fx-background-color: #33691e;
     -fx-color: #aed581;
     -fx-text-fill: #aed581;
@@ -37,7 +37,7 @@
     -fx-outer-border: green;
 }
 
-.buttonjoueur: hover{
+.buttonjoueur:hover{
     -fx-background-color: #00D507;
     -fx-color: white;
     -fx-text-fill: white;
@@ -62,7 +62,7 @@
     -fx-outer-border: green;
 }
 
-.buttonniveaux1: hover{
+.buttonniveaux1:hover{
     -fx-background-color: #FF9966;
     -fx-color: white;
     -fx-text-fill: white;
@@ -87,7 +87,7 @@
     -fx-outer-border: green;
 }
 
-.buttonniveaux2: hover{
+.buttonniveaux2:hover{
     -fx-background-color: #FF6666;
     -fx-color: white;
     -fx-text-fill: white;
@@ -112,7 +112,7 @@
     -fx-outer-border: green;
 }
 
-.buttonniveaux3: hover{
+.buttonniveaux3:hover{
     -fx-background-color: #CC0066;
     -fx-color: white;
     -fx-text-fill: white;
@@ -141,7 +141,7 @@
 
 }
 
-.buttonniveaux4: hover{
+.buttonniveaux4:hover{
     -fx-background-color: #AB8152;
     -fx-color: white;
     -fx-text-fill: white;
@@ -170,7 +170,7 @@
 
 }
 
-.buttonniveaux5: hover{
+.buttonniveaux5:hover{
     -fx-background-color: #00B506;
     -fx-color: white;
     -fx-text-fill: white;
@@ -192,7 +192,7 @@
     -fx-background-radius: 0 0 0 0;
 }
 
-.buttonniveaux4: hover{
+.buttonniveaux4:hover{
     -fx-background-color: #CB2D8C;
     -fx-color: white;
     -fx-text-fill: white;
