@@ -14,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import map.Building;
 
 public class FXUI extends Application {
 
@@ -25,7 +26,7 @@ public class FXUI extends Application {
     public void start(Stage stage) throws Exception {
         this.engine = EngineBuilder.allVsAll()
                 .player(PlayerColor.BROWN, e -> new FXUIPlayerHandler())
-                .player(PlayerColor.WHITE, BotPlayerHandler.factory(16, 2))
+                .player(PlayerColor.WHITE, BotPlayerHandler.factory(16, 0))
                 .build();
 
         this.gameView = new GameView(engine);
@@ -92,8 +93,12 @@ public class FXUI extends Application {
                     Action action = gameView.getPlacement().getAction();
                     gameView.getPlacement().cancel();
                     engine.action(action);
+                    return;
                 }
-                else if (engine.getIsland().getField(gameView.getPlacement().getHex()).getBuilding().getType() != BuildingType.NONE) {
+
+                Building building = engine.getIsland().getField(gameView.getPlacement().getHex()).getBuilding();
+                if (building.getType() != BuildingType.NONE
+                        && building.getColor() == engine.getCurrentPlayer().getColor()) {
                     gameView.getPlacement().expand(engine.getIsland().getVillage(gameView.getPlacement().getHex()));
                 }
             }
