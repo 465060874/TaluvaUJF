@@ -18,7 +18,7 @@ public class BuildingCanvas extends Canvas {
         super(WIDTH, HEIGHT);
 
         GraphicsContext gc = getGraphicsContext2D();
-        Grid grid = new Grid(0, 0, 1);
+        Grid grid = new Grid();
         grid.scale(building.getType() == BuildingType.HUT
                 ? 0.8
                 : 0.4);

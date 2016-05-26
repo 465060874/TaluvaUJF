@@ -1,37 +1,30 @@
 package ui;
 
-import com.google.common.io.Resources;
+import data.BuildingType;
 import data.PlayerColor;
 import engine.Engine;
 import engine.EngineBuilder;
 import engine.PlayerHandler;
+import engine.action.Action;
+import engine.action.SeaTileAction;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import map.Island;
-import map.IslandIO;
-
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
 public class FXUI extends Application {
 
+    private Engine engine;
     private GameView gameView;
     private Scene scene;
 
     @Override
     public void start(Stage stage) throws Exception {
-        URL rsc = FXUI.class.getResource("test.island");
-        Island island1 = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
-        Engine engine = EngineBuilder.allVsAll()
-                .island(island1)
-                .player(PlayerColor.BROWN, uiWrap(PlayerHandler.dumbFactory()))
-                .player(PlayerColor.WHITE, uiWrap(PlayerHandler.dumbFactory()))
-                .player(PlayerColor.YELLOW, uiWrap(PlayerHandler.dumbFactory()))
-                .player(PlayerColor.RED, uiWrap(PlayerHandler.dumbFactory()))
+        this.engine = EngineBuilder.allVsAll()
+                .player(PlayerColor.BROWN, e -> new FXUIPlayerHandler())
+                .player(PlayerColor.WHITE, e -> new FXUIPlayerHandler())
                 .build();
 
         this.gameView = new GameView(engine);
@@ -42,55 +35,70 @@ public class FXUI extends Application {
         stage.show();
     }
 
-    private PlayerHandler.Factory uiWrap(PlayerHandler.Factory factory) {
-        return (engine) -> new UIPlayerHandlerWrapper(factory.create(engine));
+    public static void main(String[] args) {
+        launch(args);
     }
 
-    private class UIPlayerHandlerWrapper implements PlayerHandler {
+    public class FXUIPlayerHandler implements PlayerHandler {
 
-        private final PlayerHandler wrapped;
-        private final EventHandler<MouseEvent> startWrappedTileStep;
-        private final EventHandler<MouseEvent> startWrappedBuildStep;
+        private final EventHandler<MouseEvent> mouseClickedTile;
+        private final EventHandler<MouseEvent> mouseClickedBuild;
 
-        private UIPlayerHandlerWrapper(PlayerHandler wrapped) {
-            this.startWrappedTileStep = this::startWrappedTileStep;
-            this.startWrappedBuildStep = this::startWrappedBuildStep;
-            this.wrapped = wrapped;
+        public FXUIPlayerHandler() {
+            this.mouseClickedTile = this::mouseClickedTile;
+            this.mouseClickedBuild = this::mouseClickedBuild;
         }
 
         @Override
         public void startTileStep() {
-            gameView.addEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedTileStep);
-        }
-
-        private void startWrappedTileStep(MouseEvent event) {
-            if (event.getButton() == MouseButton.PRIMARY && !event.isControlDown()) {
-                gameView.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedTileStep);
-                wrapped.startTileStep();
+            if (engine.getIsland().isEmpty()) {
+                SeaTileAction firstAction = engine.getSeaTileActions().get(0);
+                engine.placeOnSea(firstAction);
+                return;
             }
+
+            gameView.getPlacement().placeTile(engine.getVolcanoTileStack().current());
+            gameView.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickedTile);
         }
 
         @Override
         public void startBuildStep() {
-            gameView.addEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedBuildStep);
-        }
-
-        private void startWrappedBuildStep(MouseEvent event) {
-            if (event.getButton() == MouseButton.PRIMARY && !event.isControlDown()) {
-                gameView.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedBuildStep);
-                wrapped.startBuildStep();
-            }
+            gameView.getPlacement().build(engine.getCurrentPlayer().getColor());
+            gameView.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickedBuild);
         }
 
         @Override
         public void cancel() {
-            wrapped.cancel();
-            gameView.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedTileStep);
-            gameView.removeEventHandler(MouseEvent.MOUSE_CLICKED, startWrappedBuildStep);
+            gameView.getPlacement().cancel();
         }
-    }
 
-    public static void main(String[] args) {
-        launch(args);
+        private void mouseClickedTile(MouseEvent event) {
+            if (event.getButton() == MouseButton.PRIMARY && gameView.getPlacement().isValid()) {
+                gameView.removeEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickedTile);
+                Action action = gameView.getPlacement().getAction();
+                gameView.getPlacement().cancel();
+                engine.action(action);
+            }
+            else if (event.getButton() == MouseButton.SECONDARY) {
+                gameView.getPlacement().cycleTileOrientationOrBuildingType();
+            }
+        }
+
+        private void mouseClickedBuild(MouseEvent event) {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                if (gameView.getPlacement().isValid()) {
+                    gameView.removeEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickedBuild);
+                    Action action = gameView.getPlacement().getAction();
+                    gameView.getPlacement().cancel();
+                    engine.action(action);
+                }
+                else if (engine.getIsland().getField(gameView.getPlacement().getHex()).getBuilding().getType() != BuildingType.NONE) {
+                    gameView.getPlacement().expand(engine.getIsland().getVillage(gameView.getPlacement().getHex()));
+                }
+            }
+            else if (event.getButton() == MouseButton.SECONDARY) {
+                gameView.getPlacement().cycleTileOrientationOrBuildingType();
+            }
+        }
     }
 }

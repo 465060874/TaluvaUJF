@@ -52,7 +52,7 @@ class PlacementOverlay extends Canvas {
         info2.x += grid.neighborToXOffset(leftNeighbor);
         info2.y += grid.neighborToYOffset(leftNeighbor);
         info2.level = 1;
-        info2.fieldType = placement.tileFields.getLeft();
+        info2.fieldType = placement.tile.getLeft();
         info2.orientation = placement.tileOrientation.leftRotation();
         info2.building = Building.of(BuildingType.NONE, null);
 
@@ -60,7 +60,7 @@ class PlacementOverlay extends Canvas {
         info3.x += grid.neighborToXOffset(rightNeighbor);
         info3.y += grid.neighborToYOffset(rightNeighbor);
         info3.level = 1;
-        info3.fieldType = placement.tileFields.getRight();
+        info3.fieldType = placement.tile.getRight();
         info3.orientation = placement.tileOrientation.rightRotation();
         info3.building = Building.of(BuildingType.NONE, null);
 

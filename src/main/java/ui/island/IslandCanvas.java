@@ -63,7 +63,7 @@ class IslandCanvas extends Canvas {
         info2.x = grid.hexToX(hex2, getWidth());
         info2.y = grid.hexToY(hex2, getHeight());
         info2.level = level;
-        info2.fieldType = placement.tileFields.getLeft();
+        info2.fieldType = placement.tile.getLeft();
         info2.orientation = placement.tileOrientation.leftRotation();
         info2.building = Building.of(BuildingType.NONE, null);
 
@@ -71,7 +71,7 @@ class IslandCanvas extends Canvas {
         info3.x = grid.hexToX(hex3, getWidth());
         info3.y = grid.hexToY(hex3, getHeight());
         info3.level = level;
-        info3.fieldType = placement.tileFields.getRight();
+        info3.fieldType = placement.tile.getRight();
         info3.orientation = placement.tileOrientation.rightRotation();
         info3.building = Building.of(BuildingType.NONE, null);
 

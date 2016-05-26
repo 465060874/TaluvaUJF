@@ -6,11 +6,16 @@ import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
+import engine.Engine;
+import engine.action.*;
+import engine.rules.PlaceBuildingRules;
 import engine.rules.TileRules;
 import map.*;
 
 import java.util.Map;
 import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkState;
 
 public class Placement {
 
@@ -23,7 +28,7 @@ public class Placement {
         EXPAND_VILLAGE;
     }
 
-    private final Island island;
+    private final Engine engine;
     private final Grid grid;
 
     IslandCanvas islandCanvas;
@@ -36,7 +41,7 @@ public class Placement {
     boolean valid;
     Hex hex;
 
-    VolcanoTile tileFields;
+    VolcanoTile tile;
     Orientation tileOrientation;
 
     BuildingType buildingType;
@@ -46,42 +51,54 @@ public class Placement {
     FieldType expansionFieldType;
     Set<Hex> expansionHexes;
 
-    public Placement(Island island, Grid grid) {
-        this.island = island;
+    public Placement(Engine engine, Grid grid) {
+        this.engine = engine;
         this.grid = grid;
 
         this.mode = Mode.NONE;
         this.saveMode = Mode.NONE;
         this.valid = false;
         this.hex = Hex.at(0, 0);
-
-        this.tileFields = new VolcanoTile(FieldType.CLEARING, FieldType.SAND);
-        this.tileOrientation = Orientation.NORTH;
-
-        this.buildingType = BuildingType.HUT;
-        this.buildingColor = PlayerColor.RED;
     }
 
-    public void cycleMode() {
-        if (mode == Mode.NONE) {
-            mode = Mode.TILE;
-            updateValidTile();
+    public boolean isValid() {
+        return valid;
+    }
+
+    public Hex getHex() {
+        return hex;
+    }
+
+    public Action getAction() {
+        checkState(mode != Mode.NONE && valid);
+        if (mode == Mode.TILE) {
+            return engine.getIsland().getField(hex) == Field.SEA
+                    ? new SeaTileAction(tile, hex, tileOrientation)
+                    : new VolcanoTileAction(tile, hex, tileOrientation);
         }
-        else if (mode == Mode.TILE) {
-            mode = Mode.BUILDING;
-            updateValidBuilding();
-            islandCanvas.redraw();
+        else if (mode == Mode.BUILDING) {
+            return new PlaceBuildingAction(buildingType, hex);
         }
-        else {
-            if (mode == Mode.BUILDING && island.getField(hex).getBuilding().getType() != BuildingType.NONE) {
-                expand(island.getVillage(hex));
-            }
-            else {
-                mode = Mode.NONE;
-                islandCanvas.redraw();
-                placementOverlay.redraw();
-            }
+        else if (mode == Mode.EXPAND_VILLAGE) {
+            return new ExpandVillageAction(expansionVillage, engine.getIsland().getField(hex).getType());
         }
+
+        throw new IllegalStateException();
+    }
+
+    public void placeTile(VolcanoTile tile) {
+        this.mode = Mode.TILE;
+        this.tile = tile;
+        this.tileOrientation = Orientation.NORTH;
+        updateValidTile();
+    }
+
+    public void build(PlayerColor color) {
+        this.mode = Mode.BUILDING;
+        this.buildingType = BuildingType.HUT;
+        this.buildingColor = color;
+        updateValidBuilding();
+        islandCanvas.redraw();
     }
 
     public void expand(Village village) {
@@ -94,7 +111,11 @@ public class Placement {
         islandCanvas.redraw();
     }
 
-    void cycleTileOrientationOrBuildingTypeAndColor() {
+    public void cancel() {
+        this.mode = Mode.NONE;
+    }
+
+    public void cycleTileOrientationOrBuildingType() {
         if (mode == Mode.TILE) {
             tileOrientation = tileOrientation.clockWise();
             updateValidTile();
@@ -102,20 +123,22 @@ public class Placement {
         else if (mode == Mode.BUILDING) {
             if (buildingType == BuildingType.HUT) {
                 buildingType = BuildingType.TEMPLE;
-                buildingColor = PlayerColor.values()[(buildingColor.ordinal() + 1) % PlayerColor.values().length];
             }
             else if (buildingType == BuildingType.TEMPLE) {
                 buildingType = BuildingType.TOWER;
             }
             else if (buildingType == BuildingType.TOWER) {
                 buildingType = BuildingType.HUT;
-                buildingColor = PlayerColor.values()[(buildingColor.ordinal() + 1) % PlayerColor.values().length];
             }
             updateValidBuilding();
         }
+        else if (mode == Mode.EXPAND_VILLAGE) {
+            mode = Mode.BUILDING;
+            updateValidExpansion();
+        }
     }
 
-    void updateMouse(double x, double y, double width, double height) {
+    public void updateMouse(double x, double y, double width, double height) {
         this.mouseX = x;
         this.mouseY = y;
 
@@ -136,22 +159,20 @@ public class Placement {
             updateValidBuilding();
         }
         else if (mode == Mode.EXPAND_VILLAGE) {
-            updateExpandedHexes();
+            updateValidExpansion();
         }
     }
 
     private void updateValidTile() {
         boolean wasValid = valid;
-        this.valid = TileRules.validate(island, tileFields, hex, tileOrientation).isValid();
+        this.valid = TileRules.validate(engine.getIsland(), tile, hex, tileOrientation).isValid();
 
         redrawWhatsNecessary(wasValid);
     }
 
     private void updateValidBuilding() {
         boolean wasValid = valid;
-        Field field = island.getField(hex);
-        this.valid = field != Field.SEA
-                && field.getBuilding().getType() == BuildingType.NONE;
+        this.valid = PlaceBuildingRules.validate(engine, buildingType, hex);
 
         redrawWhatsNecessary(wasValid);
     }
@@ -169,7 +190,7 @@ public class Placement {
         }
     }
 
-    private void updateExpandedHexes() {
+    private void updateValidExpansion() {
         for (Map.Entry<FieldType, Set<Hex>> entry : Multimaps.asMap(expansionVillage.getExpandableHexes()).entrySet()) {
             if (entry.getValue().contains(hex)) {
                 if (expansionFieldType == entry.getKey()) {
@@ -179,28 +200,30 @@ public class Placement {
                 expansionFieldType = entry.getKey();
                 expansionHexes = ImmutableSet.copyOf(entry.getValue());
                 islandCanvas.redraw();
+                valid = !expansionHexes.isEmpty();
                 return;
             }
         }
 
         expansionFieldType = null;
         expansionHexes = ImmutableSet.of();
+        valid = false;
         islandCanvas.redraw();
     }
 
-    void saveMode() {
-        saveMode = mode;
+    public void saveMode() {
+        /*saveMode = mode;
         mode = Mode.NONE;
-        updateValidTile();
+        updateValidTile();*/
     }
 
-    void restoreMode() {
-        mode = saveMode;
+    public void restoreMode() {
+        /*mode = saveMode;
         if (mode == Mode.TILE) {
             updateValidTile();
         }
         else if (mode == Mode.BUILDING) {
             updateValidBuilding();
-        }
+        }*/
     }
 }

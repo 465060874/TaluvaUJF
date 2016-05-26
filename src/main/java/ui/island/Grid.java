@@ -14,10 +14,10 @@ public class Grid {
     private double oy;
     private double scale;
 
-    public Grid(double ox, double oy, double scale) {
-        this.ox = ox;
-        this.oy = oy;
-        this.scale = scale;
+    public Grid() {
+        this.ox = 0;
+        this.oy = 0;
+        this.scale = 1;
     }
 
     public double getOx() {

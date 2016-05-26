@@ -9,10 +9,9 @@ import ui.theme.Theme;
 
 public class IslandView extends StackPane {
 
-    private Grid grid;
-    private Placement placement;
+    private final Grid grid;
 
-    final IslandCanvas islandCanvas;
+    private final IslandCanvas islandCanvas;
     private final PlacementOverlay placementOverlay;
 
     private boolean mousePressed;
@@ -22,12 +21,15 @@ public class IslandView extends StackPane {
     private double mouseY;
 
     public IslandView(Island island, boolean debug) {
-        this.grid = new Grid(0.0, 0.0, 1);
-        this.placement = new Placement(island, grid);
+        this(island, new Grid(), new Placement(null, null), debug);
+    }
+
+    public IslandView(Island island, Grid grid, Placement placement, boolean debug) {
+        this.grid = grid;
         this.placementOverlay = new PlacementOverlay(island, grid, placement);
         this.islandCanvas = new IslandCanvas(island, grid, placement, debug);
-        placement.placementOverlay = placementOverlay;
         placement.islandCanvas = islandCanvas;
+        placement.placementOverlay = placementOverlay;
 
         this.mousePressed = false;
         this.mouseX = 0;
@@ -39,13 +41,9 @@ public class IslandView extends StackPane {
         Theme.addListener(this::updateTheme);
         updateTheme();
 
-        setOnMouseMoved(this::mouseMoved);
         setOnMousePressed(this::mousePressed);
-        setOnMouseClicked(this::mouseClicked);
         setOnMouseDragged(this::mouseDragged);
         setOnMouseReleased(this::mouseReleased);
-        setOnMouseExited(this::mouseExited);
-        setOnMouseEntered(this::mouseEntered);
         setOnScroll(this::scroll);
     }
 
@@ -53,14 +51,6 @@ public class IslandView extends StackPane {
         setBackground(Theme.getCurrent().getIslandBackground());
         islandCanvas.redraw();
         placementOverlay.redraw();
-    }
-
-    private void mouseExited(MouseEvent event) {
-        placement.saveMode();
-    }
-
-    private void mouseEntered(MouseEvent event) {
-        placement.restoreMode();
     }
 
     @Override
@@ -89,24 +79,11 @@ public class IslandView extends StackPane {
         }
     }
 
-    private void mouseMoved(MouseEvent event) {
-        placement.updateMouse(event.getX(), event.getY(), getWidth(), getHeight());
-    }
-
     private void mousePressed(MouseEvent event) {
         mousePressed = true;
         if (event.getButton() == MouseButton.PRIMARY) {
             mouseXBeforeDrag = mouseX = event.getX();
             mouseYBeforeDrag = mouseY = event.getY();
-        }
-    }
-
-    private void mouseClicked(MouseEvent event) {
-        if (event.getButton() == MouseButton.MIDDLE) {
-            placement.cycleMode();
-        }
-        else if (event.getButton() == MouseButton.SECONDARY) {
-            placement.cycleTileOrientationOrBuildingTypeAndColor();
         }
     }
 
