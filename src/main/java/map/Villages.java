@@ -37,7 +37,7 @@ class Villages {
         this.map = new HashMap<>();
         map.putAll(villages.map);
         this.perColors = new EnumMap<>(PlayerColor.class);
-        for (Map.Entry<PlayerColor, Set<Hex>> entry : perColors.entrySet()) {
+        for (Map.Entry<PlayerColor, Set<Hex>> entry : villages.perColors.entrySet()) {
             HashSet<Hex> setCopy = new HashSet<>();
             setCopy.addAll(entry.getValue());
             perColors.put(entry.getKey(), setCopy);
@@ -59,8 +59,7 @@ class Villages {
 
     private VillageImpl2 create(Hex hex) {
         VillageImpl2 created = new VillageImpl2(island, hex);
-        Set<Hex> set = perColors.computeIfAbsent(created.getColor(), c -> new HashSet<>());
-        set.add(hex);
+        perColors.computeIfAbsent(created.getColor(), c -> new HashSet<>()).add(hex);
         map.put(hex, created);
         return created;
     }
