@@ -1,7 +1,6 @@
 package IA;
 
 import data.BuildingType;
-import data.FieldType;
 import engine.Engine;
 import engine.EngineStatus;
 import engine.action.*;
@@ -10,7 +9,7 @@ import map.Hex;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
-import static engine.rules.BuildRules.validate;
+import static engine.rules.PlaceBuildingRules.validate;
 
 class BotPlayer {
 

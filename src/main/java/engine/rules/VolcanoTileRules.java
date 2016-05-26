@@ -5,7 +5,7 @@ import data.FieldType;
 import data.VolcanoTile;
 import map.*;
 
-public class VolcanoPlacementRules {
+public class VolcanoTileRules {
 
     public static Problems validate(Island island, VolcanoTile tile, Hex hex, Orientation orientation) {
         // On vérifie que la tuile sous le volcan est bien un volcan avec une orientation différente

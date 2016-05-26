@@ -16,12 +16,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
-public class VolcanoPlacementRulesTest {
+public class VolcanoTileRulesTest {
 
     private static final VolcanoTile TILE = new VolcanoTile(FieldType.JUNGLE, FieldType.JUNGLE);
 
     private void assertValid(Island island, Hex hex, Orientation orientation) {
-        Problems actual = VolcanoPlacementRules.validate(island, TILE, hex, orientation);
+        Problems actual = VolcanoTileRules.validate(island, TILE, hex, orientation);
         assertTrue("TileAction on volcano at " + hex
                         + " with orientation " + orientation
                         + " expected to be valid, but has problems " + actual,
@@ -30,7 +30,7 @@ public class VolcanoPlacementRulesTest {
 
     private void assertProblems(Island island, Hex hex, Orientation orientation, Problem... problems) {
         Problems expected = Problems.of(problems);
-        Problems actual = VolcanoPlacementRules.validate(island, TILE, hex, orientation);
+        Problems actual = VolcanoTileRules.validate(island, TILE, hex, orientation);
         assertEquals("TileAction on volcano at " + hex
                         + " with orientation " + orientation
                         + " expected to have problems " + expected
@@ -40,7 +40,7 @@ public class VolcanoPlacementRulesTest {
 
     @Test
     public void testOrientations() {
-        URL rsc = VolcanoPlacementRulesTest.class.getResource("VolcanoPlacementRulesTest.island");
+        URL rsc = VolcanoTileRulesTest.class.getResource("VolcanoTileRulesTest.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
         Hex hex;
@@ -96,7 +96,7 @@ public class VolcanoPlacementRulesTest {
 
     @Test
     public void testVillages() {
-        URL rsc = VolcanoPlacementRulesTest.class.getResource("VolcanoPlacementRulesTest2.island");
+        URL rsc = VolcanoTileRulesTest.class.getResource("VolcanoTileRulesTest2.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
         Hex hex;

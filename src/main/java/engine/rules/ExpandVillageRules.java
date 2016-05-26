@@ -9,7 +9,7 @@ import map.Village;
 
 import java.util.Set;
 
-public class ExpandRules {
+public class ExpandVillageRules {
 
     public static boolean validate(Engine engine, Village village, FieldType fieldType) {
         Island island = engine.getIsland();

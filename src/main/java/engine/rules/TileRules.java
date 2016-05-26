@@ -7,15 +7,15 @@ import map.Hex;
 import map.Island;
 import map.Orientation;
 
-public class PlacementRules {
+public class TileRules {
 
     public static Problems validate(Island island, VolcanoTile tile, Hex hex, Orientation orientation) {
         Field field = island.getField(hex);
         if (field == Field.SEA) {
-            return SeaPlacementRules.validate(island, tile, hex, orientation);
+            return SeaTileRules.validate(island, tile, hex, orientation);
         }
         else if (field.getType() == FieldType.VOLCANO) {
-            return VolcanoPlacementRules.validate(island, tile, hex, orientation);
+            return VolcanoTileRules.validate(island, tile, hex, orientation);
         }
         else {
             return Problems.of(Problem.NOT_ON_SEA_OR_VOLCANO);

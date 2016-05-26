@@ -5,6 +5,9 @@ import data.PlayerColor;
 
 import java.util.logging.Level;
 
+/**
+ * Test brute-force qui enchaine un certain nombre de parties
+ */
 public class EngineRuns {
 
     private static final int COUNT = 500;
@@ -16,14 +19,16 @@ public class EngineRuns {
                     .player(PlayerColor.RED, PlayerHandler.dumbFactory())
                     .player(PlayerColor.WHITE, BotPlayerHandler.factory(16, 2))
                     .build();
+
+            engine.logger().info("* Starting game seeded with {0}", Long.toString(engine.getSeed()));
             engine.start();
+
 
             while (!(engine.getStatus() instanceof EngineStatus.Finished)) {
                 continue;
             }
 
-            engine.logger().info("Game seeded with {0} finished because of {1}",
-                    Long.toString(engine.getSeed()),
+            engine.logger().info("  Finished because of {0}",
                     ((EngineStatus.Finished) engine.getStatus()).getWinReason());
         }
     }

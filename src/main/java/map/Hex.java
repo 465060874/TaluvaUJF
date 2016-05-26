@@ -1,21 +1,22 @@
 package map;
 
-import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
+import com.google.common.collect.ImmutableSet;
 
+import java.util.Set;
+
+/**
+ * Encapsulation des coordonnées d'un hexagone
+ * Le système de coordonnées choisi est le système
+ * dit de coordonnées axiales
+ */
 public class Hex {
 
     public static Hex at(int line, int diag) {
         return new Hex(line, diag);
     }
 
-    public static Ordering<Hex> lineThenDiagOrdering() {
-        return LINE_THEN_DIAG_ORDERING;
-    }
-
-    final int line;
-    final int diag;
+    private final int line;
+    private final int diag;
 
     private Hex(int line, int diag) {
         this.line = line;
@@ -28,8 +29,14 @@ public class Hex {
                 diag + neighbor.diagOffset);
     }
 
-    public Iterable<Hex> getNeighborhood() {
-        return Iterables.transform(Neighbor.list(), this::getNeighbor);
+    public Set<Hex> getNeighborhood() {
+        return ImmutableSet.of(
+                getNeighbor(Neighbor.NORTH_WEST),
+                getNeighbor(Neighbor.NORTH_EAST),
+                getNeighbor(Neighbor.WEST),
+                getNeighbor(Neighbor.EAST),
+                getNeighbor(Neighbor.SOUTH_WEST),
+                getNeighbor(Neighbor.SOUTH_EAST));
     }
 
     public Hex getLeftNeighbor(Orientation orientation) {
@@ -67,15 +74,5 @@ public class Hex {
     public String toString() {
         return "Hex(" + line + ", " + diag + ")";
     }
-
-    private static final Ordering<Hex> LINE_THEN_DIAG_ORDERING = new Ordering<Hex>() {
-        @Override
-        public int compare(Hex left, Hex right) {
-            return ComparisonChain.start()
-                    .compare(left.line, right.line)
-                    .compare(left.diag, right.diag)
-                    .result();
-        }
-    };
 }
 

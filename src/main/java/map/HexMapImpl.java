@@ -2,8 +2,10 @@ package map;
 
 import com.google.common.collect.Iterables;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -53,8 +55,8 @@ class HexMapImpl<E> implements HexMap<E> {
     }
 
     @Override
-    public Iterable<Hex> hexes() {
-        return Iterables.unmodifiableIterable(map.keySet());
+    public Set<Hex> hexes() {
+        return Collections.unmodifiableSet(map.keySet());
     }
 
     @Override

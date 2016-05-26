@@ -16,12 +16,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
-public class SeaPlacementRulesTest {
+public class SeaTileRulesTest {
 
     private static final VolcanoTile TILE = new VolcanoTile(FieldType.JUNGLE, FieldType.JUNGLE);
 
     private void assertValid(Island island, Hex hex, Orientation orientation) {
-        Problems actual = SeaPlacementRules.validate(island, TILE, hex, orientation);
+        Problems actual = SeaTileRules.validate(island, TILE, hex, orientation);
         assertTrue("TileAction on sea at " + hex
                         + " with orientation " + orientation
                         + " expected to be valid, but has problems " + actual,
@@ -30,7 +30,7 @@ public class SeaPlacementRulesTest {
 
     private void assertProblems(Island island, Hex hex, Orientation orientation, Problem... problems) {
         Problems expected = Problems.of(problems);
-        Problems actual = SeaPlacementRules.validate(island, TILE, hex, orientation);
+        Problems actual = SeaTileRules.validate(island, TILE, hex, orientation);
         assertEquals("TileAction on sea at " + hex
                         + " with orientation " + orientation
                         + " expected to have problems " + expected
@@ -40,7 +40,7 @@ public class SeaPlacementRulesTest {
 
     @Test
     public void testValidate() {
-        URL rsc = SeaPlacementRulesTest.class.getResource("SeaPlacementRulesTest.island");
+        URL rsc = SeaTileRulesTest.class.getResource("SeaTileRulesTest.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
         Hex hex;

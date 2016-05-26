@@ -1,5 +1,7 @@
 package map;
 
+import java.util.Set;
+
 public interface HexMap<E> {
 
     static <E> HexMap<E> create() {
@@ -18,7 +20,7 @@ public interface HexMap<E> {
 
     int size();
 
-    Iterable<Hex> hexes();
+    Set<Hex> hexes();
 
     Iterable<E> values();
 

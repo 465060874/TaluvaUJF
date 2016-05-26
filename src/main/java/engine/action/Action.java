@@ -4,6 +4,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
 
+/**
+ * Represente un coup jouable par un jouable
+ * Avec la hiérarchie suivante :
+ *     Action
+ *         TileAction (Placement de tuile)
+ *             SeaTileAction (sur la mer
+ *             VolcanoTileAtion (sur un volcan)
+ *         BuildingAction (Construction)
+ *             PlaceBuildingAction (Par placement)
+ *             ExpandVillageAction (Par extension
+ */
 public interface Action {
 
     void write(Writer writer) throws IOException;

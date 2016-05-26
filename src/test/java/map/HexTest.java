@@ -1,11 +1,11 @@
 package map;
 
+import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class HexTest {
 
@@ -54,30 +54,16 @@ public class HexTest {
     @Test
     public void testGetNeighbors() {
         Hex origin = Hex.at(ORIGIN,ORIGIN);
+        Set<Hex> expected = ImmutableSet.of(
+                Hex.at(ORIGIN, ORIGIN -1),
+                Hex.at(ORIGIN -1, ORIGIN),
+                Hex.at(ORIGIN -1, ORIGIN + 1),
+                Hex.at(ORIGIN, ORIGIN + 1),
+                Hex.at(ORIGIN + 1, ORIGIN),
+                Hex.at(ORIGIN + 1, ORIGIN - 1));
 
-        Hex hexWestExpected = Hex.at(ORIGIN, ORIGIN -1);
-        Hex hexNorthWestExpected = Hex.at(ORIGIN -1, ORIGIN);
-        Hex hexNorthEastExpected = Hex.at(ORIGIN -1, ORIGIN + 1);
-        Hex hexEastExpected = Hex.at(ORIGIN, ORIGIN + 1);
-        Hex hexSouthEastExpected = Hex.at(ORIGIN + 1, ORIGIN);
-        Hex hexSouthWestExpected = Hex.at(ORIGIN + 1, ORIGIN - 1);
-
-        List<Hex> neighbors = new ArrayList<>();
-        neighbors.add(hexWestExpected);
-        neighbors.add(hexNorthWestExpected);
-        neighbors.add(hexNorthEastExpected);
-        neighbors.add(hexEastExpected);
-        neighbors.add(hexSouthEastExpected);
-        neighbors.add(hexSouthWestExpected);
-
-        neighbors = Hex.lineThenDiagOrdering().sortedCopy(neighbors);
-
-        Iterable<Hex> neighborsExpectedIt = origin.getNeighborhood();
-        ArrayList<Hex> neighborsExpected = new ArrayList<>();
-        for (Hex hex : neighborsExpectedIt) {
-            neighborsExpected.add(hex);
-        }
-        assertEquals(neighborsExpected, neighbors);
+        ImmutableSet<Hex> actual = ImmutableSet.copyOf(origin.getNeighborhood());
+        assertEquals(expected, actual);
     }
 
     @Test

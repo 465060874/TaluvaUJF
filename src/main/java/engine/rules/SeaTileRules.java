@@ -10,7 +10,7 @@ import map.Orientation;
 import static engine.rules.Problem.NOT_ADJACENT_TO_COAST;
 import static engine.rules.Problem.NOT_ALL_ON_SEA;
 
-public class SeaPlacementRules {
+public class SeaTileRules {
 
     public static Problems validate(Island island, VolcanoTile tile, Hex volcanoHex, Orientation orientation) {
         ImmutableSet<Hex> hexes = ImmutableSet.of(

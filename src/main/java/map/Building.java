@@ -48,6 +48,18 @@ public class Building {
         return color;
     }
 
+    public int getCount(int level) {
+        if (type == BuildingType.NONE) {
+            return 0;
+        }
+        else if (type == BuildingType.HUT) {
+            return level;
+        }
+        else {
+            return 1;
+        }
+    }
+
     private static final Building[] values;
 
     private static int indexOf(BuildingType type, PlayerColor color) {

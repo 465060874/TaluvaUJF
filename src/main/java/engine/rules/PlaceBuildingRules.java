@@ -7,7 +7,10 @@ import map.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class BuildRules {
+/**
+ * Validation des placements de batiment
+ */
+public class PlaceBuildingRules {
 
     public static boolean validate(Engine engine, BuildingType type, Hex hex) {
         Island island = engine.getIsland();

@@ -6,6 +6,8 @@ import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
 
+import java.util.stream.Collectors;
+
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static map.Field.SEA;
 
@@ -36,17 +38,10 @@ class  IslandImpl implements Island {
 
     @Override
     public Iterable<Hex> getCoast() {
-        HexMap<Boolean> builder = HexMap.create();
-
-        for (Hex hex : map.hexes()) {
-            for (Hex neighbor : hex.getNeighborhood()) {
-                if (!map.contains(neighbor)) {
-                    builder.put(neighbor, true);
-                }
-            }
-        }
-
-        return builder.hexes();
+        return map.hexes().stream()
+                .flatMap(h -> h.getNeighborhood().stream())
+                .filter(h -> !map.contains(h))
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -56,7 +51,9 @@ class  IslandImpl implements Island {
 
     @Override
     public Iterable<Hex> getVolcanos() {
-        return Iterables.filter(map.hexes(), hex -> map.get(hex).getType() == FieldType.VOLCANO);
+        return map.hexes().stream()
+                .filter(hex -> map.get(hex).getType() == FieldType.VOLCANO)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -94,19 +91,19 @@ class  IslandImpl implements Island {
         int level = getField(hex).getLevel() + 1;
 
         putField(hex, Field.create(level, FieldType.VOLCANO, orientation));
-        Field leftFieldBefore = doPutField(leftHex, Field.create(level, tile.getLeft(), orientation.leftRotation()));
-        Field rightFieldBefore = doPutField(rightHex, Field.create(level, tile.getRight(), orientation.rightRotation()));
-        if (leftFieldBefore.getBuilding().getType() != BuildingType.NONE
-                && rightFieldBefore.getBuilding().getType() != BuildingType.NONE) {
+        Field leftBefore = doPutField(leftHex, Field.create(level, tile.getLeft(), orientation.leftRotation()));
+        Field rightBefore = doPutField(rightHex, Field.create(level, tile.getRight(), orientation.rightRotation()));
+
+        if (leftBefore.getBuilding().getType() != BuildingType.NONE
+                && rightBefore.getBuilding().getType() != BuildingType.NONE) {
             villages.reset(leftHex, rightHex);
         }
-        else if (leftFieldBefore.getBuilding().getType() != BuildingType.NONE) {
+        else if (leftBefore.getBuilding().getType() != BuildingType.NONE) {
             villages.reset(leftHex);
         }
-        else if (rightFieldBefore.getBuilding().getType() != BuildingType.NONE) {
+        else if (rightBefore.getBuilding().getType() != BuildingType.NONE) {
             villages.reset(rightHex);
         }
-
     }
 
     @Override

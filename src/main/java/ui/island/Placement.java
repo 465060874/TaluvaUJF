@@ -4,7 +4,7 @@ import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
-import engine.rules.PlacementRules;
+import engine.rules.TileRules;
 import map.Field;
 import map.Hex;
 import map.Island;
@@ -117,7 +117,7 @@ public class Placement {
 
     private void updateValidTile() {
         boolean wasValid = valid;
-        this.valid = PlacementRules.validate(island, tileFields, hex, tileOrientation).isValid();
+        this.valid = TileRules.validate(island, tileFields, hex, tileOrientation).isValid();
 
         if (wasValid != valid) {
             placementOverlay.redraw();

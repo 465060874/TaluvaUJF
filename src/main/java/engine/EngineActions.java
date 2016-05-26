@@ -7,10 +7,10 @@ import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
 import engine.action.*;
-import engine.rules.BuildRules;
-import engine.rules.ExpandRules;
-import engine.rules.SeaPlacementRules;
-import engine.rules.VolcanoPlacementRules;
+import engine.rules.PlaceBuildingRules;
+import engine.rules.ExpandVillageRules;
+import engine.rules.SeaTileRules;
+import engine.rules.VolcanoTileRules;
 import map.*;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This class keeps lists of all possible actions for the current player
+ * Cette classe s'occupe d'analyser tous les coups jouables à un instant donné
  */
 class EngineActions {
 
@@ -85,7 +85,7 @@ class EngineActions {
         HexMap<List<SeaTileAction>> seaTilesMap = HexMap.create();
         for (Hex hex : island.getCoast()) {
             for (Orientation orientation : Orientation.values()) {
-                if (!SeaPlacementRules.validate(island, tile, hex, orientation).isValid()) {
+                if (!SeaTileRules.validate(island, tile, hex, orientation).isValid()) {
                     continue;
                 }
 
@@ -113,7 +113,7 @@ class EngineActions {
         VolcanoTile tile = engine.getVolcanoTileStack().current();
         for (Hex hex : island.getVolcanos()) {
             for (Orientation orientation : Orientation.values()) {
-                if (!VolcanoPlacementRules.validate(island, tile, hex, orientation).isValid()) {
+                if (!VolcanoTileRules.validate(island, tile, hex, orientation).isValid()) {
                     continue;
                 }
 
@@ -141,9 +141,9 @@ class EngineActions {
         for (Hex hex : island.getFields()) {
             Field field = island.getField(hex);
             if (field.getBuilding().getType() == BuildingType.NONE) {
-                boolean hutValid = BuildRules.validate(engine, BuildingType.HUT, hex);
-                boolean templeValid = BuildRules.validate(engine, BuildingType.TEMPLE, hex);
-                boolean towerValid = BuildRules.validate(engine, BuildingType.TOWER, hex);
+                boolean hutValid = PlaceBuildingRules.validate(engine, BuildingType.HUT, hex);
+                boolean templeValid = PlaceBuildingRules.validate(engine, BuildingType.TEMPLE, hex);
+                boolean towerValid = PlaceBuildingRules.validate(engine, BuildingType.TOWER, hex);
 
                 if (!hutValid && !templeValid && !towerValid) {
                     continue;
@@ -197,7 +197,7 @@ class EngineActions {
             List<ExpandVillageAction> actions = new ArrayList<>(FieldType.values().length);
             for (FieldType fieldType : FieldType.values()) {
                 if (types[fieldType.ordinal()]
-                        && ExpandRules.validate(engine, village, fieldType)) {
+                        && ExpandVillageRules.validate(engine, village, fieldType)) {
                     actions.add(new ExpandVillageAction(firstHex, fieldType));
                 }
             }
@@ -224,10 +224,10 @@ class EngineActions {
                 continue;
             }
 
-            if (BuildRules.validate(engine, type, leftHex)) {
+            if (PlaceBuildingRules.validate(engine, type, leftHex)) {
                 builder.add(new PlaceBuildingAction(type, leftHex));
             }
-            if (BuildRules.validate(engine, type, rightHex)) {
+            if (PlaceBuildingRules.validate(engine, type, rightHex)) {
                 builder.add(new PlaceBuildingAction(type, rightHex));
             }
         }
@@ -266,7 +266,7 @@ class EngineActions {
         for (Map.Entry<Village, FieldType> entry : villageExpansion.entries()) {
             Village village = entry.getKey();
             FieldType fieldType = entry.getValue();
-            if (ExpandRules.validate(engine, village, fieldType)) {
+            if (ExpandVillageRules.validate(engine, village, fieldType)) {
                 builder.add(new ExpandVillageAction(village, fieldType));
             }
         }
