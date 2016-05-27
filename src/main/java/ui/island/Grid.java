@@ -81,14 +81,14 @@ public class Grid {
         return Hex.at((int) line, (int) diag);
     }
 
-    double hexToX(Hex hex, double width) {
+    public double hexToX(Hex hex, double width) {
         int diag = hex.getDiag();
         int line = hex.getLine();
         double centerX = width / 2 - ox;
         return centerX + lineDiagToX(line, diag);
     }
 
-    double neighborToXOffset(Neighbor neighbor) {
+    public double neighborToXOffset(Neighbor neighbor) {
         return lineDiagToX(neighbor.getLineOffset(), neighbor.getDiagOffset());
     }
 
@@ -97,13 +97,13 @@ public class Grid {
         return diag * 2 * hexHalfWidth + line * hexHalfWidth;
     }
 
-    double hexToY(Hex hex, double height) {
+    public double hexToY(Hex hex, double height) {
         int line = hex.getLine();
         double centerY = height / 2 - oy;
         return centerY + lineToY(line);
     }
 
-    double neighborToYOffset(Neighbor neighbor) {
+    public double neighborToYOffset(Neighbor neighbor) {
         return lineToY(neighbor.getLineOffset());
     }
 
