@@ -330,7 +330,6 @@ class EngineImpl implements Engine {
 
     @Override
     public List<PlaceBuildingAction> getNewPlaceBuildingActions() {
-        checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
         return actions.newPlaceBuildings;
     }
 
@@ -342,7 +341,6 @@ class EngineImpl implements Engine {
 
     @Override
     public List<ExpandVillageAction> getNewExpandVillageActions() {
-        checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
         return actions.newExpandVillages;
     }
 
