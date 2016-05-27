@@ -1,12 +1,12 @@
 package menu.data;
 
 import IA.IADifficulty;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import data.PlayerColor;
 import engine.EngineBuilder;
 import engine.PlayerHandler;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Supplier;
@@ -20,14 +20,22 @@ public class MenuData {
 
     private MultiMode multiMode;
 
-    private final List<SavedGame> savedGames;
+    private final ImmutableList<SavedGame> savedGames;
     private SavedGame selectedSavedGame;
 
-    public MenuData() {
-        this.mode = MenuMode.SOLO;
-        this.soloColor = PlayerColor.RED;
-        this.soloDifficulty = IADifficulty.MOYEN;
-        this.savedGames = new ArrayList<>();
+    public static MenuData load() {
+        return MenuDataIO.load();
+    }
+
+    MenuData(MenuMode mode,
+             PlayerColor soloColor, IADifficulty soloDifficulty,
+             MultiMode multiMode,
+             ImmutableList<SavedGame> savedGames) {
+        this.mode = mode;
+        this.soloColor = soloColor;
+        this.soloDifficulty = soloDifficulty;
+        this.savedGames = savedGames;
+        this.selectedSavedGame = Iterables.getFirst(savedGames, null);
     }
 
     public MenuMode getMode() {
@@ -62,7 +70,7 @@ public class MenuData {
         this.multiMode = multiMode;
     }
 
-    public List<SavedGame> getSavedGames() {
+    public ImmutableList<SavedGame> getSavedGames() {
         return savedGames;
     }
 
@@ -72,6 +80,10 @@ public class MenuData {
 
     public void setSelectedSavedGame(SavedGame selectedSavedGame) {
         this.selectedSavedGame = selectedSavedGame;
+    }
+
+    public void save() {
+        MenuDataIO.save(this);
     }
 
     public EngineBuilder engineBuilder(Supplier<? extends PlayerHandler.Factory> uiPlayerFactory) {
