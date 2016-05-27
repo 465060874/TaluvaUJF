@@ -28,7 +28,7 @@ public class Grid {
         return oy;
     }
 
-    void translate(double ox, double oy) {
+    public void translate(double ox, double oy) {
         this.ox += ox;
         this.oy += oy;
     }

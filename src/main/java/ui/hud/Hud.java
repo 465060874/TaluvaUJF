@@ -27,10 +27,15 @@ public class Hud extends AnchorPane implements EngineObserver {
     private final Engine engine;
 
     private final PlayerView[] playerViews;
+
     private final VBox leftButtons;
+
     private final Text textLine;
     private final TextFlow textBottom;
-    //private final TileStackCanvas tileStackCanvas;
+
+    private final TileStackCanvas tileStackCanvas;
+    private final Text tileStackSize;
+    private final VBox tileStackPane;
 
     public Hud(Engine engine) {
         this.engine = engine;
@@ -58,10 +63,15 @@ public class Hud extends AnchorPane implements EngineObserver {
         textBottom.setPadding(new Insets(0, 0, 20, 0));
         AnchorPane.setBottomAnchor(textBottom, 0.0);
 
-        //this.tileStackCanvas = new TileStackCanvas(engine);
-        AnchorPane.setRightAnchor(textBottom, 0.0);
+        this.tileStackCanvas = new TileStackCanvas(engine);
+        this.tileStackSize = new Text();
+        tileStackSize.setFont(new Font(20));
+        TextFlow tileStackSizeFlow = new TextFlow(tileStackSize);
+        tileStackSizeFlow.setTextAlignment(TextAlignment.CENTER);
+        this.tileStackPane = new VBox(tileStackCanvas, tileStackSizeFlow);
+        AnchorPane.setRightAnchor(tileStackPane, 0.0);
 
-        getChildren().addAll(leftButtons, textBottom);//, tileStackCanvas);
+        getChildren().addAll(leftButtons, textBottom, tileStackPane);
 
         widthProperty().addListener(this::resizeWidth);
         heightProperty().addListener(this::resizeHeight);
@@ -69,6 +79,7 @@ public class Hud extends AnchorPane implements EngineObserver {
         layoutBoundsProperty().addListener(this::resizeHeight);
 
         engine.registerObserver(this);
+
     }
 
     private void resizeWidth(Observable observable) {
@@ -79,7 +90,7 @@ public class Hud extends AnchorPane implements EngineObserver {
     private void resizeHeight(Observable observable) {
         double y = (getHeight() - leftButtons.getHeight()) / 2;
         AnchorPane.setTopAnchor(leftButtons, y);
-        AnchorPane.setTopAnchor(textBottom, y);
+        AnchorPane.setTopAnchor(tileStackPane, y);
         layoutChildren();
     }
 
@@ -90,7 +101,8 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     @Override
     public void onTileStackChange(boolean cancelled) {
-
+        tileStackCanvas.redraw();
+        tileStackSize.setText(Integer.toString(engine.getVolcanoTileStack().size()));
     }
 
     @Override
