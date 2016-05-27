@@ -2,6 +2,7 @@ package menu;
 
 import data.ChoosenColors;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -17,6 +18,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import menu.data.MenuData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +46,8 @@ public class Home4 extends Application {
         launch(args);
     }
 
+    private final MenuData menuData;
+
     private int iterateurIcone = 0;
 
     private ToggleGroup tabChoice;
@@ -61,6 +65,10 @@ public class Home4 extends Application {
     private List<ToggleButton> optionsHistory;
     private List<Node> capture;
     private VBox vBoxCapture = new VBox();
+
+    public Home4() {
+        this.menuData = MenuData.load();
+    }
 
     @Override public void start(Stage stage) {
         //System.out.println(ChoosenColors.BROWN);
@@ -421,6 +429,9 @@ public class Home4 extends Application {
         vBoxnulle2.getStyleClass().add("b1");
         vBoxnulle3.getStyleClass().add("b1");
 */
+
+        breprendre.setOnAction(this::debug);
+
         root.getChildren().add(vBoxScene);
         stage.setScene(scene);
         stage.show();
@@ -437,7 +448,6 @@ public class Home4 extends Application {
         }
     }
 
-
     private void updateCapture() {
         Toggle selected = historyChoice.getSelectedToggle();
         //System.out.println(historyChoice.getSelectedToggle());
@@ -449,9 +459,14 @@ public class Home4 extends Application {
         }
     }
 
+
     private void setIterateurIcone( int val ){
         iterateurIcone = val;
     }
 
+    private void debug(ActionEvent event) {
+        menuData.save();
+        menuData.debug();
+    }
 }
 

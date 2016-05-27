@@ -34,6 +34,7 @@ public class MenuData {
         this.mode = mode;
         this.soloColor = soloColor;
         this.soloDifficulty = soloDifficulty;
+        this.multiMode = multiMode;
         this.savedGames = savedGames;
         this.selectedSavedGame = Iterables.getFirst(savedGames, null);
     }
@@ -84,6 +85,10 @@ public class MenuData {
 
     public void save() {
         MenuDataIO.save(this);
+    }
+
+    public void debug() {
+        MenuDataIO.debug(this);
     }
 
     public EngineBuilder engineBuilder(Supplier<? extends PlayerHandler.Factory> uiPlayerFactory) {
