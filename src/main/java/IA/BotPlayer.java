@@ -61,8 +61,6 @@ class BotPlayer {
             else
                 return new Move( null, null, Integer.MIN_VALUE);
         }
-        // Ou s'il ne peut plus rien jouer...
-
 
         // 1 -- Determiner le poids de chaque stratégie
         heuristics.chooseStrategies(engine,strategyPoints,branchingFactor);
@@ -93,9 +91,9 @@ class BotPlayer {
             engine.action(branchMoves[i].buildingAction);
             if( engine.getStatus() instanceof EngineStatus.Finished ){
                 if( ((EngineStatus.Finished) engine.getStatus()).getWinners().contains( engine.getCurrentPlayer()))
-                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MIN_VALUE);
+                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MIN_VALUE );
                 else
-                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MAX_VALUE);
+                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MAX_VALUE );
             }else if (depth > 0) {
                 Move m = doPlay(engine, depth - 1);
                 // Pour inverser entre min et max
@@ -121,7 +119,7 @@ class BotPlayer {
     }
 
     // Fonction qui classe les coups selon la stratégie choisie
-    // !!! NE PLUS UTILISER
+    // !!! NE PLUS UTILISER + PAS OPTIMISEE
     private int branchSort(Engine engine, int[] strategyPoints, Move[] branchMoves) {
         int comp = 0;
         // POUR GERER LE CAS OU LE JOUEUR NE PEUT PLUS JOUER AUCUN COUP
@@ -198,6 +196,7 @@ class BotPlayer {
     }
 
     // Retourne le nombre de coups ajoutes dans le tableau branchMoves
+    // Remplit ce tableau avec les coups qui semblent les meilleurs
     private int branchSortFusion( Engine engine, int [] strategyPoints, Move [] branchMoves) {
         int comp = 0;
         // Donnees pour classer les differents coups ( placements, constructions, move complet ... )
@@ -348,6 +347,7 @@ class BotPlayer {
         return added;
     }
 
+    // Teste la compatibilité entre un placement et une construction/extension
     private boolean compatible( Engine engine, TileAction placement, BuildingAction build ){
         if( placement instanceof SeaTileAction ){
             // Construction + placement mer ne pose jamais de problème
@@ -406,6 +406,8 @@ class BotPlayer {
         }
     }
 
+    // Tente d'ajouter un Move dans branchMoves à l'indice ind :
+    // Renvoie false ssi le Move est déjà présent dans branchMoves
     private boolean add( Move m, Move[] branchMoves, int ind){
         for (int i = 0; i < ind; i++) {
             if( branchMoves[i].equals( m))

@@ -26,7 +26,7 @@ public class FXUI extends Application {
     public void start(Stage stage) throws Exception {
         this.engine = EngineBuilder.allVsAll()
                 .player(PlayerColor.BROWN, e -> new FXUIPlayerHandler())
-                .player(PlayerColor.WHITE, BotPlayerHandler.factory(16, 0))
+                .player(PlayerColor.WHITE, BotPlayerHandler.factory(16, 1))
                 .build();
 
         this.gameView = new GameView(engine);

@@ -17,6 +17,8 @@ class BasicHeuristics implements Heuristics {
     int nbStrategies = 4;
     int [] pointsVillageSize;
     int pointsVillageWithTemple;
+    int pointsVillageWithTower;
+    int pointsAdjacentHill;
 
     // Critères de choix de pondération
     int mintimeFinishTowers; // Temps min après lequel le joueur décide de privilégier temples à tours si il a une tour manquante et moins de temples que l'autre
@@ -29,6 +31,8 @@ class BasicHeuristics implements Heuristics {
     BasicHeuristics() {
         pointsVillageSize = new int[]{0,5,15,30,40,50};
         pointsVillageWithTemple = 100;
+        pointsVillageWithTower = 80;
+        pointsAdjacentHill = 15;
     }
 
     public void chooseStrategies (Engine e , int [] StrategyValues, int BranchingFactor ){
@@ -66,7 +70,7 @@ class BasicHeuristics implements Heuristics {
                 int ecart = StrategyValues[HUTSTRATEGY] - StrategyValues[HUTSTRATEGY]/2;
                 StrategyValues[HUTSTRATEGY] -= ecart;
                 StrategyValues[TOWERSTRATEGY] += ecart;
-            }else if( towersPlaced == 0 && (20-hutsPlaced)/turnsLeft <= 2 ){ //TODO Division par ZERO
+            }else if( turnsLeft != 0 && towersPlaced == 0 && (20-hutsPlaced)/turnsLeft <= 2 ){
                 int ecart = StrategyValues[TOWERSTRATEGY] - StrategyValues[TOWERSTRATEGY]/2;
                 StrategyValues[TOWERSTRATEGY] -= ecart;
                 StrategyValues[HUTSTRATEGY] += ecart;
@@ -127,7 +131,6 @@ class BasicHeuristics implements Heuristics {
                     if (village.getHexes().size() < 3)
                         points -= bonus; // Ecraser un petit village ( i.e l'annihiler ) est mauvais pour la strategie hutte
                 }
-                // Peut être tester si on peut accéder à un espace haut de 3 du haut
             }
         }
 
@@ -170,6 +173,8 @@ class BasicHeuristics implements Heuristics {
         int scale = 2;
         int res = 0;
         Island island = e.getIsland();
+
+        // 1 - TRAITEMENT DU VOLCANO
         Hex hex = move.getVolcanoHex();
         int bonus;
         for (Neighbor neighbor : Neighbor.values()) {
@@ -187,7 +192,7 @@ class BasicHeuristics implements Heuristics {
             }
         }
 
-        // Etude des hex qu'on va écraser avec le gauche
+        // 2 - TRAITEMENT DU HEX GAUCHE
         hex = move.getLeftHex();
         BuildingType building = island.getField(hex).getBuilding().getType();
         if( building != BuildingType.NONE ){
@@ -205,10 +210,18 @@ class BasicHeuristics implements Heuristics {
                             points += 2;
 
             }
-            /* CAs tour a gérer plus tard if( !village.hasTower() )
-                points -= bonus; */
             points -= bonus;
         }
+        // Créer la possibilité de construire une tour
+        if( island.getField(hex).getLevel() >= 2)
+            for (Neighbor neighbor : Neighbor.values()) {
+                Hex adjacent = hex.getNeighbor(neighbor);
+                if( island.getField(adjacent).getBuilding().getType() != BuildingType.NONE)
+                    if( island.getField(adjacent).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+                        points += 2;
+                    else
+                        points -= 2;
+            }
         // Et si on permet de s'étendre
         for (Neighbor neighbor : Neighbor.values()) {
             Hex adjacent = hex.getNeighbor(neighbor);
@@ -223,16 +236,11 @@ class BasicHeuristics implements Heuristics {
                 if( !village.hasTemple()) {
                     points += bonus;
                 }
-                /* if( !village.hasTower()) {
-                    points += bonus * (village.getHexes().size() > 2 ? 2 : village.getHexes().size());
-                    if( island.getField( hex ).getLevel() == 2)
-                        points += 4*bonus;
-                } */
                 points += bonus;
             }
         }
 
-
+        // 3 - TRAITEMENT DU HEX DROIT
         hex = move.getRightHex();
         building = island.getField(hex).getBuilding().getType();
         if( building != BuildingType.NONE ){
@@ -250,10 +258,18 @@ class BasicHeuristics implements Heuristics {
                             points += 2;
 
             }
-            /* CAs tour a gérer plus tard if( !village.hasTower() )
-                points -= bonus; */
             points -= bonus;
         }
+        // Créer la possibilité de construire une tour
+        if( island.getField(hex).getLevel() >= 2)
+            for (Neighbor neighbor : Neighbor.values()) {
+                Hex adjacent = hex.getNeighbor(neighbor);
+                if( island.getField(adjacent).getBuilding().getType() != BuildingType.NONE)
+                    if( island.getField(adjacent).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+                        points += 2;
+                    else
+                        points -= 2;
+            }
         for (Neighbor neighbor : Neighbor.values()) {
             Hex adjacent = hex.getNeighbor(neighbor);
             building = island.getField(adjacent).getBuilding().getType();
@@ -267,11 +283,6 @@ class BasicHeuristics implements Heuristics {
                 if( !village.hasTemple()) {
                     points += bonus;
                 }
-                /* if( !village.hasTower()) {
-                    points += bonus * (village.getHexes().size() > 2 ? 2 : village.getHexes().size());
-                    if( island.getField( hex ).getLevel() == 2)
-                        points += 4*bonus;
-                } */
                 points += bonus;
             }
         }
@@ -361,12 +372,7 @@ class BasicHeuristics implements Heuristics {
         List<Player> players = engine.getPlayers();
         Player player = engine.getCurrentPlayer();
 
-        /*Set<Village> villages = new HashSet<>();
-        for (Hex hex : engine.getIsland().getFields()) {
-            if( engine.getIsland().getField(hex).getBuilding().getType() != BuildingType.NONE )
-                villages.add(engine.getIsland().getVillage(hex));
-        }*/
-
+        // Gestion des villages
         Iterable<Village> villages = engine.getIsland().getVillages( player.getColor());
         for( Village village : villages) {
             tmpScore = 0;
@@ -374,6 +380,14 @@ class BasicHeuristics implements Heuristics {
                 tmpScore += village.getHexes().size() > 5 ? pointsVillageSize[5] : pointsVillageSize[village.getHexes().size()];
             else
                 tmpScore += pointsVillageWithTemple;
+            if( !village.hasTower() ) {
+                // On regarde le nombre de hex qui sont proches de voisins vides de niveau > 3
+                for( Hex hex : village.getHexes() )
+                    for( Hex adjacent : hex.getNeighborhood())
+                        if( engine.getIsland().getField(adjacent).getBuilding().getType() == BuildingType.NONE && engine.getIsland().getField(adjacent).getLevel() >= 3 )
+                            tmpScore += pointsAdjacentHill;
+            }else
+                tmpScore += pointsVillageWithTower;
             engine.logger().finer("[Eval] {0} Village : {1} ", player.getColor(), tmpScore);
             score += tmpScore;
         }
@@ -386,10 +400,26 @@ class BasicHeuristics implements Heuristics {
                 tmpScore += village.getHexes().size() > 5 ? pointsVillageSize[5] : pointsVillageSize[village.getHexes().size()];
             else
                 tmpScore += pointsVillageWithTemple;
+            if( !village.hasTower() ) {
+                // On regarde le nombre de hex qui sont proches de voisins vides de niveau > 3
+                for( Hex hex : village.getHexes() )
+                    for( Hex adjacent : hex.getNeighborhood())
+                        if( engine.getIsland().getField(adjacent).getBuilding().getType() == BuildingType.NONE && engine.getIsland().getField(adjacent).getLevel() >= 3 )
+                            tmpScore += pointsAdjacentHill;
+            }else
+                tmpScore += pointsVillageWithTower;
             engine.logger().finer("[Eval] {0} Village : {1} ", player.getColor(), tmpScore);
             score -= tmpScore;
         }
         engine.logger().fine("[Eval] {0} Config with {1} points ", engine.getCurrentPlayer().getColor(), score);
-        return score;
+
+        // Gestion fin du jeu :
+        if( engine.getStatus() instanceof EngineStatus.Finished ) {
+            if (((EngineStatus.Finished) engine.getStatus()).getWinners().contains(engine.getCurrentPlayer()))
+                return Integer.MAX_VALUE + 5000 + score;
+            else
+                return Integer.MIN_VALUE + 5000 + score;
+        }else
+            return score;
     }
 }
