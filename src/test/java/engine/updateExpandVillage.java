@@ -1,5 +1,6 @@
 package engine;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.io.Resources;
@@ -35,9 +36,10 @@ public class updateExpandVillage {
     public void updateExpandVillage_UniqueFieldTypeAndPlayerColor() {
         URL rsc = EngineActionTest.class.getResource("EngineTest4.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
-        Engine engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.RED, e -> PlayerHandler.dummy())
-                .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
+        Engine engine = EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
+                ImmutableMap.of(
+                        PlayerColor.RED, e -> PlayerHandler.dummy(),
+                        PlayerColor.WHITE, e -> PlayerHandler.dummy()))
                 .seed(121216213L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -124,9 +126,10 @@ public class updateExpandVillage {
     public void updateExpandVillage_UniqueFieldType_Red() {
         URL rsc = EngineActionTest.class.getResource("EngineTest5.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
-        Engine engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.RED, e -> PlayerHandler.dummy())
-                .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
+        Engine engine =  EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
+                ImmutableMap.of(
+                        PlayerColor.RED, e -> PlayerHandler.dummy(),
+                        PlayerColor.WHITE, e -> PlayerHandler.dummy()))
                 .seed(121216213L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -157,9 +160,10 @@ public class updateExpandVillage {
     public void updateExpandVillage_UniqueFieldType_White() {
         URL rsc = EngineActionTest.class.getResource("EngineTest5.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
-        Engine engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.RED, e -> PlayerHandler.dummy())
-                .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
+        Engine engine = EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
+                ImmutableMap.of(
+                        PlayerColor.WHITE, e -> PlayerHandler.dummy(),
+                        PlayerColor.RED, e -> PlayerHandler.dummy()))
                 .seed(126266215L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -222,11 +226,12 @@ public class updateExpandVillage {
     public void updateExpandVillage_UniqueFieldType_Yellow() {
         URL rsc = EngineActionTest.class.getResource("EngineTest5.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
-        Engine engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.YELLOW, e -> PlayerHandler.dummy())
-                .player(PlayerColor.BROWN, e -> PlayerHandler.dummy())
-                .player(PlayerColor.RED, e -> PlayerHandler.dummy())
-                .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
+        Engine engine = EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
+                ImmutableMap.of(
+                        PlayerColor.YELLOW, e -> PlayerHandler.dummy(),
+                        PlayerColor.RED, e -> PlayerHandler.dummy(),
+                        PlayerColor.WHITE, e -> PlayerHandler.dummy(),
+                        PlayerColor.BROWN, e -> PlayerHandler.dummy()))
                 .seed(163976325L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -254,11 +259,12 @@ public class updateExpandVillage {
     public void updateExpandVillage_Red() {
         URL rsc = EngineActionTest.class.getResource("EngineTest6.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
-        Engine engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.RED, e -> PlayerHandler.dummy())
-                .player(PlayerColor.YELLOW, e -> PlayerHandler.dummy())
-                .player(PlayerColor.BROWN, e -> PlayerHandler.dummy())
-                .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
+        Engine engine = EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
+                ImmutableMap.of(
+                        PlayerColor.RED, e -> PlayerHandler.dummy(),
+                        PlayerColor.YELLOW, e -> PlayerHandler.dummy(),
+                        PlayerColor.WHITE, e -> PlayerHandler.dummy(),
+                        PlayerColor.BROWN, e -> PlayerHandler.dummy()))
                 .seed(16245447L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -297,12 +303,12 @@ public class updateExpandVillage {
         //TODO TEST HEXES
         URL rsc = EngineActionTest.class.getResource("EngineTest7.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
-        Engine engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
-                .player(PlayerColor.RED, e -> PlayerHandler.dummy())
-                .player(PlayerColor.YELLOW, e -> PlayerHandler.dummy())
-                .player(PlayerColor.BROWN, e -> PlayerHandler.dummy())
-                .seed(16245447L)
+        Engine engine = EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
+                ImmutableMap.of(
+                        PlayerColor.RED, e -> PlayerHandler.dummy(),
+                        PlayerColor.WHITE, e -> PlayerHandler.dummy(),
+                        PlayerColor.BROWN, e -> PlayerHandler.dummy(),
+                        PlayerColor.YELLOW, e -> PlayerHandler.dummy()))
                 .logLevel(Level.INFO)
                 .island(island)
                 .build();
