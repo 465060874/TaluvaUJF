@@ -91,6 +91,7 @@ public class Home4 extends Application {
 
 
         VBox vBoxHaut = new VBox();
+        vBoxHaut.setAlignment(Pos.BOTTOM_CENTER);
         vBoxHaut.setPrefSize(largeurScene,hauteurScene/3);
         HBox hBoxMillieu= new HBox(5);
         hBoxMillieu.setAlignment(Pos.CENTER);
@@ -106,12 +107,22 @@ public class Home4 extends Application {
         for (int i = 0; i < nomdimage.length; i++)
             images[i] = new Image(getClass().getResourceAsStream(nomdimage[i]));
 
+
+
+        //vBoxHaut
+        Image vs1 = new Image(getClass().getResourceAsStream("lol.png"));
+        ImageView iv2 = new ImageView();
+        iv2.setImage(vs1);
+
+        vBoxHaut.getChildren().add(iv2);
+
         //vBoxBas
 
         VBox vBoxsolo = new VBox();
         VBox vBoxmulti = new VBox();
         VBox vBoxcharger = new VBox();
         VBox vBoxreprendre = new VBox();
+        VBox vBoxq = new VBox();
         VBox vBoxnulle1 = new VBox();
         VBox vBoxnulle2 = new VBox();
         VBox vBoxnulle3 = new VBox();
@@ -121,11 +132,13 @@ public class Home4 extends Application {
 
         vBoxreprendre.setAlignment(Pos.CENTER);
         vBoxnulle3.setAlignment(Pos.CENTER);
-
+        vBoxq.setAlignment(Pos.CENTER);
         vBoxsolo.setPrefHeight(lv-40);
         vBoxmulti.setPrefHeight(lv-40);
         vBoxcharger.setPrefHeight(lv-40);
         vBoxreprendre.setPrefSize(lv-50,lv-50);
+        vBoxq.setPrefSize(lv-50,lv-50);
+
         vBoxnulle1.setPrefHeight(hv*2/5);
         vBoxnulle2.setPrefHeight(hv*2/5);
         vBoxnulle3.setPrefHeight(hv*2/5);
@@ -134,6 +147,7 @@ public class Home4 extends Application {
         vBoxdroite.setPrefWidth(lv-40);
 
         vBoxnulle2.getChildren().add(vBoxreprendre);
+        vBoxnulle3.getChildren().add(vBoxq);
         vBoxgauche.getChildren().addAll(vBoxsolo,vBoxnulle1);
         vBoxmillieu.getChildren().addAll(vBoxnulle2,vBoxmulti);
         vBoxdroite.getChildren().addAll(vBoxcharger,vBoxnulle3);
@@ -142,11 +156,13 @@ public class Home4 extends Application {
         ToggleButton bsolo = new ToggleButton("SOLO");
         ToggleButton bmulti = new ToggleButton("MULTI");
         ToggleButton bcharger = new ToggleButton("CHARGER");
-        ToggleButton breprendre = new ToggleButton("-->");
+        ToggleButton breprendre = new ToggleButton("GO");
+        ToggleButton bq = new ToggleButton("Q");
         bsolo.setPrefSize(largeurScene/3,hauteurScene*2/9);
         bmulti.setPrefSize(largeurScene/3,hauteurScene*2/9);
         bcharger.setPrefSize(largeurScene/3,hauteurScene*2/9);
         breprendre.setPrefSize(lv-100,lv-100);
+        bq.setPrefSize(lv-100,lv-100);
 
         this.optionsButton = new ToggleButton[] { bsolo, bmulti, bcharger };
 
@@ -171,10 +187,12 @@ public class Home4 extends Application {
         bmulti.setShape(aPoly);
         bcharger.setShape(aPoly);
         breprendre.setShape(aPoly);
+        bq.setShape(aPoly);
         vBoxsolo.getChildren().add(bsolo);
         vBoxmulti.getChildren().add(bmulti);
         vBoxcharger.getChildren().add(bcharger);
         vBoxreprendre.getChildren().add(breprendre);
+        vBoxq.getChildren().add(bq);
 
 
         this.options = new StackPane();
@@ -186,11 +204,14 @@ public class Home4 extends Application {
         VBox multiOptions = new VBox(5);
         multiOptions.setAlignment(Pos.CENTER);
         multiOptions.setPrefWidth(largeurScene);
-        HBox chargerList = new HBox(10);
+        HBox chargerList = new HBox(30);
         chargerList.setAlignment(Pos.CENTER);
         chargerList.setPrefWidth(largeurScene*2/3);
         chargerList.setPadding(new Insets(10,10,10,10));
         this.optionsContent = new Node[] { soloOptions, multiOptions, chargerList };
+
+
+
 
         //pane de button solo
         //deux buttons : icone /difficulte
@@ -237,10 +258,10 @@ public class Home4 extends Application {
         vBoxd1.getChildren().add(niveaux);
 
         Button bicone = new Button();
-        Image imageDecline = new Image(getClass().getResourceAsStream(nomdimage[1]));
+        Image imageDecline = new Image(getClass().getResourceAsStream(nomdimage[menuData.getSoloColor().ordinal()]));
         bicone.setPadding(new Insets(0,0,0,0));
         bicone.setGraphic(new ImageView(imageDecline));
-        bicone.setStyle("-fx-background-color: " + couleur[1] +";");
+        bicone.setStyle("-fx-background-color: " + couleur[menuData.getSoloColor().ordinal()] +";");
 
 
         bicone.setPrefWidth(largeurScene/3);
@@ -322,7 +343,7 @@ public class Home4 extends Application {
         vBoxCapture.setAlignment(Pos.CENTER);
         vBoxoptionsCharger.setAlignment(Pos.CENTER);
         chargerList.setPrefWidth(largeurScene);
-        vBoxoptionsCharger.setPrefWidth(120);
+        vBoxoptionsCharger.setPrefWidth(150);
         vBoxoptionsCharger.setPrefHeight(kkk);
 
 
@@ -333,7 +354,7 @@ public class Home4 extends Application {
         this.historyChoice = new ToggleGroup();
         for (int i = 1; i < 10;i++) {
 ;           ToggleButton num = new ToggleButton("NUM " + i);
-            num.setPrefWidth(100);
+            num.setPrefWidth(120);
             optionsHistory.add(num);
             num.setToggleGroup(historyChoice);
 
@@ -345,7 +366,7 @@ public class Home4 extends Application {
         ScrollPane sp = new ScrollPane();
         VBox v = new VBox();
         v.getChildren().add(sp);
-        v.setPrefSize(120,100);
+        v.setPrefSize(150,100);
 
         sp.hbarPolicyProperty().set(ScrollPane.ScrollBarPolicy.NEVER);
         vBoxoptionsCharger.setAlignment(Pos.CENTER_LEFT);
@@ -371,21 +392,9 @@ public class Home4 extends Application {
             System.out.println(iterateurIcone);
             setIterateurIcone((iterateurIcone + 1) % 4);
             bicone.setStyle("-fx-background-color: " + couleur[(iterateurIcone+1)%4] +";");
+            //menuData.getSoloColor().ordinal();
             menuData.setSoloColor(PlayerColor.values()[(iterateurIcone+1)%4]);
             bicone.setGraphic(new ImageView(images[(iterateurIcone+1)%4]));
-            /*
-            if(iterateurIcone==nomdimage.length-1) {
-                setIterateurIcone(0);
-                bicone.setStyle("-fx-background-color: " + couleur[0] +";");
-                menuData.setSoloColor(PlayerColor.values()[0]);
-            }
-            else if((iterateurIcone >= 0) && ( iterateurIcone < nomdimage.length)){
-                setIterateurIcone(iterateurIcone + 1 % 4);
-                bicone.setStyle("-fx-background-color: " + couleur[iterateurIcone+1] +";");
-                menuData.setSoloColor(PlayerColor.values()[iterateurIcone+1]);
-            }
-            bicone.setGraphic(new ImageView(images[iterateurIcone+1]));
-            */
         });
 
 
@@ -398,6 +407,7 @@ public class Home4 extends Application {
         bmulti.getStyleClass().add("buttonniveaux4");
         bcharger.getStyleClass().add("buttonniveaux4");
         breprendre.getStyleClass().add("buttonniveaux5");
+        bq.getStyleClass().add("buttonniveaux6");
 
         icone.getStyleClass().add("bin");
         niveaux.getStyleClass().add("bin");
@@ -445,6 +455,12 @@ public class Home4 extends Application {
         vBoxnulle3.getStyleClass().add("b1");
 */
 
+
+        //vBoxCapture.getStyleClass().add("b2");
+        //v.getStyleClass().add("b2");
+        //vBoxScene.getStyleClass().add("b1");
+        //hBoxBas.getStyleClass().add("b3");
+        //vBoxHaut.getStyleClass().add("b1");
         breprendre.setOnAction(this::debug);
 
         root.getChildren().add(vBoxScene);
