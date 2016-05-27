@@ -18,6 +18,7 @@ public class BotPlayerHandler implements PlayerHandler {
     private final BotPlayer bot;
     private final int depth;
 
+    private boolean isFx;
     private TileAction tileAction;
     private BuildingAction buildingAction;
 
@@ -30,8 +31,14 @@ public class BotPlayerHandler implements PlayerHandler {
 
     @Override
     public void startTileStep() {
-        Thread thread = new Thread(this::doStartTileStep);
-        thread.start();
+        isFx = Platform.isFxApplicationThread();
+        if (isFx) {
+            Thread thread = new Thread(this::doStartTileStep);
+            thread.start();
+        }
+        else {
+            doStartTileStep();
+        }
     }
 
     private void doStartTileStep() {
@@ -43,7 +50,12 @@ public class BotPlayerHandler implements PlayerHandler {
 
         this.tileAction = move.tileAction;
         this.buildingAction = move.buildingAction;
-        Platform.runLater(this::finishTileStep);
+        if (isFx) {
+            Platform.runLater(this::finishTileStep);
+        }
+        else {
+            finishTileStep();
+        }
     }
 
     private void finishTileStep() {

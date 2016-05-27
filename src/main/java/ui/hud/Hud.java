@@ -30,6 +30,7 @@ public class Hud extends AnchorPane implements EngineObserver {
     private final VBox leftButtons;
     private final Text textLine;
     private final TextFlow textBottom;
+    //private final TileStackCanvas tileStackCanvas;
 
     public Hud(Engine engine) {
         this.engine = engine;
@@ -47,6 +48,7 @@ public class Hud extends AnchorPane implements EngineObserver {
         IconButton left2 = new IconButton("hud/save.png");
         left2.setOnAction((e) -> System.out.println("Save !"));
         leftButtons.getChildren().addAll(left1, left2);
+        AnchorPane.setLeftAnchor(leftButtons, 0.0);
 
         Font font = new Font(18);
         this.textLine = new Text("");
@@ -54,12 +56,12 @@ public class Hud extends AnchorPane implements EngineObserver {
         this.textBottom = new TextFlow(textLine);
         textBottom.setTextAlignment(TextAlignment.CENTER);
         textBottom.setPadding(new Insets(0, 0, 20, 0));
-
-        AnchorPane.setLeftAnchor(leftButtons, 0.0);
         AnchorPane.setBottomAnchor(textBottom, 0.0);
 
-        getChildren().add(leftButtons);
-        getChildren().add(textBottom);
+        //this.tileStackCanvas = new TileStackCanvas(engine);
+        AnchorPane.setRightAnchor(textBottom, 0.0);
+
+        getChildren().addAll(leftButtons, textBottom);//, tileStackCanvas);
 
         widthProperty().addListener(this::resizeWidth);
         heightProperty().addListener(this::resizeHeight);
@@ -75,7 +77,9 @@ public class Hud extends AnchorPane implements EngineObserver {
     }
 
     private void resizeHeight(Observable observable) {
-        AnchorPane.setTopAnchor(leftButtons, (getHeight() - leftButtons.getHeight()) / 2);
+        double y = (getHeight() - leftButtons.getHeight()) / 2;
+        AnchorPane.setTopAnchor(leftButtons, y);
+        AnchorPane.setTopAnchor(textBottom, y);
         layoutChildren();
     }
 

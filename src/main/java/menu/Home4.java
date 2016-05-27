@@ -1,6 +1,8 @@
 package menu;
 
+import IA.IADifficulty;
 import data.ChoosenColors;
+import data.PlayerColor;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -19,6 +21,7 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import menu.data.MenuData;
+import menu.data.MultiMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -255,7 +258,8 @@ public class Home4 extends Application {
         simple.setToggleGroup(levelChoice);
         moyen.setToggleGroup(levelChoice);
         difficile.setToggleGroup(levelChoice);
-        levelChoice.selectToggle(moyen);
+        levelChoice.selectToggle(levelButtons[menuData.getSoloDifficulty().ordinal()]);
+        levelChoice.selectedToggleProperty().addListener(e -> updateLevel());
 
         simple.setPrefWidth(largeurScene/3);
         moyen.setPrefWidth(largeurScene/3);
@@ -286,7 +290,8 @@ public class Home4 extends Application {
         mt.setToggleGroup(mode);
         mq1.setToggleGroup(mode);
         mq2.setToggleGroup(mode);
-        mode.selectToggle(md);
+        mode.selectToggle(optionsMode[menuData.getMultiMode().ordinal()]);
+        mode.selectedToggleProperty().addListener(e -> updatemode());
 
 
         md.setPrefWidth(largeurScene/2);
@@ -363,16 +368,24 @@ public class Home4 extends Application {
 
 
         bicone.setOnAction(e->{
+            System.out.println(iterateurIcone);
+            setIterateurIcone((iterateurIcone + 1) % 4);
+            bicone.setStyle("-fx-background-color: " + couleur[(iterateurIcone+1)%4] +";");
+            menuData.setSoloColor(PlayerColor.values()[(iterateurIcone+1)%4]);
+            bicone.setGraphic(new ImageView(images[(iterateurIcone+1)%4]));
+            /*
             if(iterateurIcone==nomdimage.length-1) {
                 setIterateurIcone(0);
                 bicone.setStyle("-fx-background-color: " + couleur[0] +";");
+                menuData.setSoloColor(PlayerColor.values()[0]);
             }
             else if((iterateurIcone >= 0) && ( iterateurIcone < nomdimage.length)){
                 setIterateurIcone(iterateurIcone + 1 % 4);
-                bicone.setStyle("-fx-background-color: " + couleur[iterateurIcone] +";");
+                bicone.setStyle("-fx-background-color: " + couleur[iterateurIcone+1] +";");
+                menuData.setSoloColor(PlayerColor.values()[iterateurIcone+1]);
             }
-            bicone.setGraphic(new ImageView(images[iterateurIcone]));
-
+            bicone.setGraphic(new ImageView(images[iterateurIcone+1]));
+            */
         });
 
 
@@ -414,6 +427,8 @@ public class Home4 extends Application {
 
         updateSelectedTab();
         updateCapture();
+        updateLevel();
+        updatemode();
 /*
         vBoxScene.getStyleClass().add("b1");
         hBoxBas.getStyleClass().add("b3");
@@ -459,6 +474,24 @@ public class Home4 extends Application {
         }
     }
 
+    private void updateLevel() {
+        Toggle selected = levelChoice.getSelectedToggle();
+        for(int i = 0; i < levelButtons.length; i++){
+            if(selected == levelButtons[i]){
+                menuData.setSoloDifficulty(IADifficulty.values()[i]);
+            }
+        }
+    }
+
+
+    private void updatemode() {
+        Toggle selected = mode.getSelectedToggle();
+        for(int i = 0; i < optionsMode.length; i++){
+            if(selected == optionsMode[i]){
+                menuData.setMultiMode(MultiMode.values()[i]);
+            }
+        }
+    }
 
     private void setIterateurIcone( int val ){
         iterateurIcone = val;

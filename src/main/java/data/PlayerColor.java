@@ -1,12 +1,13 @@
 package data;
 
 public enum PlayerColor {
+    WHITE,
 
     RED,
 
-    WHITE,
+    YELLOW,
 
-    BROWN,
+    BROWN;
 
-    YELLOW;
+
 }
