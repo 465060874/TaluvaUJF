@@ -1,12 +1,12 @@
 package engine;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.io.Resources;
 import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
-import engine.action.Action;
 import engine.action.ExpandVillageAction;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
@@ -19,7 +19,6 @@ import org.junit.Test;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -49,6 +48,13 @@ public class EngineActionTest {
     private Set<Hex> getPlaceBuildingActionsUnique(Engine engine) {
         Set<Hex> actual = new HashSet<>();
         engine.getPlaceBuildingActions().stream().filter(e -> !actual.add(e.getHex()))
+                .forEach(action -> fail("Duplicated elements " + action));
+        return actual;
+    }
+
+    private Set<ExpandVillageAction> getExpandVillageActionsUnique(Engine engine) {
+        Set<ExpandVillageAction> actual = new HashSet<>();
+        engine.getExpandVillageActions().stream().filter(e -> !actual.add(e))
                 .forEach(action -> fail("Duplicated elements " + action));
         return actual;
     }
@@ -92,6 +98,9 @@ public class EngineActionTest {
 
     @Test
     public void testVolcanoTileActions() {
+        //TODO with Buildings
+        //TODO with Levels
+        //TODO with new tile
         URL rsc = EngineActionTest.class.getResource("EngineTest2.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.allVsAll()
@@ -128,7 +137,7 @@ public class EngineActionTest {
     @Test
     public void updatePlaceBuildingTest() {
         //TODO with Buildings
-        //TODO with Lelels
+        //TODO with Levels
         //TODO with new tile
         URL rsc = EngineActionTest.class.getResource("EngineTest3.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
@@ -157,12 +166,13 @@ public class EngineActionTest {
     }
 
     @Test
-    public void updateExpandVillage() {
+    public void updateExpandVillage_UniqueFieldTypeAndPlayerColor() {
         URL rsc = EngineActionTest.class.getResource("EngineTest4.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.allVsAll()
                 .player(PlayerColor.RED, e -> PlayerHandler.dummy())
                 .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
+                .seed(121216213L)
                 .logLevel(Level.INFO)
                 .island(island)
                 .build();
@@ -226,48 +236,22 @@ public class EngineActionTest {
             Assert.assertEquals(hexOfVillage6, hexOfVillage6Found);
         }
 
+        ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesExpected = ImmutableSetMultimap.builder();
+        builderVillagesExpected.put(island.getVillage(Hex.at(1, -3)), FieldType.JUNGLE);
+        builderVillagesExpected.put(island.getVillage(Hex.at(-2, 1)), FieldType.JUNGLE);
+        builderVillagesExpected.put(island.getVillage(Hex.at(3, -2)), FieldType.JUNGLE);
+        builderVillagesExpected.put(island.getVillage(Hex.at(1, 3)), FieldType.JUNGLE);
+        builderVillagesExpected.put(island.getVillage(Hex.at(4, -1)), FieldType.JUNGLE);
+        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeExpected = builderVillagesExpected.build();
 
-        final Iterable<Village> villagesRedFound = engine.getIsland().getVillages(PlayerColor.RED);
-        for (Village village : villagesRedFound) {
-            System.out.println(village.getHexes());
+        Set<ExpandVillageAction> actualAction = getExpandVillageActionsUnique(engine);
+        ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesActual = ImmutableSetMultimap.builder();
+        for (ExpandVillageAction expandVillageAction : actualAction) {
+            builderVillagesActual.put(expandVillageAction.getVillage(island), expandVillageAction.getFieldType());
         }
+        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeActual = builderVillagesActual.build();
 
-        /*
-        System.out.println("0----------------------");
-        final List<ExpandVillageAction> newExpandVillageActions = engine.getNewExpandVillageActions();
-        System.out.println(newExpandVillageActions.size());
-        for (ExpandVillageAction newExpandVillageAction : newExpandVillageActions) {
-            final Set<Hex> hexes = newExpandVillageAction.getVillage(island).getHexes();
-            for (Hex hex : hexes) {
-                System.out.println(hex);
-            }
-            System.out.println("1===============");
-        }
-        System.out.println("2===============");
-        */
-
-        List<ExpandVillageAction> actual = engine.getExpandVillageActions();
-        ImmutableSet.Builder<Hex> builderF = ImmutableSet.builder();
-        for (ExpandVillageAction expandVillageAction : actual) {
-            final Hex villageHex = expandVillageAction.getVillageHex();
-            builderF.add(villageHex);
-        }
-        ImmutableSet<Hex> hexOfVillageActual = builderF.build();
-
-
-        ImmutableSet.Builder<Hex> builderE = ImmutableSet.builder();
-        builderE.add(Hex.at(1, -2));
-        builderE.add(Hex.at(3, -3));
-        builderE.add(Hex.at(4, -3));
-        builderE.add(Hex.at(4, -2));
-        builderE.add(Hex.at(2, -1));
-        builderE.add(Hex.at(3, 0));
-        builderE.add(Hex.at(4, 0));
-        builderE.add(Hex.at(1, 2));
-        builderE.add(Hex.at(-1, 1));
-        ImmutableSet<Hex> hexOfVillageExpected = builderE.build();
-
-        Assert.assertEquals(hexOfVillageExpected, hexOfVillageActual);
+        Assert.assertEquals(villagesFieldTypeExpected, villagesFieldTypeActual);
     }
 
 }

@@ -177,40 +177,15 @@ class EngineActions {
         Island island = engine.getIsland();
         Iterable<Village> villages = island.getVillages(engine.getCurrentPlayer().getColor());
 
-        HexMap<List<ExpandVillageAction>> expandsMap = HexMap.create();
-        for (Village village : villages) {
-            Hex firstHex = village.getHexes().iterator().next();
-            boolean[] types = new boolean[FieldType.values().length];
-            for (Hex hex : village.getHexes()) {
-                final Iterable<Hex> neighborhood = hex.getNeighborhood();
-                for (Hex neighbor : neighborhood) {
-                    Field field = island.getField(neighbor);
-                    if (field != Field.SEA
-                            && field.getType().isBuildable()
-                            && field.getBuilding().getType() == BuildingType.NONE) {
-                        types[field.getType().ordinal()] = true;
-                    }
-                }
-            }
-
-            List<ExpandVillageAction> actions = new ArrayList<>(FieldType.values().length);
-            for (FieldType fieldType : FieldType.values()) {
-                if (types[fieldType.ordinal()]
-                        && ExpandVillageRules.validate(engine, village, fieldType)) {
-                    actions.add(new ExpandVillageAction(firstHex, fieldType));
-                }
-            }
-            if (!actions.isEmpty()) {
-                for (Hex hex : village.getHexes()) {
-                    expandsMap.put(hex, actions);
-                }
-            }
-        }
-
         ImmutableList.Builder<ExpandVillageAction> builder = ImmutableList.builder();
-        for (List<ExpandVillageAction> actions : expandsMap.values()) {
-            builder.addAll(actions);
+        for (Village village : villages) {
+            for (FieldType fieldType : FieldType.values()) {
+                if (ExpandVillageRules.validate(engine, village, fieldType)) {
+                    builder.add(new ExpandVillageAction(village, fieldType));
+                }
+            }
         }
+
         this.expandVillages = builder.build();
     }
 

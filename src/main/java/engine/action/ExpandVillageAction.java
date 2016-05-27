@@ -53,4 +53,6 @@ public class ExpandVillageAction implements BuildingAction {
         FieldType fieldType = FieldType.valueOf(reader.readLine());
         return new ExpandVillageAction(Hex.at(line, diag), fieldType);
     }
+
+
 }
