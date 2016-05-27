@@ -30,7 +30,7 @@ public class Hud extends AnchorPane implements EngineObserver {
     private final VBox leftButtons;
     private final Text textLine;
     private final TextFlow textBottom;
-    private final TileStackCanvas tileStackCanvas;
+    //private final TileStackCanvas tileStackCanvas;
 
     public Hud(Engine engine) {
         this.engine = engine;
@@ -58,7 +58,7 @@ public class Hud extends AnchorPane implements EngineObserver {
         textBottom.setPadding(new Insets(0, 0, 20, 0));
         AnchorPane.setBottomAnchor(textBottom, 0.0);
 
-        this.tileStackCanvas = new TileStackCanvas(engine);
+        //this.tileStackCanvas = new TileStackCanvas(engine);
         AnchorPane.setRightAnchor(textBottom, 0.0);
 
         getChildren().addAll(leftButtons, textBottom);//, tileStackCanvas);
