@@ -155,7 +155,14 @@ public class HexShape {
 
     public void draw(GraphicsContext gc, Grid grid,
                      double x, double y, int level, FieldType fieldType, Orientation orientation, HexStyle style) {
-        updatePolygon(grid, x, y, level, orientation);
+        updatePolygon(grid, x, y, Math.max(1, level), orientation);
+
+        if (level == 0) {
+            gc.setEffect(Theme.getCurrent().getTileTopEffect(grid, style));
+            gc.setFill(Theme.getCurrent().getSeaPaint());
+            gc.fillPolygon(hexagonX, hexagonY, HEXAGON_POINTS);
+            return;
+        }
 
         // Fill shape
         gc.setEffect(Theme.getCurrent().getTileTopEffect(grid, style));

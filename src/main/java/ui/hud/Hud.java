@@ -149,6 +149,12 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     @Override
     public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
+        tileStackCanvas.redraw();
+        tileStackSize.setText(Integer.toString(engine.getVolcanoTileStack().size()));
+        for (PlayerView playerView : playerViews) {
+            playerView.updateTurn();
+        }
+
         if (winners.size() == 1) {
             updateText("Le joueur " + winners.get(0).getColor() + " a gagné !");
         }

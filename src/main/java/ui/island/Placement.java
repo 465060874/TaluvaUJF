@@ -10,8 +10,12 @@ import engine.Engine;
 import engine.action.*;
 import engine.rules.PlaceBuildingRules;
 import engine.rules.TileRules;
-import map.*;
+import map.Field;
+import map.Hex;
+import map.Orientation;
+import map.Village;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,7 +23,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 public class Placement {
 
-    private Mode saveMode;
 
     public enum Mode {
         NONE,
@@ -38,7 +41,10 @@ public class Placement {
     double mouseY;
 
     Mode mode;
+    Mode saveMode;
+
     boolean valid;
+    Set<Hex> validHexes;
     Hex hex;
 
     VolcanoTile tile;
@@ -90,13 +96,31 @@ public class Placement {
         this.mode = Mode.TILE;
         this.tile = tile;
         this.tileOrientation = Orientation.NORTH;
+
+        this.validHexes = new HashSet<>();
+        for (TileAction action : engine.getVolcanoTileActions()) {
+            validHexes.add(action.getVolcanoHex());
+            validHexes.add(action.getLeftHex());
+            validHexes.add(action.getRightHex());
+        }
+
         updateValidTile();
+        islandCanvas.redraw();
     }
 
     public void build(PlayerColor color) {
         this.mode = Mode.BUILDING;
         this.buildingType = BuildingType.HUT;
         this.buildingColor = color;
+
+        this.validHexes = new HashSet<>();
+        for (PlaceBuildingAction action : engine.getPlaceBuildingActions()) {
+            validHexes.add(action.getHex());
+        }
+        for (ExpandVillageAction action : engine.getExpandVillageActions()) {
+            validHexes.addAll(action.getVillage(engine.getIsland()).getHexes());
+        }
+
         updateValidBuilding();
         islandCanvas.redraw();
     }

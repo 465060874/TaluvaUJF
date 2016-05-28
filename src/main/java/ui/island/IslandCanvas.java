@@ -96,7 +96,13 @@ class IslandCanvas extends Canvas {
             Orientation orientation = field.getOrientation();
             Building building;
             HexStyle hexStyle;
-            if (placement.mode == Placement.Mode.EXPAND_VILLAGE) {
+            if (placement.mode == Placement.Mode.TILE) {
+                building = field.getBuilding();
+                hexStyle = placement.validHexes.contains(hex)
+                        ? HexStyle.NORMAL
+                        : HexStyle.FADED;
+            }
+            else if (placement.mode == Placement.Mode.EXPAND_VILLAGE) {
                 if (placement.expansionHexes.contains(hex)) {
                     building = Building.of(BuildingType.HUT, placement.expansionVillage.getColor());
                     hexStyle = HexStyle.HIGHLIGHTED;
@@ -111,14 +117,18 @@ class IslandCanvas extends Canvas {
                     hexStyle = HexStyle.FADED;
                 }
             }
-            else if (placement.valid && placement.mode == Placement.Mode.BUILDING) {
-                if (placement.hex.equals(hex)) {
+            else if (placement.mode == Placement.Mode.BUILDING) {
+                if (placement.valid && placement.hex.equals(hex)) {
                     building = Building.of(placement.buildingType, placement.buildingColor);
                     hexStyle = HexStyle.HIGHLIGHTED;
                 }
-                else {
+                else if (placement.validHexes.contains(hex)) {
                     building = field.getBuilding();
                     hexStyle = HexStyle.NORMAL;
+                }
+                else {
+                    building = field.getBuilding();
+                    hexStyle = HexStyle.FADED;
                 }
             }
             else {
@@ -126,10 +136,9 @@ class IslandCanvas extends Canvas {
                 hexStyle = HexStyle.NORMAL;
             }
 
-            HexToDraw info = new HexToDraw(x, y, level,
+            hexesToDraw.add(new HexToDraw(x, y, level,
                     fieldType, orientation, hexStyle,
-                    building, BuildingStyle.NORMAL);
-            hexesToDraw.add(info);
+                    building, BuildingStyle.NORMAL));
         }
     }
 

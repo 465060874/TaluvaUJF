@@ -34,8 +34,14 @@ public class TileStackCanvas extends Canvas {
         setWidth(width + 10);
         setHeight(height);
 
+        GraphicsContext gc = getGraphicsContext2D();
+        if (engine.getVolcanoTileStack().isEmpty()) {
+            gc.clearRect(0, 0, getWidth(), getHeight());
+            return;
+        }
         VolcanoTile tile = engine.getVolcanoTileStack().current();
         if (tile == null) {
+            gc.clearRect(0, 0, getWidth(), getHeight());
             return;
         }
 
@@ -48,7 +54,6 @@ public class TileStackCanvas extends Canvas {
         double rightX = volcanoX + grid.neighborToXOffset(rightNeighbor);
         double rightY = volcanoY + grid.neighborToYOffset(rightNeighbor);
 
-        GraphicsContext gc = getGraphicsContext2D();
         hexShape.draw(gc, grid, volcanoX, volcanoY, 1, FieldType.VOLCANO, Orientation.NORTH, HexStyle.NORMAL);
         hexShape.draw(gc, grid, leftX, leftY, 1, tile.getLeft(), Orientation.SOUTH_WEST, HexStyle.NORMAL);
         hexShape.draw(gc, grid, rightX, rightY, 1, tile.getRight(), Orientation.SOUTH_EAST, HexStyle.NORMAL);
