@@ -43,12 +43,26 @@ public class FXUI extends Application {
 
     public class FXUIPlayerHandler implements PlayerHandler {
 
-        private final EventHandler<MouseEvent> mouseClickedTile;
-        private final EventHandler<MouseEvent> mouseClickedBuild;
+        private final EventHandler<MouseEvent> mousePressed;
+        private final EventHandler<MouseEvent> mouseDragged;
+        private final EventHandler<MouseEvent> mouseReleasedTile;
+        private final EventHandler<MouseEvent> mouseReleasedBuild;
+
+        private boolean dragged;
 
         public FXUIPlayerHandler() {
-            this.mouseClickedTile = this::mouseClickedTile;
-            this.mouseClickedBuild = this::mouseClickedBuild;
+            this.mousePressed = this::mousePressed;
+            this.mouseDragged = this::mouseDragged;
+            this.mouseReleasedTile = this::mouseReleasedTile;
+            this.mouseReleasedBuild = this::mouseReleasedBuild;
+        }
+
+        private void mousePressed(MouseEvent mouseEvent) {
+            dragged = false;
+        }
+
+        private void mouseDragged(MouseEvent mouseEvent) {
+            dragged = true;
         }
 
         @Override
@@ -60,23 +74,38 @@ public class FXUI extends Application {
             }
 
             gameView.getPlacement().placeTile(engine.getVolcanoTileStack().current());
-            gameView.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickedTile);
+            gameView.addEventHandler(MouseEvent.MOUSE_PRESSED, mousePressed);
+            gameView.addEventHandler(MouseEvent.MOUSE_DRAGGED, mouseDragged);
+            gameView.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseReleasedTile);
         }
 
         @Override
         public void startBuildStep() {
             gameView.getPlacement().build(engine.getCurrentPlayer().getColor());
-            gameView.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickedBuild);
+            gameView.addEventHandler(MouseEvent.MOUSE_PRESSED, mousePressed);
+            gameView.addEventHandler(MouseEvent.MOUSE_DRAGGED, mouseDragged);
+            gameView.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseReleasedBuild);
         }
 
         @Override
         public void cancel() {
             gameView.getPlacement().cancel();
+            gameView.removeEventHandler(MouseEvent.MOUSE_PRESSED, mousePressed);
+            gameView.removeEventHandler(MouseEvent.MOUSE_DRAGGED, mouseDragged);
+            gameView.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseReleasedTile);
+            gameView.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseReleasedBuild);
         }
 
-        private void mouseClickedTile(MouseEvent event) {
+        private void mouseReleasedTile(MouseEvent event) {
+
             if (event.getButton() == MouseButton.PRIMARY && gameView.getPlacement().isValid()) {
-                gameView.removeEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickedTile);
+                if (dragged) {
+                    return;
+                }
+
+                gameView.removeEventHandler(MouseEvent.MOUSE_PRESSED, mousePressed);
+                gameView.removeEventHandler(MouseEvent.MOUSE_DRAGGED, mouseDragged);
+                gameView.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseReleasedTile);
                 Action action = gameView.getPlacement().getAction();
                 gameView.getPlacement().cancel();
                 engine.action(action);
@@ -86,10 +115,16 @@ public class FXUI extends Application {
             }
         }
 
-        private void mouseClickedBuild(MouseEvent event) {
+        private void mouseReleasedBuild(MouseEvent event) {
             if (event.getButton() == MouseButton.PRIMARY) {
+                if (dragged) {
+                    return;
+                }
+
                 if (gameView.getPlacement().isValid()) {
-                    gameView.removeEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickedBuild);
+                    gameView.removeEventHandler(MouseEvent.MOUSE_PRESSED, mousePressed);
+                    gameView.removeEventHandler(MouseEvent.MOUSE_DRAGGED, mouseDragged);
+                    gameView.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseReleasedBuild);
                     Action action = gameView.getPlacement().getAction();
                     gameView.getPlacement().cancel();
                     engine.action(action);
