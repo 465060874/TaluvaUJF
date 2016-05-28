@@ -16,10 +16,9 @@ import ui.island.Grid;
 
 public class BasicTheme implements Theme {
 
-    private final Background islandBackground = new Background(new BackgroundFill(
-            Color.web("5E81A2"),
-            CornerRadii.EMPTY,
-            Insets.EMPTY));
+    private final Color SEA_COLOR = Color.web("5E81A2");
+    private final Background islandBackground = new Background(
+            new BackgroundFill(SEA_COLOR, CornerRadii.EMPTY, Insets.EMPTY));
     private final Color tileBorderColor = Color.web("303030");
     private final Color tileBottomColor = Color.web("707070");
     private final Color tileVolcanoColor = Color.web("E97B33");
@@ -35,6 +34,11 @@ public class BasicTheme implements Theme {
     @Override
     public Background getIslandBackground() {
         return islandBackground;
+    }
+
+    @Override
+    public Paint getSeaPaint() {
+        return SEA_COLOR;
     }
 
     @Override

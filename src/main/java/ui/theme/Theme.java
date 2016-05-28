@@ -18,6 +18,9 @@ public interface Theme {
 
     static Theme change() {
         if (CurrentTheme.THEME instanceof ImageTheme) {
+            CurrentTheme.THEME = new SphaxTheme();
+        }
+        else if (CurrentTheme.THEME instanceof SphaxTheme) {
             CurrentTheme.THEME = new BasicTheme();
         }
         else {
@@ -38,6 +41,8 @@ public interface Theme {
     }
 
     Background getIslandBackground();
+
+    Paint getSeaPaint();
 
     Paint getTileBorderPaint(HexStyle style);
 
