@@ -1,10 +1,12 @@
 package ui.shape;
 
+import data.FieldType;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import map.Orientation;
 import ui.island.Grid;
+import ui.theme.HexStyle;
 import ui.theme.Theme;
 
 public class HexShape {
@@ -40,33 +42,32 @@ public class HexShape {
         this.bottomBorderY = new double[BOTTOM_BORDER_POINTS];
     }
 
-    private void update(Grid grid, HexShapeInfo info) {
+    private void updatePolygon(Grid grid, double x, double y, int level, Orientation orientation) {
         double hexHeight = grid.getHexHeight();
-        double x = info.x;
-        double y = info.y - (info.level - 1) * hexHeight;
+        double y2 = y - (level - 1) * hexHeight;
         double halfWidth = grid.getHexHalfWidth();
         double midY = grid.getHexRadiusY() / 2;
-        double bottomDepth = hexHeight * info.level;
+        double bottomDepth = hexHeight * level;
 
         hexagonX[0] = x - halfWidth;
-        hexagonY[0] = y + midY;
+        hexagonY[0] = y2 + midY;
 
         hexagonX[1] = x;
-        hexagonY[1] = y + grid.getHexRadiusY();
+        hexagonY[1] = y2 + grid.getHexRadiusY();
 
         hexagonX[2] = x + halfWidth;
-        hexagonY[2] = y + midY;
+        hexagonY[2] = y2 + midY;
 
         hexagonX[3] = x + halfWidth;
-        hexagonY[3] = y - midY;
+        hexagonY[3] = y2 - midY;
 
         hexagonX[4] = x;
-        hexagonY[4] = y - grid.getHexRadiusY();
+        hexagonY[4] = y2 - grid.getHexRadiusY();
 
         hexagonX[5] = x - halfWidth;
-        hexagonY[5] = y - midY;
+        hexagonY[5] = y2 - midY;
 
-        int orientationOffset = orientationOffset(info.orientation);
+        int orientationOffset = orientationOffset(orientation);
 
         hexagonBorderX[0] = hexagonX[(orientationOffset) % 6];
         hexagonBorderY[0] = hexagonY[(orientationOffset) % 6];
@@ -152,28 +153,29 @@ public class HexShape {
         bottomBorderY[4] = hexagonY[2] + bottomDepth1;
     }
 
-    public void draw(GraphicsContext gc, Grid grid, HexShapeInfo info) {
-        update(grid, info);
+    public void draw(GraphicsContext gc, Grid grid,
+                     double x, double y, int level, FieldType fieldType, Orientation orientation, HexStyle style) {
+        updatePolygon(grid, x, y, level, orientation);
 
         // Fill shape
-        gc.setEffect(Theme.getCurrent().getTileTopEffect(grid, info.placementState));
-        gc.setFill(Theme.getCurrent().getTileTopPaint(info.fieldType, info.placementState));
+        gc.setEffect(Theme.getCurrent().getTileTopEffect(grid, style));
+        gc.setFill(Theme.getCurrent().getTileTopPaint(fieldType, style));
         gc.fillPolygon(hexagonX, hexagonY, HEXAGON_POINTS);
 
-        gc.setEffect(Theme.getCurrent().getTileBottomEffect(grid, info.placementState));
-        gc.setFill(Theme.getCurrent().getTileBottomPaint(info.placementState));
+        gc.setEffect(Theme.getCurrent().getTileBottomEffect(grid, style));
+        gc.setFill(Theme.getCurrent().getTileBottomPaint(style));
         gc.fillPolygon(bottomX, bottomY, HEXAGON_POINTS);
         gc.setEffect(null);
 
         // Draw borders
-        gc.setStroke(Theme.getCurrent().getTileBorderPaint(info.placementState));
+        gc.setStroke(Theme.getCurrent().getTileBorderPaint(style));
         gc.setLineWidth(STROKE_WIDTH * grid.getScale());
         gc.setLineCap(StrokeLineCap.ROUND);
         gc.setLineJoin(StrokeLineJoin.ROUND);
 
         gc.strokePolyline(hexagonBorderX, hexagonBorderY, HEXAGON_BORDER_POINTS);
-        for (int i = 1; i <= info.level; i++) {
-            bottomBorderLevel(grid, i, info.level);
+        for (int i = 1; i <= level; i++) {
+            bottomBorderLevel(grid, i, level);
             gc.strokePolyline(bottomBorderX, bottomBorderY, BOTTOM_BORDER_POINTS);
         }
     }

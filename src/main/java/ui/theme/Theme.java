@@ -39,25 +39,25 @@ public interface Theme {
 
     Background getIslandBackground();
 
-    Paint getTileBorderPaint(PlacementState placementState);
+    Paint getTileBorderPaint(HexStyle style);
 
-    Paint getTileBottomPaint(PlacementState placementState);
+    Paint getTileBottomPaint(HexStyle style);
 
-    Effect getTileBottomEffect(Grid grid, PlacementState placementState);
+    Effect getTileBottomEffect(Grid grid, HexStyle style);
 
-    Paint getTileTopPaint(FieldType type, PlacementState placementState);
+    Paint getTileTopPaint(FieldType type, HexStyle style);
 
-    Effect getTileTopEffect(Grid grid, PlacementState placementState);
+    Effect getTileTopEffect(Grid grid, HexStyle style);
 
     Paint getBuildingBorderPaint();
 
-    Paint getBuildingFacePaint(Building building, PlacementState placementState);
+    Paint getBuildingFacePaint(Building building, BuildingStyle style);
 
-    Effect getBuildingFaceEffect(Grid grid, Building building, PlacementState placementState);
+    Effect getBuildingFaceEffect(Grid grid, Building building, BuildingStyle style);
 
-    Paint getBuildingTopPaint(Building building, PlacementState placementState);
+    Paint getBuildingTopPaint(Building building, BuildingStyle style);
 
-    Effect getBuildingTopEffect(Grid grid, Building building, PlacementState placementState);
+    Effect getBuildingTopEffect(Grid grid, Building building, BuildingStyle style);
 
     class CurrentTheme {
 

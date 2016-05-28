@@ -20,7 +20,7 @@ public class ImageTheme extends BasicTheme {
     private final ImagePattern lake = loadImagePattern("fields/lake.png");
 
     @Override
-    public Paint getTileTopPaint(FieldType type, PlacementState placementState) {
+    public Paint getTileTopPaint(FieldType type, HexStyle style) {
         switch (type) {
             case VOLCANO:  return volcano;
             case JUNGLE:   return jungle;

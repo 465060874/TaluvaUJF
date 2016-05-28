@@ -1,34 +1,33 @@
 package ui.island;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
 import data.BuildingType;
+import data.FieldType;
 import javafx.beans.Observable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
-import map.Field;
-import map.Building;
-import map.Hex;
-import map.Island;
+import map.*;
+import ui.shape.BuildingShape;
 import ui.shape.HexShape;
-import ui.shape.HexShapeInfo;
-import ui.theme.PlacementState;
+import ui.theme.BuildingStyle;
+import ui.theme.HexStyle;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static data.FieldType.VOLCANO;
-import static ui.shape.BuildingShapes.drawBuilding;
 
 class IslandCanvas extends Canvas {
 
     private final Island island;
-    private final boolean debug;
-    private final HexShape hexShape;
     private final Grid grid;
     private final Placement placement;
+    private final boolean debug;
+
+    private final HexShape hexShape;
+    private final BuildingShape buildingShape;
 
     IslandCanvas(Island island, Grid grid, Placement placement, boolean debug) {
         super(0, 0);
@@ -36,46 +35,12 @@ class IslandCanvas extends Canvas {
         this.grid = grid;
         this.placement = placement;
         this.debug = debug;
+
         this.hexShape = new HexShape();
+        this.buildingShape = new BuildingShape();
 
         widthProperty().addListener(this::resize);
         heightProperty().addListener(this::resize);
-    }
-
-    private ImmutableList<HexShapeInfo> placedInfos(double centerX, double centerY) {
-        HexShapeInfo info1 = new HexShapeInfo();
-        HexShapeInfo info2 = new HexShapeInfo();
-        HexShapeInfo info3 = new HexShapeInfo();
-
-        info1.placementState = info2.placementState = info3.placementState = PlacementState.VALID;
-
-        int level = island.getField(placement.hex).getLevel() + 1;
-
-        Hex hex1 = placement.hex;
-        info1.x = grid.hexToX(hex1, getWidth());
-        info1.y = grid.hexToY(hex1, getHeight());
-        info1.level = level;
-        info1.fieldType = VOLCANO;
-        info1.orientation = placement.tileOrientation;
-        info1.building = Building.of(BuildingType.NONE, null);
-
-        Hex hex2 = placement.hex.getLeftNeighbor(placement.tileOrientation);
-        info2.x = grid.hexToX(hex2, getWidth());
-        info2.y = grid.hexToY(hex2, getHeight());
-        info2.level = level;
-        info2.fieldType = placement.tile.getLeft();
-        info2.orientation = placement.tileOrientation.leftRotation();
-        info2.building = Building.of(BuildingType.NONE, null);
-
-        Hex hex3 = placement.hex.getRightNeighbor(placement.tileOrientation);
-        info3.x = grid.hexToX(hex3, getWidth());
-        info3.y = grid.hexToY(hex3, getHeight());
-        info3.level = level;
-        info3.fieldType = placement.tile.getRight();
-        info3.orientation = placement.tileOrientation.rightRotation();
-        info3.building = Building.of(BuildingType.NONE, null);
-
-        return ImmutableList.of(info1, info2, info3);
     }
 
     private void resize(Observable event) {
@@ -89,107 +54,165 @@ class IslandCanvas extends Canvas {
         double centerX = getWidth() / 2 - grid.getOx();
         double centerY = getHeight() / 2 - grid.getOy();
 
-        List<HexShapeInfo> infos = new ArrayList<>();
-        for (Hex hex : island.getFields()) {
-            HexShapeInfo info = new HexShapeInfo();
-            info.x = grid.hexToX(hex, getWidth());
-            info.y = grid.hexToY(hex, getHeight());
-            info.placementState = PlacementState.NONE;
-            Field field = island.getField(hex);
-            info.level = field.getLevel();
-            info.fieldType = field.getType();
-            info.orientation = field.getOrientation();
-            if (placement.mode == Placement.Mode.EXPAND_VILLAGE) {
-                if (placement.expansionHexes.contains(hex)) {
-                    info.building = Building.of(BuildingType.HUT, placement.expansionVillage.getColor());
-                    info.placementState = PlacementState.VALID;
-                }
-                else if (placement.expansionVillage.getHexes().contains(hex)
-                        || placement.expansionVillage.getExpandableHexes().containsValue(hex)) {
-                    info.building = field.getBuilding();
-                    info.placementState = PlacementState.NONE;
-                }
-                else {
-                    info.building = field.getBuilding();
-                    info.placementState = PlacementState.INVALID;
-                }
-            }
-            else if (placement.valid && placement.mode == Placement.Mode.BUILDING) {
-                if (placement.hex.equals(hex)) {
-                    info.placementState = PlacementState.VALID;
-                    info.building = Building.of(placement.buildingType, placement.buildingColor);
-                }
-                else {
-                    info.building = field.getBuilding();
-                    info.placementState = PlacementState.NONE;
-                }
-            }
-            else {
-                info.building = field.getBuilding();
-                info.placementState = PlacementState.NONE;
-            }
-
-            if (!isOutside(info)) {
-                infos.add(info);
-            }
-        }
+        List<HexToDraw> hexesToDraw = new ArrayList<>();
+        islandHexes(hexesToDraw);
 
         if (placement.valid && placement.mode == Placement.Mode.TILE) {
-            placedInfos(centerX, centerY).stream()
-                    .filter(info -> !isOutside(info))
-                    .forEach(infos::add);
+            placedHexes(hexesToDraw);
         }
 
         // Affichage de la map
-        for (HexShapeInfo info : Ordering.natural().sortedCopy(infos)) {
-            hexShape.draw(gc, grid, info);
+        for (HexToDraw hexToDraw : Ordering.natural().sortedCopy(hexesToDraw)) {
+            hexShape.draw(gc, grid,
+                    hexToDraw.x, hexToDraw.y, hexToDraw.level,
+                    hexToDraw.fieldType, hexToDraw.orientation, hexToDraw.hexStyle);
 
-            Building building = info.building;
-            if (building.getType() != BuildingType.NONE) {
-                //info.y -= grid.getHexRadiusY();
-                drawBuilding(gc, grid, info);
+            if (hexToDraw.building.getType() != BuildingType.NONE) {
+                buildingShape.draw(gc, grid,
+                        hexToDraw.x, hexToDraw.y, hexToDraw.level,
+                        hexToDraw.building, hexToDraw.buildingStyle);
             }
         }
 
         if (debug) {
-            int minLine = Integer.MAX_VALUE;
-            int minDiag = Integer.MAX_VALUE;
-            int maxLine = Integer.MIN_VALUE;
-            int maxDiag = Integer.MIN_VALUE;
-
-            for (Hex hex : island.getFields()) {
-                minLine = Math.min(minLine, hex.getLine());
-                minDiag = Math.min(minDiag, hex.getDiag());
-                maxLine = Math.max(maxLine, hex.getLine());
-                maxDiag = Math.max(maxDiag, hex.getDiag());
-            }
-
-            minLine -= 3;
-            minDiag -= 3;
-            maxLine += 3;
-            maxDiag += 3;
-            for (int line = minLine; line <= maxLine; line++) {
-                for (int diag = minDiag; diag <= maxDiag; diag++) {
-                    Hex hex = Hex.at(line, diag);
-                    double x = grid.hexToX(hex, getWidth());
-                    double y = grid.hexToY(hex, getHeight());
-                    String hexStr = line + "," + diag;
-                    gc.setTextAlign(TextAlignment.CENTER);
-                    gc.setFill(Color.BLACK);
-                    gc.fillText(hexStr, x, y);
-                }
-            }
+            drawCoordinates(gc);
         }
 
         setTranslateX(-getWidth() / 3);
         setTranslateY(-getHeight() / 3);
     }
 
-    private boolean isOutside(HexShapeInfo info) {
-        double minX = info.x - grid.getHexRadiusX();
-        double minY = info.y - grid.getHexRadiusY();
-        double maxX = info.x - grid.getHexRadiusX();
-        double maxY = info.y - grid.getHexRadiusY();
+    private void islandHexes(List<HexToDraw> hexesToDraw) {
+        for (Hex hex : island.getFields()) {
+            double x = grid.hexToX(hex, getWidth());
+            double y = grid.hexToY(hex, getHeight());
+            if (isOutside(x, y)) {
+                continue;
+            }
+
+            Field field = island.getField(hex);
+            int level = field.getLevel();
+            FieldType fieldType = field.getType();
+            Orientation orientation = field.getOrientation();
+            Building building;
+            HexStyle hexStyle;
+            if (placement.mode == Placement.Mode.EXPAND_VILLAGE) {
+                if (placement.expansionHexes.contains(hex)) {
+                    building = Building.of(BuildingType.HUT, placement.expansionVillage.getColor());
+                    hexStyle = HexStyle.HIGHLIGHTED;
+                }
+                else if (placement.expansionVillage.getHexes().contains(hex)
+                        || placement.expansionVillage.getExpandableHexes().containsValue(hex)) {
+                    building = field.getBuilding();
+                    hexStyle = HexStyle.NORMAL;
+                }
+                else {
+                    building = field.getBuilding();
+                    hexStyle = HexStyle.FADED;
+                }
+            }
+            else if (placement.valid && placement.mode == Placement.Mode.BUILDING) {
+                if (placement.hex.equals(hex)) {
+                    building = Building.of(placement.buildingType, placement.buildingColor);
+                    hexStyle = HexStyle.HIGHLIGHTED;
+                }
+                else {
+                    building = field.getBuilding();
+                    hexStyle = HexStyle.NORMAL;
+                }
+            }
+            else {
+                building = field.getBuilding();
+                hexStyle = HexStyle.NORMAL;
+            }
+
+            HexToDraw info = new HexToDraw(x, y, level,
+                    fieldType, orientation, hexStyle,
+                    building, BuildingStyle.NORMAL);
+            hexesToDraw.add(info);
+        }
+    }
+
+    private void placedHexes(List<HexToDraw> hexesToDraw) {
+        Hex hexTop = placement.hex;
+        Hex hexLeft = placement.hex.getLeftNeighbor(placement.tileOrientation);
+        Hex hexRight = placement.hex.getRightNeighbor(placement.tileOrientation);
+
+        int level = island.getField(placement.hex).getLevel() + 1;
+        HexToDraw info1 = new HexToDraw(
+                grid.hexToX(hexTop, getWidth()),
+                grid.hexToY(hexTop, getHeight()),
+                level,
+                VOLCANO,
+                placement.tileOrientation,
+                HexStyle.HIGHLIGHTED,
+                Building.none(),
+                BuildingStyle.NORMAL);
+        HexToDraw info2 = new HexToDraw(
+                grid.hexToX(hexLeft, getWidth()),
+                grid.hexToY(hexLeft, getHeight()),
+                level,
+                placement.tile.getLeft(),
+                placement.tileOrientation.leftRotation(),
+                HexStyle.HIGHLIGHTED,
+                Building.none(),
+                BuildingStyle.NORMAL);
+        HexToDraw info3 = new HexToDraw(
+                grid.hexToX(hexRight, getWidth()),
+                grid.hexToY(hexRight, getHeight()),
+                level,
+                placement.tile.getRight(),
+                placement.tileOrientation.rightRotation(),
+                HexStyle.HIGHLIGHTED,
+                Building.none(),
+                BuildingStyle.NORMAL);
+
+        if (!isOutside(info1.x, info1.y)) {
+            hexesToDraw.add(info1);
+        }
+        if (!isOutside(info2.x, info2.y)) {
+            hexesToDraw.add(info2);
+        }
+        if (!isOutside(info3.x, info3.y)) {
+            hexesToDraw.add(info3);
+        }
+    }
+
+    private boolean isOutside(double x, double y) {
+        double minX = x - grid.getHexRadiusX();
+        double minY = y - grid.getHexRadiusY();
+        double maxX = x - grid.getHexRadiusX();
+        double maxY = y - grid.getHexRadiusY();
         return maxX < 0 || maxY < 0 || minX > getWidth() || minY > getHeight();
+    }
+
+    private void drawCoordinates(GraphicsContext gc) {
+        int minLine = Integer.MAX_VALUE;
+        int minDiag = Integer.MAX_VALUE;
+        int maxLine = Integer.MIN_VALUE;
+        int maxDiag = Integer.MIN_VALUE;
+
+        for (Hex hex : island.getFields()) {
+            minLine = Math.min(minLine, hex.getLine());
+            minDiag = Math.min(minDiag, hex.getDiag());
+            maxLine = Math.max(maxLine, hex.getLine());
+            maxDiag = Math.max(maxDiag, hex.getDiag());
+        }
+
+        minLine -= 3;
+        minDiag -= 3;
+        maxLine += 3;
+        maxDiag += 3;
+        for (int line = minLine; line <= maxLine; line++) {
+            for (int diag = minDiag; diag <= maxDiag; diag++) {
+                Hex hex = Hex.at(line, diag);
+                double x = grid.hexToX(hex, getWidth());
+                double y = grid.hexToY(hex, getHeight());
+                String hexStr = line + "," + diag;
+                gc.setTextAlign(TextAlignment.CENTER);
+                gc.setFill(Color.BLACK);
+                gc.fillText(hexStr, x, y);
+            }
+        }
     }
 }

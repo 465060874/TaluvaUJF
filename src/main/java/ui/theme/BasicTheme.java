@@ -29,8 +29,8 @@ public class BasicTheme implements Theme {
     private final Color tileRockColor = Color.web("C2D0D1");
     private final Color tileLakeColor = Color.web("8BE1EB");
     private final Lighting lighting = new Lighting(new Light.Point(0, 0, 0, Color.WHITE));
-    private final Lighting lightingValid = new Lighting(new Light.Point(0, 0, 0, Color.WHITE));
-    private final Lighting lightingInvalid = new Lighting(new Light.Point(0, 0, 0, Color.GRAY));
+    private final Lighting lightingHigh = new Lighting(new Light.Point(0, 0, 0, Color.WHITE));
+    private final Lighting lightingFaded = new Lighting(new Light.Point(0, 0, 0, Color.GRAY));
 
     @Override
     public Background getIslandBackground() {
@@ -38,22 +38,22 @@ public class BasicTheme implements Theme {
     }
 
     @Override
-    public Paint getTileBorderPaint(PlacementState placementState) {
+    public Paint getTileBorderPaint(HexStyle style) {
         return tileBorderColor;
     }
 
     @Override
-    public Paint getTileBottomPaint(PlacementState placementState) {
+    public Paint getTileBottomPaint(HexStyle style) {
         return tileBottomColor;
     }
 
     @Override
-    public Effect getTileBottomEffect(Grid grid, PlacementState placementState) {
+    public Effect getTileBottomEffect(Grid grid, HexStyle style) {
         return null;
     }
 
     @Override
-    public Paint getTileTopPaint(FieldType type, PlacementState placementState) {
+    public Paint getTileTopPaint(FieldType type, HexStyle style) {
         switch (type) {
             case VOLCANO:  return tileVolcanoColor;
             case JUNGLE:   return tileJungleColor;
@@ -67,15 +67,15 @@ public class BasicTheme implements Theme {
     }
 
     @Override
-    public Effect getTileTopEffect(Grid grid, PlacementState placementState) {
+    public Effect getTileTopEffect(Grid grid, HexStyle style) {
         ((Light.Point) lighting.getLight()).setZ(grid.getScale() * 150);
-        ((Light.Point) lightingValid.getLight()).setZ(grid.getScale() * 1000);
-        ((Light.Point) lightingInvalid.getLight()).setZ(grid.getScale() * 150);
-        switch (placementState) {
-            case NONE:     return lighting;
-            case FLOATING: return lighting;
-            case INVALID:  return lightingInvalid;
-            case VALID:    return lightingValid;
+        ((Light.Point) lightingHigh.getLight()).setZ(grid.getScale() * 1000);
+        ((Light.Point) lightingFaded.getLight()).setZ(grid.getScale() * 150);
+        switch (style) {
+            case NORMAL:      return lighting;
+            case FLOATING:    return lighting;
+            case FADED:       return lightingFaded;
+            case HIGHLIGHTED: return lightingHigh;
         }
 
         throw new IllegalStateException();
@@ -87,22 +87,18 @@ public class BasicTheme implements Theme {
     }
 
     @Override
-    public Paint getBuildingFacePaint(Building building, PlacementState placementState) {
-        return getBuildingTopPaint(building, placementState);
+    public Paint getBuildingFacePaint(Building building, BuildingStyle style) {
+        return getBuildingTopPaint(building, style);
     }
 
     @Override
-    public Effect getBuildingFaceEffect(Grid grid, Building building, PlacementState placementState) {
-        return getBuildingTopEffect(grid, building, placementState);
+    public Effect getBuildingFaceEffect(Grid grid, Building building, BuildingStyle style) {
+        return getBuildingTopEffect(grid, building, style);
     }
 
     @Override
-    public Paint getBuildingTopPaint(Building building, PlacementState placementState) {
-        Color color = getBuildingTopColor(building);
-        if (placementState == PlacementState.INVALID) {
-            color = color.darker();
-        }
-        return color;
+    public Paint getBuildingTopPaint(Building building, BuildingStyle style) {
+        return getBuildingTopColor(building);
     }
 
     private Color getBuildingTopColor(Building building) {
@@ -117,7 +113,7 @@ public class BasicTheme implements Theme {
     }
 
     @Override
-    public Effect getBuildingTopEffect(Grid grid, Building building, PlacementState placementState) {
+    public Effect getBuildingTopEffect(Grid grid, Building building, BuildingStyle style) {
         return null;
     }
 }

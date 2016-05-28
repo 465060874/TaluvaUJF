@@ -94,6 +94,11 @@ public class Hud extends AnchorPane implements EngineObserver {
         layoutChildren();
     }
 
+    private void updateText(String value) {
+        textLine.setText(value);
+        resizeWidth(null);
+    }
+
     @Override
     public void onStart() {
 
@@ -145,10 +150,10 @@ public class Hud extends AnchorPane implements EngineObserver {
     @Override
     public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
         if (winners.size() == 1) {
-            textLine.setText("Le joueur " + winners.get(0).getColor() + " a gagné !");
+            updateText("Le joueur " + winners.get(0).getColor() + " a gagné !");
         }
         else {
-            textLine.setText(winners.stream()
+            updateText(winners.stream()
                     .map(Player::getColor)
                     .map(PlayerColor::name)
                     .collect(joining(", ", "Les joueurs ", " ont gagné !")));
