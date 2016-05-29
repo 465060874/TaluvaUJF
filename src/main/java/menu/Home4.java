@@ -103,7 +103,7 @@ public class Home4 extends Application {
         ImageView iv2 = new ImageView();
         iv2.setImage(vs1);
 
-        vBoxHaut.getChildren().add(iv2);
+        //vBoxHaut.getChildren().add(iv2);
 
         //vBoxBas
 
