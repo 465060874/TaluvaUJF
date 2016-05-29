@@ -295,7 +295,7 @@ public class Home4 extends Application {
         ToggleButton md = new ToggleButton("2 JOUEURS");
         ToggleButton mt = new ToggleButton("3 JOUEURS");
         ToggleButton mq1 = new ToggleButton("4 JOUEURS");
-        ToggleButton mq2 = new ToggleButton("2 JOUEURS   VS  2 JOUEURS");
+        ToggleButton mq2 = new ToggleButton("2 JOUEURS   VS   2 JOUEURS");
 
         this.optionsMode = new ToggleButton[] { md,mt,mq1,mq2 };
         this.mode = new ToggleGroup();
