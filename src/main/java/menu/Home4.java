@@ -1,8 +1,6 @@
 package menu;
 
 import IA.IADifficulty;
-import javafx.scene.layout.*;
-import theme.PlayerTheme;
 import data.PlayerColor;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -15,6 +13,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
@@ -22,6 +23,7 @@ import javafx.stage.Stage;
 import menu.data.MenuData;
 import menu.data.MenuMode;
 import menu.data.MultiMode;
+import theme.PlayerTheme;
 import ui.GameApp;
 
 import java.util.ArrayList;
@@ -371,9 +373,13 @@ public class Home4 extends Application {
         //css
 
         vBoxScene.getStyleClass().add("svBoxScene");
+        javafx.scene.text.Font buttonFont = javafx.scene.text.Font.loadFont("menu/f1.ttf", 12);
         bsolo.getStyleClass().add("buttonniveaux4");
+        bsolo.setFont(buttonFont);
         bmulti.getStyleClass().add("buttonniveaux4");
+        bmulti.setFont(buttonFont);
         bcharger.getStyleClass().add("buttonniveaux4");
+        bcharger.setFont(buttonFont);
         breprendre.getStyleClass().add("buttonniveaux5");
         bq.getStyleClass().add("buttonniveaux6");
 
@@ -434,10 +440,13 @@ public class Home4 extends Application {
 
         root.getChildren().add(vBoxScene);
 
-        stage.setScene(scene);
+        if (stage.isShowing()) {
+            stage.setX(stage.getX() - (scene.getWidth() - stage.getWidth()) / 2);
+            stage.setY(stage.getY() - (scene.getHeight() - stage.getHeight()) / 2);
+        }
         stage.setWidth(scene.getWidth());
-        stage.setHeight(scene.getHeight() + 20);
-        stage.setResizable(false);
+        stage.setHeight(scene.getHeight() + 36);
+        stage.setScene(scene);
         if (!stage.isShowing()) {
             stage.show();
         }

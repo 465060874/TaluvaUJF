@@ -44,8 +44,8 @@ public class GameApp extends Application {
 
         this.scene = new Scene(gameView, 1000, 800);
         stage.setResizable(true);
-        stage.setX(stage.getX() - (scene.getWidth() -stage.getWidth()) / 2);
-        stage.setY(stage.getY() - (scene.getHeight() -stage.getHeight()) / 2);
+        stage.setX(stage.getX() - (scene.getWidth() - stage.getWidth()) / 2);
+        stage.setY(stage.getY() - (scene.getHeight() - stage.getHeight()) / 2);
         stage.setWidth(scene.getWidth());
         stage.setHeight(scene.getHeight());
         stage.setScene(scene);

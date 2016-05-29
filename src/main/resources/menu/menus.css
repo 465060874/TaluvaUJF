@@ -131,8 +131,6 @@
 }
 
 .buttonniveaux4{
-    -fx-font-size:10pt;
-    -fx-font-family: url('/menu/f1.ttf');
     -fx-font-weight: bold;
     -fx-background-color: #EFB068;
     -fx-color: white;
