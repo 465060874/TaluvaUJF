@@ -1,18 +1,18 @@
-package data;
+package ui.theme;
 
 import javafx.scene.paint.Color;
 
-public enum ChoosenColors {
+public enum PlayerColorTheme {
 
-    RED("salmon"),
     WHITE("ivory"),
-    BROWN("peru"),
-    YELLOW("gold");
+    RED("salmon"),
+    YELLOW("gold"),
+    BROWN("peru");
 
     private final String cssDefinition;
     private final Color color;
 
-    ChoosenColors(String cssDefinition) {
+    PlayerColorTheme(String cssDefinition) {
         this.cssDefinition = cssDefinition;
         this.color = Color.web(cssDefinition);
     }

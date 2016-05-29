@@ -1,7 +1,8 @@
 package menu;
 
 import IA.IADifficulty;
-import data.ChoosenColors;
+import javafx.scene.layout.*;
+import ui.theme.PlayerColorTheme;
 import data.PlayerColor;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -14,9 +15,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
@@ -37,12 +35,6 @@ public class Home4 extends Application {
     static final String[] nomdimage = new String[]{"w.png", "r.png", "y.png","b.png"};
     static final Image[] images = new Image[nomdimage.length];
     static final ImageView[] pics = new ImageView[nomdimage.length];
-    static final String[] couleur = new String[]{
-            ChoosenColors.WHITE.cssDefinition(),
-            ChoosenColors.RED.cssDefinition(),
-            ChoosenColors.YELLOW.cssDefinition(),
-            ChoosenColors.BROWN.cssDefinition()
-    };
 
     static double size_ratio = 580.0 / 800.0;
     static int hauteurScene = 600;
@@ -54,8 +46,6 @@ public class Home4 extends Application {
 
     private final MenuData menuData;
 
-    private int iterateurIcone = 0;
-
     private Stage stage;
 
     private ToggleGroup tabChoice;
@@ -63,6 +53,7 @@ public class Home4 extends Application {
     private StackPane options;
     private Node[] optionsContent;
 
+    private Button bicone;
     private ToggleGroup levelChoice;
     private ToggleButton[] levelButtons;
 
@@ -80,7 +71,7 @@ public class Home4 extends Application {
 
     @Override public void start(Stage stage) {
         this.stage = stage;
-        //System.out.println(ChoosenColors.BROWN);
+        //System.out.println(PlayerColorTheme.BROWN);
         //scene
         stage.setTitle("TALUVA_V3");
         Group root = new Group();
@@ -263,11 +254,11 @@ public class Home4 extends Application {
         vBoxg1.getChildren().add(icone);
         vBoxd1.getChildren().add(niveaux);
 
-        Button bicone = new Button();
+        this.bicone = new Button();
         Image imageDecline = new Image(getClass().getResourceAsStream(nomdimage[menuData.getSoloColor().ordinal()]));
         bicone.setPadding(new Insets(0,0,0,0));
         bicone.setGraphic(new ImageView(imageDecline));
-        bicone.setStyle("-fx-background-color: " + couleur[menuData.getSoloColor().ordinal()] +";");
+        bicone.setStyle("-fx-background-color: " + PlayerColorTheme.values()[menuData.getSoloColor().ordinal()].cssDefinition() +";");
 
 
         bicone.setPrefWidth(largeurScene/3);
@@ -356,7 +347,7 @@ public class Home4 extends Application {
         //vBoxCapture.setPrefHeight(100);
         //vBoxoptionsCharger.setPrefHeight(100);
 
-        this.optionsHistory = new ArrayList<ToggleButton>();
+        this.optionsHistory = new ArrayList<>();
         this.historyChoice = new ToggleGroup();
         for (int i = 1; i < 10;i++) {
 ;           ToggleButton num = new ToggleButton("NUM " + i);
@@ -388,23 +379,7 @@ public class Home4 extends Application {
         //vBoxCapture.getStyleClass().add("b2");
         //v.getStyleClass().add("b2");
 
-
-
-
-
-
-
-        bicone.setOnAction(e->{
-            System.out.println(iterateurIcone);
-            setIterateurIcone((iterateurIcone + 1) % 4);
-            bicone.setStyle("-fx-background-color: " + couleur[(iterateurIcone+1)%4] +";");
-            //menuData.getSoloColor().ordinal();
-            menuData.setSoloColor(PlayerColor.values()[(iterateurIcone+1)%4]);
-            bicone.setGraphic(new ImageView(images[(iterateurIcone+1)%4]));
-        });
-
-
-
+        bicone.setOnAction(this::updateSoloColor);
 
         //css
 
@@ -481,6 +456,13 @@ public class Home4 extends Application {
         }
     }
 
+    private void updateSoloColor(ActionEvent event) {
+        int index = (menuData.getSoloColor().ordinal() + 1) % PlayerColor.values().length;
+        bicone.setStyle("-fx-background-color: " + PlayerColorTheme.values()[index].cssDefinition() +";");
+        bicone.setGraphic(new ImageView(images[index]));
+        menuData.setSoloColor(PlayerColor.values()[index]);
+    }
+
     private void updateMode() {
         Toggle selected = tabChoice.getSelectedToggle();
         //System.out.println(tabChoice.getSelectedToggle());
@@ -520,10 +502,6 @@ public class Home4 extends Application {
                 menuData.setMultiMode(MultiMode.values()[i]);
             }
         }
-    }
-
-    private void setIterateurIcone( int val ){
-        iterateurIcone = val;
     }
 
     private void start(ActionEvent event) {

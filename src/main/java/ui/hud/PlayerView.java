@@ -1,7 +1,7 @@
 package ui.hud;
 
 import data.BuildingType;
-import data.ChoosenColors;
+import ui.theme.PlayerColorTheme;
 import engine.Engine;
 import engine.Player;
 import javafx.geometry.Insets;
@@ -105,10 +105,10 @@ public class PlayerView extends AnchorPane {
 
     private Paint color() {
         switch (player().getColor()) {
-            case BROWN:  return ChoosenColors.BROWN.color();
-            case YELLOW: return ChoosenColors.YELLOW.color();
-            case RED:    return ChoosenColors.RED.color();
-            case WHITE:  return ChoosenColors.WHITE.color();
+            case BROWN:  return PlayerColorTheme.BROWN.color();
+            case YELLOW: return PlayerColorTheme.YELLOW.color();
+            case RED:    return PlayerColorTheme.RED.color();
+            case WHITE:  return PlayerColorTheme.WHITE.color();
         }
 
         throw new IllegalStateException();

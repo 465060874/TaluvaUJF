@@ -1,6 +1,5 @@
 package ui.theme;
 
-import data.ChoosenColors;
 import data.FieldType;
 import javafx.geometry.Insets;
 import javafx.scene.effect.Effect;
@@ -107,10 +106,10 @@ public class BasicTheme implements Theme {
 
     private Color getBuildingTopColor(Building building) {
         switch (building.getColor()) {
-            case RED:    return ChoosenColors.RED.color();
-            case WHITE:  return ChoosenColors.WHITE.color();
-            case BROWN:  return ChoosenColors.BROWN.color();
-            case YELLOW: return ChoosenColors.YELLOW.color();
+            case RED:    return PlayerColorTheme.RED.color();
+            case WHITE:  return PlayerColorTheme.WHITE.color();
+            case BROWN:  return PlayerColorTheme.BROWN.color();
+            case YELLOW: return PlayerColorTheme.YELLOW.color();
         }
 
         throw new IllegalStateException();
