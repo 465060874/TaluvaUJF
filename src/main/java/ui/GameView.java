@@ -8,6 +8,7 @@ import engine.action.ExpandVillageAction;
 import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -66,6 +67,10 @@ public class GameView extends StackPane implements EngineObserver {
         return placement;
     }
 
+    public Button getHomeButton() {
+        return hud.getHomeButton();
+    }
+
     @Override
     public void onStart() {
     }
@@ -73,7 +78,6 @@ public class GameView extends StackPane implements EngineObserver {
     @Override
     public void onTileStackChange(boolean cancelled) {
     }
-
 
     @Override
     public void onTileStepStart(boolean cancelled) {

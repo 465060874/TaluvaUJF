@@ -11,6 +11,7 @@ import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
 import javafx.beans.Observable;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -36,6 +37,7 @@ public class Hud extends AnchorPane implements EngineObserver {
     private final TileStackCanvas tileStackCanvas;
     private final Text tileStackSize;
     private final VBox tileStackPane;
+    private Button homeButton;
 
     public Hud(Engine engine) {
         this.engine = engine;
@@ -48,11 +50,11 @@ public class Hud extends AnchorPane implements EngineObserver {
         }
 
         this.leftButtons = new VBox();
-        IconButton left1 = new IconButton("hud/home.png");
-        left1.setOnAction((e) -> System.out.println("Home !"));
+        this.homeButton = new IconButton("hud/home.png");
+        homeButton.setOnAction((e) -> System.out.println("Home !"));
         IconButton left2 = new IconButton("hud/save.png");
         left2.setOnAction((e) -> System.out.println("Save !"));
-        leftButtons.getChildren().addAll(left1, left2);
+        leftButtons.getChildren().addAll(homeButton, left2);
         AnchorPane.setLeftAnchor(leftButtons, 0.0);
 
         Font font = new Font(18);
@@ -164,5 +166,9 @@ public class Hud extends AnchorPane implements EngineObserver {
                     .map(PlayerColor::name)
                     .collect(joining(", ", "Les joueurs ", " ont gagné !")));
         }
+    }
+
+    public Button getHomeButton() {
+        return homeButton;
     }
 }

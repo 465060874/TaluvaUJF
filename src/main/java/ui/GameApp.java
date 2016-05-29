@@ -9,32 +9,53 @@ import engine.PlayerHandler;
 import engine.action.Action;
 import engine.action.SeaTileAction;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import map.Building;
+import menu.Home4;
+import menu.data.MenuData;
 
-public class FXUI extends Application {
+public class GameApp extends Application {
 
     private Engine engine;
     private GameView gameView;
     private Scene scene;
+    private Stage stage;
 
-    @Override
-    public void start(Stage stage) throws Exception {
+    public GameApp() {
         this.engine = EngineBuilder.allVsAll()
                 .player(PlayerColor.BROWN, e -> new FXUIPlayerHandler())
                 .player(PlayerColor.WHITE, BotPlayerHandler.factory(16, 1))
                 .build();
+    }
 
+    public GameApp(MenuData menuData) {
+        this.engine = menuData.engineBuilder(() -> e -> new FXUIPlayerHandler())
+                .build();
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        this.stage = stage;
         this.gameView = new GameView(engine);
+        gameView.getHomeButton().setOnAction(this::goHome);
 
         this.scene = new Scene(gameView, 1000, 800);
+        stage.setResizable(true);
         stage.setScene(scene);
-        stage.setOnShowing(e -> engine.start());
-        stage.show();
+        engine.start();
+        if (!stage.isShowing()) {
+            stage.show();
+        }
+    }
+
+    private void goHome(ActionEvent actionEvent) {
+        Home4 home = new Home4();
+        home.start(stage);
     }
 
     public static void main(String[] args) {

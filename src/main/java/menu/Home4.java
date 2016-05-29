@@ -4,6 +4,7 @@ import IA.IADifficulty;
 import data.ChoosenColors;
 import data.PlayerColor;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -21,7 +22,9 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import menu.data.MenuData;
+import menu.data.MenuMode;
 import menu.data.MultiMode;
+import ui.GameApp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +56,8 @@ public class Home4 extends Application {
 
     private int iterateurIcone = 0;
 
+    private Stage stage;
+
     private ToggleGroup tabChoice;
     private ToggleButton[] optionsButton;
     private StackPane options;
@@ -74,6 +79,7 @@ public class Home4 extends Application {
     }
 
     @Override public void start(Stage stage) {
+        this.stage = stage;
         //System.out.println(ChoosenColors.BROWN);
         //scene
         stage.setTitle("TALUVA_V3");
@@ -110,7 +116,7 @@ public class Home4 extends Application {
 
 
         //vBoxHaut
-        Image vs1 = new Image(getClass().getResourceAsStream("lol.png"));
+        Image vs1 = new Image(getClass().getResourceAsStream("fb.png"));
         ImageView iv2 = new ImageView();
         iv2.setImage(vs1);
 
@@ -172,7 +178,7 @@ public class Home4 extends Application {
         bmulti.setToggleGroup(tabChoice);
         bcharger.setToggleGroup(tabChoice);
         tabChoice.selectToggle(bsolo);
-        tabChoice.selectedToggleProperty().addListener(e -> updateSelectedTab());
+        tabChoice.selectedToggleProperty().addListener(e -> updateMode());
 
         double[] path = new double[100];
         for (int q = 0; q < 24; q++) {
@@ -312,7 +318,7 @@ public class Home4 extends Application {
         mq1.setToggleGroup(mode);
         mq2.setToggleGroup(mode);
         mode.selectToggle(optionsMode[menuData.getMultiMode().ordinal()]);
-        mode.selectedToggleProperty().addListener(e -> updatemode());
+        mode.selectedToggleProperty().addListener(e -> updatemultimode());
 
 
         md.setPrefWidth(largeurScene/2);
@@ -435,10 +441,10 @@ public class Home4 extends Application {
 
 
 
-        updateSelectedTab();
+        updateMode();
         updateCapture();
         updateLevel();
-        updatemode();
+        updatemultimode();
 /*
         vBoxScene.getStyleClass().add("b1");
         hBoxBas.getStyleClass().add("b3");
@@ -461,19 +467,22 @@ public class Home4 extends Application {
         //vBoxScene.getStyleClass().add("b1");
         //hBoxBas.getStyleClass().add("b3");
         //vBoxHaut.getStyleClass().add("b1");
-        breprendre.setOnAction(this::debug);
+        breprendre.setOnAction(this::start);
+        bq.setOnAction(e -> Platform.exit());
 
         root.getChildren().add(vBoxScene);
+
+        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
-
     }
 
-    private void updateSelectedTab() {
+    private void updateMode() {
         Toggle selected = tabChoice.getSelectedToggle();
         //System.out.println(tabChoice.getSelectedToggle());
         for (int i = 0; i < optionsButton.length; i++) {
             if (selected == optionsButton[i]) {
+                menuData.setMode(MenuMode.values()[i]);
                 options.getChildren().setAll(optionsContent[i]);
             }
         }
@@ -500,7 +509,7 @@ public class Home4 extends Application {
     }
 
 
-    private void updatemode() {
+    private void updatemultimode() {
         Toggle selected = mode.getSelectedToggle();
         for(int i = 0; i < optionsMode.length; i++){
             if(selected == optionsMode[i]){
@@ -513,9 +522,15 @@ public class Home4 extends Application {
         iterateurIcone = val;
     }
 
-    private void debug(ActionEvent event) {
+    private void start(ActionEvent event) {
         menuData.save();
-        menuData.debug();
+        GameApp gameApp = new GameApp(menuData);
+        try {
+            gameApp.start(stage);
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
 
