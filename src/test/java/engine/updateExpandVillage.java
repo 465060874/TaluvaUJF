@@ -23,7 +23,7 @@ import java.util.logging.Level;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
-public class UpdateExpandVillage {
+public class updateExpandVillage {
 
     private Set<ExpandVillageAction> getExpandVillageActionsUnique(Engine engine) {
         Set<ExpandVillageAction> actual = new HashSet<>();

@@ -145,6 +145,7 @@ public class GameApp extends Application {
         private void mouseReleasedTile(MouseEvent event) {
             if (event.getButton() == MouseButton.PRIMARY && gameView.getPlacement().isValid()) {
                 if (dragged) {
+                    dragged = false;
                     return;
                 }
 
