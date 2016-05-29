@@ -144,14 +144,20 @@ public class Home4 extends Application {
 
         ToggleButton bsolo = new ToggleButton("SOLO");
         ToggleButton bmulti = new ToggleButton("MULTI");
-        ToggleButton bcharger = new ToggleButton("CHARGER");
-        ToggleButton breprendre = new ToggleButton("GO");
-        ToggleButton bq = new ToggleButton("Q");
+        ToggleButton bcharger = new ToggleButton("REPRENDRE");
+
         bsolo.setPrefSize(largeurScene/3,hauteurScene*2/9);
         bmulti.setPrefSize(largeurScene/3,hauteurScene*2/9);
         bcharger.setPrefSize(largeurScene/3,hauteurScene*2/9);
-        breprendre.setPrefSize(lv-100,lv-100);
+
+        Button bplay = new Button();
+        bplay.setPrefSize(lv-100,lv-100);
+        ImageView playImage = new ImageView("menu/play.png");
+        bplay.setGraphic(playImage);
+        Button bq = new Button();
         bq.setPrefSize(lv-100,lv-100);
+        ImageView quitImage = new ImageView("menu/quit.png");
+        bq.setGraphic(quitImage);
 
         this.optionsButton = new ToggleButton[] { bsolo, bmulti, bcharger };
 
@@ -175,12 +181,12 @@ public class Home4 extends Application {
         bsolo.setShape(aPoly);
         bmulti.setShape(aPoly);
         bcharger.setShape(aPoly);
-        breprendre.setShape(aPoly);
+        bplay.setShape(aPoly);
         bq.setShape(aPoly);
         vBoxsolo.getChildren().add(bsolo);
         vBoxmulti.getChildren().add(bmulti);
         vBoxcharger.getChildren().add(bcharger);
-        vBoxreprendre.getChildren().add(breprendre);
+        vBoxreprendre.getChildren().add(bplay);
         vBoxq.getChildren().add(bq);
 
 
@@ -373,14 +379,10 @@ public class Home4 extends Application {
         //css
 
         vBoxScene.getStyleClass().add("svBoxScene");
-        javafx.scene.text.Font buttonFont = javafx.scene.text.Font.loadFont("menu/f1.ttf", 12);
         bsolo.getStyleClass().add("buttonniveaux4");
-        bsolo.setFont(buttonFont);
         bmulti.getStyleClass().add("buttonniveaux4");
-        bmulti.setFont(buttonFont);
         bcharger.getStyleClass().add("buttonniveaux4");
-        bcharger.setFont(buttonFont);
-        breprendre.getStyleClass().add("buttonniveaux5");
+        bplay.getStyleClass().add("buttonniveaux5");
         bq.getStyleClass().add("buttonniveaux6");
 
         icone.getStyleClass().add("bin");
@@ -435,7 +437,7 @@ public class Home4 extends Application {
         //vBoxScene.getStyleClass().add("b1");
         //hBoxBas.getStyleClass().add("b3");
         //vBoxHaut.getStyleClass().add("b1");
-        breprendre.setOnAction(this::start);
+        bplay.setOnAction(this::start);
         bq.setOnAction(e -> Platform.exit());
 
         root.getChildren().add(vBoxScene);
