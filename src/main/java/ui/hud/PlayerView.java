@@ -116,10 +116,10 @@ public class PlayerView extends AnchorPane {
 
     private String url() {
         switch (player().getColor()) {
-            case BROWN:  return "hud/brownPlayer.png";
-            case YELLOW: return "hud/yellowPlayer.png";
-            case RED:    return "hud/redPlayer.png";
-            case WHITE: return "hud/whitePlayer.png";
+            case BROWN:  return "ui/hud/brownPlayer.png";
+            case YELLOW: return "ui/hud/yellowPlayer.png";
+            case RED:    return "ui/hud/redPlayer.png";
+            case WHITE: return "ui/hud/whitePlayer.png";
         }
 
         throw new IllegalStateException();

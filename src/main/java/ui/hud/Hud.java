@@ -51,9 +51,9 @@ public class Hud extends AnchorPane implements EngineObserver {
         }
 
         this.leftButtons = new VBox();
-        this.homeButton = new IconButton("hud/home.png");
+        this.homeButton = new IconButton("ui/hud/home.png");
         homeButton.setOnAction((e) -> System.out.println("Home !"));
-        IconButton left2 = new IconButton("hud/save.png");
+        IconButton left2 = new IconButton("ui/hud/save.png");
         left2.setOnAction((e) -> System.out.println("Save !"));
         leftButtons.getChildren().addAll(homeButton, left2);
         AnchorPane.setLeftAnchor(leftButtons, 0.0);
@@ -66,7 +66,7 @@ public class Hud extends AnchorPane implements EngineObserver {
         textBottom.setPadding(new Insets(0, 0, 20, 0));
         AnchorPane.setBottomAnchor(textBottom, 0.0);
 
-        IconButton undoButton = new IconButton("hud/undo.png");
+        IconButton undoButton = new IconButton("ui/hud/undo.png");
         undoButton.setOnAction(this::undo);
         this.tileStackCanvas = new TileStackCanvas(engine);
         this.tileStackSize = new Text();
