@@ -438,6 +438,35 @@ class EngineImpl implements Engine {
 
     private void checkBuildingCounts() {
         Player player = getCurrentPlayer();
+        int remainingBuildingTypes = remainingBuildingsType(player);
+
+        if (gamemode == Gamemode.TeamVsTeam) {
+            Player teammate = players.get((playerIndex + 2) % players.size());
+            int teammateRemainingBuildingTypes = remainingBuildingsType(teammate);
+            if (remainingBuildingTypes + teammateRemainingBuildingTypes <= 3) {
+                ImmutableList<Player> winners = ImmutableList.of(player, teammate);
+                this.status = new EngineStatus.Finished((EngineStatus.Running) status,
+                        EngineStatus.FinishReason.TEAM_THREE_BUILDING_TYPES,
+                        winners);
+                observers.forEach(o -> o.onWin(EngineStatus.FinishReason.TWO_BUILDING_TYPES, winners));
+                return;
+            }
+        }
+        else {
+            if (remainingBuildingTypes <= 1) {
+                ImmutableList<Player> winners = ImmutableList.of(player);
+                this.status = new EngineStatus.Finished((EngineStatus.Running) status,
+                        EngineStatus.FinishReason.TWO_BUILDING_TYPES,
+                        winners);
+                observers.forEach(o -> o.onWin(EngineStatus.FinishReason.TWO_BUILDING_TYPES, winners));
+                return;
+            }
+        }
+
+        nextStep();
+    }
+
+    private int remainingBuildingsType(Player player) {
         int remainingBuildingTypeCount = 0;
         if (player.getBuildingCount(BuildingType.HUT) > 0) {
             remainingBuildingTypeCount++;
@@ -448,17 +477,7 @@ class EngineImpl implements Engine {
         if (player.getBuildingCount(BuildingType.TOWER) > 0) {
             remainingBuildingTypeCount++;
         }
-
-        if (remainingBuildingTypeCount <= 1) {
-            ImmutableList<Player> winners = ImmutableList.of(player);
-            this.status = new EngineStatus.Finished((EngineStatus.Running) status,
-                    EngineStatus.FinishReason.TWO_BUILDING_TYPES,
-                    winners);
-            observers.forEach(o -> o.onWin(EngineStatus.FinishReason.TWO_BUILDING_TYPES, winners));
-        }
-        else {
-            nextStep();
-        }
+        return remainingBuildingTypeCount;
     }
 
     private interface ActionSave {
