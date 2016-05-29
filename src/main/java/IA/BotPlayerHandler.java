@@ -7,10 +7,11 @@ import engine.action.TileAction;
 import javafx.application.Platform;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BotPlayerHandler implements PlayerHandler {
 
-    public static PlayerHandler.Factory factory( int branch, int depth ){
+    public static PlayerHandler.Factory factory(int branch, int depth) {
         return engine -> new BotPlayerHandler(engine, branch, depth);
     }
 
@@ -20,13 +21,13 @@ public class BotPlayerHandler implements PlayerHandler {
     private final BotPlayer bot;
     private final int depth;
 
+    private AtomicBoolean cancelled;
     private boolean isFx;
     private TileAction tileAction;
     private BuildingAction buildingAction;
 
     public BotPlayerHandler(Engine engine, int branch, int depth) {
         this.engine = engine;
-        //this.bot = new BotPlayer(branch, new RandomHeuristics(engine.getRandom()), engine);
         this.bot = new BotPlayer(branch, new BasicHeuristics(), engine);
         this.depth = depth;
     }
@@ -48,6 +49,7 @@ public class BotPlayerHandler implements PlayerHandler {
 
         engine.logger().info("[IA] Starting");
         long startTime = System.nanoTime();
+        cancelled = new AtomicBoolean();
         Move move = bot.play(depth);
         long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
         engine.logger().info("[IA] {0}ms pour determiner le coup à jouer", duration);
@@ -55,14 +57,7 @@ public class BotPlayerHandler implements PlayerHandler {
         this.tileAction = move.tileAction;
         this.buildingAction = move.buildingAction;
         if (isFx) {
-            try {
-                final long delay = DELAY - (System.currentTimeMillis() - startMillis);
-                Thread.sleep(delay);
-            }
-            catch (InterruptedException e) {
-                // Hope this do not happen
-            }
-
+            waitABit(startMillis);
             Platform.runLater(this::finishTileStep);
         }
         else {
@@ -89,13 +84,7 @@ public class BotPlayerHandler implements PlayerHandler {
         final long startMillis = System.currentTimeMillis();
 
         if (isFx) {
-            try {
-                final long delay = DELAY - (System.currentTimeMillis() - startMillis);
-                Thread.sleep(delay);
-            } catch (InterruptedException e) {
-                // Hope this do not happen
-            }
-
+            waitABit(startMillis);
             Platform.runLater(this::finishBuildStep);
         }
         else {
@@ -105,6 +94,16 @@ public class BotPlayerHandler implements PlayerHandler {
 
     private void finishBuildStep() {
         engine.action(buildingAction);
+    }
+
+    private void waitABit(long startMillis) {
+        try {
+            final long delay = DELAY - (System.currentTimeMillis() - startMillis);
+            Thread.sleep(delay);
+        }
+        catch (InterruptedException e) {
+            // Hope this do not happen
+        }
     }
 
     @Override

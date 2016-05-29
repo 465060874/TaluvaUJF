@@ -34,7 +34,7 @@ public class GameApp extends Application {
     }
 
     public GameApp(MenuData menuData) {
-        this.engine = menuData.engineBuilder(() -> e -> new FXUIPlayerHandler())
+        this.engine = menuData.engineBuilder(e -> new FXUIPlayerHandler())
                 .build();
     }
 
