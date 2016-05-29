@@ -9,7 +9,7 @@ import map.Neighbor;
 import map.Orientation;
 import ui.island.Grid;
 import ui.shape.HexShape;
-import ui.theme.HexStyle;
+import theme.HexStyle;
 
 public class TileStackCanvas extends Canvas {
 

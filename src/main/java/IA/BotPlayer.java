@@ -8,6 +8,7 @@ import map.Hex;
 
 import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static engine.rules.PlaceBuildingRules.validate;
 
@@ -18,26 +19,32 @@ class BotPlayer {
 
     // Facteur de branchment pour l'arbre MIN-MAX
     private final int branchingFactor;
+    // Profondeur de la descente recursive dans l'arbre MIN-MAX
+    private final int totalDepth;
     // Heuristics utilisées
     private final Heuristics heuristics;
 
     // Donnees
     private final Engine realEngine;
+    private final AtomicBoolean cancelled;
     private final int[] strategyPoints = new int[NB_STRATEGIES];
 
     // Constructeur
-    BotPlayer(int branchingFactor, Heuristics heuristics, Engine realEngine) {
+    BotPlayer(int branchingFactor, int totalDepth, Heuristics heuristics, Engine realEngine, AtomicBoolean cancelled) {
         this.branchingFactor = branchingFactor;
+        this.totalDepth = totalDepth;
         this.heuristics = heuristics;
+
         this.realEngine = realEngine;
+        this.cancelled = cancelled;
     }
 
     // Jouer un coup
-    Move play(int depth) {
+    Move play() {
         Engine engineCopy = realEngine.copyWithoutObservers();
         Move m =  realEngine.getStatus().getTurn() == 0
                 ? doFirstPlay(engineCopy)
-                : doPlay(engineCopy, depth);
+                : doPlay(engineCopy, totalDepth);
         realEngine.logger().info("[play] Choosed move with {0} points ", m.points);
         return m;
     }
@@ -110,6 +117,7 @@ class BotPlayer {
                     bestConfigPoints = p;
                 }
             }
+
             engine.cancelLastStep();
             engine.cancelLastStep();
         }

@@ -4,8 +4,8 @@ import com.google.common.collect.ComparisonChain;
 import data.FieldType;
 import map.Building;
 import map.Orientation;
-import ui.theme.BuildingStyle;
-import ui.theme.HexStyle;
+import theme.BuildingStyle;
+import theme.HexStyle;
 
 class HexToDraw implements Comparable<HexToDraw> {
 

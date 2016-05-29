@@ -1,4 +1,4 @@
-package ui.theme;
+package theme;
 
 import data.FieldType;
 import javafx.scene.effect.Effect;
@@ -10,26 +10,26 @@ import ui.island.Grid;
 import java.util.ArrayList;
 import java.util.List;
 
-public interface Theme {
+public interface IslandTheme {
 
-    static Theme getCurrent() {
-        return CurrentTheme.THEME;
+    static IslandTheme getCurrent() {
+        return CurrentTheme.IslandTHEME;
     }
 
-    static Theme change() {
-        if (CurrentTheme.THEME instanceof ImageTheme) {
-            CurrentTheme.THEME = new SphaxTheme();
+    static IslandTheme change() {
+        if (CurrentTheme.IslandTHEME instanceof ImageIslandTheme) {
+            CurrentTheme.IslandTHEME = new SphaxIslandTheme();
         }
-        else if (CurrentTheme.THEME instanceof SphaxTheme) {
-            CurrentTheme.THEME = new BasicTheme();
+        else if (CurrentTheme.IslandTHEME instanceof SphaxIslandTheme) {
+            CurrentTheme.IslandTHEME = new BasicIslandTheme();
         }
         else {
-            CurrentTheme.THEME = new ImageTheme();
+            CurrentTheme.IslandTHEME = new ImageIslandTheme();
         }
 
         CurrentTheme.listeners.forEach(Runnable::run);
 
-        return CurrentTheme.THEME;
+        return CurrentTheme.IslandTHEME;
     }
 
     static void addListener(Runnable listener) {
@@ -66,7 +66,7 @@ public interface Theme {
 
     class CurrentTheme {
 
-        private static Theme THEME = new BasicTheme();
+        private static IslandTheme IslandTHEME = new BasicIslandTheme();
         private static final List<Runnable> listeners = new ArrayList<>();
     }
 }

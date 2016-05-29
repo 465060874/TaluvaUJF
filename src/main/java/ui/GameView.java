@@ -17,7 +17,7 @@ import ui.hud.Hud;
 import ui.island.Grid;
 import ui.island.IslandView;
 import ui.island.Placement;
-import ui.theme.Theme;
+import theme.IslandTheme;
 
 import java.util.List;
 
@@ -59,7 +59,7 @@ public class GameView extends StackPane implements EngineObserver {
 
     private void keyPressed(KeyEvent event) {
         if (event.getCode() == KeyCode.T) {
-            Theme.change();
+            IslandTheme.change();
         }
     }
 

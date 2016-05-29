@@ -6,8 +6,8 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import map.Orientation;
 import ui.island.Grid;
-import ui.theme.HexStyle;
-import ui.theme.Theme;
+import theme.HexStyle;
+import theme.IslandTheme;
 
 public class HexShape {
 
@@ -158,24 +158,24 @@ public class HexShape {
         updatePolygon(grid, x, y, Math.max(1, level), orientation);
 
         if (level == 0) {
-            gc.setEffect(Theme.getCurrent().getTileTopEffect(grid, style));
-            gc.setFill(Theme.getCurrent().getSeaPaint());
+            gc.setEffect(IslandTheme.getCurrent().getTileTopEffect(grid, style));
+            gc.setFill(IslandTheme.getCurrent().getSeaPaint());
             gc.fillPolygon(hexagonX, hexagonY, HEXAGON_POINTS);
             return;
         }
 
         // Fill shape
-        gc.setEffect(Theme.getCurrent().getTileTopEffect(grid, style));
-        gc.setFill(Theme.getCurrent().getTileTopPaint(fieldType, style));
+        gc.setEffect(IslandTheme.getCurrent().getTileTopEffect(grid, style));
+        gc.setFill(IslandTheme.getCurrent().getTileTopPaint(fieldType, style));
         gc.fillPolygon(hexagonX, hexagonY, HEXAGON_POINTS);
 
-        gc.setEffect(Theme.getCurrent().getTileBottomEffect(grid, style));
-        gc.setFill(Theme.getCurrent().getTileBottomPaint(style));
+        gc.setEffect(IslandTheme.getCurrent().getTileBottomEffect(grid, style));
+        gc.setFill(IslandTheme.getCurrent().getTileBottomPaint(style));
         gc.fillPolygon(bottomX, bottomY, HEXAGON_POINTS);
         gc.setEffect(null);
 
         // Draw borders
-        gc.setStroke(Theme.getCurrent().getTileBorderPaint(style));
+        gc.setStroke(IslandTheme.getCurrent().getTileBorderPaint(style));
         gc.setLineWidth(STROKE_WIDTH * grid.getScale());
         gc.setLineCap(StrokeLineCap.ROUND);
         gc.setLineJoin(StrokeLineJoin.ROUND);

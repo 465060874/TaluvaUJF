@@ -88,10 +88,7 @@ public class Hud extends AnchorPane implements EngineObserver {
     }
 
     private void undo(ActionEvent event) {
-        if (engine.getStatus().getStep() == EngineStatus.TurnStep.TILE) {
-            engine.cancelLastStep();
-        }
-        engine.cancelLastStep();
+        engine.cancelUntil(e -> e.getCurrentPlayer().isHuman() && e.getStatus().getStep() == EngineStatus.TurnStep.TILE);
     }
 
     private void resizeWidth(Observable observable) {
@@ -169,8 +166,7 @@ public class Hud extends AnchorPane implements EngineObserver {
 
         if (winners.size() == 1) {
             updateText("Le joueur " + winners.get(0).getColor() + " a gagné !");
-        }
-        else {
+        } else {
             updateText(winners.stream()
                     .map(Player::getColor)
                     .map(PlayerColor::name)

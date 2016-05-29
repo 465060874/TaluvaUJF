@@ -37,7 +37,7 @@ class EngineImpl implements Engine {
 
     private EngineStatus status;
     private int playerIndex;
-
+    private PlayerTurn playerTurn;
 
     private final List<ActionSave> actionSaves;
     private final EngineActions actions;
@@ -84,6 +84,7 @@ class EngineImpl implements Engine {
                 ? ((EngineStatus.Running) engine.status).copy()
                 : engine.status;
         this.playerIndex = engine.playerIndex;
+        this.playerTurn = PlayerHandler.dummy().startTurn(EngineStatus.TurnStep.TILE);
 
         this.actionSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
         actionSaves.addAll(engine.actionSaves);
@@ -137,8 +138,8 @@ class EngineImpl implements Engine {
 
     @Override
     public void start() {
-        status = new EngineStatus.Running();
-        playerIndex = 0;
+        this.status = new EngineStatus.Running();
+        this.playerIndex = 0;
         observers.forEach(EngineObserver::onStart);
 
         volcanoTileStack.next();
@@ -147,7 +148,7 @@ class EngineImpl implements Engine {
         actions.updateAll();
 
         observers.forEach(o -> o.onTileStepStart(false));
-        getCurrentPlayer().getHandler().startTileStep();
+        this.playerTurn = getCurrentPlayer().getHandler().startTurn(EngineStatus.TurnStep.TILE);
     }
 
     @Override
@@ -156,8 +157,13 @@ class EngineImpl implements Engine {
     }
 
     @Override
-    public synchronized void cancelLastStep() {
+    public void cancelLastStep() {
+        cancelUntil(e -> true);
+    }
+
+    public synchronized void cancelUntil(Predicate<Engine> predicate) {
         checkState(status != EngineStatus.PENDING_START);
+
         EngineStatus.Running running;
         if (status instanceof EngineStatus.Finished) {
             running = new EngineStatus.Running();
@@ -173,41 +179,42 @@ class EngineImpl implements Engine {
             return;
         }
 
-        getCurrentPlayer().getHandler().cancel();
+        playerTurn.cancel();
+        boolean volcanoTileStackChanged = false;
+        do {
+            if (running.step == EngineStatus.TurnStep.TILE) {
+                running.turn--;
+                do {
+                    playerIndex = playerIndex == 0
+                            ? players.size()
+                            : playerIndex - 1;
+                } while (getCurrentPlayer().isEliminated());
 
-        if (running.step == EngineStatus.TurnStep.TILE) {
-            running.turn--;
-            do {
-                playerIndex = playerIndex == 0
-                        ? players.size()
-                        : playerIndex - 1;
-            } while (getCurrentPlayer().isEliminated());
+                ActionSave save = actionSaves.remove(actionSaves.size() - 1);
+                save.revert(this);
 
-            ActionSave save = actionSaves.remove(actionSaves.size() - 1);
-            save.revert(this);
+                volcanoTileStack.previous();
+                volcanoTileStackChanged = true;
 
-            volcanoTileStack.previous();
+                running.step = EngineStatus.TurnStep.BUILD;
+            }
+            else {
+                ActionSave save = actionSaves.remove(actionSaves.size() - 1);
+                save.revert(this);
+
+                running.step = EngineStatus.TurnStep.TILE;
+            }
+        } while (!predicate.test(this) && !(running.turn == 0 && running.step == EngineStatus.TurnStep.TILE));
+
+        if (volcanoTileStackChanged) {
             observers.forEach(o -> o.onTileStackChange(true));
-
-            running.step = EngineStatus.TurnStep.BUILD;
-            actions.updateAll();
-            // TODO See how to handle this:
-            // actions.updateWithNewTile(...);
-
-            observers.forEach(o -> o.onBuildStepStart(true));
-            getCurrentPlayer().getHandler().startBuildStep();
         }
-        else {
-            ActionSave save = actionSaves.remove(actionSaves.size() - 1);
-            save.revert(this);
 
-            running.step = EngineStatus.TurnStep.TILE;
-
-            actions.updateAll();
-
-            observers.forEach(o -> o.onTileStepStart(true));
-            getCurrentPlayer().getHandler().startTileStep();
-        }
+        actions.updateAll();
+        observers.forEach(running.step == EngineStatus.TurnStep.TILE
+                ? o -> o.onTileStepStart(true)
+                : o -> o.onBuildStepStart(true));
+        this.playerTurn = getCurrentPlayer().getHandler().startTurn(running.step);
     }
 
     private void nextStep() {
@@ -244,7 +251,6 @@ class EngineImpl implements Engine {
             }
 
             observers.forEach(o -> o.onBuildStepStart(true));
-            getCurrentPlayer().getHandler().startBuildStep();
         }
         else {
             running.turn++;
@@ -268,7 +274,7 @@ class EngineImpl implements Engine {
             actions.updateAll();
 
             observers.forEach(o -> o.onTileStepStart(true));
-            getCurrentPlayer().getHandler().startTileStep();
+            this.playerTurn = getCurrentPlayer().getHandler().startTurn(EngineStatus.TurnStep.TILE);
         }
     }
 

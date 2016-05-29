@@ -5,8 +5,8 @@ import javafx.scene.effect.Effect;
 import javafx.scene.paint.Paint;
 import map.Building;
 import ui.island.Grid;
-import ui.theme.BuildingStyle;
-import ui.theme.Theme;
+import theme.BuildingStyle;
+import theme.IslandTheme;
 
 public class BuildingShape {
 
@@ -45,10 +45,10 @@ public class BuildingShape {
     private void drawTentShape(GraphicsContext gc, Grid grid,
             double x1, double x2, double x3, double y1, double y2, double y3, double y4,
             Building building, BuildingStyle style) {
-        Paint facePaint = Theme.getCurrent().getBuildingFacePaint(building, style);
-        Paint topPaint = Theme.getCurrent().getBuildingTopPaint(building, style);
-        Effect faceEffect = Theme.getCurrent().getBuildingFaceEffect(grid, building, style);
-        Effect topEffect = Theme.getCurrent().getBuildingTopEffect(grid, building, style);
+        Paint facePaint = IslandTheme.getCurrent().getBuildingFacePaint(building, style);
+        Paint topPaint = IslandTheme.getCurrent().getBuildingTopPaint(building, style);
+        Effect faceEffect = IslandTheme.getCurrent().getBuildingFaceEffect(grid, building, style);
+        Effect topEffect = IslandTheme.getCurrent().getBuildingTopEffect(grid, building, style);
 
         double[] xpoints = new double[4];
         double[] ypoints = new double[4];
@@ -62,7 +62,7 @@ public class BuildingShape {
         gc.setFill(facePaint);
         gc.fillPolygon(xpoints, ypoints, 3);
         gc.setEffect(null);
-        gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
+        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 3);
 
@@ -78,7 +78,7 @@ public class BuildingShape {
         gc.setFill(topPaint);
         gc.fillPolygon(xpoints, ypoints, 4);
         gc.setEffect(null);
-        gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
+        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 4);
 
@@ -94,17 +94,17 @@ public class BuildingShape {
         gc.setFill(topPaint);
         gc.fillPolygon(xpoints, ypoints, 4);
         gc.setEffect(null);
-        gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
+        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 4);
     }
 
     private void drawTower(GraphicsContext gc, Grid grid,
             double x, double y, Building building, BuildingStyle style) {
-        Paint facePaint = Theme.getCurrent().getBuildingFacePaint(building, style);
-        Paint topPaint = Theme.getCurrent().getBuildingTopPaint(building, style);
-        Effect faceEffect = Theme.getCurrent().getBuildingFaceEffect(grid, building, style);
-        Effect topEffect = Theme.getCurrent().getBuildingTopEffect(grid, building, style);
+        Paint facePaint = IslandTheme.getCurrent().getBuildingFacePaint(building, style);
+        Paint topPaint = IslandTheme.getCurrent().getBuildingTopPaint(building, style);
+        Effect faceEffect = IslandTheme.getCurrent().getBuildingFaceEffect(grid, building, style);
+        Effect topEffect = IslandTheme.getCurrent().getBuildingTopEffect(grid, building, style);
 
         double hexRadiusX = grid.getHexRadiusX();
         double hexRadiusY = grid.getHexRadiusY();
@@ -120,7 +120,7 @@ public class BuildingShape {
         gc.setFill(facePaint);
         gc.fillOval(xstart, ybottom, width, height);
         gc.setEffect(null);
-        gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
+        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokeOval(xstart, ybottom, width, height);
 
@@ -128,7 +128,7 @@ public class BuildingShape {
         gc.setFill(facePaint);
         gc.fillRect(xstart, ytop + height/2, width, ybottom - ytop);
         gc.setEffect(null);
-        gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
+        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokeLine(xstart, ytop + height/2, xstart, ybottom + height/2);
         gc.strokeLine(xstart + width, ytop + height/2, xstart + width, ybottom + height/2);
@@ -137,7 +137,7 @@ public class BuildingShape {
         gc.setFill(topPaint);
         gc.fillOval(xstart, ytop, width, height);
         gc.setEffect(null);
-        gc.setStroke(Theme.getCurrent().getBuildingBorderPaint());
+        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint());
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokeOval(xstart, ytop, width, height);
     }

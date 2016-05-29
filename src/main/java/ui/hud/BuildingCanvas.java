@@ -6,7 +6,7 @@ import javafx.scene.canvas.GraphicsContext;
 import map.Building;
 import ui.island.Grid;
 import ui.shape.BuildingShape;
-import ui.theme.BuildingStyle;
+import theme.BuildingStyle;
 
 public class BuildingCanvas extends Canvas {
 

@@ -1,4 +1,4 @@
-package ui.theme;
+package theme;
 
 public enum HexStyle {
 

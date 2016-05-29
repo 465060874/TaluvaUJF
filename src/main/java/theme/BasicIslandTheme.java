@@ -1,4 +1,4 @@
-package ui.theme;
+package theme;
 
 import data.FieldType;
 import javafx.geometry.Insets;
@@ -13,7 +13,7 @@ import javafx.scene.paint.Paint;
 import map.Building;
 import ui.island.Grid;
 
-public class BasicTheme implements Theme {
+public class BasicIslandTheme implements IslandTheme {
 
     private final Color SEA_COLOR = Color.web("5E81A2");
     private final Background islandBackground = new Background(
@@ -106,10 +106,10 @@ public class BasicTheme implements Theme {
 
     private Color getBuildingTopColor(Building building) {
         switch (building.getColor()) {
-            case RED:    return PlayerColorTheme.RED.color();
-            case WHITE:  return PlayerColorTheme.WHITE.color();
-            case BROWN:  return PlayerColorTheme.BROWN.color();
-            case YELLOW: return PlayerColorTheme.YELLOW.color();
+            case RED:    return PlayerTheme.RED.color();
+            case WHITE:  return PlayerTheme.WHITE.color();
+            case BROWN:  return PlayerTheme.BROWN.color();
+            case YELLOW: return PlayerTheme.YELLOW.color();
         }
 
         throw new IllegalStateException();

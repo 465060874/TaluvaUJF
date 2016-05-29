@@ -11,8 +11,8 @@ import javafx.scene.text.TextAlignment;
 import map.*;
 import ui.shape.BuildingShape;
 import ui.shape.HexShape;
-import ui.theme.BuildingStyle;
-import ui.theme.HexStyle;
+import theme.BuildingStyle;
+import theme.HexStyle;
 
 import java.util.ArrayList;
 import java.util.List;

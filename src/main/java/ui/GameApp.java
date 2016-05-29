@@ -3,9 +3,7 @@ package ui;
 import IA.BotPlayerHandler;
 import data.BuildingType;
 import data.PlayerColor;
-import engine.Engine;
-import engine.EngineBuilder;
-import engine.PlayerHandler;
+import engine.*;
 import engine.action.Action;
 import engine.action.SeaTileAction;
 import javafx.application.Application;
@@ -68,6 +66,22 @@ public class GameApp extends Application {
 
     public class FXUIPlayerHandler implements PlayerHandler {
 
+        public FXUIPlayerHandler() {
+        }
+
+        @Override
+        public boolean isHuman() {
+            return true;
+        }
+
+        @Override
+        public PlayerTurn startTurn(EngineStatus.TurnStep step) {
+            return new FXUIPlayerTurn(step);
+        }
+    }
+
+    public class FXUIPlayerTurn implements PlayerTurn {
+
         private final EventHandler<MouseEvent> mousePressed;
         private final EventHandler<MouseEvent> mouseDragged;
         private final EventHandler<MouseEvent> mouseReleasedTile;
@@ -75,41 +89,23 @@ public class GameApp extends Application {
 
         private boolean dragged;
 
-        public FXUIPlayerHandler() {
+        public FXUIPlayerTurn(EngineStatus.TurnStep step) {
             this.mousePressed = this::mousePressed;
             this.mouseDragged = this::mouseDragged;
             this.mouseReleasedTile = this::mouseReleasedTile;
             this.mouseReleasedBuild = this::mouseReleasedBuild;
-        }
 
-        private void mousePressed(MouseEvent mouseEvent) {
-            dragged = false;
-        }
+            this.dragged = false;
 
-        private void mouseDragged(MouseEvent mouseEvent) {
-            dragged = true;
-        }
+            gameView.addEventHandler(MouseEvent.MOUSE_PRESSED, mousePressed);
+            gameView.addEventHandler(MouseEvent.MOUSE_DRAGGED, mouseDragged);
 
-        @Override
-        public void startTileStep() {
-            if (engine.getIsland().isEmpty()) {
-                SeaTileAction firstAction = engine.getSeaTileActions().get(0);
-                engine.placeOnSea(firstAction);
-                return;
+            if (step == EngineStatus.TurnStep.TILE) {
+                prepareTileStep();
             }
-
-            gameView.getPlacement().placeTile(engine.getVolcanoTileStack().current());
-            gameView.addEventHandler(MouseEvent.MOUSE_PRESSED, mousePressed);
-            gameView.addEventHandler(MouseEvent.MOUSE_DRAGGED, mouseDragged);
-            gameView.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseReleasedTile);
-        }
-
-        @Override
-        public void startBuildStep() {
-            gameView.getPlacement().build(engine.getCurrentPlayer().getColor());
-            gameView.addEventHandler(MouseEvent.MOUSE_PRESSED, mousePressed);
-            gameView.addEventHandler(MouseEvent.MOUSE_DRAGGED, mouseDragged);
-            gameView.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseReleasedBuild);
+            else {
+                prepareBuildStep();
+            }
         }
 
         @Override
@@ -121,19 +117,42 @@ public class GameApp extends Application {
             gameView.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseReleasedBuild);
         }
 
-        private void mouseReleasedTile(MouseEvent event) {
+        private void mousePressed(MouseEvent mouseEvent) {
+            dragged = false;
+        }
 
+        private void mouseDragged(MouseEvent mouseEvent) {
+            dragged = true;
+        }
+
+        private void prepareTileStep() {
+            if (engine.getIsland().isEmpty()) {
+                SeaTileAction firstAction = engine.getSeaTileActions().get(0);
+                engine.placeOnSea(firstAction);
+                prepareBuildStep();
+            }
+            else {
+                gameView.getPlacement().placeTile(engine.getVolcanoTileStack().current());
+                gameView.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseReleasedTile);
+            }
+        }
+
+        private void prepareBuildStep() {
+            gameView.getPlacement().build(engine.getCurrentPlayer().getColor());
+            gameView.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseReleasedBuild);
+        }
+
+        private void mouseReleasedTile(MouseEvent event) {
             if (event.getButton() == MouseButton.PRIMARY && gameView.getPlacement().isValid()) {
                 if (dragged) {
                     return;
                 }
 
-                gameView.removeEventHandler(MouseEvent.MOUSE_PRESSED, mousePressed);
-                gameView.removeEventHandler(MouseEvent.MOUSE_DRAGGED, mouseDragged);
                 gameView.removeEventHandler(MouseEvent.MOUSE_RELEASED, mouseReleasedTile);
                 Action action = gameView.getPlacement().getAction();
                 gameView.getPlacement().cancel();
                 engine.action(action);
+                prepareBuildStep();
             }
             else if (event.getButton() == MouseButton.SECONDARY) {
                 gameView.getPlacement().cycleTileOrientationOrBuildingType();

@@ -11,8 +11,8 @@ import map.Island;
 import map.Neighbor;
 import ui.shape.BuildingShape;
 import ui.shape.HexShape;
-import ui.theme.BuildingStyle;
-import ui.theme.HexStyle;
+import theme.BuildingStyle;
+import theme.HexStyle;
 
 class PlacementOverlay extends Canvas {
 

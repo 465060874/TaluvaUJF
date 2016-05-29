@@ -2,7 +2,7 @@ package menu;
 
 import IA.IADifficulty;
 import javafx.scene.layout.*;
-import ui.theme.PlayerColorTheme;
+import theme.PlayerTheme;
 import data.PlayerColor;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -31,10 +31,6 @@ import java.util.List;
  * Created by zhaon on 25/05/16.
  */
 public class Home4 extends Application {
-
-    static final String[] nomdimage = new String[]{"w.png", "r.png", "y.png","b.png"};
-    static final Image[] images = new Image[nomdimage.length];
-    static final ImageView[] pics = new ImageView[nomdimage.length];
 
     static double size_ratio = 580.0 / 800.0;
     static int hauteurScene = 600;
@@ -71,7 +67,7 @@ public class Home4 extends Application {
 
     @Override public void start(Stage stage) {
         this.stage = stage;
-        //System.out.println(PlayerColorTheme.BROWN);
+        //System.out.println(PlayerTheme.BROWN);
         //scene
         stage.setTitle("TALUVA_V3");
         Group root = new Group();
@@ -99,12 +95,6 @@ public class Home4 extends Application {
 
 
         vBoxScene.getChildren().addAll(vBoxHaut,hBoxMillieu,hBoxBas);
-
-        // Tableau des images
-        for (int i = 0; i < nomdimage.length; i++)
-            images[i] = new Image(getClass().getResourceAsStream(nomdimage[i]));
-
-
 
         //vBoxHaut
         Image vs1 = new Image(getClass().getResourceAsStream("fb.png"));
@@ -255,11 +245,8 @@ public class Home4 extends Application {
         vBoxd1.getChildren().add(niveaux);
 
         this.bicone = new Button();
-        Image imageDecline = new Image(getClass().getResourceAsStream(nomdimage[menuData.getSoloColor().ordinal()]));
         bicone.setPadding(new Insets(0,0,0,0));
-        bicone.setGraphic(new ImageView(imageDecline));
-        bicone.setStyle("-fx-background-color: " + PlayerColorTheme.values()[menuData.getSoloColor().ordinal()].cssDefinition() +";");
-
+        updateSoloColorButton();
 
         bicone.setPrefWidth(largeurScene/3);
         Image vs = new Image(getClass().getResourceAsStream("vs.png"));
@@ -458,9 +445,17 @@ public class Home4 extends Application {
 
     private void updateSoloColor(ActionEvent event) {
         int index = (menuData.getSoloColor().ordinal() + 1) % PlayerColor.values().length;
-        bicone.setStyle("-fx-background-color: " + PlayerColorTheme.values()[index].cssDefinition() +";");
-        bicone.setGraphic(new ImageView(images[index]));
         menuData.setSoloColor(PlayerColor.values()[index]);
+        updateSoloColorButton();
+    }
+
+    private void updateSoloColorButton() {
+        PlayerTheme playerTheme = PlayerTheme.values()[menuData.getSoloColor().ordinal()];
+        bicone.setStyle("-fx-background-color: " + playerTheme.cssDefinition() +";");
+        ImageView imageView = new ImageView(playerTheme.getImage());
+        imageView.setFitWidth(90);
+        imageView.setFitHeight(90);
+        bicone.setGraphic(imageView);
     }
 
     private void updateMode() {

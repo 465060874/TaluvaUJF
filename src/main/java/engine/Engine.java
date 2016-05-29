@@ -7,6 +7,7 @@ import map.Island;
 
 import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
 
 public interface Engine {
 
@@ -69,6 +70,11 @@ public interface Engine {
      * Annule le dernier coup (placement ou construction)
      */
     void cancelLastStep();
+
+    /**
+     * Annule les derniers coups jusqu'à ce que le prédicat retourne vrai
+     */
+    void cancelUntil(Predicate<Engine> engine);
 
     /**
      * Retourne le numéro de tour (un tour est un placement et une construction d'un joueur)
