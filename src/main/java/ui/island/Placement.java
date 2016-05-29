@@ -205,7 +205,7 @@ public class Placement {
 
     private void updateValidBuilding() {
         boolean wasValid = valid;
-        this.valid = PlaceBuildingRules.validate(engine, buildingType, hex);
+        this.valid = PlaceBuildingRules.validate(engine, buildingType, hex).isValid();
 
         redrawWhatsNecessary(wasValid);
     }

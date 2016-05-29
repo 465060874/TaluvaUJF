@@ -377,31 +377,38 @@ class BotPlayer {
                 }
                 return true;
             }
-        }else{
+        }
+        else {
             // Placement volcan + construction simple
             if( build instanceof PlaceBuildingAction ) {
                 engine.action(placement);
-                if (!validate(engine, ((PlaceBuildingAction) build).getType(), ((PlaceBuildingAction) build).getHex())) {
+                BuildingType buildingType = ((PlaceBuildingAction) build).getType();
+                Hex buildingHex = ((PlaceBuildingAction) build).getHex();
+                if (!validate(engine, buildingType, buildingHex).isValid()) {
                     engine.cancelLastStep();
                     return false;
-                }else {
-                    engine.cancelLastStep();
-                    return (placement.getLeftHex() != ((PlaceBuildingAction) build).getHex()
-                            && placement.getRightHex() != ((PlaceBuildingAction) build).getHex());
                 }
-            }else {
+                else {
+                    engine.cancelLastStep();
+                    return (placement.getLeftHex() != buildingHex
+                            && placement.getRightHex() != buildingHex);
+                }
+            }
+            else {
                 // On vérifie que le placement ne modifie pas l'extension :
                 if( placement.getLeftFieldType() == ((ExpandVillageAction)build).getFieldType() ){
                     for(Hex neighbor : placement.getLeftHex().getNeighborhood() )
                         if( engine.getIsland().getField(neighbor).getBuilding().getType() != BuildingType.NONE)
                             if( engine.getIsland().getVillage( neighbor).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
                                 return false;
-                }else if( placement.getRightFieldType() == ((ExpandVillageAction)build).getFieldType() ){
+                }
+                else if (placement.getRightFieldType() == ((ExpandVillageAction)build).getFieldType()){
                     for(Hex neighbor : placement.getRightHex().getNeighborhood() )
                         if( engine.getIsland().getField(neighbor).getBuilding().getType() != BuildingType.NONE)
                             if( engine.getIsland().getVillage( neighbor).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
                                 return false;
                 }
+
                 // On vérifie qu'on écrase pas le village
                 if( engine.getIsland().getField(placement.getLeftHex()).getBuilding().getType() != BuildingType.NONE)
                     if( engine.getIsland().getVillage( placement.getLeftHex()).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))

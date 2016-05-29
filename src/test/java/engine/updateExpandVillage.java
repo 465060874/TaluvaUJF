@@ -274,19 +274,20 @@ public class updateExpandVillage {
         assertFalse(engine.getStatus() instanceof EngineStatus.Finished);
         Assert.assertTrue(engine.getCurrentPlayer().getColor() == PlayerColor.RED);
 
-        ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesExpected = ImmutableSetMultimap.builder();
-        builderVillagesExpected.put(island.getVillage(Hex.at(-2, 1)), FieldType.SAND);
-        builderVillagesExpected.put(island.getVillage(Hex.at(2, -1)), FieldType.JUNGLE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(2, -1)), FieldType.LAKE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(2, -1)), FieldType.CLEARING);
-        builderVillagesExpected.put(island.getVillage(Hex.at(4, -1)), FieldType.CLEARING);
-        builderVillagesExpected.put(island.getVillage(Hex.at(4, -1)), FieldType.LAKE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(1, 3)), FieldType.SAND);
-        builderVillagesExpected.put(island.getVillage(Hex.at(1, 3)), FieldType.CLEARING);
-        builderVillagesExpected.put(island.getVillage(Hex.at(1, 3)), FieldType.JUNGLE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(1, 3)), FieldType.ROCK);
-        builderVillagesExpected.put(island.getVillage(Hex.at(1, 3)), FieldType.LAKE);
-        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeExpected = builderVillagesExpected.build();
+        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeExpected =
+                ImmutableSetMultimap.<Village, FieldType>builder()
+                        .put(island.getVillage(Hex.at(-2, 1)), FieldType.SAND)
+                        .put(island.getVillage(Hex.at(2, -1)), FieldType.JUNGLE)
+                        .put(island.getVillage(Hex.at(2, -1)), FieldType.LAKE)
+                        .put(island.getVillage(Hex.at(2, -1)), FieldType.CLEARING)
+                        .put(island.getVillage(Hex.at(4, -1)), FieldType.CLEARING)
+                        .put(island.getVillage(Hex.at(4, -1)), FieldType.LAKE)
+                        .put(island.getVillage(Hex.at(1, 3)), FieldType.SAND)
+                        .put(island.getVillage(Hex.at(1, 3)), FieldType.CLEARING)
+                        .put(island.getVillage(Hex.at(1, 3)), FieldType.JUNGLE)
+                        .put(island.getVillage(Hex.at(1, 3)), FieldType.ROCK)
+                        .put(island.getVillage(Hex.at(1, 3)), FieldType.LAKE)
+                        .build();
 
         Set<ExpandVillageAction> actualAction = getExpandVillageActionsUnique(engine);
         ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesActual = ImmutableSetMultimap.builder();
