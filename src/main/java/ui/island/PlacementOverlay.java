@@ -36,7 +36,36 @@ class PlacementOverlay extends Canvas {
         heightProperty().addListener(this::resize);
     }
 
-    private ImmutableList<HexToDraw> placedFreeInfos() {
+    private void resize(Observable event) {
+        redraw();
+    }
+
+    void redraw() {
+        GraphicsContext gc = getGraphicsContext2D();
+        gc.clearRect(0, 0, getWidth(), getHeight());
+
+        if (!placement.valid) {
+            if (placement.mode == Placement.Mode.BUILDING) {
+                buildingShape.draw(gc, grid,
+                        placement.mouseX + 5,
+                        placement.mouseY,
+                        1,
+                        Building.of(placement.buildingType, placement.buildingColor),
+                        placement.valid ? BuildingStyle.HIGHLIGHTED : BuildingStyle.NORMAL);
+            }
+            else if (placement.mode == Placement.Mode.TILE) {
+                for (HexToDraw info : placedHexes()) {
+                    hexShape.draw(gc, grid,
+                            info.x, info.y, info.level, info.fieldType, info.orientation, info.hexStyle);
+                }
+            }
+        }
+
+        setTranslateX(0);
+        setTranslateY(0);
+    }
+
+    private ImmutableList<HexToDraw> placedHexes() {
         Neighbor leftNeighbor = Neighbor.leftOf(placement.tileOrientation);
         Neighbor rightNeighbor = Neighbor.rightOf(placement.tileOrientation);
 
@@ -69,34 +98,5 @@ class PlacementOverlay extends Canvas {
                 BuildingStyle.NORMAL);
 
         return Ordering.natural().immutableSortedCopy(ImmutableList.of(info1, info2, info3));
-    }
-
-    private void resize(Observable event) {
-        redraw();
-    }
-
-    void redraw() {
-        GraphicsContext gc = getGraphicsContext2D();
-        gc.clearRect(0, 0, getWidth(), getHeight());
-
-        if (!placement.valid) {
-            if (placement.mode == Placement.Mode.BUILDING) {
-                buildingShape.draw(gc, grid,
-                        placement.mouseX + 5,
-                        placement.mouseY,
-                        island.getField(placement.hex).getLevel(),
-                        Building.of(placement.buildingType, placement.buildingColor),
-                        placement.valid ? BuildingStyle.HIGHLIGHTED : BuildingStyle.NORMAL);
-            }
-            else if (placement.mode == Placement.Mode.TILE) {
-                for (HexToDraw info : placedFreeInfos()) {
-                    hexShape.draw(gc, grid,
-                            info.x, info.y, info.level, info.fieldType, info.orientation, info.hexStyle);
-                }
-            }
-        }
-
-        setTranslateX(0);
-        setTranslateY(0);
     }
 }

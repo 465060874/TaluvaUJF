@@ -122,6 +122,17 @@ class IslandCanvas extends Canvas {
                     building = Building.of(placement.buildingType, placement.buildingColor);
                     hexStyle = HexStyle.HIGHLIGHTED;
                 }
+                else if (island.getField(placement.hex).getBuilding().getType() != BuildingType.NONE) {
+                    if (island.getVillage(placement.hex).getHexes().contains(hex)
+                            || island.getVillage(placement.hex).getExpandableHexes().containsValue(hex)) {
+                        building = field.getBuilding();
+                        hexStyle = HexStyle.NORMAL;
+                    }
+                    else {
+                        building = field.getBuilding();
+                        hexStyle = HexStyle.FADED;
+                    }
+                }
                 else if (placement.validHexes.contains(hex)) {
                     building = field.getBuilding();
                     hexStyle = HexStyle.NORMAL;

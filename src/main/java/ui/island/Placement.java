@@ -10,10 +10,7 @@ import engine.Engine;
 import engine.action.*;
 import engine.rules.PlaceBuildingRules;
 import engine.rules.TileRules;
-import map.Field;
-import map.Hex;
-import map.Orientation;
-import map.Village;
+import map.*;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -181,12 +178,18 @@ public class Placement {
             return;
         }
 
+        Field oldField = engine.getIsland().getField(hex);
         hex = newHex;
         if (mode == Mode.TILE) {
             updateValidTile();
         }
         else if (mode == Mode.BUILDING) {
             updateValidBuilding();
+            Field field = engine.getIsland().getField(hex);
+            if ((oldField.getBuilding().getType() == BuildingType.NONE)
+                    != (field.getBuilding().getType() == BuildingType.NONE)) {
+                islandCanvas.redraw();
+            }
         }
         else if (mode == Mode.EXPAND_VILLAGE) {
             updateValidExpansion();
