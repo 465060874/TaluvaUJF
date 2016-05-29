@@ -472,9 +472,13 @@ public class Home4 extends Application {
 
         root.getChildren().add(vBoxScene);
 
-        stage.setResizable(false);
         stage.setScene(scene);
-        stage.show();
+        stage.setWidth(scene.getWidth());
+        stage.setHeight(scene.getHeight() + 20);
+        stage.setResizable(false);
+        if (!stage.isShowing()) {
+            stage.show();
+        }
     }
 
     private void updateMode() {

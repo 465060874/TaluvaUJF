@@ -10,6 +10,7 @@ import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
 import javafx.beans.Observable;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
@@ -65,12 +66,14 @@ public class Hud extends AnchorPane implements EngineObserver {
         textBottom.setPadding(new Insets(0, 0, 20, 0));
         AnchorPane.setBottomAnchor(textBottom, 0.0);
 
+        IconButton undoButton = new IconButton("hud/undo.png");
+        undoButton.setOnAction(this::undo);
         this.tileStackCanvas = new TileStackCanvas(engine);
         this.tileStackSize = new Text();
         tileStackSize.setFont(new Font(20));
         TextFlow tileStackSizeFlow = new TextFlow(tileStackSize);
         tileStackSizeFlow.setTextAlignment(TextAlignment.CENTER);
-        this.tileStackPane = new VBox(tileStackCanvas, tileStackSizeFlow);
+        this.tileStackPane = new VBox(undoButton, tileStackCanvas, tileStackSizeFlow);
         AnchorPane.setRightAnchor(tileStackPane, 0.0);
 
         getChildren().addAll(leftButtons, textBottom, tileStackPane);
@@ -82,6 +85,13 @@ public class Hud extends AnchorPane implements EngineObserver {
 
         engine.registerObserver(this);
 
+    }
+
+    private void undo(ActionEvent event) {
+        if (engine.getStatus().getStep() == EngineStatus.TurnStep.TILE) {
+            engine.cancelLastStep();
+        }
+        engine.cancelLastStep();
     }
 
     private void resizeWidth(Observable observable) {
