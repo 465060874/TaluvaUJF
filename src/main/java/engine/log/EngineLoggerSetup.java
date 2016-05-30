@@ -1,7 +1,6 @@
 package engine.log;
 
 import engine.Engine;
-import sun.rmi.runtime.Log;
 
 import java.io.File;
 import java.io.IOException;

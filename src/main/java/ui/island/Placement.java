@@ -12,6 +12,7 @@ import engine.rules.PlaceBuildingRules;
 import engine.rules.TileRules;
 import map.*;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,7 +20,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 public class Placement {
 
-    private Mode saveMode;
 
     public enum Mode {
         NONE,
@@ -38,7 +38,10 @@ public class Placement {
     double mouseY;
 
     Mode mode;
+    Mode saveMode;
+
     boolean valid;
+    Set<Hex> validHexes;
     Hex hex;
 
     VolcanoTile tile;
@@ -90,13 +93,31 @@ public class Placement {
         this.mode = Mode.TILE;
         this.tile = tile;
         this.tileOrientation = Orientation.NORTH;
+
+        this.validHexes = new HashSet<>();
+        for (TileAction action : engine.getVolcanoTileActions()) {
+            validHexes.add(action.getVolcanoHex());
+            validHexes.add(action.getLeftHex());
+            validHexes.add(action.getRightHex());
+        }
+
         updateValidTile();
+        islandCanvas.redraw();
     }
 
     public void build(PlayerColor color) {
         this.mode = Mode.BUILDING;
         this.buildingType = BuildingType.HUT;
         this.buildingColor = color;
+
+        this.validHexes = new HashSet<>();
+        for (PlaceBuildingAction action : engine.getPlaceBuildingActions()) {
+            validHexes.add(action.getHex());
+        }
+        for (ExpandVillageAction action : engine.getExpandVillageActions()) {
+            validHexes.addAll(action.getVillage(engine.getIsland()).getHexes());
+        }
+
         updateValidBuilding();
         islandCanvas.redraw();
     }
@@ -157,12 +178,18 @@ public class Placement {
             return;
         }
 
+        Field oldField = engine.getIsland().getField(hex);
         hex = newHex;
         if (mode == Mode.TILE) {
             updateValidTile();
         }
         else if (mode == Mode.BUILDING) {
             updateValidBuilding();
+            Field field = engine.getIsland().getField(hex);
+            if ((oldField.getBuilding().getType() == BuildingType.NONE)
+                    != (field.getBuilding().getType() == BuildingType.NONE)) {
+                islandCanvas.redraw();
+            }
         }
         else if (mode == Mode.EXPAND_VILLAGE) {
             updateValidExpansion();
@@ -178,7 +205,7 @@ public class Placement {
 
     private void updateValidBuilding() {
         boolean wasValid = valid;
-        this.valid = PlaceBuildingRules.validate(engine, buildingType, hex);
+        this.valid = PlaceBuildingRules.validate(engine, buildingType, hex).isValid();
 
         redrawWhatsNecessary(wasValid);
     }

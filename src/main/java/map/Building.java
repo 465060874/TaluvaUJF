@@ -21,6 +21,10 @@ import static com.google.common.base.Preconditions.*;
  */
 public class Building {
 
+    public static Building none() {
+        return values[0];
+    }
+
     public static Building of(BuildingType type, PlayerColor color) {
         if (type == BuildingType.NONE) {
             checkArgument(color == null);

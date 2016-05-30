@@ -5,7 +5,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.StackPane;
 import map.Island;
-import ui.theme.Theme;
+import theme.IslandTheme;
 
 public class IslandView extends StackPane {
 
@@ -38,7 +38,7 @@ public class IslandView extends StackPane {
         getChildren().add(islandCanvas);
         getChildren().add(placementOverlay);
 
-        Theme.addListener(this::updateTheme);
+        IslandTheme.addListener(this::updateTheme);
         updateTheme();
 
         setOnMousePressed(this::mousePressed);
@@ -48,7 +48,7 @@ public class IslandView extends StackPane {
     }
 
     private void updateTheme() {
-        setBackground(Theme.getCurrent().getIslandBackground());
+        setBackground(IslandTheme.getCurrent().getIslandBackground());
         islandCanvas.redraw();
         placementOverlay.redraw();
     }

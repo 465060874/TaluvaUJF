@@ -132,18 +132,36 @@ public class EngineRecord {
         }
 
         @Override
-        public void startTileStep() {
-            engine.action(actions.next());
+        public boolean isHuman() {
+            return false;
         }
 
         @Override
-        public void startBuildStep() {
-            engine.action(actions.next());
+        public PlayerTurn startTurn(EngineStatus.TurnStep step) {
+            Action nextAction = actions.next();
+            return step == EngineStatus.TurnStep.TILE
+                ? new RecordPlayerTurn(engine, nextAction, actions.next())
+                : new RecordPlayerTurn(engine, nextAction);
+        }
+    }
+
+    private static class RecordPlayerTurn implements PlayerTurn {
+
+        private final Engine engine;
+        private final Action[] actions;
+
+        public RecordPlayerTurn(Engine engine, Action... actions) {
+            this.engine = engine;
+            this.actions = actions;
+
+            for (Action action : actions) {
+                engine.action(action);
+            }
         }
 
         @Override
         public void cancel() {
-            throw new UnsupportedOperationException();
+            throw new IllegalStateException();
         }
     }
 }

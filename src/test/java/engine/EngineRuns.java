@@ -1,5 +1,6 @@
 package engine;
 
+import IA.BotPlayerHandler;
 import data.PlayerColor;
 
 import java.text.DecimalFormat;
@@ -21,9 +22,7 @@ public class EngineRuns {
             engine = EngineBuilder.allVsAll()
                     .logLevel(Level.INFO)
                     .player(PlayerColor.RED, PlayerHandler.dumbFactory())
-                    .player(PlayerColor.WHITE, PlayerHandler.dumbFactory())
-                    .player(PlayerColor.BROWN, PlayerHandler.dumbFactory())
-                    .player(PlayerColor.YELLOW, PlayerHandler.dumbFactory())
+                    .player(PlayerColor.WHITE, BotPlayerHandler.factory(16, 0))
                     .build();
 
             engine.logger().info("* Début de la partie avec la graine {0}", Long.toString(engine.getSeed()));

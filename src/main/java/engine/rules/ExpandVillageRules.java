@@ -9,13 +9,16 @@ import map.Village;
 
 import java.util.Set;
 
+import static engine.rules.Problem.EXPAND_NOT_ENOUGH_BUILDING;
+import static engine.rules.Problem.EXPAND_NO_ADJACENT_TILE;
+
 public class ExpandVillageRules {
 
-    public static boolean validate(Engine engine, Village village, FieldType fieldType) {
+    public static Problems validate(Engine engine, Village village, FieldType fieldType) {
         Island island = engine.getIsland();
         Set<Hex> expansion = village.getExpandableHexes().get(fieldType);
         if (expansion.isEmpty()) {
-            return false;
+            return Problems.of(EXPAND_NO_ADJACENT_TILE);
         }
 
         int hutsCount = 0;
@@ -23,6 +26,8 @@ public class ExpandVillageRules {
             hutsCount += island.getField(hex).getLevel();
         }
 
-        return hutsCount <= engine.getCurrentPlayer().getBuildingCount(BuildingType.HUT);
+        return hutsCount <= engine.getCurrentPlayer().getBuildingCount(BuildingType.HUT)
+                ? Problems.of()
+                : Problems.of(EXPAND_NOT_ENOUGH_BUILDING);
     }
 }
