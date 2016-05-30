@@ -9,6 +9,7 @@ import theme.IslandTheme;
 
 public class IslandView extends StackPane {
 
+    private static final double DRAGGEDLIMIT = 35000;
     private final Grid grid;
 
     private final IslandCanvas islandCanvas;
@@ -19,6 +20,10 @@ public class IslandView extends StackPane {
     private double mouseYBeforeDrag;
     private double mouseX;
     private double mouseY;
+
+    private boolean mouseDragged;
+    private double draggedX;
+    private double draggedY;
 
     public IslandView(Island island, boolean debug) {
         this(island, new Grid(), new Placement(null, null), debug);
@@ -34,6 +39,10 @@ public class IslandView extends StackPane {
         this.mousePressed = false;
         this.mouseX = 0;
         this.mouseY = 0;
+
+        this.mouseDragged = false;
+        this.draggedX = 0;
+        this.draggedY = 0;
 
         getChildren().add(islandCanvas);
         getChildren().add(placementOverlay);
@@ -92,24 +101,45 @@ public class IslandView extends StackPane {
             return;
         }
 
-        islandCanvas.setTranslateX(islandCanvas.getTranslateX() + event.getX() - mouseX);
-        islandCanvas.setTranslateY(islandCanvas.getTranslateY() + event.getY() - mouseY);
+        if (!mouseDragged) {
 
-        placementOverlay.setTranslateX(placementOverlay.getTranslateX() + event.getX() - mouseX);
-        placementOverlay.setTranslateY(placementOverlay.getTranslateY() + event.getY() - mouseY);
+            this.draggedX += Math.abs(event.getX() - mouseX);
+            this.draggedY += Math.abs(event.getY() - mouseY);
 
-        mouseX = event.getX();
-        mouseY = event.getY();
+            System.out.println(draggedX*draggedX + draggedY*draggedY);
+
+            if ((draggedX*draggedX + draggedY*draggedY) > DRAGGEDLIMIT) {
+                mouseDragged = true;
+                System.out.println("DRAGGED");
+            } else {
+                System.out.println("NOT DRAGGED");
+                return;
+            }
+        } else {
+
+            islandCanvas.setTranslateX(islandCanvas.getTranslateX() + event.getX() - mouseX);
+            islandCanvas.setTranslateY(islandCanvas.getTranslateY() + event.getY() - mouseY);
+
+            placementOverlay.setTranslateX(placementOverlay.getTranslateX() + event.getX() - mouseX);
+            placementOverlay.setTranslateY(placementOverlay.getTranslateY() + event.getY() - mouseY);
+
+            mouseX = event.getX();
+            mouseY = event.getY();
+        }
     }
 
     private void mouseReleased(MouseEvent event) {
+        draggedY = 0;
+        draggedX = 0;
         mousePressed = false;
         if (event.getButton() != MouseButton.PRIMARY) {
             return;
         }
-
-        grid.translate(mouseXBeforeDrag - event.getX(), mouseYBeforeDrag - event.getY());
-        islandCanvas.redraw();
+        if (mouseDragged) {
+            grid.translate(mouseXBeforeDrag - event.getX(), mouseYBeforeDrag - event.getY());
+            islandCanvas.redraw();
+            mouseDragged = false;
+        }
     }
 
     private void scroll(ScrollEvent event) {
@@ -125,5 +155,9 @@ public class IslandView extends StackPane {
 
     public void redrawIsland() {
         islandCanvas.redraw();
+    }
+
+    public boolean isMouseDragged() {
+        return mouseDragged;
     }
 }

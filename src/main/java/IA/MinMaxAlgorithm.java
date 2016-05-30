@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static engine.rules.PlaceBuildingRules.validate;
 
-class BotPlayer {
+class MinMaxAlgorithm implements IAAlgorithm {
 
     // Strategies possibles pour l'IA
     private static final int NB_STRATEGIES = 4;
@@ -30,7 +30,7 @@ class BotPlayer {
     private final int[] strategyPoints = new int[NB_STRATEGIES];
 
     // Constructeur
-    BotPlayer(int branchingFactor, int totalDepth, Heuristics heuristics, Engine realEngine, AtomicBoolean cancelled) {
+    MinMaxAlgorithm(int branchingFactor, int totalDepth, Heuristics heuristics, Engine realEngine, AtomicBoolean cancelled) {
         this.branchingFactor = branchingFactor;
         this.totalDepth = totalDepth;
         this.heuristics = heuristics;
@@ -40,7 +40,8 @@ class BotPlayer {
     }
 
     // Jouer un coup
-    Move play() {
+    @Override
+    public Move play() {
         Engine engineCopy = realEngine.copyWithoutObservers();
         Move m =  realEngine.getStatus().getTurn() == 0
                 ? doFirstPlay(engineCopy)
@@ -96,12 +97,12 @@ class BotPlayer {
         for (int i = 0; i < branchNb; i++) {
             engine.action(branchMoves[i].tileAction);
             engine.action(branchMoves[i].buildingAction);
-            /*if( engine.getStatus() instanceof EngineStatus.Finished ){
+            if( engine.getStatus() instanceof EngineStatus.Finished ){
                 if( ((EngineStatus.Finished) engine.getStatus()).getWinners().contains( engine.getCurrentPlayer()))
                     return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MIN_VALUE );
                 else
                     return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MAX_VALUE );
-            }else */if (depth > 0) {
+            }else if (depth > 0) {
                 Move m = doPlay(engine, depth - 1);
                 // Pour inverser entre min et max
                 m.points *= -1;

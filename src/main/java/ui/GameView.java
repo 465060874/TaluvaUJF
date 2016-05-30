@@ -116,4 +116,8 @@ public class GameView extends StackPane implements EngineObserver {
     @Override
     public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
     }
+
+    public boolean isMouseDragged(){
+        return islandView.isMouseDragged();
+    }
 }

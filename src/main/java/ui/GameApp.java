@@ -1,6 +1,7 @@
 package ui;
 
 import IA.BotPlayerHandler;
+import IA.IADifficulty;
 import data.BuildingType;
 import data.PlayerColor;
 import engine.*;
@@ -27,7 +28,7 @@ public class GameApp extends Application {
     public GameApp() {
         this.engine = EngineBuilder.allVsAll()
                 .player(PlayerColor.BROWN, e -> new FXUIPlayerHandler())
-                .player(PlayerColor.WHITE, BotPlayerHandler.factory(16, 1))
+                .player(PlayerColor.WHITE, IADifficulty.DIFFICILE.create())
                 .build();
     }
 
@@ -122,7 +123,10 @@ public class GameApp extends Application {
         }
 
         private void mouseDragged(MouseEvent mouseEvent) {
-            dragged = true;
+            if (!dragged && gameView.isMouseDragged()) {
+                System.out.println("GAMEAPP DRAGGED");
+                dragged = true;
+            }
         }
 
         private void prepareTileStep() {

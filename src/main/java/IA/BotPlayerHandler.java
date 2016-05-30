@@ -6,22 +6,20 @@ import engine.PlayerHandler;
 import engine.PlayerTurn;
 import javafx.application.Platform;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class BotPlayerHandler implements PlayerHandler {
 
-    public static PlayerHandler.Factory factory(int branch, int depth) {
-        return engine -> new BotPlayerHandler(engine, branch, depth);
+    public static PlayerHandler.Factory factory(IAAlgorithm.Factory factory) {
+        return engine -> new BotPlayerHandler(engine, factory);
     }
 
     private final Engine engine;
-    private final int branch;
-    private final int depth;
-    private final Heuristics heuristics;
+    private final IAAlgorithm.Factory playerSupplier;
 
-    public BotPlayerHandler(Engine engine, int branch, int depth) {
+    public BotPlayerHandler(Engine engine, IAAlgorithm.Factory playerFactory) {
         this.engine = engine;
-        this.branch = branch;
-        this.depth = depth;
-        this.heuristics = new BasicHeuristics();
+        this.playerSupplier = playerFactory;
     }
 
     @Override
@@ -31,8 +29,9 @@ public class BotPlayerHandler implements PlayerHandler {
 
     @Override
     public PlayerTurn startTurn(EngineStatus.TurnStep step) {
+        IAAlgorithm player = playerSupplier.create(engine, new AtomicBoolean(false));
         return Platform.isFxApplicationThread()
-                ? new BotPlayerTurnFx(engine, branch, depth, heuristics, step)
-                : new BotPlayerTurn(engine, branch, depth, heuristics, step);
+                ? new BotPlayerTurnFx(engine, player, step)
+                : new BotPlayerTurn(engine, player, step);
     }
 }

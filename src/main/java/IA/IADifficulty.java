@@ -6,21 +6,24 @@ public enum IADifficulty {
     FACILE {
         @Override
         public PlayerHandler.Factory create() {
-            return PlayerHandler.dumbFactory();
+            return BotPlayerHandler.factory(
+                    (engine, cancelled) -> new EasyAlgorithm(engine, cancelled));
         }
     },
 
     MOYEN {
         @Override
         public PlayerHandler.Factory create() {
-            return BotPlayerHandler.factory(16, 0);
+            return BotPlayerHandler.factory(
+                    (engine, cancelled) -> new MinMaxAlgorithm(16, 0, new BasicHeuristics(), engine, cancelled));
         }
     },
 
     DIFFICILE {
         @Override
         public PlayerHandler.Factory create() {
-            return BotPlayerHandler.factory(16, 1);
+            return BotPlayerHandler.factory(
+                    (engine, cancelled) -> new MinMaxAlgorithm(16, 2, new BasicHeuristics(), engine, cancelled));
         }
     };
 
