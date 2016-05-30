@@ -14,15 +14,15 @@ public class BotPlayerTurnFx implements PlayerTurn {
 
     private final Engine engine;
     private final AtomicBoolean cancelled;
-    private final BotPlayer bot;
+    private final IAAlgorithm bot;
     private final EngineStatus.TurnStep step;
 
     private Move move;
 
-    public BotPlayerTurnFx(Engine engine, int branch, int depth, Heuristics heuristics, EngineStatus.TurnStep step) {
+    public BotPlayerTurnFx(Engine engine, IAAlgorithm player, EngineStatus.TurnStep step) {
         this.engine = engine;
         this.cancelled = new AtomicBoolean(false);
-        this.bot = new BotPlayer(branch, depth, heuristics, engine, cancelled);
+        this.bot = player;
         this.step = step;
 
         this.move = null;

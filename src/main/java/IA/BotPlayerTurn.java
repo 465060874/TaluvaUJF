@@ -5,21 +5,20 @@ import engine.EngineStatus;
 import engine.PlayerTurn;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BotPlayerTurn implements PlayerTurn {
 
     private static long DELAY = 500;
 
     private final Engine engine;
-    private final BotPlayer bot;
+    private final IAAlgorithm bot;
     private final EngineStatus.TurnStep step;
 
     private Move move;
 
-    public BotPlayerTurn(Engine engine, int branch, int depth, Heuristics heuristics, EngineStatus.TurnStep step) {
+    public BotPlayerTurn(Engine engine, IAAlgorithm player, EngineStatus.TurnStep step) {
         this.engine = engine;
-        this.bot = new BotPlayer(branch, depth, heuristics, engine, new AtomicBoolean(false));
+        this.bot = player;
         this.step = step;
 
         play();
