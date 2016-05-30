@@ -8,14 +8,13 @@ import map.Island;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 
 public class IslandSnapshot {
 
     private static final double WIDTH = 170;
     private static final double HEIGHT = 170;
 
-    public static void take(Island island) throws IOException {
+    public static void take(Island island, File outputDir, String basename) throws IOException {
         Grid grid = new Grid();
         grid.scale(0.2);
 
@@ -27,7 +26,10 @@ public class IslandSnapshot {
         WritableImage image = new WritableImage(170, 170);
         WritableImage snapshot = canvas.snapshot(parameters, image);
 
-        File output = new File("Snapshot" + new Date().getTime() + ".png");
+        if (!outputDir.exists() && !outputDir.mkdirs()) {
+            throw new IOException("Unable to create Saves directory");
+        }
+        File output = new File(outputDir, basename + ".png");
         ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", output);
     }
 }

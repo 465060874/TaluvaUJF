@@ -13,14 +13,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import menu.data.MenuData;
 import menu.data.MenuMode;
 import menu.data.MultiMode;
+import menu.data.SavedGame;
 import theme.PlayerTheme;
 import ui.GameApp;
 
@@ -441,19 +443,10 @@ public class Home4 extends Application {
 
         //pane charger
         int kkk = 170;
-        Rectangle carre1 = new Rectangle(kkk,kkk, Color.AZURE);
-        Rectangle carre2 = new Rectangle(kkk,kkk, Color.DARKBLUE);
-        Rectangle carre3 = new Rectangle(kkk,kkk, Color.BLUEVIOLET);
         this.capture = new ArrayList<Node>();
-        for(int i = 0;i< 3; i++){
-            for(int j = 0;j<3;j++){
-                capture.add(carre1);
-                capture.add(carre2);
-                capture.add(carre3);
-            }
+        for (SavedGame savedGame : menuData.getSavedGames()) {
+            capture.add(new ImageView(savedGame.getImage()));
         }
-
-
 
         VBox vBoxoptionsCharger = new VBox(8);
 
@@ -470,14 +463,13 @@ public class Home4 extends Application {
 
         this.optionsHistory = new ArrayList<>();
         this.historyChoice = new ToggleGroup();
-        for (int i = 1; i < 10;i++) {
-;           ToggleButton num = new ToggleButton("NUM " + i);
-            num.setPrefWidth(120);
-            optionsHistory.add(num);
-            num.setToggleGroup(historyChoice);
-
+        for (SavedGame savedGame : menuData.getSavedGames()) {
+            ToggleButton savedButton = new ToggleButton(savedGame.getDate());
+            savedButton.setPrefWidth(120);
+            savedButton.setToggleGroup(historyChoice);
+            optionsHistory.add(savedButton);
         }
-        historyChoice.selectToggle(optionsHistory.get(2));
+        historyChoice.selectToggle(optionsHistory.get(0));
         historyChoice.selectedToggleProperty().addListener(e -> updateCapture());
 
         vBoxoptionsCharger.getChildren().addAll(optionsHistory);
@@ -490,7 +482,7 @@ public class Home4 extends Application {
         vBoxoptionsCharger.setAlignment(Pos.CENTER_LEFT);
         vBoxoptionsCharger.setPadding(new Insets(2,1,0,1));
         sp.setContent(vBoxoptionsCharger);
-        vBoxCapture.getChildren().add(carre1);
+        vBoxCapture.getChildren().add(capture.get(0));
 
         chargerList.getChildren().addAll(vBoxCapture,v);
         chargerList.setPrefHeight(80);

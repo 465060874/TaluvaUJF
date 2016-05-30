@@ -18,6 +18,7 @@ import menu.Home4;
 import menu.data.MenuData;
 import ui.island.IslandSnapshot;
 
+import java.io.File;
 import java.io.IOException;
 
 public class GameApp extends Application {
@@ -65,8 +66,10 @@ public class GameApp extends Application {
     }
 
     private void save(ActionEvent event) {
+        File outputDir = new File("Saves");
+        String basename = Long.toString(System.currentTimeMillis());
         try {
-            IslandSnapshot.take(engine.getIsland());
+            IslandSnapshot.take(engine.getIsland(), outputDir, basename);
         }
         catch (IOException e) {
             throw new RuntimeException(e);
