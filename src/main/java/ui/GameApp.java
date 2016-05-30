@@ -123,7 +123,10 @@ public class GameApp extends Application {
         }
 
         private void mouseDragged(MouseEvent mouseEvent) {
-            dragged = true;
+            if (!dragged && gameView.isMouseDragged()) {
+                System.out.println("GAMEAPP DRAGGED");
+                dragged = true;
+            }
         }
 
         private void prepareTileStep() {
