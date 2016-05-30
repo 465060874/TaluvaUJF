@@ -31,6 +31,8 @@ public class Hud extends AnchorPane implements EngineObserver {
     private final PlayerView[] playerViews;
 
     private final VBox leftButtons;
+    private final Button homeButton;
+    private final Button saveButton;
 
     private final Text textLine;
     private final TextFlow textBottom;
@@ -38,7 +40,6 @@ public class Hud extends AnchorPane implements EngineObserver {
     private final TileStackCanvas tileStackCanvas;
     private final Text tileStackSize;
     private final VBox tileStackPane;
-    private Button homeButton;
 
     public Hud(Engine engine) {
         this.engine = engine;
@@ -52,10 +53,8 @@ public class Hud extends AnchorPane implements EngineObserver {
 
         this.leftButtons = new VBox();
         this.homeButton = new IconButton("ui/hud/home.png");
-        homeButton.setOnAction((e) -> System.out.println("Home !"));
-        IconButton left2 = new IconButton("ui/hud/save.png");
-        left2.setOnAction((e) -> System.out.println("Save !"));
-        leftButtons.getChildren().addAll(homeButton, left2);
+        this.saveButton = new IconButton("ui/hud/save.png");
+        leftButtons.getChildren().addAll(homeButton, saveButton);
         AnchorPane.setLeftAnchor(leftButtons, 0.0);
 
         Font font = new Font(18);
@@ -177,4 +176,9 @@ public class Hud extends AnchorPane implements EngineObserver {
     public Button getHomeButton() {
         return homeButton;
     }
+
+    public Button getSaveButton() {
+        return saveButton;
+    }
+
 }

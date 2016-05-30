@@ -2,7 +2,6 @@ package theme;
 
 import data.FieldType;
 import javafx.scene.effect.Effect;
-import javafx.scene.layout.Background;
 import javafx.scene.paint.Paint;
 import map.Building;
 import ui.island.Grid;
@@ -42,7 +41,7 @@ public interface IslandTheme {
         CurrentTheme.listeners.remove(listener);
     }
 
-    Background getIslandBackground();
+    Paint getBackgroundPaint();
 
     Paint getTileBorderPaint(HexStyle style);
 

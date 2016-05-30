@@ -57,7 +57,6 @@ public class IslandView extends StackPane {
     }
 
     private void updateTheme() {
-        setBackground(IslandTheme.getCurrent().getIslandBackground());
         islandCanvas.redraw();
         placementOverlay.redraw();
     }

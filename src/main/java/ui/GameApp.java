@@ -16,6 +16,9 @@ import javafx.stage.Stage;
 import map.Building;
 import menu.Home4;
 import menu.data.MenuData;
+import ui.island.IslandSnapshot;
+
+import java.io.IOException;
 
 public class GameApp extends Application {
 
@@ -41,6 +44,7 @@ public class GameApp extends Application {
         this.stage = stage;
         this.gameView = new GameView(engine);
         gameView.getHomeButton().setOnAction(this::goHome);
+        gameView.getSaveButton().setOnAction(this::save);
 
         this.scene = new Scene(gameView, 1000, 800);
         stage.setResizable(true);
@@ -58,6 +62,15 @@ public class GameApp extends Application {
     private void goHome(ActionEvent actionEvent) {
         Home4 home = new Home4();
         home.start(stage);
+    }
+
+    private void save(ActionEvent event) {
+        try {
+            IslandSnapshot.take(engine.getIsland());
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void main(String[] args) {

@@ -1,13 +1,9 @@
 package theme;
 
 import data.FieldType;
-import javafx.geometry.Insets;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.Light;
 import javafx.scene.effect.Lighting;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import map.Building;
@@ -15,9 +11,7 @@ import ui.island.Grid;
 
 public class BasicIslandTheme implements IslandTheme {
 
-    private final Color SEA_COLOR = Color.web("5E81A2");
-    private final Background islandBackground = new Background(
-            new BackgroundFill(SEA_COLOR, CornerRadii.EMPTY, Insets.EMPTY));
+    private final Color backgroundColor = Color.web("5E81A2");
     private final Color tileBorderColor = Color.web("303030");
     private final Color tileBottomColor = Color.web("707070");
     private final Color tileVolcanoColor = Color.web("E97B33");
@@ -31,8 +25,8 @@ public class BasicIslandTheme implements IslandTheme {
     private final Lighting lightingFaded = new Lighting(new Light.Point(0, 0, 0, Color.GRAY));
 
     @Override
-    public Background getIslandBackground() {
-        return islandBackground;
+    public Paint getBackgroundPaint() {
+        return backgroundColor;
     }
 
     @Override

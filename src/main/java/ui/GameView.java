@@ -71,6 +71,10 @@ public class GameView extends StackPane implements EngineObserver {
         return hud.getHomeButton();
     }
 
+    public Button getSaveButton() {
+        return hud.getSaveButton();
+    }
+
     @Override
     public void onStart() {
     }
