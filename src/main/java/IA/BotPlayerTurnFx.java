@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 class BotPlayerTurnFx implements PlayerTurn {
 
-    private static long DELAY = 500;
+    private static long DELAY = 800;
 
     private final Engine engine;
     private final AtomicBoolean cancelled;
@@ -37,31 +37,32 @@ class BotPlayerTurnFx implements PlayerTurn {
 
     private void doPlay() {
         engine.logger().info("[IA] Starting");
-        long startTime = System.nanoTime();
+        long startNanos = System.nanoTime();
         move = algorithm.play();
-        long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+        long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
         engine.logger().info("[IA] {0}ms pour determiner le coup à jouer", duration);
 
-        waitAndThen(step == EngineStatus.TurnStep.TILE
+        waitAndThen(startNanos, step == EngineStatus.TurnStep.TILE
                 ? this::tileStep
                 : this::buildStep);
     }
 
 
-    private void waitAndThen(Runnable runnable) {
+    private void waitAndThen(long startNanos, Runnable runnable) {
         if (cancelled.get()) {
             return;
         }
 
-        Thread thread = new Thread(() -> doWaitAndThen(runnable));
+        Thread thread = new Thread(() -> doWaitAndThen(startNanos, runnable));
         thread.start();
     }
 
-    private void doWaitAndThen(Runnable runnable) {
-        long startMillis = System.currentTimeMillis();
+    private void doWaitAndThen(long startNanos, Runnable runnable) {
         try {
-            final long delay = DELAY - (System.currentTimeMillis() - startMillis);
-            Thread.sleep(delay);
+            final long delay = DELAY - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
+            if (delay > 0) {
+                Thread.sleep(delay);
+            }
         }
         catch (InterruptedException e) {
         }
@@ -76,7 +77,7 @@ class BotPlayerTurnFx implements PlayerTurn {
     private void tileStep() {
         if (!cancelled.get()) {
             engine.action(move.tileAction);
-            waitAndThen(this::buildStep);
+            waitAndThen(System.nanoTime(), this::buildStep);
         }
     }
 
