@@ -1,14 +1,14 @@
-package ui.theme;
+package theme;
 
 import data.FieldType;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Paint;
 
-public class ImageTheme extends BasicTheme {
+public class ImageIslandTheme extends BasicIslandTheme {
 
     private static final ImagePattern loadImagePattern(String resourceName) {
-        String resource = ImageTheme.class.getResource(resourceName).toString();
+        String resource = ImageIslandTheme.class.getResource(resourceName).toString();
         return new ImagePattern(new Image(resource));
     }
 
@@ -20,7 +20,7 @@ public class ImageTheme extends BasicTheme {
     private final ImagePattern lake = loadImagePattern("fields/lake.png");
 
     @Override
-    public Paint getTileTopPaint(FieldType type, PlacementState placementState) {
+    public Paint getTileTopPaint(FieldType type, HexStyle style) {
         switch (type) {
             case VOLCANO:  return volcano;
             case JUNGLE:   return jungle;

@@ -73,6 +73,7 @@ public abstract class EngineStatus {
     public enum FinishReason {
         NO_MORE_TILES,
         TWO_BUILDING_TYPES,
+        TEAM_THREE_BUILDING_TYPES,
         LAST_STANDING,
     }
 

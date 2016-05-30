@@ -121,31 +121,27 @@
 .buttonniveaux3:armed {
     -fx-color: white;
     -fx-background-color: #CC0066;
-
     -fx-text-fill: white;
 }
 
 .buttonniveaux3:selected {
     -fx-color: white;
     -fx-background-color: #CC0066;
-
     -fx-text-fill: white;
 }
 
 .buttonniveaux4{
-    -fx-font: 16px "Avantgarde, sans-serif";
+    -fx-font-weight: bold;
     -fx-background-color: #EFB068;
     -fx-color: white;
     -fx-text-fill: white;
     -fx-outer-border: #EFB068;
-
 }
 
 .buttonniveaux4:hover{
     -fx-background-color: #AB8152;
     -fx-color: white;
     -fx-text-fill: white;
-
 }
 /*
 .buttonniveaux4:armed {
@@ -158,23 +154,22 @@
 .buttonniveaux4:selected {
     -fx-color: white;
     -fx-background-color: #AB8152;
-
     -fx-text-fill: white;
 }
 
 .buttonniveaux5{
+    -fx-font-size:11pt;
+    -fx-font-weight: bold;
     -fx-background-color: #00D507;
     -fx-color: white;
     -fx-text-fill: white;
     -fx-outer-border: #00D507;
-
 }
 
 .buttonniveaux5:hover{
     -fx-background-color: #00B506;
     -fx-color: white;
     -fx-text-fill: white;
-
 }
 
 .buttonniveaux5:focused {
@@ -183,6 +178,27 @@
     -fx-text-fill: white;
 }
 
+
+.buttonniveaux6{
+    -fx-font-size:11pt;
+    -fx-font-weight: bold;
+    -fx-background-color: red;
+    -fx-color: white;
+    -fx-text-fill: white;
+    -fx-outer-border: red;
+}
+
+.buttonniveaux6:hover{
+    -fx-background-color: #C00105;
+    -fx-color: white;
+    -fx-text-fill: white;
+}
+
+.buttonniveaux6:focused {
+    -fx-color: white;
+    -fx-background-color: #C00105;
+    -fx-text-fill: white;
+}
 /*
 .buttonniveaux4{
     -fx-background-color: #F337A8;
@@ -320,8 +336,16 @@
 }
 
 .s  .scroll-bar .increment-arrow {
+  /*-fx-shape: " ";*/
+  /*-fx-padding:3px;*/
    -fx-background-color: #4CAF50;
 }
 .s  .scroll-bar .decrement-arrow{
+    /*-fx-shape: " ";*/
+    /*-fx-padding:3px;*/
   -fx-background-color: #4CAF50;
 }
+.s .scroll-bar :vertical .track{
+
+-fx-border-radius:2em
+ }

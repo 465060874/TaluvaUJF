@@ -1,7 +1,7 @@
 package ui.hud;
 
 import data.BuildingType;
-import data.ChoosenColors;
+import theme.PlayerTheme;
 import engine.Engine;
 import engine.Player;
 import javafx.geometry.Insets;
@@ -33,7 +33,7 @@ public class PlayerView extends AnchorPane {
         this.engine = engine;
         this.index = index;
 
-        this.faceView = new ImageView(url());
+        this.faceView = new ImageView(PlayerTheme.of(player().getColor()).getImage());
         corner().anchor(this);
         this.facePane = new BorderPane();
         facePane.setBackground(createBackground(corner().faceRadii()));
@@ -105,21 +105,10 @@ public class PlayerView extends AnchorPane {
 
     private Paint color() {
         switch (player().getColor()) {
-            case BROWN:  return ChoosenColors.BROWN.color();
-            case YELLOW: return ChoosenColors.YELLOW.color();
-            case RED:    return ChoosenColors.RED.color();
-            case WHITE:  return ChoosenColors.WHITE.color();
-        }
-
-        throw new IllegalStateException();
-    }
-
-    private String url() {
-        switch (player().getColor()) {
-            case BROWN:  return "hud/brownPlayer.png";
-            case YELLOW: return "hud/yellowPlayer.png";
-            case RED:    return "hud/redPlayer.png";
-            case WHITE: return "hud/whitePlayer.png";
+            case BROWN:  return PlayerTheme.BROWN.color();
+            case YELLOW: return PlayerTheme.YELLOW.color();
+            case RED:    return PlayerTheme.RED.color();
+            case WHITE:  return PlayerTheme.WHITE.color();
         }
 
         throw new IllegalStateException();

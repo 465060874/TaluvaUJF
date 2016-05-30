@@ -8,6 +8,7 @@ import map.Hex;
 
 import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static engine.rules.PlaceBuildingRules.validate;
 
@@ -18,26 +19,32 @@ class BotPlayer {
 
     // Facteur de branchment pour l'arbre MIN-MAX
     private final int branchingFactor;
+    // Profondeur de la descente recursive dans l'arbre MIN-MAX
+    private final int totalDepth;
     // Heuristics utilisées
     private final Heuristics heuristics;
 
     // Donnees
     private final Engine realEngine;
+    private final AtomicBoolean cancelled;
     private final int[] strategyPoints = new int[NB_STRATEGIES];
 
     // Constructeur
-    BotPlayer(int branchingFactor, Heuristics heuristics, Engine realEngine) {
+    BotPlayer(int branchingFactor, int totalDepth, Heuristics heuristics, Engine realEngine, AtomicBoolean cancelled) {
         this.branchingFactor = branchingFactor;
+        this.totalDepth = totalDepth;
         this.heuristics = heuristics;
+
         this.realEngine = realEngine;
+        this.cancelled = cancelled;
     }
 
     // Jouer un coup
-    Move play(int depth) {
+    Move play() {
         Engine engineCopy = realEngine.copyWithoutObservers();
         Move m =  realEngine.getStatus().getTurn() == 0
                 ? doFirstPlay(engineCopy)
-                : doPlay(engineCopy, depth);
+                : doPlay(engineCopy, totalDepth);
         realEngine.logger().info("[play] Choosed move with {0} points ", m.points);
         return m;
     }
@@ -110,6 +117,7 @@ class BotPlayer {
                     bestConfigPoints = p;
                 }
             }
+
             engine.cancelLastStep();
             engine.cancelLastStep();
         }
@@ -369,31 +377,38 @@ class BotPlayer {
                 }
                 return true;
             }
-        }else{
+        }
+        else {
             // Placement volcan + construction simple
             if( build instanceof PlaceBuildingAction ) {
                 engine.action(placement);
-                if (!validate(engine, ((PlaceBuildingAction) build).getType(), ((PlaceBuildingAction) build).getHex())) {
+                BuildingType buildingType = ((PlaceBuildingAction) build).getType();
+                Hex buildingHex = ((PlaceBuildingAction) build).getHex();
+                if (!validate(engine, buildingType, buildingHex).isValid()) {
                     engine.cancelLastStep();
                     return false;
-                }else {
-                    engine.cancelLastStep();
-                    return (placement.getLeftHex() != ((PlaceBuildingAction) build).getHex()
-                            && placement.getRightHex() != ((PlaceBuildingAction) build).getHex());
                 }
-            }else {
+                else {
+                    engine.cancelLastStep();
+                    return (placement.getLeftHex() != buildingHex
+                            && placement.getRightHex() != buildingHex);
+                }
+            }
+            else {
                 // On vérifie que le placement ne modifie pas l'extension :
                 if( placement.getLeftFieldType() == ((ExpandVillageAction)build).getFieldType() ){
                     for(Hex neighbor : placement.getLeftHex().getNeighborhood() )
                         if( engine.getIsland().getField(neighbor).getBuilding().getType() != BuildingType.NONE)
                             if( engine.getIsland().getVillage( neighbor).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
                                 return false;
-                }else if( placement.getRightFieldType() == ((ExpandVillageAction)build).getFieldType() ){
+                }
+                else if (placement.getRightFieldType() == ((ExpandVillageAction)build).getFieldType()){
                     for(Hex neighbor : placement.getRightHex().getNeighborhood() )
                         if( engine.getIsland().getField(neighbor).getBuilding().getType() != BuildingType.NONE)
                             if( engine.getIsland().getVillage( neighbor).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
                                 return false;
                 }
+
                 // On vérifie qu'on écrase pas le village
                 if( engine.getIsland().getField(placement.getLeftHex()).getBuilding().getType() != BuildingType.NONE)
                     if( engine.getIsland().getVillage( placement.getLeftHex()).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))

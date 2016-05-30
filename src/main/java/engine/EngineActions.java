@@ -140,9 +140,9 @@ class EngineActions {
         for (Hex hex : island.getFields()) {
             Field field = island.getField(hex);
             if (field.getBuilding().getType() == BuildingType.NONE) {
-                boolean hutValid = PlaceBuildingRules.validate(engine, BuildingType.HUT, hex);
-                boolean templeValid = PlaceBuildingRules.validate(engine, BuildingType.TEMPLE, hex);
-                boolean towerValid = PlaceBuildingRules.validate(engine, BuildingType.TOWER, hex);
+                boolean hutValid = PlaceBuildingRules.validate(engine, BuildingType.HUT, hex).isValid();
+                boolean templeValid = PlaceBuildingRules.validate(engine, BuildingType.TEMPLE, hex).isValid();
+                boolean towerValid = PlaceBuildingRules.validate(engine, BuildingType.TOWER, hex).isValid();
 
                 if (!hutValid && !templeValid && !towerValid) {
                     continue;
@@ -180,7 +180,7 @@ class EngineActions {
         ImmutableList.Builder<ExpandVillageAction> builder = ImmutableList.builder();
         for (Village village : villages) {
             for (FieldType fieldType : FieldType.values()) {
-                if (ExpandVillageRules.validate(engine, village, fieldType)) {
+                if (ExpandVillageRules.validate(engine, village, fieldType).isValid()) {
                     builder.add(new ExpandVillageAction(village, fieldType));
                 }
             }
@@ -198,10 +198,10 @@ class EngineActions {
                 continue;
             }
 
-            if (PlaceBuildingRules.validate(engine, type, leftHex)) {
+            if (PlaceBuildingRules.validate(engine, type, leftHex).isValid()) {
                 builder.add(new PlaceBuildingAction(type, leftHex));
             }
-            if (PlaceBuildingRules.validate(engine, type, rightHex)) {
+            if (PlaceBuildingRules.validate(engine, type, rightHex).isValid()) {
                 builder.add(new PlaceBuildingAction(type, rightHex));
             }
         }
@@ -240,7 +240,7 @@ class EngineActions {
         for (Map.Entry<Village, FieldType> entry : villageExpansion.entries()) {
             Village village = entry.getKey();
             FieldType fieldType = entry.getValue();
-            if (ExpandVillageRules.validate(engine, village, fieldType)) {
+            if (ExpandVillageRules.validate(engine, village, fieldType).isValid()) {
                 builder.add(new ExpandVillageAction(village, fieldType));
             }
         }

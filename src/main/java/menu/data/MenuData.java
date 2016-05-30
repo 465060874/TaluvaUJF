@@ -9,7 +9,6 @@ import engine.PlayerHandler;
 
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Supplier;
 
 public class MenuData {
 
@@ -91,7 +90,7 @@ public class MenuData {
         MenuDataIO.debug(this);
     }
 
-    public EngineBuilder engineBuilder(Supplier<? extends PlayerHandler.Factory> uiPlayerFactory) {
+    public EngineBuilder engineBuilder(PlayerHandler.Factory uiPlayerFactory) {
         switch (mode) {
             case SOLO: return soloEngineBuilder(uiPlayerFactory);
             case MULTIJOUEUR: return multiEngineBuilder(uiPlayerFactory);
@@ -101,9 +100,9 @@ public class MenuData {
         throw new IllegalStateException();
     }
 
-    private EngineBuilder soloEngineBuilder(Supplier<? extends PlayerHandler.Factory> uiPlayerFactory) {
+    private EngineBuilder soloEngineBuilder(PlayerHandler.Factory uiPlayerFactory) {
         return EngineBuilder.allVsAll()
-                .player(soloColor, uiPlayerFactory.get())
+                .player(soloColor, uiPlayerFactory)
                 .player(otherColor(soloColor), soloDifficulty.create());
     }
 
@@ -118,27 +117,27 @@ public class MenuData {
         }
     }
 
-    private EngineBuilder multiEngineBuilder(Supplier<? extends PlayerHandler.Factory> uiPlayerFactory) {
+    private EngineBuilder multiEngineBuilder(PlayerHandler.Factory uiPlayerFactory) {
         switch (multiMode) {
             case TWO_PLAYER:
                 return EngineBuilder.allVsAll()
-                        .player(PlayerColor.WHITE, uiPlayerFactory.get())
-                        .player(PlayerColor.RED, uiPlayerFactory.get());
+                        .player(PlayerColor.WHITE, uiPlayerFactory)
+                        .player(PlayerColor.RED, uiPlayerFactory);
             case THREE_PLAYER:
                 return EngineBuilder.allVsAll()
-                        .player(PlayerColor.WHITE, uiPlayerFactory.get())
-                        .player(PlayerColor.RED, uiPlayerFactory.get())
-                        .player(PlayerColor.YELLOW, uiPlayerFactory.get());
+                        .player(PlayerColor.WHITE, uiPlayerFactory)
+                        .player(PlayerColor.RED, uiPlayerFactory)
+                        .player(PlayerColor.YELLOW, uiPlayerFactory);
             case FOUR_PLAYER:
                 return EngineBuilder.allVsAll()
-                        .player(PlayerColor.WHITE, uiPlayerFactory.get())
-                        .player(PlayerColor.RED, uiPlayerFactory.get())
-                        .player(PlayerColor.YELLOW, uiPlayerFactory.get())
-                        .player(PlayerColor.BROWN, uiPlayerFactory.get());
+                        .player(PlayerColor.WHITE, uiPlayerFactory)
+                        .player(PlayerColor.RED, uiPlayerFactory)
+                        .player(PlayerColor.YELLOW, uiPlayerFactory)
+                        .player(PlayerColor.BROWN, uiPlayerFactory);
             case TEAM_VS_TEAM:
                 return EngineBuilder.teamVsTeam()
-                        .team(PlayerColor.BROWN, PlayerColor.WHITE, uiPlayerFactory.get())
-                        .team(PlayerColor.RED, PlayerColor.YELLOW, uiPlayerFactory.get());
+                        .team(PlayerColor.BROWN, PlayerColor.WHITE, uiPlayerFactory)
+                        .team(PlayerColor.RED, PlayerColor.YELLOW, uiPlayerFactory);
         }
 
         throw new IllegalStateException();

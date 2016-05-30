@@ -2,7 +2,6 @@ package ui.island;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
-import data.BuildingType;
 import data.FieldType;
 import javafx.beans.Observable;
 import javafx.scene.canvas.Canvas;
@@ -10,61 +9,31 @@ import javafx.scene.canvas.GraphicsContext;
 import map.Building;
 import map.Island;
 import map.Neighbor;
+import ui.shape.BuildingShape;
 import ui.shape.HexShape;
-import ui.shape.HexShapeInfo;
-import ui.theme.PlacementState;
-
-import static ui.shape.BuildingShapes.drawBuilding;
+import theme.BuildingStyle;
+import theme.HexStyle;
 
 class PlacementOverlay extends Canvas {
 
     private final Grid grid;
     private final Island island;
-    private final HexShape hexShape;
     private final Placement placement;
+
+    private final HexShape hexShape;
+    private final BuildingShape buildingShape;
 
     PlacementOverlay(Island island, Grid grid, Placement placement) {
         super(0, 0);
         this.island = island;
         this.grid = grid;
         this.placement = placement;
+
         this.hexShape = new HexShape();
+        this.buildingShape = new BuildingShape();
 
         widthProperty().addListener(this::resize);
         heightProperty().addListener(this::resize);
-    }
-
-    private ImmutableList<HexShapeInfo> placedFreeInfos() {
-        HexShapeInfo info1 = new HexShapeInfo();
-        HexShapeInfo info2 = new HexShapeInfo();
-        HexShapeInfo info3 = new HexShapeInfo();
-
-        info1.placementState = info2.placementState = info3.placementState = PlacementState.FLOATING;
-        info1.x = info2.x = info3.x = placement.mouseX;
-        info1.y = info2.y = info3.y = placement.mouseY;
-
-        info1.level = 1;
-        info1.fieldType = FieldType.VOLCANO;
-        info1.orientation = placement.tileOrientation;
-        info1.building = Building.of(BuildingType.NONE, null);
-
-        Neighbor leftNeighbor = Neighbor.leftOf(placement.tileOrientation);
-        info2.x += grid.neighborToXOffset(leftNeighbor);
-        info2.y += grid.neighborToYOffset(leftNeighbor);
-        info2.level = 1;
-        info2.fieldType = placement.tile.getLeft();
-        info2.orientation = placement.tileOrientation.leftRotation();
-        info2.building = Building.of(BuildingType.NONE, null);
-
-        Neighbor rightNeighbor = Neighbor.rightOf(placement.tileOrientation);
-        info3.x += grid.neighborToXOffset(rightNeighbor);
-        info3.y += grid.neighborToYOffset(rightNeighbor);
-        info3.level = 1;
-        info3.fieldType = placement.tile.getRight();
-        info3.orientation = placement.tileOrientation.rightRotation();
-        info3.building = Building.of(BuildingType.NONE, null);
-
-        return Ordering.natural().immutableSortedCopy(ImmutableList.of(info1, info2, info3));
     }
 
     private void resize(Observable event) {
@@ -77,25 +46,17 @@ class PlacementOverlay extends Canvas {
 
         if (!placement.valid) {
             if (placement.mode == Placement.Mode.BUILDING) {
-                HexShapeInfo info = new HexShapeInfo();
-
-                if (placement.valid) {
-                    info.x = grid.hexToX(placement.hex, getWidth());
-                    info.y = grid.hexToY(placement.hex, getHeight());
-                }
-                else {
-                    info.x = placement.mouseX + 5;
-                    info.y = placement.mouseY;
-                }
-
-                info.placementState = placement.valid ? PlacementState.VALID : PlacementState.FLOATING;
-                info.level = island.getField(placement.hex).getLevel();
-                info.building = Building.of(placement.buildingType, placement.buildingColor);
-                drawBuilding(gc, grid, info);
+                buildingShape.draw(gc, grid,
+                        placement.mouseX + 5,
+                        placement.mouseY,
+                        1,
+                        Building.of(placement.buildingType, placement.buildingColor),
+                        placement.valid ? BuildingStyle.HIGHLIGHTED : BuildingStyle.NORMAL);
             }
             else if (placement.mode == Placement.Mode.TILE) {
-                for (HexShapeInfo info : placedFreeInfos()) {
-                    hexShape.draw(gc, grid, info);
+                for (HexToDraw info : placedHexes()) {
+                    hexShape.draw(gc, grid,
+                            info.x, info.y, info.level, info.fieldType, info.orientation, info.hexStyle);
                 }
             }
         }
@@ -104,4 +65,38 @@ class PlacementOverlay extends Canvas {
         setTranslateY(0);
     }
 
+    private ImmutableList<HexToDraw> placedHexes() {
+        Neighbor leftNeighbor = Neighbor.leftOf(placement.tileOrientation);
+        Neighbor rightNeighbor = Neighbor.rightOf(placement.tileOrientation);
+
+        HexToDraw info1 = new HexToDraw(
+                placement.mouseX,
+                placement.mouseY,
+                1,
+                FieldType.VOLCANO,
+                placement.tileOrientation,
+                HexStyle.FLOATING,
+                Building.none(),
+                BuildingStyle.NORMAL);
+        HexToDraw info2 = new HexToDraw(
+                placement.mouseX + grid.neighborToXOffset(leftNeighbor),
+                placement.mouseY + grid.neighborToYOffset(leftNeighbor),
+                1,
+                placement.tile.getLeft(),
+                placement.tileOrientation.leftRotation(),
+                HexStyle.FLOATING,
+                Building.none(),
+                BuildingStyle.NORMAL);
+        HexToDraw info3 = new HexToDraw(
+                placement.mouseX + grid.neighborToXOffset(rightNeighbor),
+                placement.mouseY + grid.neighborToYOffset(rightNeighbor),
+                1,
+                placement.tile.getRight(),
+                placement.tileOrientation.rightRotation(),
+                HexStyle.FLOATING,
+                Building.none(),
+                BuildingStyle.NORMAL);
+
+        return Ordering.natural().immutableSortedCopy(ImmutableList.of(info1, info2, info3));
+    }
 }

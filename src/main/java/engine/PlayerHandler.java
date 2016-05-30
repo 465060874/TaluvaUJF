@@ -1,7 +1,6 @@
 package engine;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import data.BuildingType;
 import engine.action.BuildingAction;
 import engine.action.PlaceBuildingAction;
@@ -12,11 +11,9 @@ import java.util.List;
 
 public interface PlayerHandler {
 
-    void startTileStep();
+    boolean isHuman();
 
-    void startBuildStep();
-
-    void cancel();
+    PlayerTurn startTurn(EngineStatus.TurnStep step);
 
     interface Factory {
 
@@ -32,16 +29,18 @@ public interface PlayerHandler {
     }
 }
 
-enum DummyPlayerHandler implements PlayerHandler {
+enum DummyPlayerHandler implements PlayerHandler, PlayerTurn {
 
     INSTANCE;
 
     @Override
-    public void startTileStep() {
+    public boolean isHuman() {
+        return false;
     }
 
     @Override
-    public void startBuildStep() {
+    public PlayerTurn startTurn(EngineStatus.TurnStep step) {
+        return this;
     }
 
     @Override
@@ -49,7 +48,7 @@ enum DummyPlayerHandler implements PlayerHandler {
     }
 }
 
-class DumbPlayerHandler implements PlayerHandler {
+class DumbPlayerHandler implements PlayerHandler, PlayerTurn {
 
     private final Engine engine;
 
@@ -58,7 +57,18 @@ class DumbPlayerHandler implements PlayerHandler {
     }
 
     @Override
-    public void startTileStep() {
+    public boolean isHuman() {
+        return false;
+    }
+
+    @Override
+    public PlayerTurn startTurn(EngineStatus.TurnStep step) {
+        tileStep();
+        buildStep();
+        return this;
+    }
+
+    private void tileStep() {
         List<? extends TileAction> tileActions;
         if (engine.getVolcanoTileActions().isEmpty() || engine.getRandom().nextInt(3) == 2) {
             tileActions = engine.getSeaTileActions();
@@ -72,8 +82,7 @@ class DumbPlayerHandler implements PlayerHandler {
         engine.action(tileAction);
     }
 
-    @Override
-    public void startBuildStep() {
+    private void buildStep() {
         List<BuildingAction> buildTowerOrTemple = new ArrayList<>();
         List<BuildingAction> buildHut = new ArrayList<>();
         for (PlaceBuildingAction action : engine.getPlaceBuildingActions()) {
@@ -106,7 +115,8 @@ class DumbPlayerHandler implements PlayerHandler {
 
     @Override
     public void cancel() {
-        System.out.println("Dammit");
+        // Single threaded implementation, should not happened
+        throw new IllegalStateException();
     }
 }
 

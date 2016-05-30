@@ -56,6 +56,10 @@ public class Player {
         buildings[type.ordinal() - 1] -= count;
     }
 
+    public boolean isHuman() {
+        return playerHandler.isHuman();
+    }
+
     PlayerHandler getHandler() {
         return playerHandler;
     }

@@ -1,67 +1,61 @@
 package ui.hud;
 
-import data.BuildingType;
+import data.FieldType;
 import data.VolcanoTile;
 import engine.Engine;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import map.Building;
 import map.Neighbor;
 import map.Orientation;
 import ui.island.Grid;
 import ui.shape.HexShape;
-import ui.shape.HexShapeInfo;
+import theme.HexStyle;
 
-/*
 public class TileStackCanvas extends Canvas {
 
     private final Engine engine;
     private final Grid grid;
-    private final HexShapeInfo volcanoInfo;
-    private final HexShapeInfo leftInfo;
-    private final HexShapeInfo rightInfo;
     private final HexShape hexShape;
 
     public TileStackCanvas(Engine engine) {
         super(0, 0);
         this.engine = engine;
-        this.grid = new Grid(0, 0, 1);
-        this.volcanoInfo = new HexShapeInfo();
-        this.leftInfo = new HexShapeInfo();
-        this.rightInfo = new HexShapeInfo();
+        this.grid = new Grid();
         this.hexShape = new HexShape();
 
-        volcanoInfo.x = 0;
-        volcanoInfo.y = -grid.getHexRadiusY();
-        volcanoInfo.building = Building.of(BuildingType.NONE, null);
-        Neighbor leftNeighbor = Neighbor.SOUTH_WEST;
-        leftInfo.x = volcanoInfo.x + grid.neighborToXOffset(leftNeighbor);
-        leftInfo.y = volcanoInfo.y + grid.neighborToYOffset(leftNeighbor);
-        leftInfo.building = Building.of(BuildingType.NONE, null);
-        Neighbor rightNeighbor = Neighbor.SOUTH_EAST;
-        rightInfo.x = volcanoInfo.x + grid.neighborToXOffset(rightNeighbor);
-        rightInfo.y = volcanoInfo.y + grid.neighborToYOffset(rightNeighbor);
-        rightInfo.building = Building.of(BuildingType.NONE, null);
+        grid.scale(0.4);
 
         redraw();
     }
 
-    private void redraw() {
-        setWidth(4 * grid.getHexHalfWidth());
-        setHeight(6 * grid.getHexHeight() / 2);
+    void redraw() {
+        double width = 4 * grid.getHexHalfWidth();
+        double height = 6 * grid.getHexRadiusY();
+        setWidth(width + 10);
+        setHeight(height);
 
+        GraphicsContext gc = getGraphicsContext2D();
+        if (engine.getVolcanoTileStack().isEmpty()) {
+            gc.clearRect(0, 0, getWidth(), getHeight());
+            return;
+        }
         VolcanoTile tile = engine.getVolcanoTileStack().current();
         if (tile == null) {
+            gc.clearRect(0, 0, getWidth(), getHeight());
             return;
         }
 
-        leftInfo.fieldType = tile.getLeft();
-        rightInfo.fieldType = tile.getRight();
+        double volcanoX = width / 2 + 3;
+        double volcanoY = height / 2 - grid.getHexRadiusY();
+        Neighbor leftNeighbor = Neighbor.SOUTH_WEST;
+        double leftX = volcanoX + grid.neighborToXOffset(leftNeighbor);
+        double leftY = volcanoY + grid.neighborToYOffset(leftNeighbor);
+        Neighbor rightNeighbor = Neighbor.SOUTH_EAST;
+        double rightX = volcanoX + grid.neighborToXOffset(rightNeighbor);
+        double rightY = volcanoY + grid.neighborToYOffset(rightNeighbor);
 
-        GraphicsContext gc = getGraphicsContext2D();
-        hexShape.draw(gc, grid, volcanoInfo);
-        hexShape.draw(gc, grid, leftInfo);
-        hexShape.draw(gc, grid, rightInfo);
+        hexShape.draw(gc, grid, volcanoX, volcanoY, 1, FieldType.VOLCANO, Orientation.NORTH, HexStyle.NORMAL);
+        hexShape.draw(gc, grid, leftX, leftY, 1, tile.getLeft(), Orientation.SOUTH_WEST, HexStyle.NORMAL);
+        hexShape.draw(gc, grid, rightX, rightY, 1, tile.getRight(), Orientation.SOUTH_EAST, HexStyle.NORMAL);
     }
 }
-*/

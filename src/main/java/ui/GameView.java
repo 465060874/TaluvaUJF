@@ -8,6 +8,7 @@ import engine.action.ExpandVillageAction;
 import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -16,7 +17,7 @@ import ui.hud.Hud;
 import ui.island.Grid;
 import ui.island.IslandView;
 import ui.island.Placement;
-import ui.theme.Theme;
+import theme.IslandTheme;
 
 import java.util.List;
 
@@ -58,12 +59,16 @@ public class GameView extends StackPane implements EngineObserver {
 
     private void keyPressed(KeyEvent event) {
         if (event.getCode() == KeyCode.T) {
-            Theme.change();
+            IslandTheme.change();
         }
     }
 
     public Placement getPlacement() {
         return placement;
+    }
+
+    public Button getHomeButton() {
+        return hud.getHomeButton();
     }
 
     @Override
@@ -73,7 +78,6 @@ public class GameView extends StackPane implements EngineObserver {
     @Override
     public void onTileStackChange(boolean cancelled) {
     }
-
 
     @Override
     public void onTileStepStart(boolean cancelled) {
