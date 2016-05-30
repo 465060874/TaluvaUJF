@@ -7,11 +7,7 @@ import data.StandardVolcanoTiles;
 import engine.tilestack.VolcanoTileStack;
 import map.Island;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.*;
 import java.util.logging.Level;
 
 import static com.google.common.base.Preconditions.*;
@@ -33,6 +29,8 @@ import static com.google.common.base.Verify.verify;
  */
 public abstract class EngineBuilder<B extends EngineBuilder> {
 
+    private static final Random SEEDER = new Random();
+
     final Gamemode gamemode;
     Level logLevel;
     long seed;
@@ -49,14 +47,14 @@ public abstract class EngineBuilder<B extends EngineBuilder> {
 
     public static EngineBuilder<?> withPredefinedPlayers(
             Gamemode gamemode,
-            ImmutableMap<PlayerColor, PlayerHandler.Factory> players) {
+            ImmutableMap<PlayerColor, PlayerHandler> players) {
         return new WithPredefinedPlayer(gamemode, players);
     }
 
     private EngineBuilder(Gamemode gamemode) {
         this.gamemode = gamemode;
         this.logLevel = Level.INFO;
-        this.seed = seedUniquifier() ^ System.nanoTime();
+        this.seed = SEEDER.nextLong();
         this.island = Island.createEmpty();
         this.volcanoTileStackFactory = VolcanoTileStack.randomFactory(StandardVolcanoTiles.LIST);
     }
@@ -91,11 +89,11 @@ public abstract class EngineBuilder<B extends EngineBuilder> {
 
     public static class AllVsAll extends EngineBuilder<AllVsAll> {
 
-        private final PlayerHandler.Factory[] handlerFactories;
+        private final PlayerHandler[] playerHandlers;
 
         private AllVsAll() {
             super(Gamemode.AllVsAll);
-            this.handlerFactories = new PlayerHandler.Factory[PlayerColor.values().length];
+            this.playerHandlers = new PlayerHandler[PlayerColor.values().length];
         }
 
         @Override
@@ -103,12 +101,12 @@ public abstract class EngineBuilder<B extends EngineBuilder> {
             return this;
         }
 
-        public AllVsAll player(PlayerColor color, PlayerHandler.Factory factory) {
+        public AllVsAll player(PlayerColor color, PlayerHandler handler) {
             checkNotNull(color);
-            checkNotNull(factory);
-            checkState(handlerFactories[color.ordinal()] == null, "Color already taken");
+            checkNotNull(handler);
+            checkState(playerHandlers[color.ordinal()] == null, "Color already taken");
 
-            handlerFactories[color.ordinal()] = factory;
+            playerHandlers[color.ordinal()] = handler;
             return this;
         }
 
@@ -116,12 +114,11 @@ public abstract class EngineBuilder<B extends EngineBuilder> {
             List<Player> players = new ArrayList<>();
 
             for (PlayerColor color : PlayerColor.values()) {
-                PlayerHandler.Factory factory = handlerFactories[color.ordinal()];
-                if (factory == null) {
+                PlayerHandler handler = playerHandlers[color.ordinal()];
+                if (handler == null) {
                     continue;
                 }
 
-                PlayerHandler handler = factory.create(engine);
                 players.add(new Player(color, handler));
             }
 
@@ -135,19 +132,19 @@ public abstract class EngineBuilder<B extends EngineBuilder> {
 
         private PlayerColor color11;
         private PlayerColor color12;
-        private PlayerHandler.Factory handlerFactory1;
+        private PlayerHandler playerHandler1;
         private PlayerColor color21;
         private PlayerColor color22;
-        private PlayerHandler.Factory handlerFactory2;
+        private PlayerHandler playerHandler2;
 
         private TeamVsTeam() {
             super(Gamemode.TeamVsTeam);
             this.color11 = null;
             this.color12 = null;
-            this.handlerFactory1 = null;
+            this.playerHandler1 = null;
             this.color21 = null;
             this.color22 = null;
-            this.handlerFactory2 = null;
+            this.playerHandler2 = null;
 
         }
 
@@ -156,24 +153,24 @@ public abstract class EngineBuilder<B extends EngineBuilder> {
             return this;
         }
 
-        public TeamVsTeam team(PlayerColor color1, PlayerColor color2, PlayerHandler.Factory factory) {
+        public TeamVsTeam team(PlayerColor color1, PlayerColor color2, PlayerHandler factory) {
             checkNotNull(color1);
             checkNotNull(color2);
             checkNotNull(factory);
             checkArgument(color1 != color2, "Can't use the same color");
-            checkState(handlerFactory2 == null, "Can't add more than 2 team");
+            checkState(playerHandler2 == null, "Can't add more than 2 team");
 
-            if (handlerFactory1 == null) {
+            if (playerHandler1 == null) {
                 color11 = color1;
                 color12 = color2;
-                handlerFactory1 = factory;
+                playerHandler1 = factory;
             }
             else {
                 checkArgument(color1 != color12 && color1 != color21, "Color already taken");
                 checkArgument(color2 != color12 && color2 != color21, "Color already taken");
                 color21 = color1;
                 color22 = color2;
-                handlerFactory2 = factory;
+                playerHandler2 = factory;
             }
 
             return this;
@@ -181,24 +178,22 @@ public abstract class EngineBuilder<B extends EngineBuilder> {
 
         @Override
         ImmutableList<Player> createPlayers(Engine engine) {
-            verify(handlerFactory2 != null, "Not enough team");
+            verify(playerHandler2 != null, "Not enough team");
 
             ImmutableList.Builder<Player> builder = ImmutableList.builder();
-            PlayerHandler handler1 = handlerFactory1.create(engine);
-            PlayerHandler handler2 = handlerFactory2.create(engine);
             if (engine.getRandom().nextBoolean()) {
                 // Team 1 is first
-                builder.add(new Player(color11, handler1));
-                builder.add(new Player(color21, handler2));
-                builder.add(new Player(color12, handler1));
-                builder.add(new Player(color22, handler2));
+                builder.add(new Player(color11, playerHandler1));
+                builder.add(new Player(color21, playerHandler2));
+                builder.add(new Player(color12, playerHandler1));
+                builder.add(new Player(color22, playerHandler2));
             }
             else {
                 // Team 2 is first
-                builder.add(new Player(color21, handler2));
-                builder.add(new Player(color11, handler1));
-                builder.add(new Player(color22, handler2));
-                builder.add(new Player(color12, handler1));
+                builder.add(new Player(color21, playerHandler2));
+                builder.add(new Player(color11, playerHandler1));
+                builder.add(new Player(color22, playerHandler2));
+                builder.add(new Player(color12, playerHandler1));
             }
 
             return builder.build();
@@ -206,9 +201,9 @@ public abstract class EngineBuilder<B extends EngineBuilder> {
     }
 
     private static class WithPredefinedPlayer extends EngineBuilder<WithPredefinedPlayer> {
-        private final ImmutableMap<PlayerColor, PlayerHandler.Factory> playersMap;
+        private final ImmutableMap<PlayerColor, PlayerHandler> playersMap;
 
-        public WithPredefinedPlayer(Gamemode gamemode, ImmutableMap<PlayerColor, PlayerHandler.Factory> playersMap) {
+        public WithPredefinedPlayer(Gamemode gamemode, ImmutableMap<PlayerColor, PlayerHandler> playersMap) {
             super(gamemode);
             this.playersMap = playersMap;
         }
@@ -221,24 +216,13 @@ public abstract class EngineBuilder<B extends EngineBuilder> {
         @Override
         ImmutableList<Player> createPlayers(Engine engine) {
             ImmutableList.Builder<Player> builder = ImmutableList.builder();
-            for (Map.Entry<PlayerColor, PlayerHandler.Factory> entry : playersMap.entrySet()) {
+            for (Map.Entry<PlayerColor, PlayerHandler> entry : playersMap.entrySet()) {
                 PlayerColor color = entry.getKey();
-                PlayerHandler handler = entry.getValue().create(engine);
+                PlayerHandler handler = entry.getValue();
                 builder.add(new Player(color, handler));
             }
 
             return builder.build();
-        }
-    }
-
-    // Ripped from java.lang.Random
-    private static final AtomicLong seedUniquifier = new AtomicLong(8682522807148012L);
-    private static long seedUniquifier() {
-        for (;;) {
-            long current = seedUniquifier.get();
-            long next = current * 181783497276652981L;
-            if (seedUniquifier.compareAndSet(current, next))
-                return next;
         }
     }
 }

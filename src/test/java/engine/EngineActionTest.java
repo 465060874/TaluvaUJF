@@ -55,8 +55,8 @@ public class EngineActionTest {
         URL rsc = EngineActionTest.class.getResource("EngineTest1.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.RED, e -> PlayerHandler.dummy())
-                .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
+                .player(PlayerColor.RED, PlayerHandler.dummy())
+                .player(PlayerColor.WHITE, PlayerHandler.dummy())
                 .logLevel(Level.INFO)
                 .island(island)
                 .build();
@@ -95,8 +95,8 @@ public class EngineActionTest {
         URL rsc = EngineActionTest.class.getResource("EngineTest2.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.RED, e -> PlayerHandler.dummy())
-                .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
+                .player(PlayerColor.RED, PlayerHandler.dummy())
+                .player(PlayerColor.WHITE, PlayerHandler.dummy())
                 .logLevel(Level.INFO)
                 .island(island)
                 .build();
@@ -133,8 +133,8 @@ public class EngineActionTest {
         URL rsc = EngineActionTest.class.getResource("EngineTest3.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.RED, e -> PlayerHandler.dummy())
-                .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
+                .player(PlayerColor.RED, PlayerHandler.dummy())
+                .player(PlayerColor.WHITE, PlayerHandler.dummy())
                 .logLevel(Level.INFO)
                 .island(island)
                 .build();

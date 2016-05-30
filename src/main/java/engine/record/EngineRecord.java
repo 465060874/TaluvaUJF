@@ -110,8 +110,8 @@ public class EngineRecord {
 
     public Engine replay() {
         UnmodifiableIterator<Action> actionsIt = ImmutableList.copyOf(actions).iterator();
-        ImmutableMap.Builder<PlayerColor, PlayerHandler.Factory> playersBuilder = ImmutableMap.builder();
-        PlayerHandler.Factory playerHandlerFactory = (engine) -> new RecordPlayerHandler(engine, actionsIt);
+        ImmutableMap.Builder<PlayerColor, PlayerHandler> playersBuilder = ImmutableMap.builder();
+        PlayerHandler playerHandlerFactory = new RecordPlayerHandler(actionsIt);
         for (PlayerColor color : colors) {
             playersBuilder.put(color, playerHandlerFactory);
         }
@@ -123,11 +123,9 @@ public class EngineRecord {
 
     private static class RecordPlayerHandler implements PlayerHandler {
 
-        private final Engine engine;
         private final Iterator<Action> actions;
 
-        private RecordPlayerHandler(Engine engine, Iterator<Action> actions) {
-            this.engine = engine;
+        private RecordPlayerHandler(Iterator<Action> actions) {
             this.actions = actions;
         }
 
@@ -137,7 +135,7 @@ public class EngineRecord {
         }
 
         @Override
-        public PlayerTurn startTurn(EngineStatus.TurnStep step) {
+        public PlayerTurn startTurn(Engine engine, EngineStatus.TurnStep step) {
             Action nextAction = actions.next();
             return step == EngineStatus.TurnStep.TILE
                 ? new RecordPlayerTurn(engine, nextAction, actions.next())

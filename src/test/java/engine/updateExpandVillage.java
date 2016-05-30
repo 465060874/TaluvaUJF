@@ -38,8 +38,8 @@ public class updateExpandVillage {
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
                 ImmutableMap.of(
-                        PlayerColor.RED, e -> PlayerHandler.dummy(),
-                        PlayerColor.WHITE, e -> PlayerHandler.dummy()))
+                        PlayerColor.RED, PlayerHandler.dummy(),
+                        PlayerColor.WHITE, PlayerHandler.dummy()))
                 .seed(121216213L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -128,8 +128,8 @@ public class updateExpandVillage {
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine =  EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
                 ImmutableMap.of(
-                        PlayerColor.RED, e -> PlayerHandler.dummy(),
-                        PlayerColor.WHITE, e -> PlayerHandler.dummy()))
+                        PlayerColor.RED, PlayerHandler.dummy(),
+                        PlayerColor.WHITE, PlayerHandler.dummy()))
                 .seed(121216213L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -162,8 +162,8 @@ public class updateExpandVillage {
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
                 ImmutableMap.of(
-                        PlayerColor.WHITE, e -> PlayerHandler.dummy(),
-                        PlayerColor.RED, e -> PlayerHandler.dummy()))
+                        PlayerColor.WHITE, PlayerHandler.dummy(),
+                        PlayerColor.RED, PlayerHandler.dummy()))
                 .seed(126266215L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -195,9 +195,9 @@ public class updateExpandVillage {
         URL rsc = EngineActionTest.class.getResource("EngineTest5.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.BROWN, e -> PlayerHandler.dummy())
-                .player(PlayerColor.RED, e -> PlayerHandler.dummy())
-                .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
+                .player(PlayerColor.BROWN, PlayerHandler.dummy())
+                .player(PlayerColor.RED, PlayerHandler.dummy())
+                .player(PlayerColor.WHITE, PlayerHandler.dummy())
                 .seed(123276805L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -228,10 +228,10 @@ public class updateExpandVillage {
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
                 ImmutableMap.of(
-                        PlayerColor.YELLOW, e -> PlayerHandler.dummy(),
-                        PlayerColor.RED, e -> PlayerHandler.dummy(),
-                        PlayerColor.WHITE, e -> PlayerHandler.dummy(),
-                        PlayerColor.BROWN, e -> PlayerHandler.dummy()))
+                        PlayerColor.YELLOW, PlayerHandler.dummy(),
+                        PlayerColor.RED, PlayerHandler.dummy(),
+                        PlayerColor.WHITE, PlayerHandler.dummy(),
+                        PlayerColor.BROWN, PlayerHandler.dummy()))
                 .seed(163976325L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -261,10 +261,10 @@ public class updateExpandVillage {
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
                 ImmutableMap.of(
-                        PlayerColor.RED, e -> PlayerHandler.dummy(),
-                        PlayerColor.YELLOW, e -> PlayerHandler.dummy(),
-                        PlayerColor.WHITE, e -> PlayerHandler.dummy(),
-                        PlayerColor.BROWN, e -> PlayerHandler.dummy()))
+                        PlayerColor.RED, PlayerHandler.dummy(),
+                        PlayerColor.YELLOW, PlayerHandler.dummy(),
+                        PlayerColor.WHITE, PlayerHandler.dummy(),
+                        PlayerColor.BROWN, PlayerHandler.dummy()))
                 .seed(16245447L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -306,10 +306,10 @@ public class updateExpandVillage {
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
                 ImmutableMap.of(
-                        PlayerColor.RED, e -> PlayerHandler.dummy(),
-                        PlayerColor.WHITE, e -> PlayerHandler.dummy(),
-                        PlayerColor.BROWN, e -> PlayerHandler.dummy(),
-                        PlayerColor.YELLOW, e -> PlayerHandler.dummy()))
+                        PlayerColor.RED, PlayerHandler.dummy(),
+                        PlayerColor.WHITE, PlayerHandler.dummy(),
+                        PlayerColor.BROWN, PlayerHandler.dummy(),
+                        PlayerColor.YELLOW, PlayerHandler.dummy()))
                 .logLevel(Level.INFO)
                 .island(island)
                 .build();

@@ -1,6 +1,6 @@
 package ui;
 
-import IA.IADifficulty;
+import IA.IA;
 import data.BuildingType;
 import data.PlayerColor;
 import engine.*;
@@ -26,13 +26,13 @@ public class GameApp extends Application {
 
     public GameApp() {
         this.engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.BROWN, e -> new FXUIPlayerHandler())
-                .player(PlayerColor.WHITE, IADifficulty.DIFFICILE.create())
+                .player(PlayerColor.BROWN, IA.DIFFICILE)
+                .player(PlayerColor.WHITE, IA.DIFFICILE)
                 .build();
     }
 
     public GameApp(MenuData menuData) {
-        this.engine = menuData.engineBuilder(e -> new FXUIPlayerHandler())
+        this.engine = menuData.engineBuilder(new FXPlayerHandler())
                 .build();
     }
 
@@ -64,10 +64,7 @@ public class GameApp extends Application {
         launch(args);
     }
 
-    public class FXUIPlayerHandler implements PlayerHandler {
-
-        public FXUIPlayerHandler() {
-        }
+    public class FXPlayerHandler implements PlayerHandler {
 
         @Override
         public boolean isHuman() {
@@ -75,7 +72,7 @@ public class GameApp extends Application {
         }
 
         @Override
-        public PlayerTurn startTurn(EngineStatus.TurnStep step) {
+        public PlayerTurn startTurn(Engine engine, EngineStatus.TurnStep step) {
             return new FXUIPlayerTurn(step);
         }
     }

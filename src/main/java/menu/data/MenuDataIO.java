@@ -1,6 +1,6 @@
 package menu.data;
 
-import IA.IADifficulty;
+import IA.IA;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 import data.PlayerColor;
@@ -32,8 +32,8 @@ class MenuDataIO {
 
         String soloColorStr = (String) properties.getOrDefault("solo-color", PlayerColor.WHITE.name());
         PlayerColor soloColor = PlayerColor.valueOf(soloColorStr);
-        String soloDifficultyStr = (String) properties.getOrDefault("solo-difficulty", IADifficulty.FACILE.name());
-        IADifficulty soloDifficulty = IADifficulty.valueOf(soloDifficultyStr);
+        String soloDifficultyStr = (String) properties.getOrDefault("solo-difficulty", IA.FACILE.name());
+        IA soloDifficulty = IA.valueOf(soloDifficultyStr);
 
         String multiModeStr = (String) properties.getOrDefault("multi-mode", MultiMode.TWO_PLAYER.name());
         MultiMode multiMode = MultiMode.valueOf(multiModeStr);

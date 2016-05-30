@@ -84,7 +84,7 @@ class EngineImpl implements Engine {
                 ? ((EngineStatus.Running) engine.status).copy()
                 : engine.status;
         this.playerIndex = engine.playerIndex;
-        this.playerTurn = PlayerHandler.dummy().startTurn(EngineStatus.TurnStep.TILE);
+        this.playerTurn = PlayerHandler.dummy().startTurn(this, EngineStatus.TurnStep.TILE);
 
         this.actionSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
         actionSaves.addAll(engine.actionSaves);
@@ -148,7 +148,7 @@ class EngineImpl implements Engine {
         actions.updateAll();
 
         observers.forEach(o -> o.onTileStepStart(false));
-        this.playerTurn = getCurrentPlayer().getHandler().startTurn(EngineStatus.TurnStep.TILE);
+        this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, EngineStatus.TurnStep.TILE);
     }
 
     @Override
@@ -214,7 +214,7 @@ class EngineImpl implements Engine {
         observers.forEach(running.step == EngineStatus.TurnStep.TILE
                 ? o -> o.onTileStepStart(true)
                 : o -> o.onBuildStepStart(true));
-        this.playerTurn = getCurrentPlayer().getHandler().startTurn(running.step);
+        this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, running.step);
     }
 
     private void nextStep() {
@@ -274,7 +274,7 @@ class EngineImpl implements Engine {
             actions.updateAll();
 
             observers.forEach(o -> o.onTileStepStart(true));
-            this.playerTurn = getCurrentPlayer().getHandler().startTurn(EngineStatus.TurnStep.TILE);
+            this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, EngineStatus.TurnStep.TILE);
         }
     }
 

@@ -9,6 +9,7 @@ import data.FieldType;
 import data.PlayerColor;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
@@ -24,24 +25,16 @@ class Villages {
     //   - An instance of Hex which is the parent of this hex in the union find
     //   - An instance of VillageImple2 (if the key Hex is a top-level parent)
     private final Map<Hex, Object> map;
-    private final Map<PlayerColor, Set<Hex>> perColors;
 
     Villages(Island island) {
         this.island = island;
         this.map = new HashMap<>(HexMapImpl.INITIAL_CAPACITY);
-        this.perColors = new EnumMap<>(PlayerColor.class);
     }
 
     Villages(Villages villages, Island island) {
         this.island = island;
         this.map = new HashMap<>();
         map.putAll(villages.map);
-        this.perColors = new EnumMap<>(PlayerColor.class);
-        for (Map.Entry<PlayerColor, Set<Hex>> entry : villages.perColors.entrySet()) {
-            HashSet<Hex> setCopy = new HashSet<>();
-            setCopy.addAll(entry.getValue());
-            perColors.put(entry.getKey(), setCopy);
-        }
     }
 
     private Hex find(Hex hex) {
@@ -59,7 +52,6 @@ class Villages {
 
     private VillageImpl2 create(Hex hex) {
         VillageImpl2 created = new VillageImpl2(island, hex);
-        perColors.computeIfAbsent(created.getColor(), c -> new HashSet<>()).add(hex);
         map.put(hex, created);
         return created;
     }
@@ -80,12 +72,10 @@ class Villages {
         // This supposedly helps make the union-find tree more wide
         // than deep
         if (village1.hexes.size() > village2.hexes.size()) {
-            perColors.get(union.getColor()).remove(root2);
             map.put(root2, root1);
             map.put(root1, union);
         }
         else {
-            perColors.get(union.getColor()).remove(root1);
             map.put(root1, root2);
             map.put(root2, union);
         }
@@ -100,7 +90,11 @@ class Villages {
     }
 
     Iterable<Village> getAll(PlayerColor color) {
-        return Iterables.transform(perColors.getOrDefault(color, ImmutableSet.of()), this::get);
+        return map.values().stream()
+                .filter(o -> o instanceof VillageImpl2)
+                .map(o -> (VillageImpl2) o)
+                .filter(v -> v.getColor() == color)
+                .collect(Collectors.toList());
     }
 
     void update(Hex hex) {
@@ -121,7 +115,6 @@ class Villages {
         }
     }
 
-    // TODO optimize
     void reset(Hex... hexes) {
         Set<Hex> hexesToUpdate = new HashSet<>();
         for (Hex hex : hexes) {
@@ -129,9 +122,6 @@ class Villages {
                 Hex root = find(hex);
                 checkState(map.containsKey(root), "Something has gone wrong");
                 Village village = (VillageImpl2) map.get(root);
-                if (perColors.containsKey(village.getColor())) {
-                    perColors.get(village.getColor()).remove(root);
-                }
 
                 if (!hexesToUpdate.contains(hex)) {
                     hexesToUpdate.addAll(village.getHexes());

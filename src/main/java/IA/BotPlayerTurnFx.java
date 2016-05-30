@@ -8,21 +8,21 @@ import javafx.application.Platform;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class BotPlayerTurnFx implements PlayerTurn {
+class BotPlayerTurnFx implements PlayerTurn {
 
     private static long DELAY = 500;
 
     private final Engine engine;
     private final AtomicBoolean cancelled;
-    private final IAAlgorithm bot;
+    private final IAAlgorithm algorithm;
     private final EngineStatus.TurnStep step;
 
     private Move move;
 
-    public BotPlayerTurnFx(Engine engine, IAAlgorithm player, EngineStatus.TurnStep step) {
+    BotPlayerTurnFx(Engine engine, IAAlgorithm player, EngineStatus.TurnStep step) {
         this.engine = engine;
         this.cancelled = new AtomicBoolean(false);
-        this.bot = player;
+        this.algorithm = player;
         this.step = step;
 
         this.move = null;
@@ -38,7 +38,7 @@ public class BotPlayerTurnFx implements PlayerTurn {
     private void doPlay() {
         engine.logger().info("[IA] Starting");
         long startTime = System.nanoTime();
-        move = bot.play();
+        move = algorithm.play();
         long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
         engine.logger().info("[IA] {0}ms pour determiner le coup à jouer", duration);
 

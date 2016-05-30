@@ -7,13 +7,13 @@ import engine.action.*;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class EasyAlgorithm implements IAAlgorithm {
+class EasyAlgorithm implements IAAlgorithm {
 
     // Donnees
     private final Engine realEngine;
     private final AtomicBoolean cancelled;
 
-    public EasyAlgorithm(Engine e, AtomicBoolean b){
+    EasyAlgorithm(Engine e, AtomicBoolean b){
         realEngine = e;
         cancelled = b;
     }

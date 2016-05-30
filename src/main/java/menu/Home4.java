@@ -1,6 +1,6 @@
 package menu;
 
-import IA.IADifficulty;
+import IA.IA;
 import data.PlayerColor;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -17,7 +17,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import menu.data.MenuData;
 import menu.data.MenuMode;
@@ -629,7 +628,7 @@ public class Home4 extends Application {
         Toggle selected = levelChoice.getSelectedToggle();
         for(int i = 0; i < levelButtons.length; i++){
             if(selected == levelButtons[i]){
-                menuData.setSoloDifficulty(IADifficulty.values()[i]);
+                menuData.setSoloDifficulty(IA.values()[i]);
             }
         }
     }
