@@ -13,12 +13,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import menu.data.MenuData;
 import menu.data.MenuMode;
@@ -99,11 +98,11 @@ public class Home4 extends Application {
         vBoxScene.getChildren().addAll(vBoxHaut,hBoxMillieu,hBoxBas);
 
         //vBoxHaut
-        Image vs1 = new Image(getClass().getResourceAsStream("fb.png"));
+        Image vs1 = new Image(getClass().getResourceAsStream("lol.png"));
         ImageView iv2 = new ImageView();
         iv2.setImage(vs1);
 
-        //vBoxHaut.getChildren().add(iv2);
+        vBoxHaut.getChildren().add(iv2);
 
         //vBoxBas
 
@@ -142,7 +141,9 @@ public class Home4 extends Application {
         vBoxdroite.getChildren().addAll(vBoxcharger,vBoxnulle3);
         hBoxBas.getChildren().addAll(vBoxgauche,vBoxmillieu,vBoxdroite);
 
+        //Font font = Font.loadFont(getClass().getResourceAsStream("f1.ttf").toString(), 20);
         ToggleButton bsolo = new ToggleButton("SOLO");
+        //bsolo.setFont(font);
         ToggleButton bmulti = new ToggleButton("MULTI");
         ToggleButton bcharger = new ToggleButton("REPRENDRE");
 
@@ -196,7 +197,7 @@ public class Home4 extends Application {
 
         VBox soloOptions = new VBox(5);
         soloOptions.setAlignment(Pos.CENTER);
-        VBox multiOptions = new VBox(5);
+        VBox multiOptions = new VBox(20);
         multiOptions.setAlignment(Pos.CENTER);
         multiOptions.setPrefWidth(largeurScene);
         HBox chargerList = new HBox(30);
@@ -241,7 +242,7 @@ public class Home4 extends Application {
         hBoxII.getChildren().addAll(vBoxg2,vBoxm2,vBoxd2);
         soloOptions.getChildren().addAll(hBoxI,hBoxII);
 
-        Label icone = new Label("ICONE");
+        Label icone = new Label("CHOIX COULEUR");
         Label niveaux = new Label("DIFFICULTE");
         icone.setPrefWidth(largeurScene/3);
         icone.setPrefHeight(27);
@@ -292,6 +293,8 @@ public class Home4 extends Application {
 
 
         //pane button multijoueurs
+
+        /*
         ToggleButton md = new ToggleButton("2 JOUEURS");
         ToggleButton mt = new ToggleButton("3 JOUEURS");
         ToggleButton mq1 = new ToggleButton("4 JOUEURS");
@@ -314,7 +317,126 @@ public class Home4 extends Application {
         mt.setPrefWidth(largeurScene/2);
         mq1.setPrefWidth(largeurScene/2);
         mq2.setPrefWidth(largeurScene/2);
-        multiOptions.getChildren().addAll(md,mt,mq1,mq2);
+*/
+
+
+        HBox hhaut = new HBox(20);
+        HBox hbas  = new HBox(20);
+        VBox vg1   = new VBox(10);
+        VBox vd1   = new VBox(10);
+        VBox vg2   = new VBox(10);
+        VBox vd2   = new VBox(10);
+
+        hhaut.setAlignment(Pos.CENTER);
+        hbas.setAlignment(Pos.CENTER);
+        vg1.setAlignment(Pos.CENTER_RIGHT);
+        vd1.setAlignment(Pos.CENTER_LEFT);
+        vg2.setAlignment(Pos.CENTER_RIGHT);
+        vd2.setAlignment(Pos.CENTER_LEFT);
+
+        hhaut.setPrefWidth(largeurScene);
+        hbas.setPrefWidth(largeurScene);
+        vg1.setPrefWidth(largeurScene/2);
+        vg2.setPrefWidth(largeurScene/2);
+        vd1.setPrefWidth(largeurScene/2);
+        vd2.setPrefWidth(largeurScene/2);
+
+        //Image masque1 = new Image(getClass().getResourceAsStream(PlayerTheme.WHITE.getImage()));
+
+
+
+        //Button button1 = new Button("", new ImageView(PlayerTheme.WHITE.getImage()));
+        //Image masque = new Image(PlayerTheme.WHITE.getImage());
+        ImageView masque11 = createPlayerImageView(PlayerTheme.WHITE.getImage());
+        ImageView masque12 = createPlayerImageView(PlayerTheme.WHITE.getImage());
+        ImageView masque13 = createPlayerImageView(PlayerTheme.WHITE.getImage());
+        ImageView masque14 = createPlayerImageView(PlayerTheme.WHITE.getImage());
+
+        ImageView masque21 = createPlayerImageView(PlayerTheme.RED.getImage());
+        ImageView masque22 = createPlayerImageView(PlayerTheme.RED.getImage());
+        ImageView masque23 = createPlayerImageView(PlayerTheme.RED.getImage());
+        ImageView masque24 = createPlayerImageView(PlayerTheme.RED.getImage());
+
+        //ImageView masque31 = createPlayerImageView(PlayerTheme.YELLOW.getImage());
+        ImageView masque32 = createPlayerImageView(PlayerTheme.YELLOW.getImage());
+        ImageView masque33 = createPlayerImageView(PlayerTheme.YELLOW.getImage());
+        ImageView masque34 = createPlayerImageView(PlayerTheme.YELLOW.getImage());
+
+        //ImageView masque41 = createPlayerImageView(PlayerTheme.BROWN.getImage());
+        //ImageView masque42 = createPlayerImageView(PlayerTheme.BROWN.getImage());
+        ImageView masque43 = createPlayerImageView(PlayerTheme.BROWN.getImage());
+        ImageView masque44 = createPlayerImageView(PlayerTheme.BROWN.getImage());
+
+
+        Image vvss = new Image(getClass().getResourceAsStream("vs.png"));
+        ImageView  vvssi = new ImageView(vvss);
+        vvssi.setFitWidth(15);
+        vvssi.setFitWidth(15);
+
+
+        GridPane b1 = new GridPane();
+        b1.setAlignment(Pos.CENTER);
+        b1.setVgap(2);
+        b1.add(masque11,1,0);
+        b1.add(masque21,2,0);
+        ToggleButton md = new ToggleButton("",b1);
+        GridPane b2 = new GridPane();
+        b2.setAlignment(Pos.CENTER);
+        b2.setVgap(3);
+        b2.add(masque12,1,0);
+        b2.add(masque22,2,0);
+        b2.add(masque32,3,0);
+        ToggleButton mt = new ToggleButton("",b2);
+        GridPane b3 = new GridPane();
+        b3.setAlignment(Pos.CENTER);
+        b3.setVgap(4);
+        b3.add(masque13,1,0);
+        b3.add(masque23,2,0);
+        b3.add(masque33,3,0);
+        b3.add(masque43,4,0);
+        ToggleButton mq1 = new ToggleButton("",b3);
+        GridPane b4 = new GridPane();
+        b4.setAlignment(Pos.CENTER);
+        b4.setVgap(5);
+        b4.add(masque14,1,0);
+        b4.add(masque24,2,0);
+        b4.add(vvssi,3,0);
+        b4.add(masque34,4,0);
+        b4.add(masque44,5,0);
+        ToggleButton mq2 = new ToggleButton("",b4);
+        this.optionsMode = new ToggleButton[] { md,mt,mq1,mq2 };
+        this.mode = new ToggleGroup();
+        md.setToggleGroup(mode);
+        mt.setToggleGroup(mode);
+        mq1.setToggleGroup(mode);
+        mq2.setToggleGroup(mode);
+        mode.selectToggle(optionsMode[menuData.getMultiMode().ordinal()]);
+        mode.selectedToggleProperty().addListener(e -> updatemultimode());
+
+        //md.setPrefWidth(largeurScene*1/2);
+        //mt.setPrefWidth(largeurScene*1/2);
+        //mq1.setPrefWidth(largeurScene*1/2);
+        //mq2.setPrefWidth(largeurScene*1/2);
+
+        md.setPrefHeight(50);
+        mt.setPrefHeight(50);
+        mq1.setPrefHeight(50);
+        mq2.setPrefHeight(50);
+        md.setAlignment(Pos.CENTER);
+        mt.setAlignment(Pos.CENTER);
+
+        vg1.getChildren().add(md);
+        vd1.getChildren().add(mt);
+        vg2.getChildren().add(mq1);
+        vd2.getChildren().add(mq2);
+
+        hhaut.getChildren().addAll(vg1,vd1);
+        hbas.getChildren().addAll(vg2,vd2);
+
+
+        //multiOptions.getChildren().addAll(md,mt,mq1,mq2);
+        multiOptions.getChildren().addAll(hhaut,hbas);
+
 
 
 
@@ -457,6 +579,13 @@ public class Home4 extends Application {
         if (!stage.isShowing()) {
             stage.show();
         }
+    }
+
+    private ImageView createPlayerImageView(Image image) {
+        ImageView masque1 = new ImageView(image);
+        masque1.setFitHeight(40);
+        masque1.setFitWidth(40);
+        return masque1;
     }
 
     private void updateSoloColor(ActionEvent event) {
