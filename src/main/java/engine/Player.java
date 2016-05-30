@@ -60,7 +60,7 @@ public class Player {
         return playerHandler.isHuman();
     }
 
-    PlayerHandler getHandler() {
+    public PlayerHandler getHandler() {
         return playerHandler;
     }
 

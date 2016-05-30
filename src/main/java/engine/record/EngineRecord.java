@@ -33,13 +33,18 @@ public class EngineRecord {
 
     private final Gamemode gamemode;
     private final ImmutableList<PlayerColor> colors;
+    private final ImmutableList<PlayerHandler> handlers;
     private final ImmutableList<VolcanoTile> tiles;
     private final ImmutableList<Action> actions;
 
-    EngineRecord(Gamemode gamemode, List<PlayerColor> colors, List<VolcanoTile> tiles,
+    EngineRecord(Gamemode gamemode,
+                 List<PlayerColor> colors,
+                 List<PlayerHandler> handlers,
+                 List<VolcanoTile> tiles,
                  List<Action> actions) {
         this.gamemode = gamemode;
         this.colors = ImmutableList.copyOf(colors);
+        this.handlers = ImmutableList.copyOf(handlers);
         this.tiles = ImmutableList.copyOf(tiles);
         this.actions = ImmutableList.copyOf(actions);
     }
@@ -47,6 +52,7 @@ public class EngineRecord {
     public static EngineRecord load(CharSource source) {
         Gamemode gamemode;
         ImmutableList.Builder<PlayerColor> colorsBuilder = ImmutableList.builder();
+        ImmutableList.Builder<PlayerHandler> handlersBuilder = ImmutableList.builder();
         ImmutableList.Builder<VolcanoTile> tilesBuilder = ImmutableList.builder();
         ImmutableList.Builder<Action> actionsBuilder = ImmutableList.builder();
 
@@ -55,6 +61,7 @@ public class EngineRecord {
             int colorsCount = Integer.valueOf(reader.readLine());
             for (int i = 0; i < colorsCount; i++) {
                 colorsBuilder.add(PlayerColor.valueOf(reader.readLine()));
+                handlersBuilder.add(readHandler(reader.readLine()));
             }
 
             int tilesCount = Integer.valueOf(reader.readLine());
@@ -69,11 +76,20 @@ public class EngineRecord {
                 actionsBuilder.add(Action.read(reader));
             }
 
-            return new EngineRecord(gamemode, colorsBuilder.build(), tilesBuilder.build(), actionsBuilder.build());
+            return new EngineRecord(gamemode,
+                    colorsBuilder.build(),
+                    handlersBuilder.build(),
+                    tilesBuilder.build(),
+                    actionsBuilder.build());
         }
         catch (IOException e) {
             throw new Exception(e);
         }
+    }
+
+    private static PlayerHandler readHandler(String handlerStr) {
+        // TODO
+        return PlayerHandler.dummy();
     }
 
     public void save(CharSink sink) {
