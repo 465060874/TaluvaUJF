@@ -89,12 +89,12 @@ class BotPlayer {
         for (int i = 0; i < branchNb; i++) {
             engine.action(branchMoves[i].tileAction);
             engine.action(branchMoves[i].buildingAction);
-            if( engine.getStatus() instanceof EngineStatus.Finished ){
+            /*if( engine.getStatus() instanceof EngineStatus.Finished ){
                 if( ((EngineStatus.Finished) engine.getStatus()).getWinners().contains( engine.getCurrentPlayer()))
                     return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MIN_VALUE );
                 else
                     return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MAX_VALUE );
-            }else if (depth > 0) {
+            }else */if (depth > 0) {
                 Move m = doPlay(engine, depth - 1);
                 // Pour inverser entre min et max
                 m.points *= -1;

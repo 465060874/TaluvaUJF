@@ -286,6 +286,37 @@ class BasicHeuristics implements Heuristics {
                 points += bonus;
             }
         }
+        // 4 - NOMBRE DE VILLES DE TROIS CREES
+        // COmpte le nombre de villes
+        int nbVillages;
+        int i = 0;
+        Player player;
+        List<Player> players = e.getPlayers();
+        nbVillages = 0;
+        for( Village village :  e.getIsland().getVillages( e.getCurrentPlayer().getColor()) )
+            if( ! village.hasTemple() )
+                nbVillages++;
+        while ((player = players.get(i++)) == e.getCurrentPlayer()) {}
+        for( Village village :  e.getIsland().getVillages( e.getCurrentPlayer().getColor()) )
+            if( ! village.hasTemple() )
+                nbVillages--;
+
+        // On joue le coup et on recompte :
+        e.placeOnVolcano(move );
+        int nbVillagesAfter = 0;
+        i = 0;
+        for( Village village :  e.getIsland().getVillages( e.getCurrentPlayer().getColor()) )
+            if( ! village.hasTemple() )
+                nbVillagesAfter++;
+        while ((player = players.get(i++)) == e.getCurrentPlayer()) {}
+        for( Village village :  e.getIsland().getVillages( e.getCurrentPlayer().getColor()) )
+            if( ! village.hasTemple() )
+                nbVillagesAfter--;
+        e.cancelLastStep();
+
+        // Différence :
+        int diff = nbVillages - nbVillagesAfter;
+        points += diff*4;
         return points*scale;
     }
 
@@ -372,54 +403,105 @@ class BasicHeuristics implements Heuristics {
         List<Player> players = engine.getPlayers();
         Player player = engine.getCurrentPlayer();
 
-        // Gestion des villages
-        Iterable<Village> villages = engine.getIsland().getVillages( player.getColor());
-        for( Village village : villages) {
-            tmpScore = 0;
-            if( !village.hasTemple())
-                tmpScore += village.getHexes().size() > 5 ? pointsVillageSize[5] : pointsVillageSize[village.getHexes().size()];
-            else
-                tmpScore += pointsVillageWithTemple;
-            if( !village.hasTower() ) {
-                // On regarde le nombre de hex qui sont proches de voisins vides de niveau > 3
-                for( Hex hex : village.getHexes() )
-                    for( Hex adjacent : hex.getNeighborhood())
-                        if( engine.getIsland().getField(adjacent).getBuilding().getType() == BuildingType.NONE && engine.getIsland().getField(adjacent).getLevel() >= 3 )
-                            tmpScore += pointsAdjacentHill;
-            }else
-                tmpScore += pointsVillageWithTower;
-            engine.logger().finer("[Eval] {0} Village : {1} ", player.getColor(), tmpScore);
-            score += tmpScore;
-        }
-        int i = 0;
-        while( (player = players.get(i++)) == engine.getCurrentPlayer() ){}
-        villages = engine.getIsland().getVillages( player.getColor());
-        for( Village village : villages) {
-            tmpScore = 0;
-            if( !village.hasTemple())
-                tmpScore += village.getHexes().size() > 5 ? pointsVillageSize[5] : pointsVillageSize[village.getHexes().size()];
-            else
-                tmpScore += pointsVillageWithTemple;
-            if( !village.hasTower() ) {
-                // On regarde le nombre de hex qui sont proches de voisins vides de niveau > 3
-                for( Hex hex : village.getHexes() )
-                    for( Hex adjacent : hex.getNeighborhood())
-                        if( engine.getIsland().getField(adjacent).getBuilding().getType() == BuildingType.NONE && engine.getIsland().getField(adjacent).getLevel() >= 3 )
-                            tmpScore += pointsAdjacentHill;
-            }else
-                tmpScore += pointsVillageWithTower;
-            engine.logger().finer("[Eval] {0} Village : {1} ", player.getColor(), tmpScore);
-            score -= tmpScore;
-        }
-        engine.logger().fine("[Eval] {0} Config with {1} points ", engine.getCurrentPlayer().getColor(), score);
+        // Début et milieu de partie
+        if( engine.getVolcanoTileStack().size() > 4 ) {
+            // Gestion des villages
+            Iterable<Village> villages = engine.getIsland().getVillages(player.getColor());
+            for (Village village : villages) {
+                tmpScore = 0;
+                if (!village.hasTemple())
+                    tmpScore += village.getHexes().size() > 5 ? pointsVillageSize[5] : pointsVillageSize[village.getHexes().size()];
+                else
+                    tmpScore += pointsVillageWithTemple;
+                if (!village.hasTower()) {
+                    // On regarde le nombre de hex qui sont proches de voisins vides de niveau > 3
+                    for (Hex hex : village.getHexes())
+                        for (Hex adjacent : hex.getNeighborhood())
+                            if (engine.getIsland().getField(adjacent).getBuilding().getType() == BuildingType.NONE && engine.getIsland().getField(adjacent).getLevel() >= 3)
+                                tmpScore += pointsAdjacentHill;
+                } else
+                    tmpScore += pointsVillageWithTower;
+                engine.logger().finer("[Eval] {0} Village : {1} ", player.getColor(), tmpScore);
+                score += tmpScore;
+            }
+            int i = 0;
+            while ((player = players.get(i++)) == engine.getCurrentPlayer()) {
+            }
+            villages = engine.getIsland().getVillages(player.getColor());
+            for (Village village : villages) {
+                tmpScore = 0;
+                if (!village.hasTemple())
+                    tmpScore += village.getHexes().size() > 5 ? pointsVillageSize[5] : pointsVillageSize[village.getHexes().size()];
+                else
+                    tmpScore += pointsVillageWithTemple;
+                if (!village.hasTower()) {
+                    // On regarde le nombre de hex qui sont proches de voisins vides de niveau > 3
+                    for (Hex hex : village.getHexes())
+                        for (Hex adjacent : hex.getNeighborhood())
+                            if (engine.getIsland().getField(adjacent).getBuilding().getType() == BuildingType.NONE && engine.getIsland().getField(adjacent).getLevel() >= 3)
+                                tmpScore += pointsAdjacentHill;
+                } else
+                    tmpScore += pointsVillageWithTower;
+                engine.logger().finer("[Eval] {0} Village : {1} ", player.getColor(), tmpScore);
+                score -= tmpScore;
+            }
+            engine.logger().fine("[Eval] {0} Config with {1} points ", engine.getCurrentPlayer().getColor(), score);
 
-        // Gestion fin du jeu :
-        if( engine.getStatus() instanceof EngineStatus.Finished ) {
-            if (((EngineStatus.Finished) engine.getStatus()).getWinners().contains(engine.getCurrentPlayer()))
-                return Integer.MAX_VALUE + 5000 + score;
-            else
-                return Integer.MIN_VALUE + 5000 + score;
-        }else
-            return score;
+            // Gestion fin du jeu :
+            if (engine.getStatus() instanceof EngineStatus.Finished) {
+                if (((EngineStatus.Finished) engine.getStatus()).getWinners().contains(engine.getCurrentPlayer()))
+                    return Integer.MAX_VALUE - 5000 + score;
+                else
+                    return Integer.MIN_VALUE + 5000 + score;
+            } else
+                return score;
+        }
+        // Fin de partie ( tiles restantes <= 3 )
+        else{
+            int temple = 330;
+            int tower = 110;
+            int hut = 5;
+
+            // Gestion des villages
+            Iterable<Village> villages = engine.getIsland().getVillages(player.getColor());
+            for (Village village : villages) {
+                tmpScore = 0;
+                for (Hex hex : village.getHexes())
+                    if (engine.getIsland().getField(hex).getBuilding().getType() == BuildingType.HUT )
+                        tmpScore += hut;
+                    else if (engine.getIsland().getField(hex).getBuilding().getType() == BuildingType.TOWER )
+                        tmpScore += tower;
+                    else if (engine.getIsland().getField(hex).getBuilding().getType() == BuildingType.TEMPLE )
+                        tmpScore += temple;
+                    score += tmpScore;
+            }
+
+            int i = 0;
+            while ((player = players.get(i++)) == engine.getCurrentPlayer()) {}
+            villages = engine.getIsland().getVillages(player.getColor());
+            for (Village village : villages) {
+                tmpScore = 0;
+                for (Hex hex : village.getHexes())
+                    if (engine.getIsland().getField(hex).getBuilding().getType() == BuildingType.HUT )
+                        tmpScore -= hut;
+                    else if (engine.getIsland().getField(hex).getBuilding().getType() == BuildingType.TOWER )
+                        tmpScore -= tower;
+                    else if (engine.getIsland().getField(hex).getBuilding().getType() == BuildingType.TEMPLE )
+                        tmpScore -= temple;
+                score += tmpScore;
+            }
+            engine.logger().fine("[Eval] {0} Config with {1} points ", engine.getCurrentPlayer().getColor(), score);
+
+            // Gestion fin du jeu :
+            if (engine.getStatus() instanceof EngineStatus.Finished) {
+                engine.logger().info("[!!!!!!!!] Finished -> bug ? ");
+                if (((EngineStatus.Finished) engine.getStatus()).getWinners().contains(engine.getCurrentPlayer()))
+                    return Integer.MAX_VALUE - 5000 + score;
+                else
+                    return Integer.MIN_VALUE + 5000 + score;
+            } else
+                return score;
+        }
+
     }
 }
