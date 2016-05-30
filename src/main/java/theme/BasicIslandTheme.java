@@ -36,11 +36,6 @@ public class BasicIslandTheme implements IslandTheme {
     }
 
     @Override
-    public Paint getSeaPaint() {
-        return SEA_COLOR;
-    }
-
-    @Override
     public Paint getTileBorderPaint(HexStyle style) {
         return tileBorderColor;
     }

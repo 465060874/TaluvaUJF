@@ -44,8 +44,6 @@ public interface IslandTheme {
 
     Background getIslandBackground();
 
-    Paint getSeaPaint();
-
     Paint getTileBorderPaint(HexStyle style);
 
     Paint getTileBottomPaint(HexStyle style);
