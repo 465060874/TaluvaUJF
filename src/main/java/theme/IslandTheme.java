@@ -23,7 +23,9 @@ public interface IslandTheme {
         else if (CurrentTheme.IslandTHEME instanceof SphaxIslandTheme) {
             CurrentTheme.IslandTHEME = new BasicIslandTheme();
         }
-        else {
+        else if (CurrentTheme.IslandTHEME instanceof BasicIslandTheme){
+            CurrentTheme.IslandTHEME = new BasicIslandTheme_withNoLight();
+        } else {
             CurrentTheme.IslandTHEME = new ImageIslandTheme();
         }
 

@@ -1,6 +1,5 @@
 package ui;
 
-import IA.BotPlayerHandler;
 import IA.IADifficulty;
 import data.BuildingType;
 import data.PlayerColor;
@@ -124,7 +123,6 @@ public class GameApp extends Application {
 
         private void mouseDragged(MouseEvent mouseEvent) {
             if (!dragged && gameView.isMouseDragged()) {
-                System.out.println("GAMEAPP DRAGGED");
                 dragged = true;
             }
         }
