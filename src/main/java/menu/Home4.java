@@ -305,6 +305,9 @@ public class Home4 extends Application {
         ToggleButton mq1 = new ToggleButton("4 JOUEURS");
         ToggleButton mq2 = new ToggleButton("2 JOUEURS   VS  2 JOUEURS");
 
+
+
+
         this.optionsMode = new ToggleButton[] { md,mt,mq1,mq2 };
         this.mode = new ToggleGroup();
         md.setToggleGroup(mode);
@@ -320,6 +323,8 @@ public class Home4 extends Application {
         mq1.setPrefWidth(largeurScene/2);
         mq2.setPrefWidth(largeurScene/2);
         multiOptions.getChildren().addAll(md,mt,mq1,mq2);
+
+
 
         //pane charger
         int kkk = 170;
@@ -425,7 +430,7 @@ public class Home4 extends Application {
         //vBoxoptionsCharger.getStyleClass().add("s2");
 
         for(int i = 0;i < optionsHistory.size(); i++){
-            optionsHistory.get(i).getStyleClass().add("buttonjoueur");
+            optionsHistory.get(i).getStyleClass().add("buttonniveaux7");
         }
 
 /*

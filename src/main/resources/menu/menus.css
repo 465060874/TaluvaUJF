@@ -201,6 +201,37 @@
     -fx-background-color: #C00105;
     -fx-text-fill: white;
 }
+
+.buttonniveaux7{
+    -fx-background-color:white;
+    /*-fx-color: white;*/
+    -fx-text-fill: green;
+    -fx-outer-border: green;
+    /*-fx-border: 20px;*/
+    -fx-border-color: green;
+    -fx-border-radius:10;
+    -fx-background-radius:12;
+    -fx-border-width:1;
+}
+
+.buttonniveaux7:hover{
+    -fx-background-color: #00D507;
+    -fx-color: white;
+    -fx-text-fill: white;
+}
+
+.buttonniveaux7:armed {
+    -fx-color: white;
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+}
+
+.buttonniveaux7:selected {
+    -fx-color: white;
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+}
+
 /*
 .buttonniveaux4{
     -fx-background-color: #F337A8;
