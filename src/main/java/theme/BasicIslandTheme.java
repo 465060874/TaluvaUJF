@@ -24,6 +24,7 @@ public class BasicIslandTheme implements IslandTheme {
     private final Lighting lighting = new Lighting(new Light.Point(0, 0, 0, Color.WHITE));
     private final Lighting lightingHigh = new Lighting(new Light.Point(0, 0, 0, Color.WHITE));
     private final Lighting lightingFaded = new Lighting(new Light.Point(0, 0, 0, Color.GRAY));
+    private final Color selected = Color.web("ea3434");
 
     @Override
     public Paint getBackgroundPaint() {
@@ -33,6 +34,11 @@ public class BasicIslandTheme implements IslandTheme {
     @Override
     public Paint getTileBorderPaint(HexStyle style) {
         return tileBorderColor;
+    }
+
+    @Override
+    public Paint getInnerBorderPaint(HexStyle style) {
+        return selected;
     }
 
     @Override
@@ -67,7 +73,8 @@ public class BasicIslandTheme implements IslandTheme {
         switch (style) {
             case NORMAL:      return lighting;
             case FLOATING:    return lighting;
-            case FADED:       return lightingFaded;
+            case FADED:       return lighting;
+            case TRULYFADED:  return lightingFaded;
             case HIGHLIGHTED: return lightingHigh;
         }
 
@@ -112,11 +119,6 @@ public class BasicIslandTheme implements IslandTheme {
 
     @Override
     public Paint getGradiantEffect(Orientation orientation, double[] hexagonBorderX, double[] hexagonBorderY) {
-        return null;
-    }
-
-    @Override
-    public Paint getGradiantEffectOthers(Orientation orientation, double[] hexagonX, double[] hexagonY, FieldType baseColor) {
         return null;
     }
 }

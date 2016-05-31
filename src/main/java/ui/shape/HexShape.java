@@ -17,6 +17,7 @@ public class HexShape {
     private static final int BOTTOM_POINTS = 6;
     private static final int BOTTOM_BORDER_POINTS = 5;
     public static final float STROKE_WIDTH = 3f;
+    private static final double FADEDRATIO = 0.8f;
 
     private final double[] hexagonX;
     private final double[] hexagonY;
@@ -28,6 +29,8 @@ public class HexShape {
     private final double[] bottomY;
     private final double[] bottomBorderX;
     private final double[] bottomBorderY;
+    private final double[] fadedBorderX;
+    private final double[] fadedBorderY;
 
     public HexShape() {
         this.hexagonX = new double[HEXAGON_POINTS];
@@ -40,6 +43,10 @@ public class HexShape {
         this.bottomY = new double[BOTTOM_POINTS];
         this.bottomBorderX = new double[BOTTOM_BORDER_POINTS];
         this.bottomBorderY = new double[BOTTOM_BORDER_POINTS];
+
+        // Hexagone de selection
+        this.fadedBorderX = new double [HEXAGON_POINTS + 1];
+        this.fadedBorderY = new double [HEXAGON_POINTS + 1];
     }
 
     private void updatePolygon(Grid grid, double x, double y, int level, Orientation orientation) {
@@ -66,6 +73,32 @@ public class HexShape {
 
         hexagonX[5] = x - halfWidth;
         hexagonY[5] = y2 - midY;
+
+        double hexHeightFaded = hexHeight * FADEDRATIO;
+        double y2Faded = y - (level - 1) * hexHeightFaded;
+        double halfWidthFaded = grid.getHexHalfWidth() * FADEDRATIO;
+        double midYFaded = (grid.getHexRadiusY() / 2) * FADEDRATIO;
+
+        fadedBorderX[0] = x - halfWidthFaded;
+        fadedBorderY[0] = y2Faded + midYFaded;
+
+        fadedBorderX[1] = x;
+        fadedBorderY[1] = y2Faded + grid.getHexRadiusY() * FADEDRATIO;
+
+        fadedBorderX[2] = x + halfWidthFaded;
+        fadedBorderY[2] = y2Faded + midYFaded;
+
+        fadedBorderX[3] = x + halfWidthFaded;
+        fadedBorderY[3] = y2Faded - midYFaded;
+
+        fadedBorderX[4] = x;
+        fadedBorderY[4] = y2Faded - grid.getHexRadiusY() * FADEDRATIO;
+
+        fadedBorderX[5] = x - halfWidthFaded;
+        fadedBorderY[5] = y2Faded - midYFaded;
+
+        fadedBorderX[6] = fadedBorderX[0];
+        fadedBorderY[6] = fadedBorderY[0];
 
         int orientationOffset = orientationOffset(orientation);
 
@@ -172,9 +205,8 @@ public class HexShape {
         }
         else if (fieldType == FieldType.VOLCANO) {
             gc.setFill(IslandTheme.getCurrent().getGradiantEffect(orientation, hexagonX, hexagonY));
-        } else {
-            gc.setFill(IslandTheme.getCurrent().getGradiantEffectOthers(orientation, hexagonX, hexagonY, fieldType));
         }
+
         gc.fillPolygon(hexagonX, hexagonY, HEXAGON_POINTS);
 
         gc.setEffect(IslandTheme.getCurrent().getTileBottomEffect(grid, style));
@@ -192,6 +224,12 @@ public class HexShape {
         for (int i = 1; i <= level; i++) {
             bottomBorderLevel(grid, i, level);
             gc.strokePolyline(bottomBorderX, bottomBorderY, BOTTOM_BORDER_POINTS);
+        }
+
+        // Ajout des cases non jouable en contour rouge
+        if (style == HexStyle.FADED) {
+            gc.setStroke(IslandTheme.getCurrent().getInnerBorderPaint(style));
+            gc.strokePolyline(fadedBorderX, fadedBorderY, HEXAGON_POINTS + 1);
         }
     }
 }

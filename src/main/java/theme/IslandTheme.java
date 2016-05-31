@@ -46,6 +46,8 @@ public interface IslandTheme {
 
     Paint getTileBorderPaint(HexStyle style);
 
+    Paint getInnerBorderPaint(HexStyle style);
+
     Paint getTileBottomPaint(HexStyle style);
 
     Effect getTileBottomEffect(Grid grid, HexStyle style);
@@ -65,8 +67,6 @@ public interface IslandTheme {
     Effect getBuildingTopEffect(Grid grid, Building building, BuildingStyle style);
 
     Paint getGradiantEffect(Orientation orientation, double[] hexagonBorderX, double[] hexagonBorderY);
-
-    Paint getGradiantEffectOthers(Orientation orientation, double[] hexagonX, double[] hexagonY, FieldType baseColor);
 
     class CurrentTheme {
 

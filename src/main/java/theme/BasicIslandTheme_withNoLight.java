@@ -23,6 +23,7 @@ public class BasicIslandTheme_withNoLight implements IslandTheme {
     private final Lighting lighting = new Lighting(new Light.Point(0, 0, 0, Color.WHITE));
     private final Lighting lightingHigh = new Lighting(new Light.Point(0, 0, 0, Color.WHITE));
     private final Lighting lightingFaded = new Lighting(new Light.Point(0, 0, 0, Color.GRAY));
+    private final Color selected = Color.web("ea3434");
 
     @Override
     public Paint getBackgroundPaint() {
@@ -32,6 +33,11 @@ public class BasicIslandTheme_withNoLight implements IslandTheme {
     @Override
     public Paint getTileBorderPaint(HexStyle style) {
         return tileBorderColor;
+    }
+    @Override
+    public Paint getInnerBorderPaint(HexStyle style) {
+        return selected;
+
     }
 
     @Override
@@ -60,21 +66,19 @@ public class BasicIslandTheme_withNoLight implements IslandTheme {
 
     @Override
     public Effect getTileTopEffect(Grid grid, HexStyle style) {
-        //return null;
-
         ((Light.Point) lighting.getLight()).setZ(grid.getScale() * 150);
-        return lighting;
-
-        /*((Light.Point) lightingHigh.getLight()).setZ(grid.getScale() * 1000);
+        ((Light.Point) lightingHigh.getLight()).setZ(grid.getScale() * 1000);
         ((Light.Point) lightingFaded.getLight()).setZ(grid.getScale() * 150);
+
         switch (style) {
             case NORMAL:      return lighting;
             case FLOATING:    return lighting;
-            case FADED:       return lightingFaded;
+            case FADED:       return lighting;
+            case TRULYFADED:  return lightingFaded;
             case HIGHLIGHTED: return lightingHigh;
         }
 
-        throw new IllegalStateException();*/
+        throw new IllegalStateException();
     }
 
     @Override
@@ -132,47 +136,6 @@ public class BasicIslandTheme_withNoLight implements IslandTheme {
         }
         stops = new Stop[]{new Stop(0, Color.BLACK), new Stop(1, Color.web("E97B33"))};
         return new LinearGradient(hexagonX[0], hexagonY[0], hexagonX[3], hexagonY[3], false, CycleMethod.NO_CYCLE, stops);
-    }
-
-    private Color getTileTopPaint(FieldType type) {
-        switch (type) {
-            case VOLCANO:  return tileVolcanoColor;
-            case JUNGLE:   return tileJungleColor;
-            case CLEARING: return tileClearingColor;
-            case SAND:     return tileSandColor;
-            case ROCK:     return tileRockColor;
-            case LAKE:     return tileLakeColor;
-        }
-
-        throw new IllegalStateException();
-    }
-
-    @Override
-    public Paint getGradiantEffectOthers(Orientation orientation, double[] hexagonX, double[] hexagonY, FieldType fieldType) {
-        return null;
-
-        /*
-        Color baseColor = getTileTopPaint(fieldType);
-        Color toColor = baseColor.interpolate(Color.WHITE, 0.2);
-
-        Stop[] stops = new Stop[] {new Stop(0.4, baseColor), new Stop(1, toColor)};
-        switch(orientation) {
-            case NORTH:
-                return new LinearGradient(hexagonX[4], hexagonY[4], hexagonX[1], hexagonY[1], false, CycleMethod.NO_CYCLE, stops);
-            case SOUTH:
-                return new LinearGradient(hexagonX[1], hexagonY[1], hexagonX[4], hexagonY[4], false, CycleMethod.NO_CYCLE, stops);
-            case SOUTH_WEST:
-                return new LinearGradient(hexagonX[0], hexagonY[0], hexagonX[3], hexagonY[3], false, CycleMethod.NO_CYCLE, stops);
-            case NORTH_EAST:
-                return new LinearGradient(hexagonX[3], hexagonY[3], hexagonX[0], hexagonY[0], false, CycleMethod.NO_CYCLE, stops);
-            case NORTH_WEST:
-                return new LinearGradient(hexagonX[5], hexagonY[5], hexagonX[2], hexagonY[2], false, CycleMethod.NO_CYCLE, stops);
-            case SOUTH_EAST:
-                return new LinearGradient(hexagonX[2], hexagonY[2], hexagonX[5], hexagonY[5], false, CycleMethod.NO_CYCLE, stops);
-        }
-        stops = new Stop[]{new Stop(0, Color.BLACK), new Stop(1, Color.web("E97B33"))};
-        return new LinearGradient(hexagonX[0], hexagonY[0], hexagonX[3], hexagonY[3], false, CycleMethod.NO_CYCLE, stops);
-        */
     }
 
 

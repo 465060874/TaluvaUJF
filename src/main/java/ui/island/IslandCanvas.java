@@ -116,7 +116,7 @@ class IslandCanvas extends Canvas {
                 }
                 else {
                     building = field.getBuilding();
-                    hexStyle = HexStyle.FADED;
+                    hexStyle = HexStyle.TRULYFADED;
                 }
             }
             else if (placement.mode == Placement.Mode.BUILDING) {
@@ -132,7 +132,7 @@ class IslandCanvas extends Canvas {
                     }
                     else {
                         building = field.getBuilding();
-                        hexStyle = HexStyle.FADED;
+                        hexStyle = HexStyle.TRULYFADED;
                     }
                 }
                 else if (placement.validHexes.contains(hex)) {

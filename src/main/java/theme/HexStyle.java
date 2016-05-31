@@ -8,5 +8,7 @@ public enum HexStyle {
 
     FADED,
 
+    TRULYFADED,
+
     FLOATING;
 }
