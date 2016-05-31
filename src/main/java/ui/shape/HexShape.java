@@ -155,12 +155,22 @@ public class HexShape {
 
     public void draw(GraphicsContext gc, Grid grid,
                      double x, double y, int level, FieldType fieldType, Orientation orientation, HexStyle style) {
+        draw(gc, grid, x, y, level, fieldType, orientation, style, false);
+    }
+
+    public void draw(GraphicsContext gc, Grid grid,
+                     double x, double y, int level,
+                     FieldType fieldType, Orientation orientation, HexStyle style,
+                     boolean hidden) {
         updatePolygon(grid, x, y, Math.max(1, level), orientation);
 
         // Fill shape
         gc.setEffect(IslandTheme.getCurrent().getTileTopEffect(grid, style));
         gc.setFill(IslandTheme.getCurrent().getTileTopPaint(fieldType, style));
-        if (fieldType == FieldType.VOLCANO) {
+        if (hidden) {
+            gc.setFill(IslandTheme.getCurrent().getTileBottomPaint(style));
+        }
+        else if (fieldType == FieldType.VOLCANO) {
             gc.setFill(IslandTheme.getCurrent().getGradiantEffect(orientation, hexagonX, hexagonY));
         } else {
             gc.setFill(IslandTheme.getCurrent().getGradiantEffectOthers(orientation, hexagonX, hexagonY, fieldType));

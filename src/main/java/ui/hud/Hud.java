@@ -127,7 +127,8 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     @Override
     public void onBuildStepStart(boolean cancelled) {
-
+        tileStackCanvas.redraw();
+        tileStackSize.setText(Integer.toString(engine.getVolcanoTileStack().size() - 1));
     }
 
     @Override

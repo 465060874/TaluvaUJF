@@ -3,6 +3,7 @@ package ui.hud;
 import data.FieldType;
 import data.VolcanoTile;
 import engine.Engine;
+import engine.EngineStatus;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import map.Neighbor;
@@ -32,19 +33,26 @@ public class TileStackCanvas extends Canvas {
     }
 
     void redraw() {
+        boolean build = engine.getStatus() == EngineStatus.PENDING_START
+                || engine.getStatus().getStep() == EngineStatus.TurnStep.BUILD;
+        int stackSize = engine.getVolcanoTileStack().size();
+        if (build) {
+            stackSize--;
+        }
+        stackSize = Math.min(10, stackSize);
+
         double width = 4 * grid.getHexHalfWidth();
-        double height = 6 * grid.getHexRadiusY();
+        double height = 6 * grid.getHexRadiusY() + grid.getHexHeight() * stackSize;
         setWidth(width + 10);
         setHeight(height);
 
         GraphicsContext gc = getGraphicsContext2D();
+        gc.clearRect(0, 0, getWidth(), getHeight());
         if (engine.getVolcanoTileStack().isEmpty()) {
-            gc.clearRect(0, 0, getWidth(), getHeight());
             return;
         }
         VolcanoTile tile = engine.getVolcanoTileStack().current();
         if (tile == null) {
-            gc.clearRect(0, 0, getWidth(), getHeight());
             return;
         }
 
@@ -57,8 +65,11 @@ public class TileStackCanvas extends Canvas {
         double rightX = volcanoX + grid.neighborToXOffset(rightNeighbor);
         double rightY = volcanoY + grid.neighborToYOffset(rightNeighbor);
 
-        hexShape.draw(gc, grid, volcanoX, volcanoY, 1, FieldType.VOLCANO, Orientation.NORTH, HexStyle.NORMAL);
-        hexShape.draw(gc, grid, leftX, leftY, 1, tile.getLeft(), Orientation.SOUTH_WEST, HexStyle.NORMAL);
-        hexShape.draw(gc, grid, rightX, rightY, 1, tile.getRight(), Orientation.SOUTH_EAST, HexStyle.NORMAL);
+        hexShape.draw(gc, grid, volcanoX, volcanoY, stackSize,
+                FieldType.VOLCANO, Orientation.NORTH, HexStyle.NORMAL, build);
+        hexShape.draw(gc, grid, leftX, leftY, stackSize,
+                tile.getLeft(), Orientation.SOUTH_WEST, HexStyle.NORMAL, build);
+        hexShape.draw(gc, grid, rightX, rightY, stackSize,
+                tile.getRight(), Orientation.SOUTH_EAST, HexStyle.NORMAL, build);
     }
 }
