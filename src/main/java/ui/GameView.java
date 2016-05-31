@@ -33,7 +33,7 @@ public class GameView extends StackPane implements EngineObserver {
         engine.registerObserver(this);
         Grid grid = new Grid();
         this.placement = new Placement(engine, grid);
-        this.islandView = new IslandView(engine.getIsland(), grid, placement, true);
+        this.islandView = new IslandView(engine.getIsland(), grid, placement, false);
         this.hud = new Hud(engine);
 
         hud.setPickOnBounds(false);

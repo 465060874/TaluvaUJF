@@ -15,7 +15,7 @@ import java.util.Set;
 
 import static map.Hex.at;
 import static org.junit.Assert.assertEquals;
-import static utils.SetTest.assertNoDuplicatesAndCreateSet;
+import static util.SetTest.assertNoDuplicatesAndCreateSet;
 
 public class IslandTest {
 

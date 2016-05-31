@@ -1,4 +1,4 @@
-package utils;
+package util;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +12,7 @@ public class SetTest {
         for (E element : iterable) {
             // On vérifie l'unicité au fur et a mesure
             if (!set.add(element)) {
-                fail("Duplicated elements" + element);
+                Assert.fail("Duplicated elements" + element);
             }
         }
 

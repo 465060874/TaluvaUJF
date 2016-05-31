@@ -21,7 +21,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertFalse;
-import static utils.SetTest.assertNoDuplicatesAndCreateSet;
+import static util.SetTest.assertNoDuplicatesAndCreateSet;
 
 public class EngineActionTest {
 
