@@ -469,7 +469,9 @@ public class Home4 extends Application {
             savedButton.setToggleGroup(historyChoice);
             optionsHistory.add(savedButton);
         }
-        historyChoice.selectToggle(optionsHistory.get(0));
+        if (!optionsHistory.isEmpty()) {
+            historyChoice.selectToggle(optionsHistory.get(0));
+        }
         historyChoice.selectedToggleProperty().addListener(e -> updateCapture());
 
         vBoxoptionsCharger.getChildren().addAll(optionsHistory);
@@ -482,7 +484,9 @@ public class Home4 extends Application {
         vBoxoptionsCharger.setAlignment(Pos.CENTER_LEFT);
         vBoxoptionsCharger.setPadding(new Insets(2,1,0,1));
         sp.setContent(vBoxoptionsCharger);
-        vBoxCapture.getChildren().add(capture.get(0));
+        if (!capture.isEmpty()) {
+            vBoxCapture.getChildren().add(capture.get(0));
+        }
 
         chargerList.getChildren().addAll(vBoxCapture,v);
         chargerList.setPrefHeight(80);

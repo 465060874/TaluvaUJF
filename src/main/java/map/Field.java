@@ -2,7 +2,10 @@ package map;
 
 import data.BuildingType;
 import data.FieldType;
-import static com.google.common.base.Preconditions.*;
+import data.PlayerColor;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Représente une case de la carte
@@ -61,6 +64,15 @@ public class Field {
 
     public Orientation getOrientation() {
         return orientation;
+    }
+
+    public boolean hasBuilding() {
+        return building.getType() != BuildingType.NONE;
+    }
+
+    public boolean hasBuilding(PlayerColor color) {
+        return building.getType() != BuildingType.NONE
+                && building.getColor() == color;
     }
 
     public Building getBuilding() {

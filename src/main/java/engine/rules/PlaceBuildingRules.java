@@ -42,14 +42,13 @@ public class PlaceBuildingRules {
     static boolean isBuildable(Field field) {
         return field != Field.SEA
                 && field.getType().isBuildable()
-                && field.getBuilding().getType() == BuildingType.NONE;
+                && !field.hasBuilding();
     }
 
     static Problems validateTemple(Hex hex, Island island, PlayerColor color) {
         for (Hex neighbor : hex.getNeighborhood()) {
-            Building neighborBuilding = island.getField(neighbor).getBuilding();
-            if (neighborBuilding.getType() != BuildingType.NONE
-                    && neighborBuilding.getColor() == color) {
+            Field neighborField = island.getField(neighbor);
+            if (neighborField.hasBuilding(color)) {
                 final Village village = island.getVillage(neighbor);
                 if (!village.hasTemple() && village.getHexes().size() > 2) {
                     return Problems.of();
@@ -66,9 +65,8 @@ public class PlaceBuildingRules {
         }
 
         for (Hex neighbor : hex.getNeighborhood()) {
-            Building neighborBuilding = island.getField(neighbor).getBuilding();
-            if (neighborBuilding.getType() != BuildingType.NONE
-                    && neighborBuilding.getColor() == color) {
+            Field neighborField = island.getField(neighbor);
+            if (neighborField.hasBuilding(color)) {
                 final Village village = island.getVillage(neighbor);
                 if (!village.hasTower()) {
                     return Problems.of();

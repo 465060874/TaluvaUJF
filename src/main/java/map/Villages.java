@@ -2,13 +2,15 @@ package map;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.SetMultimap;
 import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -83,7 +85,7 @@ class Villages {
 
     @SuppressWarnings("unchecked")
     Village get(Hex hex) {
-        checkArgument(island.getField(hex).getBuilding().getType() != BuildingType.NONE,
+        checkArgument(island.getField(hex).hasBuilding(),
                 "Requesting village for a hex without a building");
         checkState(map.containsKey(hex), "Something has gone wrong");
         return (VillageImpl2) map.get(find(hex));
@@ -103,12 +105,12 @@ class Villages {
     }
 
     private void doUpdate(Hex hex) {
-        Building building = island.getField(hex).getBuilding();
-        if (building.getType() != BuildingType.NONE) {
+        Field field = island.getField(hex);
+        if (field.hasBuilding()) {
+            PlayerColor buildingColor = field.getBuilding().getColor();
             for (Hex neighbor : hex.getNeighborhood()) {
-                Building neighborBuilding = island.getField(neighbor).getBuilding();
-                if (neighborBuilding.getType() != BuildingType.NONE
-                        && building.getColor() == neighborBuilding.getColor()) {
+                Field neighborField = island.getField(neighbor);
+                if (neighborField.hasBuilding(buildingColor)) {
                     union(hex, neighbor);
                 }
             }
@@ -130,7 +132,7 @@ class Villages {
         }
 
         for (Hex hex : hexesToUpdate) {
-            if (island.getField(hex).getBuilding().getType() != BuildingType.NONE) {
+            if (island.getField(hex).hasBuilding()) {
                 create(hex);
             }
             else {
@@ -139,21 +141,21 @@ class Villages {
         }
 
         for (Hex hex : hexesToUpdate) {
-            doUpdate(hex);
+            if (island.getField(hex).hasBuilding()) {
+                doUpdate(hex);
+            }
         }
     }
 
     void populate() {
         for (Hex existing : island.getFields()) {
-            Building building = island.getField(existing).getBuilding();
-            if (building.getType() != BuildingType.NONE) {
+            if (island.getField(existing).hasBuilding()) {
                 create(existing);
             }
         }
 
         for (Hex existing : island.getFields()) {
-            Building building = island.getField(existing).getBuilding();
-            if (building.getType() != BuildingType.NONE) {
+            if (island.getField(existing).hasBuilding()) {
                 doUpdate(existing);
             }
         }
@@ -210,7 +212,7 @@ class Villages {
                     Field field = island.getField(neighbor);
                     if (field != Field.SEA
                             && field.getType().isBuildable()
-                            && field.getBuilding().getType() == BuildingType.NONE) {
+                            && !field.hasBuilding()) {
                         builder.put(field.getType(), neighbor);
                     }
                 }

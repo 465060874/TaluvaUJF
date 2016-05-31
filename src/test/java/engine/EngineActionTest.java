@@ -2,7 +2,6 @@ package engine;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
-import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
@@ -145,7 +144,7 @@ public class EngineActionTest {
         ImmutableSet.Builder<Hex> builder = ImmutableSet.builder();
         for (Hex hex : island.getFields()) {
             Field field = island.getField(hex);
-            if (field.getBuilding().getType() == BuildingType.NONE && field.getLevel() == 1 && field.getType() != FieldType.VOLCANO) {
+            if (!field.hasBuilding() && field.getLevel() == 1 && field.getType() != FieldType.VOLCANO) {
                 builder.add(hex);
             }
         }

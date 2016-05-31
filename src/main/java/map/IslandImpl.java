@@ -1,7 +1,6 @@
 package map;
 
 import com.google.common.collect.Iterables;
-import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
@@ -76,10 +75,10 @@ class IslandImpl implements Island {
     @Override
     public void putField(Hex hex, Field field) {
         Field fieldBefore = doPutField(hex, field);
-        if (fieldBefore.getBuilding().getType() != BuildingType.NONE) {
+        if (fieldBefore.hasBuilding()) {
             villages.reset(hex);
         }
-        else if (field.getBuilding().getType() != BuildingType.NONE) {
+        else if (field.hasBuilding()) {
             villages.update(hex);
         }
     }
@@ -94,14 +93,13 @@ class IslandImpl implements Island {
         Field leftBefore = doPutField(leftHex, Field.create(level, tile.getLeft(), orientation.leftRotation()));
         Field rightBefore = doPutField(rightHex, Field.create(level, tile.getRight(), orientation.rightRotation()));
 
-        if (leftBefore.getBuilding().getType() != BuildingType.NONE
-                && rightBefore.getBuilding().getType() != BuildingType.NONE) {
+        if (leftBefore.hasBuilding() && rightBefore.hasBuilding()) {
             villages.reset(leftHex, rightHex);
         }
-        else if (leftBefore.getBuilding().getType() != BuildingType.NONE) {
+        else if (leftBefore.hasBuilding()) {
             villages.reset(leftHex);
         }
-        else if (rightBefore.getBuilding().getType() != BuildingType.NONE) {
+        else if (rightBefore.hasBuilding()) {
             villages.reset(rightHex);
         }
     }

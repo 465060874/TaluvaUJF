@@ -139,7 +139,7 @@ class EngineActions {
         HexMap<List<PlaceBuildingAction>> buildsMap = HexMap.create();
         for (Hex hex : island.getFields()) {
             Field field = island.getField(hex);
-            if (field.getBuilding().getType() == BuildingType.NONE) {
+            if (!field.hasBuilding()) {
                 boolean hutValid = PlaceBuildingRules.validate(engine, BuildingType.HUT, hex).isValid();
                 boolean templeValid = PlaceBuildingRules.validate(engine, BuildingType.TEMPLE, hex).isValid();
                 boolean towerValid = PlaceBuildingRules.validate(engine, BuildingType.TOWER, hex).isValid();
@@ -223,16 +223,12 @@ class EngineActions {
         // This store them by identity instead of equality, which is what we want
         HashMultimap<Village, FieldType> villageExpansion = HashMultimap.create();
         for (Hex hex : leftHex.getNeighborhood()) {
-            Building building = island.getField(hex).getBuilding();
-            if (building.getType() != BuildingType.NONE
-                    && building.getColor() == color) {
+            if (island.getField(hex).hasBuilding(color)) {
                 villageExpansion.put(island.getVillage(hex), leftFieldType);
             }
         }
         for (Hex hex : rightHex.getNeighborhood()) {
-            Building building = island.getField(hex).getBuilding();
-            if (building.getType() != BuildingType.NONE
-                    && building.getColor() == color) {
+            if (island.getField(hex).hasBuilding(color)) {
                 villageExpansion.put(island.getVillage(hex), rightFieldType);
             }
         }

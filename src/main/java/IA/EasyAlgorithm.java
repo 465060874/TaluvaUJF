@@ -25,7 +25,7 @@ class EasyAlgorithm implements IAAlgorithm {
         Move m =  realEngine.getStatus().getTurn() == 0
                 ? doFirstPlay(engineCopy)
                 : doPlay(engineCopy);
-        realEngine.logger().info("[play] Choosed move with {0} points ", m.points);
+        realEngine.logger().info("[IA] Choosed move with {0} points ", m.points);
         return m;
     }
 

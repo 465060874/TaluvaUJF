@@ -46,7 +46,7 @@ class MinMaxAlgorithm implements IAAlgorithm {
         Move m =  realEngine.getStatus().getTurn() == 0
                 ? doFirstPlay(engineCopy)
                 : doPlay(engineCopy, totalDepth);
-        realEngine.logger().info("[play] Choosed move with {0} points ", m.points);
+        realEngine.logger().info("[IA] Choosed move with {0} points ", m.points);
         return m;
     }
 
@@ -364,16 +364,18 @@ class MinMaxAlgorithm implements IAAlgorithm {
                 return true;
             // Si extension et placement mer :
             else{
+                ExpandVillageAction expandVillageAction = (ExpandVillageAction) build;
                 // On vérifie que le palcement ne modifie pas l'extension :
-                if( placement.getLeftFieldType() == ((ExpandVillageAction)build).getFieldType() ){
+                if (placement.getLeftFieldType() == expandVillageAction.getFieldType()) {
                     for(Hex neighbor : placement.getLeftHex().getNeighborhood() )
-                        if( engine.getIsland().getField(neighbor).getBuilding().getType() != BuildingType.NONE)
-                            if( engine.getIsland().getVillage( neighbor).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
+                        if (engine.getIsland().getField(neighbor).hasBuilding()
+                            && engine.getIsland().getVillage(neighbor).equals(expandVillageAction.getVillage(engine.getIsland())))
                                 return false;
-                }else if( placement.getRightFieldType() == ((ExpandVillageAction)build).getFieldType() ){
+                }
+                else if (placement.getRightFieldType() == expandVillageAction.getFieldType()) {
                     for(Hex neighbor : placement.getRightHex().getNeighborhood() )
-                        if( engine.getIsland().getField(neighbor).getBuilding().getType() != BuildingType.NONE)
-                            if( engine.getIsland().getVillage( neighbor).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
+                        if (engine.getIsland().getField(neighbor).hasBuilding())
+                            if (engine.getIsland().getVillage(neighbor).equals(expandVillageAction.getVillage(engine.getIsland())))
                                 return false;
                 }
                 return true;
@@ -399,22 +401,22 @@ class MinMaxAlgorithm implements IAAlgorithm {
                 // On vérifie que le placement ne modifie pas l'extension :
                 if( placement.getLeftFieldType() == ((ExpandVillageAction)build).getFieldType() ){
                     for(Hex neighbor : placement.getLeftHex().getNeighborhood() )
-                        if( engine.getIsland().getField(neighbor).getBuilding().getType() != BuildingType.NONE)
+                        if( engine.getIsland().getField(neighbor).hasBuilding())
                             if( engine.getIsland().getVillage( neighbor).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
                                 return false;
                 }
                 else if (placement.getRightFieldType() == ((ExpandVillageAction)build).getFieldType()){
                     for(Hex neighbor : placement.getRightHex().getNeighborhood() )
-                        if( engine.getIsland().getField(neighbor).getBuilding().getType() != BuildingType.NONE)
+                        if( engine.getIsland().getField(neighbor).hasBuilding())
                             if( engine.getIsland().getVillage( neighbor).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
                                 return false;
                 }
 
                 // On vérifie qu'on écrase pas le village
-                if( engine.getIsland().getField(placement.getLeftHex()).getBuilding().getType() != BuildingType.NONE)
+                if( engine.getIsland().getField(placement.getLeftHex()).hasBuilding())
                     if( engine.getIsland().getVillage( placement.getLeftHex()).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
                         return false;
-                if( engine.getIsland().getField(placement.getRightHex()).getBuilding().getType() != BuildingType.NONE)
+                if( engine.getIsland().getField(placement.getRightHex()).hasBuilding())
                     if( engine.getIsland().getVillage( placement.getRightHex()).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
                         return false;
                 return true;
