@@ -7,13 +7,13 @@ import engine.action.*;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class EasyAlgorithm implements IAAlgorithm {
+class EasyAlgorithm implements IAAlgorithm {
 
     // Donnees
     private final Engine realEngine;
     private final AtomicBoolean cancelled;
 
-    public EasyAlgorithm(Engine e, AtomicBoolean b){
+    EasyAlgorithm(Engine e, AtomicBoolean b){
         realEngine = e;
         cancelled = b;
     }
@@ -25,7 +25,7 @@ public class EasyAlgorithm implements IAAlgorithm {
         Move m =  realEngine.getStatus().getTurn() == 0
                 ? doFirstPlay(engineCopy)
                 : doPlay(engineCopy);
-        realEngine.logger().info("[play] Choosed move with {0} points ", m.points);
+        realEngine.logger().info("[IA] Choosed move with {0} points ", m.points);
         return m;
     }
 

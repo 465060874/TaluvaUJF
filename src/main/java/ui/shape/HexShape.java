@@ -157,13 +157,6 @@ public class HexShape {
                      double x, double y, int level, FieldType fieldType, Orientation orientation, HexStyle style) {
         updatePolygon(grid, x, y, Math.max(1, level), orientation);
 
-        if (level == 0) {
-            gc.setEffect(IslandTheme.getCurrent().getTileTopEffect(grid, style));
-            gc.setFill(IslandTheme.getCurrent().getSeaPaint());
-            gc.fillPolygon(hexagonX, hexagonY, HEXAGON_POINTS);
-            return;
-        }
-
         // Fill shape
         gc.setEffect(IslandTheme.getCurrent().getTileTopEffect(grid, style));
         gc.setFill(IslandTheme.getCurrent().getTileTopPaint(fieldType, style));

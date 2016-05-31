@@ -2,7 +2,6 @@ package theme;
 
 import data.FieldType;
 import javafx.scene.effect.Effect;
-import javafx.scene.layout.Background;
 import javafx.scene.paint.Paint;
 import map.Building;
 import ui.island.Grid;
@@ -23,7 +22,9 @@ public interface IslandTheme {
         else if (CurrentTheme.IslandTHEME instanceof SphaxIslandTheme) {
             CurrentTheme.IslandTHEME = new BasicIslandTheme();
         }
-        else {
+        else if (CurrentTheme.IslandTHEME instanceof BasicIslandTheme){
+            CurrentTheme.IslandTHEME = new BasicIslandTheme_withNoLight();
+        } else {
             CurrentTheme.IslandTHEME = new ImageIslandTheme();
         }
 
@@ -40,9 +41,7 @@ public interface IslandTheme {
         CurrentTheme.listeners.remove(listener);
     }
 
-    Background getIslandBackground();
-
-    Paint getSeaPaint();
+    Paint getBackgroundPaint();
 
     Paint getTileBorderPaint(HexStyle style);
 

@@ -16,30 +16,22 @@ import org.junit.Test;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
+import static utils.SetTest.assertNoDuplicatesAndCreateSet;
 
-public class updateExpandVillage {
-
-    private Set<ExpandVillageAction> getExpandVillageActionsUnique(Engine engine) {
-        Set<ExpandVillageAction> actual = new HashSet<>();
-        engine.getExpandVillageActions().stream().filter(e -> !actual.add(e))
-                .forEach(action -> fail("Duplicated elements " + action));
-        return actual;
-    }
+public class UpdateExpandVillage_ {
 
     @Test
-    public void updateExpandVillage_UniqueFieldTypeAndPlayerColor() {
+    public void testUniqueFieldTypeAndPlayerColor() {
         URL rsc = EngineActionTest.class.getResource("EngineTest4.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
                 ImmutableMap.of(
-                        PlayerColor.RED, e -> PlayerHandler.dummy(),
-                        PlayerColor.WHITE, e -> PlayerHandler.dummy()))
+                        PlayerColor.RED, PlayerHandler.dummy(),
+                        PlayerColor.WHITE, PlayerHandler.dummy()))
                 .seed(121216213L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -51,33 +43,17 @@ public class updateExpandVillage {
         Assert.assertTrue(engine.getCurrentPlayer().getColor() == PlayerColor.RED);
 
         // Les villages de l'engine correspondent à ceux de la map
-        ImmutableSet.Builder<Hex> builder1 = ImmutableSet.builder();
-        builder1.add(Hex.at(-2, 1));
-        builder1.add(Hex.at(-2, 0));
-        builder1.add(Hex.at(-1, -2));
-        builder1.add(Hex.at(-2, -1));
-        ImmutableSet<Hex> hexOfVillage1 = builder1.build();
+        ImmutableSet<Hex> hexOfVillage1 = ImmutableSet.of(
+                Hex.at(-2, 1),
+                Hex.at(-2, 0),
+                Hex.at(-1, -2),
+                Hex.at(-2, -1));
 
-        ImmutableSet.Builder<Hex> builder2 = ImmutableSet.builder();
-        builder2.add(Hex.at(3, -2));
-        ImmutableSet<Hex> hexOfVillage2 = builder2.build();
-
-        ImmutableSet.Builder<Hex> builder3 = ImmutableSet.builder();
-        builder3.add(Hex.at(2, -5));
-        builder3.add(Hex.at(3, -5));
-        ImmutableSet<Hex> hexOfVillage3 = builder3.build();
-
-        ImmutableSet.Builder<Hex> builder4 = ImmutableSet.builder();
-        builder4.add(Hex.at(4, -1));
-        ImmutableSet<Hex> hexOfVillage4 = builder4.build();
-
-        ImmutableSet.Builder<Hex> builder5 = ImmutableSet.builder();
-        builder5.add(Hex.at(1, -3));
-        ImmutableSet<Hex> hexOfVillage5 = builder5.build();
-
-        ImmutableSet.Builder<Hex> builder6 = ImmutableSet.builder();
-        builder6.add(Hex.at(1, 3));
-        ImmutableSet<Hex> hexOfVillage6 = builder6.build();
+        ImmutableSet<Hex> hexOfVillage2 = ImmutableSet.of(Hex.at(3, -2));
+        ImmutableSet<Hex> hexOfVillage3 = ImmutableSet.of(Hex.at(2, -5), Hex.at(3, -5));
+        ImmutableSet<Hex> hexOfVillage4 = ImmutableSet.of(Hex.at(4, -1));
+        ImmutableSet<Hex> hexOfVillage5 = ImmutableSet.of(Hex.at(1, -3));
+        ImmutableSet<Hex> hexOfVillage6 = ImmutableSet.of(Hex.at(1, 3));
 
         for (Hex hex : hexOfVillage1) {
             final Set<Hex> hexOfVillage1Found = engine.getIsland().getVillage(hex).getHexes();
@@ -104,15 +80,14 @@ public class updateExpandVillage {
             Assert.assertEquals(hexOfVillage6, hexOfVillage6Found);
         }
 
-        ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesExpected = ImmutableSetMultimap.builder();
-        builderVillagesExpected.put(island.getVillage(Hex.at(1, -3)), FieldType.JUNGLE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(-2, 1)), FieldType.JUNGLE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(3, -2)), FieldType.JUNGLE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(1, 3)), FieldType.JUNGLE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(4, -1)), FieldType.JUNGLE);
-        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeExpected = builderVillagesExpected.build();
+        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeExpected = ImmutableSetMultimap.of(
+                island.getVillage(Hex.at(1, -3)), FieldType.JUNGLE,
+                island.getVillage(Hex.at(-2, 1)), FieldType.JUNGLE,
+                island.getVillage(Hex.at(3, -2)), FieldType.JUNGLE,
+                island.getVillage(Hex.at(1, 3)), FieldType.JUNGLE,
+                island.getVillage(Hex.at(4, -1)), FieldType.JUNGLE);
 
-        Set<ExpandVillageAction> actualAction = getExpandVillageActionsUnique(engine);
+        Set<ExpandVillageAction> actualAction = assertNoDuplicatesAndCreateSet(engine.getExpandVillageActions());
         ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesActual = ImmutableSetMultimap.builder();
         for (ExpandVillageAction expandVillageAction : actualAction) {
             builderVillagesActual.put(expandVillageAction.getVillage(island), expandVillageAction.getFieldType());
@@ -123,13 +98,13 @@ public class updateExpandVillage {
     }
 
     @Test
-    public void updateExpandVillage_UniqueFieldType_Red() {
+    public void testUniqueFieldType_Red() {
         URL rsc = EngineActionTest.class.getResource("EngineTest5.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine =  EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
                 ImmutableMap.of(
-                        PlayerColor.RED, e -> PlayerHandler.dummy(),
-                        PlayerColor.WHITE, e -> PlayerHandler.dummy()))
+                        PlayerColor.RED, PlayerHandler.dummy(),
+                        PlayerColor.WHITE, PlayerHandler.dummy()))
                 .seed(121216213L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -139,14 +114,13 @@ public class updateExpandVillage {
         assertFalse(engine.getStatus() instanceof EngineStatus.Finished);
         Assert.assertTrue(engine.getCurrentPlayer().getColor() == PlayerColor.RED);
 
-        ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesExpected = ImmutableSetMultimap.builder();
-        builderVillagesExpected.put(island.getVillage(Hex.at(-2, 1)), FieldType.JUNGLE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(2, 0)), FieldType.JUNGLE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(4, -1)), FieldType.JUNGLE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(1, 3)), FieldType.JUNGLE);
-        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeExpected = builderVillagesExpected.build();
+        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeExpected = ImmutableSetMultimap.of(
+                island.getVillage(Hex.at(-2, 1)), FieldType.JUNGLE,
+                island.getVillage(Hex.at(2, 0)), FieldType.JUNGLE,
+                island.getVillage(Hex.at(4, -1)), FieldType.JUNGLE,
+                island.getVillage(Hex.at(1, 3)), FieldType.JUNGLE);
 
-        Set<ExpandVillageAction> actualAction = getExpandVillageActionsUnique(engine);
+        Set<ExpandVillageAction> actualAction = assertNoDuplicatesAndCreateSet(engine.getExpandVillageActions());
         ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesActual = ImmutableSetMultimap.builder();
         for (ExpandVillageAction expandVillageAction : actualAction) {
             builderVillagesActual.put(expandVillageAction.getVillage(island), expandVillageAction.getFieldType());
@@ -157,13 +131,13 @@ public class updateExpandVillage {
     }
 
     @Test
-    public void updateExpandVillage_UniqueFieldType_White() {
+    public void testUniqueFieldType_White() {
         URL rsc = EngineActionTest.class.getResource("EngineTest5.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
                 ImmutableMap.of(
-                        PlayerColor.WHITE, e -> PlayerHandler.dummy(),
-                        PlayerColor.RED, e -> PlayerHandler.dummy()))
+                        PlayerColor.WHITE, PlayerHandler.dummy(),
+                        PlayerColor.RED, PlayerHandler.dummy()))
                 .seed(126266215L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -173,14 +147,13 @@ public class updateExpandVillage {
         assertFalse(engine.getStatus() instanceof EngineStatus.Finished);
         Assert.assertTrue(engine.getCurrentPlayer().getColor() == PlayerColor.WHITE);
 
-        ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesExpected = ImmutableSetMultimap.builder();
-        builderVillagesExpected.put(island.getVillage(Hex.at(-1, -2)), FieldType.JUNGLE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(1, -3)), FieldType.JUNGLE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(2, 1)), FieldType.JUNGLE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(4, 0)), FieldType.JUNGLE);
-        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeExpected = builderVillagesExpected.build();
+        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeExpected = ImmutableSetMultimap.of(
+                island.getVillage(Hex.at(-1, -2)), FieldType.JUNGLE,
+                island.getVillage(Hex.at(1, -3)), FieldType.JUNGLE,
+                island.getVillage(Hex.at(2, 1)), FieldType.JUNGLE,
+                island.getVillage(Hex.at(4, 0)), FieldType.JUNGLE);
 
-        Set<ExpandVillageAction> actualAction = getExpandVillageActionsUnique(engine);
+        Set<ExpandVillageAction> actualAction = assertNoDuplicatesAndCreateSet(engine.getExpandVillageActions());
         ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesActual = ImmutableSetMultimap.builder();
         for (ExpandVillageAction expandVillageAction : actualAction) {
             builderVillagesActual.put(expandVillageAction.getVillage(island), expandVillageAction.getFieldType());
@@ -191,13 +164,13 @@ public class updateExpandVillage {
     }
 
     @Test
-    public void updateExpandVillage_UniqueFieldType_Brown() {
+    public void testUniqueFieldType_Brown() {
         URL rsc = EngineActionTest.class.getResource("EngineTest5.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.BROWN, e -> PlayerHandler.dummy())
-                .player(PlayerColor.RED, e -> PlayerHandler.dummy())
-                .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
+                .player(PlayerColor.BROWN, PlayerHandler.dummy())
+                .player(PlayerColor.RED, PlayerHandler.dummy())
+                .player(PlayerColor.WHITE, PlayerHandler.dummy())
                 .seed(123276805L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -207,12 +180,11 @@ public class updateExpandVillage {
         assertFalse(engine.getStatus() instanceof EngineStatus.Finished);
         Assert.assertTrue(engine.getCurrentPlayer().getColor() == PlayerColor.BROWN);
 
-        ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesExpected = ImmutableSetMultimap.builder();
-        builderVillagesExpected.put(island.getVillage(Hex.at(4, -4)), FieldType.JUNGLE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(-2, 0)), FieldType.JUNGLE);
-        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeExpected = builderVillagesExpected.build();
+        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeExpected = ImmutableSetMultimap.of(
+                island.getVillage(Hex.at(4, -4)), FieldType.JUNGLE,
+                island.getVillage(Hex.at(-2, 0)), FieldType.JUNGLE);
 
-        Set<ExpandVillageAction> actualAction = getExpandVillageActionsUnique(engine);
+        Set<ExpandVillageAction> actualAction = assertNoDuplicatesAndCreateSet(engine.getExpandVillageActions());
         ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesActual = ImmutableSetMultimap.builder();
         for (ExpandVillageAction expandVillageAction : actualAction) {
             builderVillagesActual.put(expandVillageAction.getVillage(island), expandVillageAction.getFieldType());
@@ -223,15 +195,15 @@ public class updateExpandVillage {
     }
 
     @Test
-    public void updateExpandVillage_UniqueFieldType_Yellow() {
+    public void testUniqueFieldType_Yellow() {
         URL rsc = EngineActionTest.class.getResource("EngineTest5.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
                 ImmutableMap.of(
-                        PlayerColor.YELLOW, e -> PlayerHandler.dummy(),
-                        PlayerColor.RED, e -> PlayerHandler.dummy(),
-                        PlayerColor.WHITE, e -> PlayerHandler.dummy(),
-                        PlayerColor.BROWN, e -> PlayerHandler.dummy()))
+                        PlayerColor.YELLOW, PlayerHandler.dummy(),
+                        PlayerColor.RED, PlayerHandler.dummy(),
+                        PlayerColor.WHITE, PlayerHandler.dummy(),
+                        PlayerColor.BROWN, PlayerHandler.dummy()))
                 .seed(163976325L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -241,11 +213,10 @@ public class updateExpandVillage {
         assertFalse(engine.getStatus() instanceof EngineStatus.Finished);
         Assert.assertTrue(engine.getCurrentPlayer().getColor() == PlayerColor.YELLOW);
 
-        ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesExpected = ImmutableSetMultimap.builder();
-        builderVillagesExpected.put(island.getVillage(Hex.at(4, -3)), FieldType.JUNGLE);
-        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeExpected = builderVillagesExpected.build();
+        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeExpected = ImmutableSetMultimap.of(
+                island.getVillage(Hex.at(4, -3)), FieldType.JUNGLE);
 
-        Set<ExpandVillageAction> actualAction = getExpandVillageActionsUnique(engine);
+        Set<ExpandVillageAction> actualAction = assertNoDuplicatesAndCreateSet(engine.getExpandVillageActions());
         ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesActual = ImmutableSetMultimap.builder();
         for (ExpandVillageAction expandVillageAction : actualAction) {
             builderVillagesActual.put(expandVillageAction.getVillage(island), expandVillageAction.getFieldType());
@@ -256,15 +227,15 @@ public class updateExpandVillage {
     }
 
     @Test
-    public void updateExpandVillage_Red() {
+    public void testRed() {
         URL rsc = EngineActionTest.class.getResource("EngineTest6.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
                 ImmutableMap.of(
-                        PlayerColor.RED, e -> PlayerHandler.dummy(),
-                        PlayerColor.YELLOW, e -> PlayerHandler.dummy(),
-                        PlayerColor.WHITE, e -> PlayerHandler.dummy(),
-                        PlayerColor.BROWN, e -> PlayerHandler.dummy()))
+                        PlayerColor.RED, PlayerHandler.dummy(),
+                        PlayerColor.YELLOW, PlayerHandler.dummy(),
+                        PlayerColor.WHITE, PlayerHandler.dummy(),
+                        PlayerColor.BROWN, PlayerHandler.dummy()))
                 .seed(16245447L)
                 .logLevel(Level.INFO)
                 .island(island)
@@ -289,7 +260,7 @@ public class updateExpandVillage {
                         .put(island.getVillage(Hex.at(1, 3)), FieldType.LAKE)
                         .build();
 
-        Set<ExpandVillageAction> actualAction = getExpandVillageActionsUnique(engine);
+        Set<ExpandVillageAction> actualAction = assertNoDuplicatesAndCreateSet(engine.getExpandVillageActions());
         ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesActual = ImmutableSetMultimap.builder();
         for (ExpandVillageAction expandVillageAction : actualAction) {
             builderVillagesActual.put(expandVillageAction.getVillage(island), expandVillageAction.getFieldType());
@@ -300,16 +271,16 @@ public class updateExpandVillage {
     }
 
     @Test
-    public void updateExpandVillage_RedWithBuildings() {
+    public void testRedWithBuildings() {
         //TODO TEST HEXES
         URL rsc = EngineActionTest.class.getResource("EngineTest7.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.withPredefinedPlayers(Gamemode.AllVsAll,
                 ImmutableMap.of(
-                        PlayerColor.RED, e -> PlayerHandler.dummy(),
-                        PlayerColor.WHITE, e -> PlayerHandler.dummy(),
-                        PlayerColor.BROWN, e -> PlayerHandler.dummy(),
-                        PlayerColor.YELLOW, e -> PlayerHandler.dummy()))
+                        PlayerColor.RED, PlayerHandler.dummy(),
+                        PlayerColor.WHITE, PlayerHandler.dummy(),
+                        PlayerColor.BROWN, PlayerHandler.dummy(),
+                        PlayerColor.YELLOW, PlayerHandler.dummy()))
                 .logLevel(Level.INFO)
                 .island(island)
                 .build();
@@ -318,17 +289,18 @@ public class updateExpandVillage {
         assertFalse(engine.getStatus() instanceof EngineStatus.Finished);
         Assert.assertTrue(engine.getCurrentPlayer().getColor() == PlayerColor.RED);
 
-        ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesExpected = ImmutableSetMultimap.builder();
-        builderVillagesExpected.put(island.getVillage(Hex.at(-2, 1)), FieldType.SAND);
-        builderVillagesExpected.put(island.getVillage(Hex.at(2, -1)), FieldType.JUNGLE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(2, -1)), FieldType.LAKE);
-        builderVillagesExpected.put(island.getVillage(Hex.at(2, -1)), FieldType.CLEARING);
-        builderVillagesExpected.put(island.getVillage(Hex.at(1, 3)), FieldType.SAND);
-        builderVillagesExpected.put(island.getVillage(Hex.at(1, 3)), FieldType.CLEARING);
-        builderVillagesExpected.put(island.getVillage(Hex.at(1, 3)), FieldType.JUNGLE);
-        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeExpected = builderVillagesExpected.build();
+        ImmutableSetMultimap<Village, FieldType> villagesFieldTypeExpected =
+                ImmutableSetMultimap.<Village, FieldType>builder()
+                        .put(island.getVillage(Hex.at(-2, 1)), FieldType.SAND)
+                        .put(island.getVillage(Hex.at(2, -1)), FieldType.JUNGLE)
+                        .put(island.getVillage(Hex.at(2, -1)), FieldType.LAKE)
+                        .put(island.getVillage(Hex.at(2, -1)), FieldType.CLEARING)
+                        .put(island.getVillage(Hex.at(1, 3)), FieldType.SAND)
+                        .put(island.getVillage(Hex.at(1, 3)), FieldType.CLEARING)
+                        .put(island.getVillage(Hex.at(1, 3)), FieldType.JUNGLE)
+                        .build();
 
-        Set<ExpandVillageAction> actualAction = getExpandVillageActionsUnique(engine);
+        Set<ExpandVillageAction> actualAction = assertNoDuplicatesAndCreateSet(engine.getExpandVillageActions());
         ImmutableSetMultimap.Builder<Village, FieldType> builderVillagesActual = ImmutableSetMultimap.builder();
         for (ExpandVillageAction expandVillageAction : actualAction) {
             builderVillagesActual.put(expandVillageAction.getVillage(island), expandVillageAction.getFieldType());

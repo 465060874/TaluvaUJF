@@ -2,7 +2,10 @@ package map;
 
 import data.BuildingType;
 import data.FieldType;
-import static com.google.common.base.Preconditions.*;
+import data.PlayerColor;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Représente une case de la carte
@@ -17,7 +20,7 @@ import static com.google.common.base.Preconditions.*;
  * nord de la carte, l'orientation de la case est NORTH.
  *
  * Les instances de Field peuvent être créé à l'aide de la méthode
- * statique Field.create(level, FieldType, Orientation)
+ * statique Field.createHandler(level, FieldType, Orientation)
  *
  * Les cases sont initialement créés sans batiment.
  * Pour ajouter un batiment, il suffit d'utiliser la méthode
@@ -61,6 +64,15 @@ public class Field {
 
     public Orientation getOrientation() {
         return orientation;
+    }
+
+    public boolean hasBuilding() {
+        return building.getType() != BuildingType.NONE;
+    }
+
+    public boolean hasBuilding(PlayerColor color) {
+        return building.getType() != BuildingType.NONE
+                && building.getColor() == color;
     }
 
     public Building getBuilding() {

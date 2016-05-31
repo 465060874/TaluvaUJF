@@ -11,11 +11,11 @@ import org.junit.Test;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
 import java.util.Set;
 
 import static map.Hex.at;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static utils.SetTest.assertNoDuplicatesAndCreateSet;
 
 public class IslandTest {
 
@@ -57,14 +57,7 @@ public class IslandTest {
         URL rsc = IslandTest.class.getResource("IslandTest2.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
-        Set<Hex> actual = new HashSet<>();
-        for (Hex hex : island.getCoast()) {
-            // On vérifie l'unicité, on ne souhaite pas que l'iterable renvoyé par
-            // getCoast contienne plusieurs fois le même élément
-            if (!actual.add(hex)) {
-                fail("Duplicated elements" + hex);
-            }
-        }
+        Set<Hex> actual = assertNoDuplicatesAndCreateSet(island.getCoast());
 
         ImmutableSet<Hex> expected = ImmutableSet.of(
                 Hex.at(-3, -2),
@@ -88,14 +81,7 @@ public class IslandTest {
         URL rsc = IslandTest.class.getResource("IslandTest3.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
-        Set<Hex> actual = new HashSet<>();
-        for (Hex hex : island.getVolcanos()) {
-            // On vérifie l'unicité, on ne souhaite pas que l'iterable renvoyé par
-            // getCoast contienne plusieurs fois le même élément
-            if (!actual.add(hex)) {
-                fail("Duplicated elements " + hex);
-            }
-        }
+        Set<Hex> actual = assertNoDuplicatesAndCreateSet(island.getVolcanos());
 
         ImmutableSet<Hex> expected = ImmutableSet.of(
                 Hex.at(-1, -1),
@@ -126,15 +112,7 @@ public class IslandTest {
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
         Village oneHutVillage = island.getVillage(Hex.at(3, -2));
-        Set<Hex> actual = new HashSet<>();
-
-        // On vérifie l'unicité, on ne souhaite pas que l'iterable renvoyé par
-        // getCoast contienne plusieurs fois le même élément
-        for (Hex hex : oneHutVillage.getHexes()) {
-            if (!actual.add(hex)) {
-                fail("Duplicated elements in getVillages(): " + hex);
-            }
-        }
+        Set<Hex> actual = oneHutVillage.getHexes();
 
         ImmutableSet<Hex> expected = ImmutableSet.of(Hex.at(3, -2));
 
@@ -147,15 +125,7 @@ public class IslandTest {
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
 
         Village bigVillage = island.getVillage(Hex.at(0, 1));
-        Set<Hex> actual = new HashSet<>();
-
-        // On vérifie l'unicité, on ne souhaite pas que l'iterable renvoyé par
-        // getCoast contienne plusieurs fois le même élément
-        for (Hex hex : bigVillage.getHexes()) {
-            if (!actual.add(hex)) {
-                fail("Duplicated elements in getVillages(): " + hex);
-            }
-        }
+        Set<Hex> actual = bigVillage.getHexes();
 
         ImmutableSet<Hex> expected = ImmutableSet.of(
                 Hex.at(-2, 0),

@@ -9,7 +9,7 @@ import javafx.scene.paint.Paint;
 import map.Building;
 import ui.island.Grid;
 
-public class BasicIslandTheme implements IslandTheme {
+public class BasicIslandTheme_withNoLight implements IslandTheme {
 
     private final Color backgroundColor = Color.web("5E81A2");
     private final Color tileBorderColor = Color.web("303030");
@@ -60,6 +60,16 @@ public class BasicIslandTheme implements IslandTheme {
 
     @Override
     public Effect getTileTopEffect(Grid grid, HexStyle style) {
+        return null;
+
+            /*
+            if (fieldType == FieldType.VOLCANO) {
+            Stop[] stops = new Stop[]{new Stop(0, Color.WHITE), new Stop(1, Color.web("E97B33"))};
+            LinearGradient lg1 = new LinearGradient(0, 1, 0, 0, true, CycleMethod.NO_CYCLE, stops);
+            gc.setFill(lg1);
+     */
+
+        /*
         ((Light.Point) lighting.getLight()).setZ(grid.getScale() * 150);
         ((Light.Point) lightingHigh.getLight()).setZ(grid.getScale() * 1000);
         ((Light.Point) lightingFaded.getLight()).setZ(grid.getScale() * 150);
@@ -71,6 +81,7 @@ public class BasicIslandTheme implements IslandTheme {
         }
 
         throw new IllegalStateException();
+        */
     }
 
     @Override

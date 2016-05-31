@@ -1,7 +1,6 @@
 package ui;
 
-import IA.BotPlayerHandler;
-import IA.IADifficulty;
+import IA.IA;
 import data.BuildingType;
 import data.PlayerColor;
 import engine.*;
@@ -17,6 +16,10 @@ import javafx.stage.Stage;
 import map.Building;
 import menu.Home4;
 import menu.data.MenuData;
+import ui.island.IslandSnapshot;
+
+import java.io.File;
+import java.io.IOException;
 
 public class GameApp extends Application {
 
@@ -27,13 +30,13 @@ public class GameApp extends Application {
 
     public GameApp() {
         this.engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.BROWN, e -> new FXUIPlayerHandler())
-                .player(PlayerColor.WHITE, IADifficulty.DIFFICILE.create())
+                .player(PlayerColor.BROWN, IA.DIFFICILE)
+                .player(PlayerColor.WHITE, IA.DIFFICILE)
                 .build();
     }
 
     public GameApp(MenuData menuData) {
-        this.engine = menuData.engineBuilder(e -> new FXUIPlayerHandler())
+        this.engine = menuData.engineBuilder(new FXPlayerHandler())
                 .build();
     }
 
@@ -42,6 +45,7 @@ public class GameApp extends Application {
         this.stage = stage;
         this.gameView = new GameView(engine);
         gameView.getHomeButton().setOnAction(this::goHome);
+        gameView.getSaveButton().setOnAction(this::save);
 
         this.scene = new Scene(gameView, 1000, 800);
         stage.setResizable(true);
@@ -61,14 +65,22 @@ public class GameApp extends Application {
         home.start(stage);
     }
 
+    private void save(ActionEvent event) {
+        File outputDir = new File("Saves");
+        String basename = Long.toString(System.currentTimeMillis());
+        try {
+            IslandSnapshot.take(engine.getIsland(), outputDir, basename);
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
 
-    public class FXUIPlayerHandler implements PlayerHandler {
-
-        public FXUIPlayerHandler() {
-        }
+    public class FXPlayerHandler implements PlayerHandler {
 
         @Override
         public boolean isHuman() {
@@ -76,7 +88,7 @@ public class GameApp extends Application {
         }
 
         @Override
-        public PlayerTurn startTurn(EngineStatus.TurnStep step) {
+        public PlayerTurn startTurn(Engine engine, EngineStatus.TurnStep step) {
             return new FXUIPlayerTurn(step);
         }
     }
@@ -124,7 +136,6 @@ public class GameApp extends Application {
 
         private void mouseDragged(MouseEvent mouseEvent) {
             if (!dragged && gameView.isMouseDragged()) {
-                System.out.println("GAMEAPP DRAGGED");
                 dragged = true;
             }
         }

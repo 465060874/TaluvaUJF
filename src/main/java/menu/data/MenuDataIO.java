@@ -1,19 +1,27 @@
 package menu.data;
 
-import IA.IADifficulty;
+import IA.IA;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Ordering;
 import com.google.common.io.Files;
 import data.PlayerColor;
+import javafx.scene.image.Image;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 class MenuDataIO {
 
     private static final File FILE = new File("menu.data");
     private static final Charset CHARSET = StandardCharsets.UTF_8;
+    private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM hh:mm");
 
     static MenuData load() {
         Properties properties = new Properties();
@@ -27,20 +35,34 @@ class MenuDataIO {
             }
         }
 
-        String modeStr = (String) properties.getOrDefault("mode", MenuMode.SOLO.name());
-        MenuMode mode = MenuMode.valueOf(modeStr);
-
         String soloColorStr = (String) properties.getOrDefault("solo-color", PlayerColor.WHITE.name());
         PlayerColor soloColor = PlayerColor.valueOf(soloColorStr);
-        String soloDifficultyStr = (String) properties.getOrDefault("solo-difficulty", IADifficulty.FACILE.name());
-        IADifficulty soloDifficulty = IADifficulty.valueOf(soloDifficultyStr);
+        String soloDifficultyStr = (String) properties.getOrDefault("solo-difficulty", IA.FACILE.name());
+        IA soloDifficulty = IA.valueOf(soloDifficultyStr);
 
         String multiModeStr = (String) properties.getOrDefault("multi-mode", MultiMode.TWO_PLAYER.name());
         MultiMode multiMode = MultiMode.valueOf(multiModeStr);
 
-        ImmutableList<SavedGame> savedGames = ImmutableList.of();
+        ImmutableList.Builder<SavedGame> savedGamesBuilder = ImmutableList.builder();
+        File savesDir = new File("Saves");
+        for (File file : firstNonNull(savesDir.listFiles((dir, name) -> name.endsWith(".png")), new File[0])) {
+            long millis = Long.parseLong(file.getName().split("\\.")[0]);
+            String date = DATE_FORMATTER.format(new Date(millis));
+            try {
+                Image image = new Image(new FileInputStream(file));
+                savedGamesBuilder.add(new SavedGame(date, image));
+            }
+            catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
 
-        return new MenuData(mode, soloColor, soloDifficulty, multiMode, savedGames);
+        }
+        ImmutableList<SavedGame> savedGames = Ordering.natural()
+                .onResultOf(SavedGame::getDate)
+                .reverse()
+                .immutableSortedCopy(savedGamesBuilder.build());
+
+        return new MenuData(soloColor, soloDifficulty, multiMode, savedGames);
     }
 
     private static Properties toProperties(MenuData menuData) {
@@ -60,16 +82,6 @@ class MenuDataIO {
         Properties properties = toProperties(menuData);
         try (Writer writer = Files.asCharSink(FILE, CHARSET).openBufferedStream()) {
             properties.store(writer, "");
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    static void debug(MenuData menuData) {
-        Properties properties = toProperties(menuData);
-        try {
-            properties.store(new PrintWriter(System.out), "");
         }
         catch (IOException e) {
             throw new RuntimeException(e);

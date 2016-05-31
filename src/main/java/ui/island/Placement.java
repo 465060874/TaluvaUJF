@@ -186,8 +186,7 @@ public class Placement {
         else if (mode == Mode.BUILDING) {
             updateValidBuilding();
             Field field = engine.getIsland().getField(hex);
-            if ((oldField.getBuilding().getType() == BuildingType.NONE)
-                    != (field.getBuilding().getType() == BuildingType.NONE)) {
+            if (oldField.hasBuilding() != field.hasBuilding()) {
                 islandCanvas.redraw();
             }
         }

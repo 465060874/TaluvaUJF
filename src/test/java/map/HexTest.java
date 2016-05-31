@@ -67,7 +67,7 @@ public class HexTest {
     }
 
     @Test
-    public void getLeftNeighborTest() {
+    public void testGetLeftNeighbor() {
         Hex origin = Hex.at(ORIGIN,ORIGIN);
 
         Hex hexNorth = origin.getLeftNeighbor(Orientation.NORTH);
@@ -86,7 +86,7 @@ public class HexTest {
     }
 
     @Test
-    public void getRightNeighborTest() {
+    public void testGetRightNeighbor() {
         Hex origin = Hex.at(ORIGIN,ORIGIN);
 
         Hex hexNorth = origin.getRightNeighbor(Orientation.NORTH);

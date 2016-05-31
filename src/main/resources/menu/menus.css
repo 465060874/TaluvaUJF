@@ -9,6 +9,10 @@
               }
 */
 
+@font-face {
+    font-family: 'f1';
+    src: url('/menu/f1.ttf');
+}
 
 .svBoxScene{
            -fx-background-image: url(bg2.jpg);
@@ -131,6 +135,7 @@
 }
 
 .buttonniveaux4{
+    -fx-font-family: 'f1';
     -fx-font-weight: bold;
     -fx-background-color: #EFB068;
     -fx-color: white;
@@ -151,9 +156,18 @@
     -fx-text-fill: white;
 }
 */
+
+/*
+
+    private final Color tileJungleColor = Color.web("A681B6");
+    private final Color tileClearingColor = Color.web("8DC435");
+    private final Color tileSandColor = Color.web("EFDD6F");
+    private final Color tileRockColor = Color.web("C2D0D1");
+    private final Color tileLakeColor = Color.web("8BE1EB");
+    */
 .buttonniveaux4:selected {
     -fx-color: white;
-    -fx-background-color: #AB8152;
+    -fx-background-color: #E97B33;
     -fx-text-fill: white;
 }
 
@@ -254,7 +268,7 @@
 }
 */
 .bin{
-    -fx-background-color:#FF9966;
+    -fx-background-color:#E97B33;
     -fx-text-fill: white;
 }
 

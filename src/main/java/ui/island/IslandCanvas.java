@@ -9,10 +9,11 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import map.*;
-import ui.shape.BuildingShape;
-import ui.shape.HexShape;
 import theme.BuildingStyle;
 import theme.HexStyle;
+import theme.IslandTheme;
+import ui.shape.BuildingShape;
+import ui.shape.HexShape;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,10 +50,11 @@ class IslandCanvas extends Canvas {
 
     void redraw() {
         GraphicsContext gc = getGraphicsContext2D();
-        gc.clearRect(0, 0, getWidth(), getHeight());
-
-        double centerX = getWidth() / 2 - grid.getOx();
-        double centerY = getHeight() / 2 - grid.getOy();
+        gc.setFill(IslandTheme.getCurrent().getBackgroundPaint());
+        if (gc.getFill().isOpaque()) {
+            gc.clearRect(0, 0, getWidth(), getHeight());
+        }
+        gc.fillRect(0, 0, getWidth(), getHeight());
 
         List<HexToDraw> hexesToDraw = new ArrayList<>();
         islandHexes(hexesToDraw);
@@ -122,7 +124,7 @@ class IslandCanvas extends Canvas {
                     building = Building.of(placement.buildingType, placement.buildingColor);
                     hexStyle = HexStyle.HIGHLIGHTED;
                 }
-                else if (island.getField(placement.hex).getBuilding().getType() != BuildingType.NONE) {
+                else if (island.getField(placement.hex).hasBuilding()) {
                     if (island.getVillage(placement.hex).getHexes().contains(hex)
                             || island.getVillage(placement.hex).getExpandableHexes().containsValue(hex)) {
                         building = field.getBuilding();

@@ -1,6 +1,6 @@
 package menu.data;
 
-import IA.IADifficulty;
+import IA.IA;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import data.PlayerColor;
@@ -15,7 +15,7 @@ public class MenuData {
     private MenuMode mode;
 
     private PlayerColor soloColor;
-    private IADifficulty soloDifficulty;
+    private IA soloDifficulty;
 
     private MultiMode multiMode;
 
@@ -26,11 +26,11 @@ public class MenuData {
         return MenuDataIO.load();
     }
 
-    MenuData(MenuMode mode,
-             PlayerColor soloColor, IADifficulty soloDifficulty,
+    MenuData(PlayerColor soloColor,
+             IA soloDifficulty,
              MultiMode multiMode,
              ImmutableList<SavedGame> savedGames) {
-        this.mode = mode;
+        this.mode = null;
         this.soloColor = soloColor;
         this.soloDifficulty = soloDifficulty;
         this.multiMode = multiMode;
@@ -54,11 +54,11 @@ public class MenuData {
         this.soloColor = soloColor;
     }
 
-    public IADifficulty getSoloDifficulty() {
+    public IA getSoloDifficulty() {
         return soloDifficulty;
     }
 
-    public void setSoloDifficulty(IADifficulty soloDifficulty) {
+    public void setSoloDifficulty(IA soloDifficulty) {
         this.soloDifficulty = soloDifficulty;
     }
 
@@ -86,24 +86,20 @@ public class MenuData {
         MenuDataIO.save(this);
     }
 
-    public void debug() {
-        MenuDataIO.debug(this);
-    }
-
-    public EngineBuilder engineBuilder(PlayerHandler.Factory uiPlayerFactory) {
+    public EngineBuilder engineBuilder(PlayerHandler uiPlayerHandler) {
         switch (mode) {
-            case SOLO: return soloEngineBuilder(uiPlayerFactory);
-            case MULTIJOUEUR: return multiEngineBuilder(uiPlayerFactory);
+            case SOLO: return soloEngineBuilder(uiPlayerHandler);
+            case MULTIJOUEUR: return multiEngineBuilder(uiPlayerHandler);
             case CHARGER: throw new UnsupportedOperationException("Not implemented yet");
         }
 
         throw new IllegalStateException();
     }
 
-    private EngineBuilder soloEngineBuilder(PlayerHandler.Factory uiPlayerFactory) {
+    private EngineBuilder soloEngineBuilder(PlayerHandler uiPlayerHandler) {
         return EngineBuilder.allVsAll()
-                .player(soloColor, uiPlayerFactory)
-                .player(otherColor(soloColor), soloDifficulty.create());
+                .player(soloColor, uiPlayerHandler)
+                .player(otherColor(soloColor), soloDifficulty);
     }
 
     private PlayerColor otherColor(PlayerColor soloColor) {
@@ -117,27 +113,27 @@ public class MenuData {
         }
     }
 
-    private EngineBuilder multiEngineBuilder(PlayerHandler.Factory uiPlayerFactory) {
+    private EngineBuilder multiEngineBuilder(PlayerHandler uiPlayerHandler) {
         switch (multiMode) {
             case TWO_PLAYER:
                 return EngineBuilder.allVsAll()
-                        .player(PlayerColor.WHITE, uiPlayerFactory)
-                        .player(PlayerColor.RED, uiPlayerFactory);
+                        .player(PlayerColor.WHITE, uiPlayerHandler)
+                        .player(PlayerColor.RED, uiPlayerHandler);
             case THREE_PLAYER:
                 return EngineBuilder.allVsAll()
-                        .player(PlayerColor.WHITE, uiPlayerFactory)
-                        .player(PlayerColor.RED, uiPlayerFactory)
-                        .player(PlayerColor.YELLOW, uiPlayerFactory);
+                        .player(PlayerColor.WHITE, uiPlayerHandler)
+                        .player(PlayerColor.RED, uiPlayerHandler)
+                        .player(PlayerColor.YELLOW, uiPlayerHandler);
             case FOUR_PLAYER:
                 return EngineBuilder.allVsAll()
-                        .player(PlayerColor.WHITE, uiPlayerFactory)
-                        .player(PlayerColor.RED, uiPlayerFactory)
-                        .player(PlayerColor.YELLOW, uiPlayerFactory)
-                        .player(PlayerColor.BROWN, uiPlayerFactory);
+                        .player(PlayerColor.WHITE, uiPlayerHandler)
+                        .player(PlayerColor.RED, uiPlayerHandler)
+                        .player(PlayerColor.YELLOW, uiPlayerHandler)
+                        .player(PlayerColor.BROWN, uiPlayerHandler);
             case TEAM_VS_TEAM:
                 return EngineBuilder.teamVsTeam()
-                        .team(PlayerColor.BROWN, PlayerColor.WHITE, uiPlayerFactory)
-                        .team(PlayerColor.RED, PlayerColor.YELLOW, uiPlayerFactory);
+                        .team(PlayerColor.BROWN, PlayerColor.WHITE, uiPlayerHandler)
+                        .team(PlayerColor.RED, PlayerColor.YELLOW, uiPlayerHandler);
         }
 
         throw new IllegalStateException();

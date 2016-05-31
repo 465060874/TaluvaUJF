@@ -2,14 +2,14 @@ package IA;
 import com.google.common.collect.SetMultimap;
 import data.BuildingType;
 import data.FieldType;
-import engine.*;
+import engine.Engine;
+import engine.EngineStatus;
+import engine.Player;
 import engine.action.*;
 import map.*;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
-import static java.lang.Thread.sleep;
+import java.util.List;
+import java.util.PriorityQueue;
 
 class BasicHeuristics implements Heuristics {
     // Critères d'évaluation pondérés
@@ -137,9 +137,9 @@ class BasicHeuristics implements Heuristics {
         hex = move.getLeftHex();
         for (Neighbor neighbor : Neighbor.values()) {
             Hex adjacent = hex.getNeighbor(neighbor);
-            BuildingType building = island.getField(adjacent).getBuilding().getType();
-            if( building != BuildingType.NONE ){
-                if( island.getField(adjacent).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+            Field field = island.getField(adjacent);
+            if (field.hasBuilding()){
+                if (field.hasBuilding(e.getCurrentPlayer().getColor()))
                     bonus = 1;
                 else
                     bonus = -1;
@@ -153,9 +153,9 @@ class BasicHeuristics implements Heuristics {
         hex = move.getRightHex();
         for (Neighbor neighbor : Neighbor.values()) {
             Hex adjacent = hex.getNeighbor(neighbor);
-            BuildingType building = island.getField(adjacent).getBuilding().getType();
-            if( building != BuildingType.NONE ){
-                if( island.getField(adjacent).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+            Field field = island.getField(adjacent);
+            if (field.hasBuilding()){
+                if (field.hasBuilding(e.getCurrentPlayer().getColor()))
                     bonus = 1;
                 else
                     bonus = -1;
@@ -194,9 +194,9 @@ class BasicHeuristics implements Heuristics {
 
         // 2 - TRAITEMENT DU HEX GAUCHE
         hex = move.getLeftHex();
-        BuildingType building = island.getField(hex).getBuilding().getType();
-        if( building != BuildingType.NONE ){
-            if( island.getField(hex).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+        Field leftField = island.getField(hex);
+        if (leftField.hasBuilding()) {
+            if (leftField.hasBuilding(e.getCurrentPlayer().getColor()))
                 bonus = 2;
             else
                 bonus = -2;
@@ -205,7 +205,7 @@ class BasicHeuristics implements Heuristics {
                 points -= bonus;
                 // Si on réduit un village sans temple à moins de 3 hexs...
                 if( village.getHexes().size() == 3 || village.getHexes().size() == 4)
-                    if (island.getField(move.getRightHex()).getBuilding().getType() != BuildingType.NONE )
+                    if (island.getField(move.getRightHex()).hasBuilding())
                         if( island.getField(move.getRightHex()).getBuilding().getColor() != e.getCurrentPlayer().getColor() )
                             points += 2;
 
@@ -216,19 +216,20 @@ class BasicHeuristics implements Heuristics {
         if( island.getField(hex).getLevel() >= 2)
             for (Neighbor neighbor : Neighbor.values()) {
                 Hex adjacent = hex.getNeighbor(neighbor);
-                if( island.getField(adjacent).getBuilding().getType() != BuildingType.NONE)
+                if (island.getField(adjacent).hasBuilding())
                     if( island.getField(adjacent).getBuilding().getColor() == e.getCurrentPlayer().getColor())
                         points += 2;
                     else
                         points -= 2;
             }
+
         // Et si on permet de s'étendre
         for (Neighbor neighbor : Neighbor.values()) {
             Hex adjacent = hex.getNeighbor(neighbor);
-            building = island.getField(adjacent).getBuilding().getType();
+            Field field = island.getField(adjacent);
             // On donne la possibilité de s'étendre notamment à une ville sans temple
-            if( !adjacent.equals( move.getRightHex() ) && building != BuildingType.NONE  ){
-                if( island.getField(adjacent).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+            if( !adjacent.equals( move.getRightHex() ) && field.hasBuilding()) {
+                if (field.hasBuilding(e.getCurrentPlayer().getColor()))
                     bonus = 2;
                 else
                     bonus = -2;
@@ -242,40 +243,43 @@ class BasicHeuristics implements Heuristics {
 
         // 3 - TRAITEMENT DU HEX DROIT
         hex = move.getRightHex();
-        building = island.getField(hex).getBuilding().getType();
-        if( building != BuildingType.NONE ){
-            if( island.getField(hex).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+        Field rightField = island.getField(hex);
+        if (rightField.hasBuilding()){
+            if (rightField.hasBuilding(e.getCurrentPlayer().getColor()))
                 bonus = 2;
             else
                 bonus = -2;
+
             Village village = island.getVillage(hex);
             if( !village.hasTemple()) {
                 points -= bonus;
                 // Si on réduit un village sans temple à moins de 3 hexs...
                 if( village.getHexes().size() == 3 || village.getHexes().size() == 4)
-                    if (island.getField(move.getLeftHex()).getBuilding().getType() != BuildingType.NONE )
-                        if( island.getField(move.getLeftHex()).getBuilding().getColor() != e.getCurrentPlayer().getColor() )
-                            points += 2;
+                    if (island.getField(move.getLeftHex()).hasBuilding(e.getCurrentPlayer().getColor()))
+                        points += 2;
 
             }
             points -= bonus;
         }
+
         // Créer la possibilité de construire une tour
         if( island.getField(hex).getLevel() >= 2)
             for (Neighbor neighbor : Neighbor.values()) {
                 Hex adjacent = hex.getNeighbor(neighbor);
-                if( island.getField(adjacent).getBuilding().getType() != BuildingType.NONE)
-                    if( island.getField(adjacent).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+                Field field = island.getField(adjacent);
+                if (field.hasBuilding())
+                    if (field.hasBuilding(e.getCurrentPlayer().getColor()))
                         points += 2;
                     else
                         points -= 2;
             }
+
         for (Neighbor neighbor : Neighbor.values()) {
             Hex adjacent = hex.getNeighbor(neighbor);
-            building = island.getField(adjacent).getBuilding().getType();
+            Field field = island.getField(adjacent);
             // On donne la possibilité de s'étendre notamment à une ville sans temple
-            if( !adjacent.equals( move.getLeftHex() ) && building != BuildingType.NONE  ){
-                if( island.getField(adjacent).getBuilding().getColor() == e.getCurrentPlayer().getColor())
+            if (!adjacent.equals( move.getLeftHex() ) && field.hasBuilding()) {
+                if (field.hasBuilding(e.getCurrentPlayer().getColor()))
                     bonus = 2;
                 else
                     bonus = -2;
@@ -335,14 +339,15 @@ class BasicHeuristics implements Heuristics {
             huts += 1;
             for (Neighbor neighbor : Neighbor.values()) {
                 Hex adjacent = hex.getNeighbor(neighbor);
-                if( e.getIsland().getField( adjacent).getLevel() >= 3 && e.getIsland().getField( adjacent).getBuilding().getType() == BuildingType.NONE )
+                if( e.getIsland().getField( adjacent).getLevel() >= 3
+                        && !e.getIsland().getField( adjacent).hasBuilding())
                     tower += 5;
             }
         }
         for (Neighbor neighbor : Neighbor.values()) {
             Hex adjacent = hex.getNeighbor(neighbor);
-            Building building = e.getIsland().getField(adjacent).getBuilding();
-            if( building.getType() != BuildingType.NONE && building.getColor() != e.getCurrentPlayer().getColor() ) {
+            Field field = e.getIsland().getField(adjacent);
+            if (field.hasBuilding(e.getCurrentPlayer().getColor())) {
                 if( !e.getIsland().getVillage(adjacent).hasTemple()) {
                     general += 1;
                     counter += 2;
@@ -368,14 +373,13 @@ class BasicHeuristics implements Heuristics {
             for (Neighbor neighbor : Neighbor.values()) {
                 Hex adjacent = hex.getNeighbor(neighbor);
                 // COnstruire a la place de l'autre
-                if( e.getIsland().getField(adjacent).getBuilding().getType() != BuildingType.NONE
-                        && e.getIsland().getField(adjacent).getBuilding().getColor() != e.getCurrentPlayer().getColor() )
+                if (e.getIsland().getField(adjacent).hasBuilding(e.getCurrentPlayer().getColor()) )
                         if( ! e.getIsland().getVillage(adjacent).hasTemple()) {
                             general += 1;
                             counter += 2;
                         }
                 // Construire à côté d'une hauteur 3 sans tour
-               if( !village.hasTower() && e.getIsland().getField(adjacent).getBuilding().getType() == BuildingType.NONE)
+               if( !village.hasTower() && !e.getIsland().getField(adjacent).hasBuilding())
                     if( e.getIsland().getField( adjacent ).getLevel() >= 3 )
                         tower += 5;
             }
@@ -416,11 +420,15 @@ class BasicHeuristics implements Heuristics {
                 if (!village.hasTower()) {
                     // On regarde le nombre de hex qui sont proches de voisins vides de niveau > 3
                     for (Hex hex : village.getHexes())
-                        for (Hex adjacent : hex.getNeighborhood())
-                            if (engine.getIsland().getField(adjacent).getBuilding().getType() == BuildingType.NONE && engine.getIsland().getField(adjacent).getLevel() >= 3)
+                        for (Hex adjacent : hex.getNeighborhood()) {
+                            Field field = engine.getIsland().getField(adjacent);
+                            if (!field.hasBuilding() && field.getLevel() >= 3)
                                 tmpScore += pointsAdjacentHill;
-                } else
+                        }
+                }
+                else {
                     tmpScore += pointsVillageWithTower;
+                }
                 engine.logger().finer("[Eval] {0} Village : {1} ", player.getColor(), tmpScore);
                 score += tmpScore;
             }
@@ -438,7 +446,8 @@ class BasicHeuristics implements Heuristics {
                     // On regarde le nombre de hex qui sont proches de voisins vides de niveau > 3
                     for (Hex hex : village.getHexes())
                         for (Hex adjacent : hex.getNeighborhood())
-                            if (engine.getIsland().getField(adjacent).getBuilding().getType() == BuildingType.NONE && engine.getIsland().getField(adjacent).getLevel() >= 3)
+                            if (!engine.getIsland().getField(adjacent).hasBuilding()
+                                    && engine.getIsland().getField(adjacent).getLevel() >= 3)
                                 tmpScore += pointsAdjacentHill;
                 } else
                     tmpScore += pointsVillageWithTower;

@@ -14,6 +14,7 @@ public class EngineRecorder {
 
     private final Gamemode gamemode;
     private final List<PlayerColor> colors;
+    private final List<PlayerHandler> handlers;
     private final List<VolcanoTile> tiles;
     private final List<Action> actions;
 
@@ -27,6 +28,7 @@ public class EngineRecorder {
 
         this.gamemode = engine.getGamemode();
         this.colors = new ArrayList<>();
+        this.handlers = new ArrayList<>();
         this.tiles = new ArrayList<>();
         this.actions = new ArrayList<>();
     }
@@ -34,6 +36,10 @@ public class EngineRecorder {
     private class Observer implements EngineObserver {
 
         public void onStart() {
+            for (Player player : engine.getPlayers()) {
+                colors.add(player.getColor());
+                handlers.add(player.getHandler());
+            }
             engine.getPlayers().stream()
                     .map(Player::getColor)
                     .forEach(colors::add);
@@ -84,6 +90,6 @@ public class EngineRecorder {
     }
 
     public EngineRecord getRecord() {
-        return new EngineRecord(gamemode, colors, tiles, actions);
+        return new EngineRecord(gamemode, colors, handlers, tiles, actions);
     }
 }

@@ -33,13 +33,18 @@ public class EngineRecord {
 
     private final Gamemode gamemode;
     private final ImmutableList<PlayerColor> colors;
+    private final ImmutableList<PlayerHandler> handlers;
     private final ImmutableList<VolcanoTile> tiles;
     private final ImmutableList<Action> actions;
 
-    EngineRecord(Gamemode gamemode, List<PlayerColor> colors, List<VolcanoTile> tiles,
+    EngineRecord(Gamemode gamemode,
+                 List<PlayerColor> colors,
+                 List<PlayerHandler> handlers,
+                 List<VolcanoTile> tiles,
                  List<Action> actions) {
         this.gamemode = gamemode;
         this.colors = ImmutableList.copyOf(colors);
+        this.handlers = ImmutableList.copyOf(handlers);
         this.tiles = ImmutableList.copyOf(tiles);
         this.actions = ImmutableList.copyOf(actions);
     }
@@ -47,6 +52,7 @@ public class EngineRecord {
     public static EngineRecord load(CharSource source) {
         Gamemode gamemode;
         ImmutableList.Builder<PlayerColor> colorsBuilder = ImmutableList.builder();
+        ImmutableList.Builder<PlayerHandler> handlersBuilder = ImmutableList.builder();
         ImmutableList.Builder<VolcanoTile> tilesBuilder = ImmutableList.builder();
         ImmutableList.Builder<Action> actionsBuilder = ImmutableList.builder();
 
@@ -55,6 +61,7 @@ public class EngineRecord {
             int colorsCount = Integer.valueOf(reader.readLine());
             for (int i = 0; i < colorsCount; i++) {
                 colorsBuilder.add(PlayerColor.valueOf(reader.readLine()));
+                handlersBuilder.add(readHandler(reader.readLine()));
             }
 
             int tilesCount = Integer.valueOf(reader.readLine());
@@ -69,11 +76,20 @@ public class EngineRecord {
                 actionsBuilder.add(Action.read(reader));
             }
 
-            return new EngineRecord(gamemode, colorsBuilder.build(), tilesBuilder.build(), actionsBuilder.build());
+            return new EngineRecord(gamemode,
+                    colorsBuilder.build(),
+                    handlersBuilder.build(),
+                    tilesBuilder.build(),
+                    actionsBuilder.build());
         }
         catch (IOException e) {
             throw new Exception(e);
         }
+    }
+
+    private static PlayerHandler readHandler(String handlerStr) {
+        // TODO
+        return PlayerHandler.dummy();
     }
 
     public void save(CharSink sink) {
@@ -110,8 +126,8 @@ public class EngineRecord {
 
     public Engine replay() {
         UnmodifiableIterator<Action> actionsIt = ImmutableList.copyOf(actions).iterator();
-        ImmutableMap.Builder<PlayerColor, PlayerHandler.Factory> playersBuilder = ImmutableMap.builder();
-        PlayerHandler.Factory playerHandlerFactory = (engine) -> new RecordPlayerHandler(engine, actionsIt);
+        ImmutableMap.Builder<PlayerColor, PlayerHandler> playersBuilder = ImmutableMap.builder();
+        PlayerHandler playerHandlerFactory = new RecordPlayerHandler(actionsIt);
         for (PlayerColor color : colors) {
             playersBuilder.put(color, playerHandlerFactory);
         }
@@ -123,11 +139,9 @@ public class EngineRecord {
 
     private static class RecordPlayerHandler implements PlayerHandler {
 
-        private final Engine engine;
         private final Iterator<Action> actions;
 
-        private RecordPlayerHandler(Engine engine, Iterator<Action> actions) {
-            this.engine = engine;
+        private RecordPlayerHandler(Iterator<Action> actions) {
             this.actions = actions;
         }
 
@@ -137,7 +151,7 @@ public class EngineRecord {
         }
 
         @Override
-        public PlayerTurn startTurn(EngineStatus.TurnStep step) {
+        public PlayerTurn startTurn(Engine engine, EngineStatus.TurnStep step) {
             Action nextAction = actions.next();
             return step == EngineStatus.TurnStep.TILE
                 ? new RecordPlayerTurn(engine, nextAction, actions.next())

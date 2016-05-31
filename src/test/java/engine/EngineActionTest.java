@@ -2,10 +2,10 @@ package engine;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
-import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
+import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
 import engine.rules.SeaTileRules;
@@ -16,47 +16,24 @@ import org.junit.Test;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
+import static utils.SetTest.assertNoDuplicatesAndCreateSet;
 
 public class EngineActionTest {
 
     public static final int LIMIT = 10;
-
-    private Set<SeaTileAction> getSeaTileActionsUnique(Engine engine) {
-        Set<SeaTileAction> actual = new HashSet<>();
-        // On vérifie l'unicité, on ne souhaite pas que l'iterable renvoyé par
-        // contienne plusieurs fois le même élément
-        engine.getSeaTileActions().stream().filter(e -> !actual.add(e))
-                .forEach(action -> fail("Duplicated elements " + action));
-        return actual;
-    }
-
-    private Set<VolcanoTileAction> getVolcanoTileActionsUnique(Engine engine) {
-        Set<VolcanoTileAction> actual = new HashSet<>();
-        engine.getVolcanoTileActions().stream().filter(e -> !actual.add(e))
-                .forEach(action -> fail("Duplicated elements " + action));
-        return actual;
-    }
-
-    private Set<Hex> getPlaceBuildingActionsUnique(Engine engine) {
-        Set<Hex> actual = new HashSet<>();
-        engine.getPlaceBuildingActions().stream().filter(e -> !actual.add(e.getHex()))
-                .forEach(action -> fail("Duplicated elements " + action));
-        return actual;
-    }
 
     @Test
     public void testSeaTileActions() {
         URL rsc = EngineActionTest.class.getResource("EngineTest1.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.RED, e -> PlayerHandler.dummy())
-                .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
+                .player(PlayerColor.RED, PlayerHandler.dummy())
+                .player(PlayerColor.WHITE, PlayerHandler.dummy())
                 .logLevel(Level.INFO)
                 .island(island)
                 .build();
@@ -66,8 +43,7 @@ public class EngineActionTest {
 
         VolcanoTile tile = engine.getVolcanoTileStack().current();
 
-        Set<SeaTileAction> actual = getSeaTileActionsUnique(engine);
-
+        Set<SeaTileAction> actual = assertNoDuplicatesAndCreateSet(engine.getSeaTileActions());
 
         ImmutableSet.Builder<SeaTileAction> builder = ImmutableSet.builder();
         for (int i = -LIMIT; i < LIMIT; i++) {
@@ -95,8 +71,8 @@ public class EngineActionTest {
         URL rsc = EngineActionTest.class.getResource("EngineTest2.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.RED, e -> PlayerHandler.dummy())
-                .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
+                .player(PlayerColor.RED, PlayerHandler.dummy())
+                .player(PlayerColor.WHITE, PlayerHandler.dummy())
                 .logLevel(Level.INFO)
                 .island(island)
                 .build();
@@ -106,7 +82,7 @@ public class EngineActionTest {
 
         VolcanoTile tile = engine.getVolcanoTileStack().current();
 
-        Set<VolcanoTileAction> actual = getVolcanoTileActionsUnique(engine);
+        Set<VolcanoTileAction> actual = assertNoDuplicatesAndCreateSet(engine.getVolcanoTileActions());
 
         ImmutableSet.Builder<VolcanoTileAction> builder = ImmutableSet.builder();
         for (int i = -LIMIT; i < LIMIT; i++) {
@@ -126,15 +102,15 @@ public class EngineActionTest {
     }
 
     @Test
-    public void updatePlaceBuildingTest() {
+    public void testUpdatePlaceBuilding() {
         //TODO with Buildings
         //TODO with Levels
         //TODO with new tile
         URL rsc = EngineActionTest.class.getResource("EngineTest3.island");
         Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
         Engine engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.RED, e -> PlayerHandler.dummy())
-                .player(PlayerColor.WHITE, e -> PlayerHandler.dummy())
+                .player(PlayerColor.RED, PlayerHandler.dummy())
+                .player(PlayerColor.WHITE, PlayerHandler.dummy())
                 .logLevel(Level.INFO)
                 .island(island)
                 .build();
@@ -145,13 +121,15 @@ public class EngineActionTest {
         ImmutableSet.Builder<Hex> builder = ImmutableSet.builder();
         for (Hex hex : island.getFields()) {
             Field field = island.getField(hex);
-            if (field.getBuilding().getType() == BuildingType.NONE && field.getLevel() == 1 && field.getType() != FieldType.VOLCANO) {
+            if (!field.hasBuilding() && field.getLevel() == 1 && field.getType() != FieldType.VOLCANO) {
                 builder.add(hex);
             }
         }
 
         ImmutableSet<Hex> expected = builder.build();
-        Set<Hex> actual = getPlaceBuildingActionsUnique(engine);
+        Set<Hex> actual = assertNoDuplicatesAndCreateSet(engine.getPlaceBuildingActions().stream()
+                .map(PlaceBuildingAction::getHex)
+                .collect(Collectors.toList()));
 
         Assert.assertEquals(expected, actual);
     }

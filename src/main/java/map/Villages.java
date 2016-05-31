@@ -2,13 +2,16 @@ package map;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.SetMultimap;
 import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
@@ -24,24 +27,16 @@ class Villages {
     //   - An instance of Hex which is the parent of this hex in the union find
     //   - An instance of VillageImple2 (if the key Hex is a top-level parent)
     private final Map<Hex, Object> map;
-    private final Map<PlayerColor, Set<Hex>> perColors;
 
     Villages(Island island) {
         this.island = island;
         this.map = new HashMap<>(HexMapImpl.INITIAL_CAPACITY);
-        this.perColors = new EnumMap<>(PlayerColor.class);
     }
 
     Villages(Villages villages, Island island) {
         this.island = island;
         this.map = new HashMap<>();
         map.putAll(villages.map);
-        this.perColors = new EnumMap<>(PlayerColor.class);
-        for (Map.Entry<PlayerColor, Set<Hex>> entry : villages.perColors.entrySet()) {
-            HashSet<Hex> setCopy = new HashSet<>();
-            setCopy.addAll(entry.getValue());
-            perColors.put(entry.getKey(), setCopy);
-        }
     }
 
     private Hex find(Hex hex) {
@@ -59,7 +54,6 @@ class Villages {
 
     private VillageImpl2 create(Hex hex) {
         VillageImpl2 created = new VillageImpl2(island, hex);
-        perColors.computeIfAbsent(created.getColor(), c -> new HashSet<>()).add(hex);
         map.put(hex, created);
         return created;
     }
@@ -80,12 +74,10 @@ class Villages {
         // This supposedly helps make the union-find tree more wide
         // than deep
         if (village1.hexes.size() > village2.hexes.size()) {
-            perColors.get(union.getColor()).remove(root2);
             map.put(root2, root1);
             map.put(root1, union);
         }
         else {
-            perColors.get(union.getColor()).remove(root1);
             map.put(root1, root2);
             map.put(root2, union);
         }
@@ -93,14 +85,18 @@ class Villages {
 
     @SuppressWarnings("unchecked")
     Village get(Hex hex) {
-        checkArgument(island.getField(hex).getBuilding().getType() != BuildingType.NONE,
+        checkArgument(island.getField(hex).hasBuilding(),
                 "Requesting village for a hex without a building");
         checkState(map.containsKey(hex), "Something has gone wrong");
         return (VillageImpl2) map.get(find(hex));
     }
 
     Iterable<Village> getAll(PlayerColor color) {
-        return Iterables.transform(perColors.getOrDefault(color, ImmutableSet.of()), this::get);
+        return map.values().stream()
+                .filter(o -> o instanceof VillageImpl2)
+                .map(o -> (VillageImpl2) o)
+                .filter(v -> v.getColor() == color)
+                .collect(Collectors.toList());
     }
 
     void update(Hex hex) {
@@ -109,19 +105,18 @@ class Villages {
     }
 
     private void doUpdate(Hex hex) {
-        Building building = island.getField(hex).getBuilding();
-        if (building.getType() != BuildingType.NONE) {
+        Field field = island.getField(hex);
+        if (field.hasBuilding()) {
+            PlayerColor buildingColor = field.getBuilding().getColor();
             for (Hex neighbor : hex.getNeighborhood()) {
-                Building neighborBuilding = island.getField(neighbor).getBuilding();
-                if (neighborBuilding.getType() != BuildingType.NONE
-                        && building.getColor() == neighborBuilding.getColor()) {
+                Field neighborField = island.getField(neighbor);
+                if (neighborField.hasBuilding(buildingColor)) {
                     union(hex, neighbor);
                 }
             }
         }
     }
 
-    // TODO optimize
     void reset(Hex... hexes) {
         Set<Hex> hexesToUpdate = new HashSet<>();
         for (Hex hex : hexes) {
@@ -129,9 +124,6 @@ class Villages {
                 Hex root = find(hex);
                 checkState(map.containsKey(root), "Something has gone wrong");
                 Village village = (VillageImpl2) map.get(root);
-                if (perColors.containsKey(village.getColor())) {
-                    perColors.get(village.getColor()).remove(root);
-                }
 
                 if (!hexesToUpdate.contains(hex)) {
                     hexesToUpdate.addAll(village.getHexes());
@@ -140,7 +132,7 @@ class Villages {
         }
 
         for (Hex hex : hexesToUpdate) {
-            if (island.getField(hex).getBuilding().getType() != BuildingType.NONE) {
+            if (island.getField(hex).hasBuilding()) {
                 create(hex);
             }
             else {
@@ -149,21 +141,21 @@ class Villages {
         }
 
         for (Hex hex : hexesToUpdate) {
-            doUpdate(hex);
+            if (island.getField(hex).hasBuilding()) {
+                doUpdate(hex);
+            }
         }
     }
 
     void populate() {
         for (Hex existing : island.getFields()) {
-            Building building = island.getField(existing).getBuilding();
-            if (building.getType() != BuildingType.NONE) {
+            if (island.getField(existing).hasBuilding()) {
                 create(existing);
             }
         }
 
         for (Hex existing : island.getFields()) {
-            Building building = island.getField(existing).getBuilding();
-            if (building.getType() != BuildingType.NONE) {
+            if (island.getField(existing).hasBuilding()) {
                 doUpdate(existing);
             }
         }
@@ -220,7 +212,7 @@ class Villages {
                     Field field = island.getField(neighbor);
                     if (field != Field.SEA
                             && field.getType().isBuildable()
-                            && field.getBuilding().getType() == BuildingType.NONE) {
+                            && !field.hasBuilding()) {
                         builder.put(field.getType(), neighbor);
                     }
                 }
