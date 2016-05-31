@@ -1,7 +1,6 @@
 package engine;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import data.BuildingType;
 import data.PlayerColor;
@@ -13,7 +12,6 @@ import map.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.function.Predicate;
 
@@ -230,29 +228,7 @@ class EngineImpl implements Engine {
         if (running.step == EngineStatus.TurnStep.TILE) {
             running.step = EngineStatus.TurnStep.BUILD;
 
-            if (actions.placeBuildings.isEmpty()
-                    && actions.newPlaceBuildings.isEmpty()
-                    && actions.expandVillages.isEmpty()
-                    && actions.newExpandVillages.isEmpty()) {
-                Player eliminated = getCurrentPlayer();
-                eliminated.setEliminated();
-                observers.forEach(o -> o.onEliminated(eliminated));
-
-                Predicate<Player> isEliminated = Player::isEliminated;
-                List<Player> remainingPlayers = players.stream()
-                        .filter(isEliminated.negate())
-                        .collect(toList());
-                verify(remainingPlayers.size() > 0);
-
-                if (remainingPlayers.size() == 1) {
-                    this.status = new EngineStatus.Finished((EngineStatus.Running) status,
-                            EngineStatus.FinishReason.LAST_STANDING,
-                            remainingPlayers);
-                    observers.forEach(o -> o.onWin(EngineStatus.FinishReason.LAST_STANDING, remainingPlayers));
-                }
-                else {
-                    nextStep();
-                }
+            if (checkElimination()) {
                 return;
             }
 
@@ -263,18 +239,13 @@ class EngineImpl implements Engine {
             do {
                 playerIndex++;
             } while (getCurrentPlayer().isEliminated());
-
             running.step = EngineStatus.TurnStep.TILE;
-            volcanoTileStack.next();
 
-            if (volcanoTileStack.isEmpty()) {
-                List<Player> winners = winnersByScore();
-                this.status = new EngineStatus.Finished((EngineStatus.Running) status,
-                        EngineStatus.FinishReason.NO_MORE_TILES,
-                        winners);
-                observers.forEach(o -> o.onWin(EngineStatus.FinishReason.NO_MORE_TILES, winners));
+            volcanoTileStack.next();
+            if (checkTileStackEmpty()) {
                 return;
             }
+
             observers.forEach(o -> o.onTileStackChange(true));
 
             actions.updateAll();
@@ -282,6 +253,50 @@ class EngineImpl implements Engine {
             observers.forEach(o -> o.onTileStepStart(true));
             this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, EngineStatus.TurnStep.TILE);
         }
+    }
+
+    private boolean checkElimination() {
+        if (!actions.placeBuildings.isEmpty()
+                || !actions.newPlaceBuildings.isEmpty()
+                || !actions.expandVillages.isEmpty()
+                || !actions.newExpandVillages.isEmpty()) {
+            return false;
+        }
+
+        Player eliminated = getCurrentPlayer();
+        eliminated.setEliminated();
+        observers.forEach(o -> o.onEliminated(eliminated));
+
+        Predicate<Player> isEliminated = Player::isEliminated;
+        List<Player> remainingPlayers = players.stream()
+                .filter(isEliminated.negate())
+                .collect(toList());
+        verify(remainingPlayers.size() > 0);
+
+        if (remainingPlayers.size() == 1) {
+            this.status = new EngineStatus.Finished((EngineStatus.Running) status,
+                    EngineStatus.FinishReason.LAST_STANDING,
+                    remainingPlayers);
+            observers.forEach(o -> o.onWin(EngineStatus.FinishReason.LAST_STANDING, remainingPlayers));
+        }
+        else {
+            nextStep();
+        }
+
+        return true;
+    }
+
+    private boolean checkTileStackEmpty() {
+        if (!volcanoTileStack.isEmpty()) {
+            return false;
+        }
+
+        List<Player> winners = winnersByScore();
+        this.status = new EngineStatus.Finished((EngineStatus.Running) status,
+                EngineStatus.FinishReason.NO_MORE_TILES,
+                winners);
+        observers.forEach(o -> o.onWin(EngineStatus.FinishReason.NO_MORE_TILES, winners));
+        return true;
     }
 
     private List<Player> playerWithMinimumBuildingOfType(Iterable<Player> candidates, BuildingType type) {
@@ -309,6 +324,7 @@ class EngineImpl implements Engine {
                 candidates = playerWithMinimumBuildingOfType(candidates, BuildingType.HUT);
             }
         }
+
         return candidates;
     }
 
@@ -390,7 +406,7 @@ class EngineImpl implements Engine {
             verify(problems.isValid(), problems.toString());
         }
 
-        actionSaves.add(new TileActionSave(this, action));
+        actionSaves.add(new ActionSave.Tile(this, action));
         island.putTile(volcanoTileStack.current(), action.getVolcanoHex(), action.getOrientation());
 
         actions.updateWithNewTile(action);
@@ -412,7 +428,7 @@ class EngineImpl implements Engine {
             verify(problems.isValid(), problems.toString());
         }
 
-        actionSaves.add(new TileActionSave(this, action));
+        actionSaves.add(new ActionSave.Tile(this, action));
         island.putTile(volcanoTileStack.current(), action.getVolcanoHex(), action.getOrientation());
 
         actions.updateWithNewTile(action);
@@ -433,7 +449,7 @@ class EngineImpl implements Engine {
             verify(problems.isValid(), problems.toString());
         }
 
-        actionSaves.add(new BuildActionSave(this, action));
+        actionSaves.add(new ActionSave.Build(this, action));
         PlayerColor color = getCurrentPlayer().getColor();
         island.putBuilding(action.getHex(), Building.of(action.getType(), color));
         int buildingCount = island.getField(action.getHex()).getBuildingCount();
@@ -456,7 +472,7 @@ class EngineImpl implements Engine {
             verify(problems.isValid(), problems.toString());
         }
 
-        actionSaves.add(new BuildActionSave(this, action));
+        actionSaves.add(new ActionSave.Build(this, action));
         PlayerColor color = getCurrentPlayer().getColor();
         Building building = Building.of(BuildingType.HUT, color);
         int buildingCount = 0;
@@ -473,11 +489,11 @@ class EngineImpl implements Engine {
 
     private void checkBuildingCounts() {
         Player player = getCurrentPlayer();
-        int remainingBuildingTypes = remainingBuildingsType(player);
+        int remainingBuildingTypes = remainingBuildingTypeCount(player);
 
         if (gamemode == Gamemode.TeamVsTeam) {
             Player teammate = players.get((playerIndex + 2) % players.size());
-            int teammateRemainingBuildingTypes = remainingBuildingsType(teammate);
+            int teammateRemainingBuildingTypes = remainingBuildingTypeCount(teammate);
             if (remainingBuildingTypes + teammateRemainingBuildingTypes <= 3) {
                 ImmutableList<Player> winners = ImmutableList.of(player, teammate);
                 this.status = new EngineStatus.Finished((EngineStatus.Running) status,
@@ -501,7 +517,7 @@ class EngineImpl implements Engine {
         nextStep();
     }
 
-    private int remainingBuildingsType(Player player) {
+    private int remainingBuildingTypeCount(Player player) {
         int remainingBuildingTypeCount = 0;
         if (player.getBuildingCount(BuildingType.HUT) > 0) {
             remainingBuildingTypeCount++;
@@ -513,65 +529,5 @@ class EngineImpl implements Engine {
             remainingBuildingTypeCount++;
         }
         return remainingBuildingTypeCount;
-    }
-
-    private interface ActionSave {
-
-        void revert(EngineImpl engine);
-    }
-
-    private static class TileActionSave implements ActionSave {
-
-        private final ImmutableMap<Hex, Field> islandDiff;
-
-        TileActionSave(EngineImpl engine, TileAction placement) {
-            this.islandDiff = ImmutableMap.of(
-                    placement.getVolcanoHex(), engine.island.getField(placement.getVolcanoHex()),
-                    placement.getLeftHex(), engine.island.getField(placement.getLeftHex()),
-                    placement.getRightHex(), engine.island.getField(placement.getRightHex()));
-        }
-
-        @Override
-        public void revert(EngineImpl engine) {
-            for (Map.Entry<Hex, Field> entry : islandDiff.entrySet()) {
-                engine.island.putField(entry.getKey(), entry.getValue());
-            }
-        }
-    }
-
-    private static class BuildActionSave implements ActionSave {
-
-        private final ImmutableMap<Hex, Field> islandDiff;
-        private final BuildingType buildingType;
-        private final int buildingCount;
-
-        BuildActionSave(EngineImpl engine, PlaceBuildingAction action) {
-            Field field = engine.island.getField(action.getHex());
-            this.islandDiff = ImmutableMap.of(action.getHex(), field);
-            this.buildingType = action.getType();
-            this.buildingCount = engine.getCurrentPlayer().getBuildingCount(action.getType());
-        }
-
-        BuildActionSave(EngineImpl engine, ExpandVillageAction action) {
-            ImmutableMap.Builder<Hex, Field> islandsDiffBuilder = ImmutableMap.builder();
-            Village village = engine.getIsland().getVillage(action.getVillageHex());
-            for (Hex hex : village.getExpandableHexes().get(action.getFieldType())) {
-                Field field = engine.island.getField(hex);
-                islandsDiffBuilder.put(hex, field);
-            }
-
-            this.islandDiff = islandsDiffBuilder.build();
-            this.buildingType = BuildingType.HUT;
-            this.buildingCount = engine.getCurrentPlayer().getBuildingCount(BuildingType.HUT);
-        }
-
-        @Override
-        public void revert(EngineImpl engine) {
-            for (Map.Entry<Hex, Field> entry : islandDiff.entrySet()) {
-                engine.island.putField(entry.getKey(), entry.getValue());
-            }
-
-            engine.getCurrentPlayer().updateBuildingCount(buildingType, buildingCount);
-        }
     }
 }
