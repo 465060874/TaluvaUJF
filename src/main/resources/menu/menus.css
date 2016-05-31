@@ -148,14 +148,15 @@
     -fx-color: white;
     -fx-text-fill: white;
 }
-/*
-.buttonniveaux4:armed {
+
+.buttonniveaux4:disabled {
     -fx-color: white;
-    -fx-background-color: #AB8152;
+    -fx-background-color: #D4B78F;
     -fx-background-radius: 0;
     -fx-text-fill: white;
+    -fx-opacity:1.0;
 }
-*/
+
 
 /*
 

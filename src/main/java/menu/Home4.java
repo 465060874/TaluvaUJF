@@ -100,11 +100,7 @@ public class Home4 extends Application {
         vBoxScene.getChildren().addAll(vBoxHaut, hBoxMillieu, hBoxBas);
 
         //vBoxHaut
-        Image vs1 = new Image(getClass().getResourceAsStream("lol.png"));
-        ImageView iv2 = new ImageView();
-        iv2.setImage(vs1);
-
-        vBoxHaut.getChildren().add(iv2);
+        createVBoxHaut(vBoxHaut);
 
         //vBoxBas
 
@@ -162,23 +158,9 @@ public class Home4 extends Application {
         ImageView quitImage = new ImageView("menu/quit.png");
         bquit.setGraphic(quitImage);
 
-        this.modeButtons = new ToggleButton[] { bsolo, bmulti, bcharger };
 
-        this.modeToggle = new ToggleGroup();
-        bsolo.setToggleGroup(modeToggle);
-        bmulti.setToggleGroup(modeToggle);
-        bcharger.setToggleGroup(modeToggle);
-        modeToggle.selectedToggleProperty().addListener(e -> updateMode());
 
-        double[] path = new double[100];
-        for (int q = 0; q < 24; q++) {
-            double x = Math.cos(Math.PI / 3.0 * q + Math.PI / 2.0);
-            double y = Math.sin(Math.PI / 3.0 * q + Math.PI / 2.0);
-            path[q * 2] = x;
-            path[q * 2 + 1] = y;
-        }
-
-        Polygon aPoly = new Polygon(path);
+        Polygon aPoly = getshapHexagone();
         bsolo.setShape(aPoly);
         bmulti.setShape(aPoly);
         bcharger.setShape(aPoly);
@@ -191,6 +173,13 @@ public class Home4 extends Application {
         vBoxreprendre.getChildren().add(bplay);
         vBoxq.getChildren().add(bquit);
 
+        this.modeButtons = new ToggleButton[] { bsolo, bmulti, bcharger };
+
+        this.modeToggle = new ToggleGroup();
+        bsolo.setToggleGroup(modeToggle);
+        bmulti.setToggleGroup(modeToggle);
+        bcharger.setToggleGroup(modeToggle);
+        modeToggle.selectedToggleProperty().addListener(e -> updateMode());
 
         this.modeOptionsPane = new StackPane();
         hBoxMillieu.getChildren().add(modeOptionsPane);
@@ -363,34 +352,41 @@ public class Home4 extends Application {
         vvssi.setFitWidth(15);
         vvssi.setFitWidth(15);
 
-
+       // Label labelVS  = new Label("VS");
         GridPane b1 = new GridPane();
         b1.setAlignment(Pos.CENTER);
-        b1.setVgap(2);
+        b1.setVgap(3);
         b1.add(masque11,1,0);
-        b1.add(masque21,2,0);
+        b1.add(new Label("VS"),2,0);
+        b1.add(masque21,3,0);
         ToggleButton md = new ToggleButton("",b1);
         GridPane b2 = new GridPane();
         b2.setAlignment(Pos.CENTER);
-        b2.setVgap(3);
+        b2.setVgap(5);
         b2.add(masque12,1,0);
-        b2.add(masque22,2,0);
-        b2.add(masque32,3,0);
+        b2.add(new Label("VS"),2,0);
+        b2.add(masque22,3,0);
+        b2.add(new Label("VS"),4,0);
+        b2.add(masque32,5,0);
         ToggleButton mt = new ToggleButton("",b2);
         GridPane b3 = new GridPane();
         b3.setAlignment(Pos.CENTER);
-        b3.setVgap(4);
+        b3.setVgap(7);
         b3.add(masque13,1,0);
-        b3.add(masque23,2,0);
-        b3.add(masque33,3,0);
-        b3.add(masque43,4,0);
+        b3.add(new Label("vs"),2,0);
+        b3.add(masque23,3,0);
+        b3.add(new Label("vs"),4,0);
+        b3.add(masque33,5,0);
+        b3.add(new Label("vs"),6,0);
+        b3.add(masque43,7,0);
         ToggleButton mq1 = new ToggleButton("",b3);
         GridPane b4 = new GridPane();
         b4.setAlignment(Pos.CENTER);
         b4.setVgap(5);
         b4.add(masque14,1,0);
         b4.add(masque24,2,0);
-        b4.add(vvssi,3,0);
+        //b4.add(vvssi,3,0);
+        b4.add(new Label("vs"),3,0);
         b4.add(masque34,4,0);
         b4.add(masque44,5,0);
         ToggleButton mq2 = new ToggleButton("",b4);
@@ -572,6 +568,26 @@ public class Home4 extends Application {
         }
     }
 
+    private Polygon getshapHexagone() {
+        double[] path = new double[100];
+        for (int q = 0; q < 24; q++) {
+            double x = Math.cos(Math.PI / 3.0 * q + Math.PI / 2.0);
+            double y = Math.sin(Math.PI / 3.0 * q + Math.PI / 2.0);
+            path[q * 2] = x;
+            path[q * 2 + 1] = y;
+        }
+
+        return new Polygon(path);
+    }
+
+    private void createVBoxHaut(VBox vBoxHaut) {
+        Image vs1 = new Image(getClass().getResourceAsStream("lol.png"));
+        ImageView iv2 = new ImageView();
+        iv2.setImage(vs1);
+
+        vBoxHaut.getChildren().add(iv2);
+    }
+
     private ImageView createPlayerImageView(Image image) {
         ImageView masque1 = new ImageView(image);
         masque1.setFitHeight(40);
@@ -650,7 +666,7 @@ public class Home4 extends Application {
             return;
         }
 
-        menuData.save();
+        //menuData.save();
         GameApp gameApp = new GameApp(menuData);
         try {
             gameApp.start(stage);
