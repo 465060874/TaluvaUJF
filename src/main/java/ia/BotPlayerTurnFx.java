@@ -4,6 +4,7 @@ import engine.Engine;
 import engine.EngineStatus;
 import engine.PlayerTurn;
 import javafx.application.Platform;
+import util.CustomUncaughtExceptionHandler;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -19,6 +20,12 @@ class BotPlayerTurnFx implements PlayerTurn {
 
     private Move move;
 
+    private void runThread(Runnable runnable) {
+        Thread thread = new Thread(runnable);
+        CustomUncaughtExceptionHandler.install(thread, engine);
+        thread.start();
+    }
+
     BotPlayerTurnFx(Engine engine, IAAlgorithm player, EngineStatus.TurnStep step) {
         this.engine = engine;
         this.cancelled = new AtomicBoolean(false);
@@ -26,8 +33,7 @@ class BotPlayerTurnFx implements PlayerTurn {
         this.step = step;
 
         this.move = null;
-        Thread thread = new Thread(this::doPlay);
-        thread.start();
+        runThread(this::doPlay);
     }
 
     @Override
@@ -53,8 +59,7 @@ class BotPlayerTurnFx implements PlayerTurn {
             return;
         }
 
-        Thread thread = new Thread(() -> doWaitAndThen(startNanos, runnable));
-        thread.start();
+        runThread(() -> doWaitAndThen(startNanos, runnable));
     }
 
     private void doWaitAndThen(long startNanos, Runnable runnable) {

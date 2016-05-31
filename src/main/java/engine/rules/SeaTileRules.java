@@ -13,6 +13,10 @@ import static engine.rules.Problem.NOT_ALL_ON_SEA;
 public class SeaTileRules {
 
     public static Problems validate(Island island, VolcanoTile tile, Hex volcanoHex, Orientation orientation) {
+        if (island.isEmpty()) {
+            return Problems.of();
+        }
+
         ImmutableSet<Hex> hexes = ImmutableSet.of(
                 volcanoHex,
                 volcanoHex.getLeftNeighbor(orientation),

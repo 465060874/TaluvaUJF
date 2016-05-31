@@ -7,6 +7,7 @@ import data.BuildingType;
 import data.PlayerColor;
 import engine.action.*;
 import engine.log.EngineLogger;
+import engine.rules.*;
 import engine.tilestack.VolcanoTileStack;
 import map.*;
 
@@ -22,6 +23,8 @@ import static com.google.common.base.Verify.verify;
 import static java.util.stream.Collectors.toList;
 
 class EngineImpl implements Engine {
+
+    private static final boolean DEBUG = true;
 
     private static final int TILES_PER_PLAYER = 12;
 
@@ -139,6 +142,8 @@ class EngineImpl implements Engine {
 
     @Override
     public void start() {
+        logger.warning("[Engine] Starting with seed {0}", Long.toString(seed));
+
         this.status = new EngineStatus.Running();
         this.playerIndex = 0;
         observers.forEach(EngineObserver::onStart);
@@ -377,6 +382,14 @@ class EngineImpl implements Engine {
         checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
                 "Can't place a tile during building step");
 
+        if (DEBUG) {
+            Problems problems = SeaTileRules.validate(island,
+                    getVolcanoTileStack().current(),
+                    action.getVolcanoHex(),
+                    action.getOrientation());
+            verify(problems.isValid(), problems.toString());
+        }
+
         actionSaves.add(new TileActionSave(this, action));
         island.putTile(volcanoTileStack.current(), action.getVolcanoHex(), action.getOrientation());
 
@@ -391,6 +404,14 @@ class EngineImpl implements Engine {
         checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.TILE,
                 "Can't place a tile during building step");
 
+        if (DEBUG) {
+            Problems problems = VolcanoTileRules.validate(island,
+                    getVolcanoTileStack().current(),
+                    action.getVolcanoHex(),
+                    action.getOrientation());
+            verify(problems.isValid(), problems.toString());
+        }
+
         actionSaves.add(new TileActionSave(this, action));
         island.putTile(volcanoTileStack.current(), action.getVolcanoHex(), action.getOrientation());
 
@@ -404,6 +425,13 @@ class EngineImpl implements Engine {
         checkState(status instanceof EngineStatus.Running, "Can't do an action while the game is not running");
         checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
                 "Can't build during tile placement step");
+
+        if (DEBUG) {
+            Problems problems = PlaceBuildingRules.validate(this,
+                    action.getType(),
+                    action.getHex());
+            verify(problems.isValid(), problems.toString());
+        }
 
         actionSaves.add(new BuildActionSave(this, action));
         PlayerColor color = getCurrentPlayer().getColor();
@@ -420,6 +448,13 @@ class EngineImpl implements Engine {
         checkState(status instanceof EngineStatus.Running, "Can't do an action while the game is not running");
         checkState(((EngineStatus.Running) status).step == EngineStatus.TurnStep.BUILD,
                 "Can't expand during tile placement step");
+
+        if (DEBUG) {
+            Problems problems = ExpandVillageRules.validate(this,
+                    action.getVillage(island),
+                    action.getFieldType());
+            verify(problems.isValid(), problems.toString());
+        }
 
         actionSaves.add(new BuildActionSave(this, action));
         PlayerColor color = getCurrentPlayer().getColor();

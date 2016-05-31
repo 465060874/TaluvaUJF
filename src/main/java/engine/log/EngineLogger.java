@@ -17,6 +17,8 @@ import java.util.logging.Logger;
  */
 public class EngineLogger {
 
+    static final boolean LOG_IN_FILE = false;
+
     static {
         // Force initialisation of base logger
         EngineLoggerSetup.BASE_LOGGER.getLevel();
