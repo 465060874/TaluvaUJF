@@ -65,9 +65,9 @@ class MinMaxAlgorithm implements IAAlgorithm {
         // Test effectué au début du coup : si le joueur appartient à la liste des gagnants
         if( engine.getStatus() instanceof EngineStatus.Finished ){
             if( ((EngineStatus.Finished) engine.getStatus()).getWinners().contains( engine.getCurrentPlayer()))
-                return new Move( null, null, Integer.MAX_VALUE);
+                return new Move( null, null, Integer.MAX_VALUE - 5000 + heuristics.evaluateConfiguration(engine));
             else
-                return new Move( null, null, Integer.MIN_VALUE);
+                return new Move( null, null, Integer.MIN_VALUE + 5001 + heuristics.evaluateConfiguration(engine));
         }
 
         // 1 -- Determiner le poids de chaque stratégie
@@ -99,9 +99,9 @@ class MinMaxAlgorithm implements IAAlgorithm {
             engine.action(branchMoves[i].buildingAction);
             if( engine.getStatus() instanceof EngineStatus.Finished ){
                 if( ((EngineStatus.Finished) engine.getStatus()).getWinners().contains( engine.getCurrentPlayer()))
-                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MIN_VALUE );
+                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MIN_VALUE - 5000 + heuristics.evaluateConfiguration(engine));
                 else
-                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MAX_VALUE );
+                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MAX_VALUE + 5001 + heuristics.evaluateConfiguration(engine));
             }else if (depth > 0) {
                 Move m = doPlay(engine, depth - 1);
                 // Pour inverser entre min et max
