@@ -1,4 +1,4 @@
-package IA;
+package ia;
 
 interface IAAlgorithm {
 

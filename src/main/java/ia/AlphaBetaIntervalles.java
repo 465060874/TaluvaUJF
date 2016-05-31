@@ -1,4 +1,4 @@
-package IA;
+package ia;
 
 /**
  * Created by milanovb on 31/05/16.

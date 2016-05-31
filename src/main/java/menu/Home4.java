@@ -1,6 +1,6 @@
 package menu;
 
-import IA.IA;
+import ia.IA;
 import data.PlayerColor;
 import javafx.application.Application;
 import javafx.application.Platform;

@@ -1,6 +1,6 @@
 package menu.data;
 
-import IA.IA;
+import ia.IA;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import data.PlayerColor;

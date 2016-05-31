@@ -1,7 +1,7 @@
 package engine;
 
-import IA.IA;
-import IA.IADebug;
+import ia.IA;
+import ia.IADebug;
 import data.PlayerColor;
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package IA;
+package ia;
 
 import engine.Engine;
 import engine.action.*;

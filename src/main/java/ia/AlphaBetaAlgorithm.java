@@ -1,4 +1,4 @@
-package IA;
+package ia;
 
 import data.BuildingType;
 import engine.Engine;
@@ -49,7 +49,7 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
         Move m =  realEngine.getStatus().getTurn() == 0
                 ? doFirstPlay(engineCopy)
                 : doPlay(engineCopy, totalDepth, Integer.MAX_VALUE, AlphaBetaIntervalles.INF);
-        realEngine.logger().info("[IA] Choosed move with {0} points ", m.points);
+        realEngine.logger().fine("[IA] Choosed move with {0} points ", m.points);
         return m;
     }
 
@@ -116,7 +116,7 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
                     bestMove = new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, bestPoints );
                     if( type == AlphaBetaIntervalles.SUP )
                         if( bestPoints <= alpha ) {
-                            engine.logger().info("[AB] Alpha cut");
+                            engine.logger().fine("[AB] Alpha cut");
                             engine.cancelLastStep();
                             engine.cancelLastStep();
                             return bestMove;
@@ -125,7 +125,7 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
                             alpha = bestPoints;
                     else if( type == AlphaBetaIntervalles.INF )
                         if( bestPoints >= alpha ){
-                            engine.logger().info("[AB] Alpha cut");
+                            engine.logger().fine("[AB] Alpha cut");
                             engine.cancelLastStep();
                             engine.cancelLastStep();
                             return bestMove;

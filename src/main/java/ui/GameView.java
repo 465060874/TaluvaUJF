@@ -33,7 +33,7 @@ public class GameView extends StackPane implements EngineObserver {
         engine.registerObserver(this);
         Grid grid = new Grid();
         this.placement = new Placement(engine, grid);
-        this.islandView = new IslandView(engine.getIsland(), grid, placement, false);
+        this.islandView = new IslandView(engine.getIsland(), grid, placement, true);
         this.hud = new Hud(engine);
 
         hud.setPickOnBounds(false);
@@ -122,6 +122,6 @@ public class GameView extends StackPane implements EngineObserver {
     }
 
     public boolean isMouseDragged(){
-        return islandView.isMouseDragged();
+        return islandView.isMouseDragThresholdReached();
     }
 }

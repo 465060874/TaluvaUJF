@@ -11,7 +11,10 @@ import java.util.Set;
  */
 public class Hex {
 
+    private static int count = 0;
+
     public static Hex at(int line, int diag) {
+        count++;
         return new Hex(line, diag);
     }
 

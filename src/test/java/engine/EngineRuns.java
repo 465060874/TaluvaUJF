@@ -1,6 +1,6 @@
 package engine;
 
-import IA.IA;
+import ia.IA;
 import data.PlayerColor;
 
 import java.text.DecimalFormat;

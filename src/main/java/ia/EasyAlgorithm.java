@@ -1,7 +1,6 @@
 
-package IA;
+package ia;
 
-import com.google.common.base.Verify;
 import data.BuildingType;
 import engine.Engine;
 import engine.action.*;

@@ -1,11 +1,11 @@
 package ui;
 
-import IA.IA;
 import data.BuildingType;
 import data.PlayerColor;
 import engine.*;
 import engine.action.Action;
 import engine.action.SeaTileAction;
+import ia.IA;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -89,11 +89,11 @@ public class GameApp extends Application {
 
         @Override
         public PlayerTurn startTurn(Engine engine, EngineStatus.TurnStep step) {
-            return new FXUIPlayerTurn(step);
+            return new FXPlayerTurn(step);
         }
     }
 
-    public class FXUIPlayerTurn implements PlayerTurn {
+    public class FXPlayerTurn implements PlayerTurn {
 
         private final EventHandler<MouseEvent> mousePressed;
         private final EventHandler<MouseEvent> mouseDragged;
@@ -102,7 +102,7 @@ public class GameApp extends Application {
 
         private boolean dragged;
 
-        public FXUIPlayerTurn(EngineStatus.TurnStep step) {
+        public FXPlayerTurn(EngineStatus.TurnStep step) {
             this.mousePressed = this::mousePressed;
             this.mouseDragged = this::mouseDragged;
             this.mouseReleasedTile = this::mouseReleasedTile;

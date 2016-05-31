@@ -1,4 +1,4 @@
-package IA;
+package ia;
 import com.google.common.collect.SetMultimap;
 import data.BuildingType;
 import data.FieldType;

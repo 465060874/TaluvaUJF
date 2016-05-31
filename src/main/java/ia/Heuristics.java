@@ -1,4 +1,4 @@
-package IA;
+package ia;
 import engine.*;
 import engine.action.*;
 import java.util.PriorityQueue;
