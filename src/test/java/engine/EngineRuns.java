@@ -23,6 +23,7 @@ public class EngineRuns {
                     .logLevel(Level.INFO)
                     .player(PlayerColor.RED, IA.MOYEN)
                     .player(PlayerColor.WHITE, IA.DIFFICILE)
+                    .seed( 654651651651651L )
                     .build();
 
             engine.logger().info("* Début de la partie avec la graine {0}", Long.toString(engine.getSeed()));
