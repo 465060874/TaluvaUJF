@@ -24,7 +24,7 @@ public interface IslandTheme {
             CurrentTheme.IslandTHEME = new BasicIslandTheme();
         }
         else if (CurrentTheme.IslandTHEME instanceof BasicIslandTheme){
-            CurrentTheme.IslandTHEME = new BasicIslandTheme_withNoLight();
+            CurrentTheme.IslandTHEME = new BasicIslandThemeDefault();
         } else {
             CurrentTheme.IslandTHEME = new ImageIslandTheme();
         }
@@ -70,7 +70,7 @@ public interface IslandTheme {
 
     class CurrentTheme {
 
-        private static IslandTheme IslandTHEME = new BasicIslandTheme();
+        private static IslandTheme IslandTHEME = new BasicIslandThemeDefault();
         private static final List<Runnable> listeners = new ArrayList<>();
     }
 }

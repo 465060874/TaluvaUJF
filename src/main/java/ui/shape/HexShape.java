@@ -74,28 +74,28 @@ public class HexShape {
         hexagonX[5] = x - halfWidth;
         hexagonY[5] = y2 - midY;
 
-        double hexHeightFaded = hexHeight * FADEDRATIO;
-        double y2Faded = y - (level - 1) * hexHeightFaded;
-        double halfWidthFaded = grid.getHexHalfWidth() * FADEDRATIO;
-        double midYFaded = (grid.getHexRadiusY() / 2) * FADEDRATIO;
+        double hexHeightInner = hexHeight * FADEDRATIO;
+        double y2Faded = y - (level - 1) * hexHeight;
+        double halfWidthInner = grid.getHexHalfWidth() * FADEDRATIO;
+        double midYInner = (grid.getHexRadiusY() / 2) * FADEDRATIO;
 
-        fadedBorderX[0] = x - halfWidthFaded;
-        fadedBorderY[0] = y2Faded + midYFaded;
+        fadedBorderX[0] = x - halfWidthInner;
+        fadedBorderY[0] = y2Faded + midYInner;
 
         fadedBorderX[1] = x;
         fadedBorderY[1] = y2Faded + grid.getHexRadiusY() * FADEDRATIO;
 
-        fadedBorderX[2] = x + halfWidthFaded;
-        fadedBorderY[2] = y2Faded + midYFaded;
+        fadedBorderX[2] = x + halfWidthInner;
+        fadedBorderY[2] = y2Faded + midYInner;
 
-        fadedBorderX[3] = x + halfWidthFaded;
-        fadedBorderY[3] = y2Faded - midYFaded;
+        fadedBorderX[3] = x + halfWidthInner;
+        fadedBorderY[3] = y2Faded - midYInner;
 
         fadedBorderX[4] = x;
         fadedBorderY[4] = y2Faded - grid.getHexRadiusY() * FADEDRATIO;
 
-        fadedBorderX[5] = x - halfWidthFaded;
-        fadedBorderY[5] = y2Faded - midYFaded;
+        fadedBorderX[5] = x - halfWidthInner;
+        fadedBorderY[5] = y2Faded - midYInner;
 
         fadedBorderX[6] = fadedBorderX[0];
         fadedBorderY[6] = fadedBorderY[0];

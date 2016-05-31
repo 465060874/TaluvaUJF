@@ -9,7 +9,7 @@ import map.Building;
 import map.Orientation;
 import ui.island.Grid;
 
-public class BasicIslandTheme_withNoLight implements IslandTheme {
+public class BasicIslandThemeDefault implements IslandTheme {
 
     private final Color backgroundColor = Color.web("5E81A2");
     private final Color tileBorderColor = Color.web("303030");
