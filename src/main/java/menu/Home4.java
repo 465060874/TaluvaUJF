@@ -4,6 +4,7 @@ import IA.IA;
 import data.PlayerColor;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -46,22 +47,24 @@ public class Home4 extends Application {
 
     private Stage stage;
 
-    private ToggleGroup tabChoice;
-    private ToggleButton[] optionsButton;
-    private StackPane options;
-    private Node[] optionsContent;
+    private Button bplay;
+
+    private ToggleGroup modeToggle;
+    private ToggleButton[] modeButtons;
+    private StackPane modeOptionsPane;
+    private Node[] modeOptions;
 
     private Button bicone;
-    private ToggleGroup levelChoice;
+    private ToggleGroup levelToggle;
     private ToggleButton[] levelButtons;
 
-    private ToggleGroup mode;
-    private ToggleButton[] optionsMode;
+    private ToggleGroup multiModeToggle;
+    private ToggleButton[] multiModeButtons;
 
-    private ToggleGroup historyChoice;
-    private List<ToggleButton> optionsHistory;
-    private List<Node> capture;
-    private VBox vBoxCapture = new VBox();
+    private ToggleGroup reprendreToggle;
+    private List<ToggleButton> reprendreButtons;
+    private List<Node> reprendreSnapshots;
+    private VBox reprendreSnapshotBox = new VBox();
 
     public Home4() {
         this.menuData = MenuData.load();
@@ -84,7 +87,6 @@ public class Home4 extends Application {
         vBoxScene.setAlignment(Pos.CENTER);
         vBoxScene.setPrefSize(largeurScene,hauteurScene);
 
-
         VBox vBoxHaut = new VBox();
         vBoxHaut.setAlignment(Pos.BOTTOM_CENTER);
         vBoxHaut.setPrefSize(largeurScene,hauteurScene/3);
@@ -95,8 +97,7 @@ public class Home4 extends Application {
         hBoxBas.setAlignment(Pos.CENTER);
         hBoxBas.setPrefSize(largeurScene,hauteurScene/3);
 
-
-        vBoxScene.getChildren().addAll(vBoxHaut,hBoxMillieu,hBoxBas);
+        vBoxScene.getChildren().addAll(vBoxHaut, hBoxMillieu, hBoxBas);
 
         //vBoxHaut
         Image vs1 = new Image(getClass().getResourceAsStream("lol.png"));
@@ -152,24 +153,22 @@ public class Home4 extends Application {
         bmulti.setPrefSize(largeurScene/3,hauteurScene*2/9);
         bcharger.setPrefSize(largeurScene/3,hauteurScene*2/9);
 
-        Button bplay = new Button();
+        this.bplay = new Button();
         bplay.setPrefSize(lv-100,lv-100);
         ImageView playImage = new ImageView("menu/play.png");
         bplay.setGraphic(playImage);
-        Button bq = new Button();
-        bq.setPrefSize(lv-100,lv-100);
+        Button bquit = new Button();
+        bquit.setPrefSize(lv-100,lv-100);
         ImageView quitImage = new ImageView("menu/quit.png");
-        bq.setGraphic(quitImage);
+        bquit.setGraphic(quitImage);
 
-        this.optionsButton = new ToggleButton[] { bsolo, bmulti, bcharger };
+        this.modeButtons = new ToggleButton[] { bsolo, bmulti, bcharger };
 
-
-        this.tabChoice = new ToggleGroup();
-        bsolo.setToggleGroup(tabChoice);
-        bmulti.setToggleGroup(tabChoice);
-        bcharger.setToggleGroup(tabChoice);
-        tabChoice.selectToggle(bsolo);
-        tabChoice.selectedToggleProperty().addListener(e -> updateMode());
+        this.modeToggle = new ToggleGroup();
+        bsolo.setToggleGroup(modeToggle);
+        bmulti.setToggleGroup(modeToggle);
+        bcharger.setToggleGroup(modeToggle);
+        modeToggle.selectedToggleProperty().addListener(e -> updateMode());
 
         double[] path = new double[100];
         for (int q = 0; q < 24; q++) {
@@ -184,17 +183,17 @@ public class Home4 extends Application {
         bmulti.setShape(aPoly);
         bcharger.setShape(aPoly);
         bplay.setShape(aPoly);
-        bq.setShape(aPoly);
+        bquit.setShape(aPoly);
+
         vBoxsolo.getChildren().add(bsolo);
         vBoxmulti.getChildren().add(bmulti);
         vBoxcharger.getChildren().add(bcharger);
         vBoxreprendre.getChildren().add(bplay);
-        vBoxq.getChildren().add(bq);
+        vBoxq.getChildren().add(bquit);
 
 
-        this.options = new StackPane();
-        hBoxMillieu.getChildren().add(options);
-
+        this.modeOptionsPane = new StackPane();
+        hBoxMillieu.getChildren().add(modeOptionsPane);
 
         VBox soloOptions = new VBox(5);
         soloOptions.setAlignment(Pos.CENTER);
@@ -205,15 +204,12 @@ public class Home4 extends Application {
         chargerList.setAlignment(Pos.CENTER);
         chargerList.setPrefWidth(largeurScene*2/3);
         chargerList.setPadding(new Insets(10,10,10,10));
-        this.optionsContent = new Node[] { soloOptions, multiOptions, chargerList };
-
-
-
+        this.modeOptions = new Node[] { soloOptions, multiOptions, chargerList };
 
         //pane de button solo
         //deux buttons : icone /difficulte
 
-        double largeurBoder = largeurScene/10;
+        double largeurBorder = largeurScene/10;
         HBox hBoxI = new HBox(3);
         HBox hBoxII = new HBox(3);
         hBoxI.setAlignment(Pos.CENTER);
@@ -225,9 +221,9 @@ public class Home4 extends Application {
         vBoxg1.setAlignment(Pos.CENTER);
         vBoxm1.setAlignment(Pos.CENTER);
         vBoxd1.setAlignment(Pos.CENTER);
-        vBoxg1.setPrefWidth((largeurScene-25-largeurBoder)/2);
+        vBoxg1.setPrefWidth((largeurScene-25-largeurBorder)/2);
         vBoxm1.setPrefWidth(25);
-        vBoxd1.setPrefWidth((largeurScene-25-largeurBoder)/2);
+        vBoxd1.setPrefWidth((largeurScene-25-largeurBorder)/2);
 
         VBox vBoxg2 = new VBox();
         VBox vBoxm2 = new VBox();
@@ -235,9 +231,9 @@ public class Home4 extends Application {
         vBoxg2.setAlignment(Pos.CENTER);
         vBoxd2.setAlignment(Pos.CENTER);
         vBoxm2.setAlignment(Pos.CENTER);
-        vBoxg2.setPrefWidth((largeurScene-25-largeurBoder)/2);
+        vBoxg2.setPrefWidth((largeurScene-25-largeurBorder)/2);
         vBoxm2.setPrefWidth(25);
-        vBoxd2.setPrefWidth((largeurScene-25-largeurBoder)/2);
+        vBoxd2.setPrefWidth((largeurScene-25-largeurBorder)/2);
 
         hBoxI.getChildren().addAll(vBoxg1,vBoxm1,vBoxd1);
         hBoxII.getChildren().addAll(vBoxg2,vBoxm2,vBoxd2);
@@ -269,12 +265,12 @@ public class Home4 extends Application {
         ToggleButton difficile = new ToggleButton("DIFFICILE");
 
         this.levelButtons = new ToggleButton[] { simple, moyen, difficile };
-        this.levelChoice = new ToggleGroup();
-        simple.setToggleGroup(levelChoice);
-        moyen.setToggleGroup(levelChoice);
-        difficile.setToggleGroup(levelChoice);
-        levelChoice.selectToggle(levelButtons[menuData.getSoloDifficulty().ordinal()]);
-        levelChoice.selectedToggleProperty().addListener(e -> updateLevel());
+        this.levelToggle = new PersistentToggleGroup();
+        simple.setToggleGroup(levelToggle);
+        moyen.setToggleGroup(levelToggle);
+        difficile.setToggleGroup(levelToggle);
+        levelToggle.selectToggle(levelButtons[menuData.getSoloDifficulty().ordinal()]);
+        levelToggle.selectedToggleProperty().addListener(e -> updateLevel());
 
         simple.setPrefWidth(largeurScene/3);
         moyen.setPrefWidth(largeurScene/3);
@@ -284,13 +280,6 @@ public class Home4 extends Application {
         vBoxg2.getChildren().add(bicone);
         vBoxm2.getChildren().add(iv1);
         vBoxd2.getChildren().add(vBoxNiveaux);
-
-
-
-
-
-
-
 
 
         //pane button multijoueurs
@@ -304,14 +293,14 @@ public class Home4 extends Application {
 
 
 
-        this.optionsMode = new ToggleButton[] { md,mt,mq1,mq2 };
-        this.mode = new ToggleGroup();
-        md.setToggleGroup(mode);
-        mt.setToggleGroup(mode);
-        mq1.setToggleGroup(mode);
-        mq2.setToggleGroup(mode);
-        mode.selectToggle(optionsMode[menuData.getMultiMode().ordinal()]);
-        mode.selectedToggleProperty().addListener(e -> updatemultimode());
+        this.multiModeButtons = new ToggleButton[] { md,mt,mq1,mq2 };
+        this.multiModeToggle = new ToggleGroup();
+        md.setToggleGroup(multiModeToggle);
+        mt.setToggleGroup(multiModeToggle);
+        mq1.setToggleGroup(multiModeToggle);
+        mq2.setToggleGroup(multiModeToggle);
+        multiModeToggle.selectToggle(multiModeButtons[menuData.getMultiMode().ordinal()]);
+        multiModeToggle.selectedToggleProperty().addListener(e -> updatemultimode());
 
 
         md.setPrefWidth(largeurScene/2);
@@ -405,14 +394,14 @@ public class Home4 extends Application {
         b4.add(masque34,4,0);
         b4.add(masque44,5,0);
         ToggleButton mq2 = new ToggleButton("",b4);
-        this.optionsMode = new ToggleButton[] { md,mt,mq1,mq2 };
-        this.mode = new ToggleGroup();
-        md.setToggleGroup(mode);
-        mt.setToggleGroup(mode);
-        mq1.setToggleGroup(mode);
-        mq2.setToggleGroup(mode);
-        mode.selectToggle(optionsMode[menuData.getMultiMode().ordinal()]);
-        mode.selectedToggleProperty().addListener(e -> updatemultimode());
+        this.multiModeButtons = new ToggleButton[] { md,mt,mq1,mq2 };
+        this.multiModeToggle = new PersistentToggleGroup();
+        md.setToggleGroup(multiModeToggle);
+        mt.setToggleGroup(multiModeToggle);
+        mq1.setToggleGroup(multiModeToggle);
+        mq2.setToggleGroup(multiModeToggle);
+        multiModeToggle.selectToggle(multiModeButtons[menuData.getMultiMode().ordinal()]);
+        multiModeToggle.selectedToggleProperty().addListener(e -> updatemultimode());
 
         //md.setPrefWidth(largeurScene*1/2);
         //mt.setPrefWidth(largeurScene*1/2);
@@ -439,62 +428,70 @@ public class Home4 extends Application {
         multiOptions.getChildren().addAll(hhaut,hbas);
 
 
-
-
-        //pane charger
-        int kkk = 170;
-        this.capture = new ArrayList<Node>();
-        for (SavedGame savedGame : menuData.getSavedGames()) {
-            capture.add(new ImageView(savedGame.getImage()));
+        this.reprendreButtons = new ArrayList<>();
+        this.reprendreToggle = new PersistentToggleGroup();
+        this.reprendreSnapshots = new ArrayList<>();
+        if (menuData.getSavedGames().isEmpty()) {
+            bcharger.setDisable(true);
         }
+        else {
+            //pane charger
+            int kkk = 170;
+            for (SavedGame savedGame : menuData.getSavedGames()) {
+                reprendreSnapshots.add(new ImageView(savedGame.getImage()));
+            }
 
-        VBox vBoxoptionsCharger = new VBox(8);
+            VBox vBoxoptionsCharger = new VBox(8);
 
-        chargerList.setAlignment(Pos.CENTER);
-        vBoxCapture.setAlignment(Pos.CENTER);
-        vBoxoptionsCharger.setAlignment(Pos.CENTER);
-        chargerList.setPrefWidth(largeurScene);
-        vBoxoptionsCharger.setPrefWidth(150);
-        vBoxoptionsCharger.setPrefHeight(kkk);
+            chargerList.setAlignment(Pos.CENTER);
+            reprendreSnapshotBox.setAlignment(Pos.CENTER);
+            vBoxoptionsCharger.setAlignment(Pos.CENTER);
+            chargerList.setPrefWidth(largeurScene);
+            vBoxoptionsCharger.setPrefWidth(150);
+            vBoxoptionsCharger.setPrefHeight(kkk);
 
 
-        //vBoxCapture.setPrefHeight(100);
-        //vBoxoptionsCharger.setPrefHeight(100);
+            //reprendreSnapshotBox.setPrefHeight(100);
+            //vBoxoptionsCharger.setPrefHeight(100);
 
-        this.optionsHistory = new ArrayList<>();
-        this.historyChoice = new ToggleGroup();
-        for (SavedGame savedGame : menuData.getSavedGames()) {
-            ToggleButton savedButton = new ToggleButton(savedGame.getDate());
-            savedButton.setPrefWidth(120);
-            savedButton.setToggleGroup(historyChoice);
-            optionsHistory.add(savedButton);
+            for (SavedGame savedGame : menuData.getSavedGames()) {
+                ToggleButton savedButton = new ToggleButton(savedGame.getDate());
+                savedButton.setPrefWidth(120);
+                savedButton.setToggleGroup(reprendreToggle);
+                reprendreButtons.add(savedButton);
+            }
+            if (!reprendreButtons.isEmpty()) {
+                reprendreToggle.selectToggle(reprendreButtons.get(0));
+            }
+            reprendreToggle.selectedToggleProperty().addListener(e -> updateReprendreSnapshot());
+
+            vBoxoptionsCharger.getChildren().addAll(reprendreButtons);
+
+            ScrollPane sp = new ScrollPane();
+            VBox v = new VBox();
+            v.getChildren().add(sp);
+            v.setPrefSize(150, 100);
+
+            sp.hbarPolicyProperty().set(ScrollPane.ScrollBarPolicy.NEVER);
+            vBoxoptionsCharger.setAlignment(Pos.CENTER_LEFT);
+            vBoxoptionsCharger.setPadding(new Insets(2, 1, 0, 1));
+            sp.setContent(vBoxoptionsCharger);
+            if (!reprendreSnapshots.isEmpty()) {
+                reprendreSnapshotBox.getChildren().add(reprendreSnapshots.get(0));
+
+            }
+
+
+            chargerList.getChildren().addAll(reprendreSnapshotBox, v);
+            chargerList.setPrefHeight(80);
+
+            v.setAlignment(Pos.CENTER);
+            reprendreSnapshotBox.setAlignment(Pos.CENTER);
+            //reprendreSnapshotBox.getStyleClass().add("b2");
+            //v.getStyleClass().add("b2");
+
+            sp.getStyleClass().add("s");
         }
-        if (!optionsHistory.isEmpty()) {
-            historyChoice.selectToggle(optionsHistory.get(0));
-        }
-        historyChoice.selectedToggleProperty().addListener(e -> updateCapture());
-
-        vBoxoptionsCharger.getChildren().addAll(optionsHistory);
-        ScrollPane sp = new ScrollPane();
-        VBox v = new VBox();
-        v.getChildren().add(sp);
-        v.setPrefSize(150,100);
-
-        sp.hbarPolicyProperty().set(ScrollPane.ScrollBarPolicy.NEVER);
-        vBoxoptionsCharger.setAlignment(Pos.CENTER_LEFT);
-        vBoxoptionsCharger.setPadding(new Insets(2,1,0,1));
-        sp.setContent(vBoxoptionsCharger);
-        if (!capture.isEmpty()) {
-            vBoxCapture.getChildren().add(capture.get(0));
-        }
-
-        chargerList.getChildren().addAll(vBoxCapture,v);
-        chargerList.setPrefHeight(80);
-
-        v.setAlignment(Pos.CENTER);
-        vBoxCapture.setAlignment(Pos.CENTER);
-        //vBoxCapture.getStyleClass().add("b2");
-        //v.getStyleClass().add("b2");
 
         bicone.setOnAction(this::updateSoloColor);
 
@@ -505,7 +502,7 @@ public class Home4 extends Application {
         bmulti.getStyleClass().add("buttonniveaux4");
         bcharger.getStyleClass().add("buttonniveaux4");
         bplay.getStyleClass().add("buttonniveaux5");
-        bq.getStyleClass().add("buttonniveaux6");
+        bquit.getStyleClass().add("buttonniveaux6");
 
         icone.getStyleClass().add("bin");
         niveaux.getStyleClass().add("bin");
@@ -517,13 +514,11 @@ public class Home4 extends Application {
         mq1.getStyleClass().add("buttonjoueur");
         mq2.getStyleClass().add("buttonjoueur");
 
-        sp.getStyleClass().add("s");
-
         //v.getStyleClass().add("s2");
         //vBoxoptionsCharger.getStyleClass().add("s2");
 
-        for(int i = 0;i < optionsHistory.size(); i++){
-            optionsHistory.get(i).getStyleClass().add("buttonniveaux7");
+        for(int i = 0; i < reprendreButtons.size(); i++){
+            reprendreButtons.get(i).getStyleClass().add("buttonniveaux7");
         }
 
 /*
@@ -534,9 +529,10 @@ public class Home4 extends Application {
 
 
         updateMode();
-        updateCapture();
+        updateReprendreSnapshot();
         updateLevel();
         updatemultimode();
+        updateButtonPlay();
 /*
         vBoxScene.getStyleClass().add("b1");
         hBoxBas.getStyleClass().add("b3");
@@ -554,13 +550,13 @@ public class Home4 extends Application {
 */
 
 
-        //vBoxCapture.getStyleClass().add("b2");
+        //reprendreSnapshotBox.getStyleClass().add("b2");
         //v.getStyleClass().add("b2");
         //vBoxScene.getStyleClass().add("b1");
         //hBoxBas.getStyleClass().add("b3");
         //vBoxHaut.getStyleClass().add("b1");
         bplay.setOnAction(this::start);
-        bq.setOnAction(e -> Platform.exit());
+        bquit.setOnAction(e -> Platform.exit());
 
         root.getChildren().add(vBoxScene);
 
@@ -583,6 +579,10 @@ public class Home4 extends Application {
         return masque1;
     }
 
+    private void updateButtonPlay() {
+        bplay.setVisible(menuData.getMode() != null);
+    }
+
     private void updateSoloColor(ActionEvent event) {
         int index = (menuData.getSoloColor().ordinal() + 1) % PlayerColor.values().length;
         menuData.setSoloColor(PlayerColor.values()[index]);
@@ -599,29 +599,35 @@ public class Home4 extends Application {
     }
 
     private void updateMode() {
-        Toggle selected = tabChoice.getSelectedToggle();
-        //System.out.println(tabChoice.getSelectedToggle());
-        for (int i = 0; i < optionsButton.length; i++) {
-            if (selected == optionsButton[i]) {
-                menuData.setMode(MenuMode.values()[i]);
-                options.getChildren().setAll(optionsContent[i]);
+        Toggle selected = modeToggle.getSelectedToggle();
+
+        if (selected == null) {
+            menuData.setMode(null);
+            modeOptionsPane.getChildren().clear();
+        }
+        else {
+            for (int i = 0; i < modeButtons.length; i++) {
+                if (selected == modeButtons[i]) {
+                    menuData.setMode(MenuMode.values()[i]);
+                    modeOptionsPane.getChildren().setAll(modeOptions[i]);
+                }
             }
         }
+        updateButtonPlay();
     }
 
-    private void updateCapture() {
-        Toggle selected = historyChoice.getSelectedToggle();
-        //System.out.println(historyChoice.getSelectedToggle());
-        for (int i = 0; i < optionsHistory.size(); i++) {
-            if (selected == optionsHistory.get(i)) {
-                //vBoxCapture.
-                vBoxCapture.getChildren().setAll(capture.get(i));
+    private void updateReprendreSnapshot() {
+        Toggle selected = reprendreToggle.getSelectedToggle();
+        for (int i = 0; i < reprendreButtons.size(); i++) {
+            if (selected == reprendreButtons.get(i)) {
+                //reprendreSnapshotBox.
+                reprendreSnapshotBox.getChildren().setAll(reprendreSnapshots.get(i));
             }
         }
     }
 
     private void updateLevel() {
-        Toggle selected = levelChoice.getSelectedToggle();
+        Toggle selected = levelToggle.getSelectedToggle();
         for(int i = 0; i < levelButtons.length; i++){
             if(selected == levelButtons[i]){
                 menuData.setSoloDifficulty(IA.values()[i]);
@@ -631,15 +637,19 @@ public class Home4 extends Application {
 
 
     private void updatemultimode() {
-        Toggle selected = mode.getSelectedToggle();
-        for(int i = 0; i < optionsMode.length; i++){
-            if(selected == optionsMode[i]){
+        Toggle selected = multiModeToggle.getSelectedToggle();
+        for(int i = 0; i < multiModeButtons.length; i++){
+            if(selected == multiModeButtons[i]){
                 menuData.setMultiMode(MultiMode.values()[i]);
             }
         }
     }
 
     private void start(ActionEvent event) {
+        if (menuData.getMode() == null) {
+            return;
+        }
+
         menuData.save();
         GameApp gameApp = new GameApp(menuData);
         try {
@@ -651,3 +661,15 @@ public class Home4 extends Application {
     }
 }
 
+class PersistentToggleGroup extends ToggleGroup {
+    PersistentToggleGroup() {
+        super();
+        selectedToggleProperty().addListener(this::selectedTogglePropertyChange);
+    }
+
+    private void selectedTogglePropertyChange(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+        if (newValue == null) {
+            selectToggle(oldValue);
+        }
+    }
+}

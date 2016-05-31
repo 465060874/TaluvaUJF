@@ -35,9 +35,6 @@ class MenuDataIO {
             }
         }
 
-        String modeStr = (String) properties.getOrDefault("mode", MenuMode.SOLO.name());
-        MenuMode mode = MenuMode.valueOf(modeStr);
-
         String soloColorStr = (String) properties.getOrDefault("solo-color", PlayerColor.WHITE.name());
         PlayerColor soloColor = PlayerColor.valueOf(soloColorStr);
         String soloDifficultyStr = (String) properties.getOrDefault("solo-difficulty", IA.FACILE.name());
@@ -65,7 +62,7 @@ class MenuDataIO {
                 .reverse()
                 .immutableSortedCopy(savedGamesBuilder.build());
 
-        return new MenuData(mode, soloColor, soloDifficulty, multiMode, savedGames);
+        return new MenuData(soloColor, soloDifficulty, multiMode, savedGames);
     }
 
     private static Properties toProperties(MenuData menuData) {
@@ -85,16 +82,6 @@ class MenuDataIO {
         Properties properties = toProperties(menuData);
         try (Writer writer = Files.asCharSink(FILE, CHARSET).openBufferedStream()) {
             properties.store(writer, "");
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    static void debug(MenuData menuData) {
-        Properties properties = toProperties(menuData);
-        try {
-            properties.store(new PrintWriter(System.out), "");
         }
         catch (IOException e) {
             throw new RuntimeException(e);

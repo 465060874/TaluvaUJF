@@ -26,11 +26,11 @@ public class MenuData {
         return MenuDataIO.load();
     }
 
-    MenuData(MenuMode mode,
-             PlayerColor soloColor, IA soloDifficulty,
+    MenuData(PlayerColor soloColor,
+             IA soloDifficulty,
              MultiMode multiMode,
              ImmutableList<SavedGame> savedGames) {
-        this.mode = mode;
+        this.mode = null;
         this.soloColor = soloColor;
         this.soloDifficulty = soloDifficulty;
         this.multiMode = multiMode;
@@ -84,10 +84,6 @@ public class MenuData {
 
     public void save() {
         MenuDataIO.save(this);
-    }
-
-    public void debug() {
-        MenuDataIO.debug(this);
     }
 
     public EngineBuilder engineBuilder(PlayerHandler uiPlayerHandler) {
