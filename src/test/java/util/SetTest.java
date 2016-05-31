@@ -12,7 +12,7 @@ public class SetTest {
         for (E element : iterable) {
             // On vérifie l'unicité au fur et a mesure
             if (!set.add(element)) {
-                Assert.fail("Duplicated elements" + element);
+                fail("Duplicated elements" + element);
             }
         }
 
