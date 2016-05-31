@@ -1,6 +1,7 @@
 
 package IA;
 
+import com.google.common.base.Verify;
 import data.BuildingType;
 import engine.Engine;
 import engine.action.*;
@@ -139,6 +140,6 @@ class EasyAlgorithm implements IAAlgorithm {
                 engine.cancelLastStep();
             }
         }
-        return new Move( null, null, 0);
+        throw new IllegalStateException("No move found for EsayPlayer");
     }
 }

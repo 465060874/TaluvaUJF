@@ -12,7 +12,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static engine.rules.PlaceBuildingRules.validate;
 
-class MinMaxAlgorithm implements IAAlgorithm {
+/**
+ * Created by milanovb on 31/05/16.
+ */
+public class AlphaBetaAlgorithm implements IAAlgorithm {
 
     // Strategies possibles pour l'IA
     private static final int NB_STRATEGIES = 4;
@@ -30,7 +33,7 @@ class MinMaxAlgorithm implements IAAlgorithm {
     private final int[] strategyPoints = new int[NB_STRATEGIES];
 
     // Constructeur
-    MinMaxAlgorithm(int branchingFactor, int totalDepth, Heuristics heuristics, Engine realEngine, AtomicBoolean cancelled) {
+    AlphaBetaAlgorithm(int branchingFactor, int totalDepth, Heuristics heuristics, Engine realEngine, AtomicBoolean cancelled) {
         this.branchingFactor = branchingFactor;
         this.totalDepth = totalDepth;
         this.heuristics = heuristics;
@@ -45,7 +48,7 @@ class MinMaxAlgorithm implements IAAlgorithm {
         Engine engineCopy = realEngine.copyWithoutObservers();
         Move m =  realEngine.getStatus().getTurn() == 0
                 ? doFirstPlay(engineCopy)
-                : doPlay(engineCopy, totalDepth);
+                : doPlay(engineCopy, totalDepth, Integer.MIN_VALUE+1, Integer.MAX_VALUE);
         realEngine.logger().info("[IA] Choosed move with {0} points ", m.points);
         return m;
     }
@@ -58,19 +61,22 @@ class MinMaxAlgorithm implements IAAlgorithm {
     }
 
 
-    private Move doPlay(Engine engine, int depth) {
+    private Move doPlay(Engine engine, int depth, int alpha, int beta) {
         engine.logger().fine("PLAY : depth {0}", depth);
 
         // 0 -- Test d'un gagnant ou perdant
         // Test effectué au début du coup : si le joueur appartient à la liste des gagnants
         if( engine.getStatus() instanceof EngineStatus.Finished ){
-                throw new IllegalStateException("Call to doPlay() but game not running anymore");
+            if( ((EngineStatus.Finished) engine.getStatus()).getWinners().contains( engine.getCurrentPlayer()))
+                return new Move( null, null, Integer.MAX_VALUE - 5000 + heuristics.evaluateConfiguration(engine));
+            else
+                return new Move( null, null, Integer.MIN_VALUE + 5001 + heuristics.evaluateConfiguration(engine));
         }
 
         // 1 -- Determiner le poids de chaque stratégie
         heuristics.chooseStrategies(engine,strategyPoints,branchingFactor);
         engine.logger().fine("-> Strategy Chosen\n" +
-                "\tTemples {0}\n\tTours {1}\n\tHuttes {2}\n\tContre {3}",
+                        "\tTemples {0}\n\tTours {1}\n\tHuttes {2}\n\tContre {3}",
                 strategyPoints[0], strategyPoints[1], strategyPoints[2], strategyPoints[3]);
 
         // 2 -- Determiner un sous-ensemble pertinent de coups possibles
@@ -83,7 +89,7 @@ class MinMaxAlgorithm implements IAAlgorithm {
 
         engine.logger().fine("-> Branch Chosen");
 
-        // 3 -- MIN-MAX sur l'arbre réduit
+        // 3 -- ALPHA-BETA sur l'arbre réduit
         // A ce point : strategiesQueues contient les coups possibles pour chaque stratégie.
         // On va donc appeler la fonction de jeu pour l'adversaire dessus...
         // Et de choisir le meilleur choix
@@ -100,7 +106,7 @@ class MinMaxAlgorithm implements IAAlgorithm {
                 else
                     return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MAX_VALUE + 5001 + heuristics.evaluateConfiguration(engine));
             }else if (depth > 0) {
-                Move m = doPlay(engine, depth - 1);
+                Move m = doPlay(engine, depth - 1, -1*beta, -1*alpha);
                 // Pour inverser entre min et max
                 m.points *= -1;
                 if (m.points < bestPoints) {
@@ -359,15 +365,15 @@ class MinMaxAlgorithm implements IAAlgorithm {
             // Construction + placement mer ne pose jamais de problème
             if( build instanceof PlaceBuildingAction )
                 return true;
-            // Si extension et placement mer :
+                // Si extension et placement mer :
             else{
                 ExpandVillageAction expandVillageAction = (ExpandVillageAction) build;
                 // On vérifie que le palcement ne modifie pas l'extension :
                 if (placement.getLeftFieldType() == expandVillageAction.getFieldType()) {
                     for(Hex neighbor : placement.getLeftHex().getNeighborhood() )
                         if (engine.getIsland().getField(neighbor).hasBuilding()
-                            && engine.getIsland().getVillage(neighbor).equals(expandVillageAction.getVillage(engine.getIsland())))
-                                return false;
+                                && engine.getIsland().getVillage(neighbor).equals(expandVillageAction.getVillage(engine.getIsland())))
+                            return false;
                 }
                 else if (placement.getRightFieldType() == expandVillageAction.getFieldType()) {
                     for(Hex neighbor : placement.getRightHex().getNeighborhood() )
@@ -432,3 +438,4 @@ class MinMaxAlgorithm implements IAAlgorithm {
         return true;
     }
 }
+

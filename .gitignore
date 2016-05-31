@@ -6,3 +6,6 @@
 /logs
 target
 hs_err_pid*
+menu.data
+src/main/java/menu/data
+
