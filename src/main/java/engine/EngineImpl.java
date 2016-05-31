@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Predicate;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Verify.verify;
 import static java.util.stream.Collectors.toList;
@@ -352,6 +353,7 @@ class EngineImpl implements Engine {
 
     @Override
     public void action(Action action) {
+        checkNotNull(action);
         if (action instanceof SeaTileAction) {
             placeOnSea((SeaTileAction) action);
         }
@@ -406,9 +408,7 @@ class EngineImpl implements Engine {
         actionSaves.add(new BuildActionSave(this, action));
         PlayerColor color = getCurrentPlayer().getColor();
         island.putBuilding(action.getHex(), Building.of(action.getType(), color));
-        int buildingCount = action.getType() == BuildingType.HUT
-                ? island.getField(action.getHex()).getLevel()
-                : 1;
+        int buildingCount = island.getField(action.getHex()).getBuildingCount();
         getCurrentPlayer().decreaseBuildingCount(action.getType(), buildingCount);
 
         observers.forEach(o -> o.onBuild(action));
@@ -428,7 +428,7 @@ class EngineImpl implements Engine {
         Village village = getIsland().getVillage(action.getVillageHex());
         for (Hex hex : village.getExpandableHexes().get(action.getFieldType())) {
             island.putBuilding(hex, building);
-            buildingCount += island.getField(hex).getLevel();
+            buildingCount += island.getField(hex).getBuildingCount();
         }
         getCurrentPlayer().decreaseBuildingCount(BuildingType.HUT, buildingCount);
 

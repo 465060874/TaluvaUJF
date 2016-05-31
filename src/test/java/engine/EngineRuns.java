@@ -21,7 +21,7 @@ public class EngineRuns {
         for (int i = 0; i < COUNT; i++) {
             engine = EngineBuilder.allVsAll()
                     .logLevel(Level.INFO)
-                    .player(PlayerColor.RED, IA.FACILE)
+                    .player(PlayerColor.RED, IA.MOYEN)
                     .player(PlayerColor.WHITE, IA.DIFFICILE)
                     .build();
 

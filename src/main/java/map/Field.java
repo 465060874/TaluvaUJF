@@ -79,6 +79,17 @@ public class Field {
         return building;
     }
 
+    public int getBuildingCount() {
+        switch (building.getType()) {
+            case NONE: return 0;
+            case HUT: return level;
+            case TEMPLE: return 1;
+            case TOWER: return 1;
+        }
+
+        throw new IllegalStateException();
+    }
+
     public Field withBuilding(Building building) {
         return new Field(level, type, orientation, building);
     }
