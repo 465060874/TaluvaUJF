@@ -21,7 +21,7 @@ public class EngineRuns {
         for (int i = 0; i < COUNT; i++) {
             engine = EngineBuilder.allVsAll()
                     .logLevel(Level.INFO)
-                    .player(PlayerColor.RED, IA.MOYEN)
+                    .player(PlayerColor.RED, IA.DIFFICILE)
                     .player(PlayerColor.WHITE, IA.DIFFICILE)
                     .seed( 654651651651651L )
                     .build();

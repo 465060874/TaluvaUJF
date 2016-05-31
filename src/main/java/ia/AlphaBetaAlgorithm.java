@@ -4,7 +4,9 @@ import data.BuildingType;
 import engine.Engine;
 import engine.EngineStatus;
 import engine.action.*;
+import engine.rules.ExpandVillageRules;
 import map.Hex;
+import map.Village;
 
 import java.util.Iterator;
 import java.util.PriorityQueue;
@@ -99,6 +101,17 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
             if( branchMoves[i].tileAction == null || branchMoves[i].buildingAction == null )
                 throw new IllegalStateException("Coup mal recombiné -> un des champs est null");
             engine.action(branchMoves[i].tileAction);
+
+            // FIXME: I'm an ugly hack, pls FIX ME !
+            if (branchMoves[i].buildingAction instanceof ExpandVillageAction) {
+                ExpandVillageAction expand = (ExpandVillageAction) branchMoves[i].buildingAction;
+                Village village = expand.getVillage(engine.getIsland());
+                if (!ExpandVillageRules.validate(engine, village, expand.getFieldType()).isValid()) {
+                    engine.cancelLastStep();
+                    continue;
+                }
+            }
+
             engine.action(branchMoves[i].buildingAction);
             if( engine.getStatus() instanceof EngineStatus.Finished ){
                 // On evalue la config de l'adversaire donc on prend sa moins bonne configuration !!!

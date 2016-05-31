@@ -24,7 +24,7 @@ import static java.util.stream.Collectors.toList;
 
 class EngineImpl implements Engine {
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static final int TILES_PER_PLAYER = 12;
 

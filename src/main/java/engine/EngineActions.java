@@ -180,6 +180,10 @@ class EngineActions {
         ImmutableList.Builder<ExpandVillageAction> builder = ImmutableList.builder();
         for (Village village : villages) {
             for (FieldType fieldType : FieldType.values()) {
+                if (fieldType == FieldType.VOLCANO) {
+                    continue;
+                }
+
                 if (ExpandVillageRules.validate(engine, village, fieldType).isValid()) {
                     builder.add(new ExpandVillageAction(village, fieldType));
                 }
