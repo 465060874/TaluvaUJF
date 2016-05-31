@@ -94,12 +94,12 @@ class MinMaxAlgorithm implements IAAlgorithm {
         for (int i = 0; i < branchNb; i++) {
             engine.action(branchMoves[i].tileAction);
             engine.action(branchMoves[i].buildingAction);
-            if( engine.getStatus() instanceof EngineStatus.Finished ){
+            /*if( engine.getStatus() instanceof EngineStatus.Finished ){
                 if( ((EngineStatus.Finished) engine.getStatus()).getWinners().contains( engine.getCurrentPlayer()))
-                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MIN_VALUE - 5000 + heuristics.evaluateConfiguration(engine));
+                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MAX_VALUE - 50000 + heuristics.evaluateConfiguration(engine));
                 else
-                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MAX_VALUE + 5001 + heuristics.evaluateConfiguration(engine));
-            }else if (depth > 0) {
+                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MIN_VALUE + 50001 + heuristics.evaluateConfiguration(engine));
+            }else */if (depth > 0) {
                 Move m = doPlay(engine, depth - 1);
                 // Pour inverser entre min et max
                 m.points *= -1;

@@ -18,13 +18,13 @@ public enum IA implements PlayerHandler {
 
     MOYEN {
         protected IAAlgorithm createAlgorithm(Engine engine, AtomicBoolean cancelled) {
-            return new MinMaxAlgorithm(16, 0, new BasicHeuristics(), engine, cancelled);
+            return new AlphaBetaAlgorithm(16, 0, new BasicHeuristics(), engine, cancelled);
         }
     },
 
     DIFFICILE {
         protected IAAlgorithm createAlgorithm(Engine engine, AtomicBoolean cancelled) {
-            return new MinMaxAlgorithm(16, 2, new BasicHeuristics(), engine, cancelled);
+            return new AlphaBetaAlgorithm(16, 2, new BasicHeuristics(), engine, cancelled);
         }
     };
 

@@ -48,7 +48,7 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
         Engine engineCopy = realEngine.copyWithoutObservers();
         Move m =  realEngine.getStatus().getTurn() == 0
                 ? doFirstPlay(engineCopy)
-                : doPlay(engineCopy, totalDepth, Integer.MIN_VALUE+1, Integer.MAX_VALUE);
+                : doPlay(engineCopy, totalDepth, Integer.MAX_VALUE, AlphaBetaIntervalles.INF);
         realEngine.logger().info("[IA] Choosed move with {0} points ", m.points);
         return m;
     }
@@ -61,16 +61,13 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
     }
 
 
-    private Move doPlay(Engine engine, int depth, int alpha, int beta) {
+    private Move doPlay(Engine engine, int depth, int alpha, AlphaBetaIntervalles type) {
         engine.logger().fine("PLAY : depth {0}", depth);
 
         // 0 -- Test d'un gagnant ou perdant
         // Test effectué au début du coup : si le joueur appartient à la liste des gagnants
         if( engine.getStatus() instanceof EngineStatus.Finished ){
-            if( ((EngineStatus.Finished) engine.getStatus()).getWinners().contains( engine.getCurrentPlayer()))
-                return new Move( null, null, Integer.MAX_VALUE - 5000 + heuristics.evaluateConfiguration(engine));
-            else
-                return new Move( null, null, Integer.MIN_VALUE + 5001 + heuristics.evaluateConfiguration(engine));
+            throw new IllegalStateException("Call to doPlay() but game not running anymore");
         }
 
         // 1 -- Determiner le poids de chaque stratégie
@@ -84,7 +81,8 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
         int branchNb = branchSortFusion(engine, strategyPoints, branchMoves );
         // Test du cas où aucun coup n'est jouable !!
         if( branchMoves[0] == null){
-            return new Move(null, null, Integer.MIN_VALUE);
+            engine.logger().info("[!!!!] AUCUN COUP POSSIBLE APRES LE PLACEMENT");
+            return new Move(null, null, Integer.MAX_VALUE);
         }
 
         engine.logger().fine("-> Branch Chosen");
@@ -98,20 +96,42 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
         int bestConfigPoints = Integer.MAX_VALUE;
         int p;
         for (int i = 0; i < branchNb; i++) {
+            if( branchMoves[i].tileAction == null || branchMoves[i].buildingAction == null )
+                throw new IllegalStateException("Coup mal recombiné -> un des champs est null");
             engine.action(branchMoves[i].tileAction);
             engine.action(branchMoves[i].buildingAction);
             if( engine.getStatus() instanceof EngineStatus.Finished ){
-                if( ((EngineStatus.Finished) engine.getStatus()).getWinners().contains( engine.getCurrentPlayer()))
-                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MIN_VALUE - 5000 + heuristics.evaluateConfiguration(engine));
-                else
-                    return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MAX_VALUE + 5001 + heuristics.evaluateConfiguration(engine));
+                // On evalue la config de l'adversaire donc on prend sa moins bonne configuration !!!
+                if( (p = heuristics.evaluateConfiguration(engine)) < bestConfigPoints ){
+                    bestMove = new Move(branchMoves[i].buildingAction, branchMoves[i].tileAction, p);
+                    bestConfigPoints = p;
+                    bestPoints = p;
+                }
             }else if (depth > 0) {
-                Move m = doPlay(engine, depth - 1, -1*beta, -1*alpha);
+                Move m = doPlay(engine, depth - 1, -1*alpha, type.inverse());
                 // Pour inverser entre min et max
                 m.points *= -1;
                 if (m.points < bestPoints) {
                     bestPoints = m.points;
                     bestMove = new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, bestPoints );
+                    if( type == AlphaBetaIntervalles.SUP )
+                        if( bestPoints <= alpha ) {
+                            engine.logger().info("[AB] Alpha cut");
+                            engine.cancelLastStep();
+                            engine.cancelLastStep();
+                            return bestMove;
+                        }
+                        else
+                            alpha = bestPoints;
+                    else if( type == AlphaBetaIntervalles.INF )
+                        if( bestPoints >= alpha ){
+                            engine.logger().info("[AB] Alpha cut");
+                            engine.cancelLastStep();
+                            engine.cancelLastStep();
+                            return bestMove;
+                        }
+                        else
+                            alpha = bestPoints;
                     engine.logger().fine("[Choice] Found opponent best choice only : {0}", m.points);
                 }
             }else{
@@ -119,6 +139,10 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
                 if( (p = heuristics.evaluateConfiguration(engine)) < bestConfigPoints ){
                     bestMove = new Move(branchMoves[i].buildingAction, branchMoves[i].tileAction, p);
                     bestConfigPoints = p;
+                    if( type == AlphaBetaIntervalles.INF && p < alpha )
+                        alpha = p;
+                    else if( type == AlphaBetaIntervalles.SUP && p > alpha )
+                        alpha = p;
                 }
             }
 

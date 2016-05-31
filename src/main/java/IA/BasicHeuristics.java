@@ -459,9 +459,9 @@ class BasicHeuristics implements Heuristics {
             // Gestion fin du jeu :
             if (engine.getStatus() instanceof EngineStatus.Finished) {
                 if (((EngineStatus.Finished) engine.getStatus()).getWinners().contains(engine.getCurrentPlayer()))
-                    return Integer.MAX_VALUE - 5000 + score;
+                    return Integer.MAX_VALUE - 50000 + score;
                 else
-                    return Integer.MIN_VALUE + 5000 + score;
+                    return Integer.MIN_VALUE + 50000 + score;
             } else
                 return score;
         }
@@ -503,13 +503,11 @@ class BasicHeuristics implements Heuristics {
 
             // Gestion fin du jeu :
             if (engine.getStatus() instanceof EngineStatus.Finished) {
-                engine.logger().info("[!!!!!!!!] Finished -> bug ? ");
-                if ((((EngineStatus.Finished) engine.getStatus()).getWinners().contains(engine.getCurrentPlayer())) &&
-                        !(((EngineStatus.Finished) engine.getStatus()).getWinners().contains(player)) )
-                    return Integer.MAX_VALUE - 5000 + score;
+                if (((EngineStatus.Finished) engine.getStatus()).getWinners().contains(engine.getCurrentPlayer()))
+                    return Integer.MAX_VALUE - 50000 + score;
                 else
-                    return Integer.MIN_VALUE + 5001 + score;
-            } else
+                    return Integer.MIN_VALUE + 50001 + score;
+            }else
                 return score;
         }
 
