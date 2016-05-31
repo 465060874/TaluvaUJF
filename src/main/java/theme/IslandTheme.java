@@ -4,6 +4,7 @@ import data.FieldType;
 import javafx.scene.effect.Effect;
 import javafx.scene.paint.Paint;
 import map.Building;
+import map.Orientation;
 import ui.island.Grid;
 
 import java.util.ArrayList;
@@ -62,6 +63,10 @@ public interface IslandTheme {
     Paint getBuildingTopPaint(Building building, BuildingStyle style);
 
     Effect getBuildingTopEffect(Grid grid, Building building, BuildingStyle style);
+
+    Paint getGradiantEffect(Orientation orientation, double[] hexagonBorderX, double[] hexagonBorderY);
+
+    Paint getGradiantEffectOthers(Orientation orientation, double[] hexagonX, double[] hexagonY, FieldType baseColor);
 
     class CurrentTheme {
 

@@ -11,7 +11,7 @@ import java.util.logging.Level;
 public class IaBattles {
 
     private static final int COUNT = 100;
-    private static final int COUNT10 = 2;
+    private static final int COUNT10 = 10;
 
     @Test
     public void facileVsDifficile() {
@@ -61,8 +61,8 @@ public class IaBattles {
         int error = 0;
 
         // Paramètres de IADebug
-        int[] branchFactor = new int[]{256, 16};
-        int[] depth = new int[]{0, 1};
+        int[] branchFactor = new int[]{16, 16};
+        int[] depth = new int[]{1, 2};
 
 
         for (int i = 0; i < COUNT10; i++) {

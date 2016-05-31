@@ -5,9 +5,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import map.Orientation;
-import ui.island.Grid;
 import theme.HexStyle;
 import theme.IslandTheme;
+import ui.island.Grid;
 
 public class HexShape {
 
@@ -16,7 +16,7 @@ public class HexShape {
     private static final int HEXAGON_BORDER2_POINTS = 3;
     private static final int BOTTOM_POINTS = 6;
     private static final int BOTTOM_BORDER_POINTS = 5;
-    public static final float STROKE_WIDTH = 2f;
+    public static final float STROKE_WIDTH = 3f;
 
     private final double[] hexagonX;
     private final double[] hexagonY;
@@ -160,6 +160,11 @@ public class HexShape {
         // Fill shape
         gc.setEffect(IslandTheme.getCurrent().getTileTopEffect(grid, style));
         gc.setFill(IslandTheme.getCurrent().getTileTopPaint(fieldType, style));
+        if (fieldType == FieldType.VOLCANO) {
+            gc.setFill(IslandTheme.getCurrent().getGradiantEffect(orientation, hexagonX, hexagonY));
+        } else {
+            gc.setFill(IslandTheme.getCurrent().getGradiantEffectOthers(orientation, hexagonX, hexagonY, fieldType));
+        }
         gc.fillPolygon(hexagonX, hexagonY, HEXAGON_POINTS);
 
         gc.setEffect(IslandTheme.getCurrent().getTileBottomEffect(grid, style));

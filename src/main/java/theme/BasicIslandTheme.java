@@ -7,6 +7,7 @@ import javafx.scene.effect.Lighting;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import map.Building;
+import map.Orientation;
 import ui.island.Grid;
 
 public class BasicIslandTheme implements IslandTheme {
@@ -106,6 +107,16 @@ public class BasicIslandTheme implements IslandTheme {
 
     @Override
     public Effect getBuildingTopEffect(Grid grid, Building building, BuildingStyle style) {
+        return null;
+    }
+
+    @Override
+    public Paint getGradiantEffect(Orientation orientation, double[] hexagonBorderX, double[] hexagonBorderY) {
+        return null;
+    }
+
+    @Override
+    public Paint getGradiantEffectOthers(Orientation orientation, double[] hexagonX, double[] hexagonY, FieldType baseColor) {
         return null;
     }
 }
