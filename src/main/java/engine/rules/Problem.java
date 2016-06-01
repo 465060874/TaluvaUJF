@@ -25,6 +25,7 @@ public enum Problem {
     TOWER_NOT_IN_VILLAGE,
 
     // ExpandVillage
+    NOT_A_VILLAGE,
     EXPAND_NO_ADJACENT_TILE,
     EXPAND_NOT_ENOUGH_BUILDING;
 }
