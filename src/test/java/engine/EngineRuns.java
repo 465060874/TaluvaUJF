@@ -21,9 +21,8 @@ public class EngineRuns {
         for (int i = 0; i < COUNT; i++) {
             engine = EngineBuilder.allVsAll()
                     .logLevel(Level.INFO)
-                    .player(PlayerColor.RED, IA.DIFFICILE)
-                    .player(PlayerColor.WHITE, IA.DIFFICILE)
-                    .seed( 654651651651651L )
+                    .player(PlayerColor.RED, IA.MOYEN)
+                    .player(PlayerColor.WHITE, IA.MOYEN)
                     .build();
 
             engine.logger().info("* Début de la partie avec la graine {0}", Long.toString(engine.getSeed()));
@@ -32,10 +31,7 @@ public class EngineRuns {
 
             while (!(engine.getStatus() instanceof EngineStatus.Finished));
             long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
-            // Skip the X first runs to account for when the JIT kicks in
-            if (i >= 20) {
-                durationSum += duration;
-            }
+            durationSum += duration;
 
             hashFactorSum += engine.getIsland().getHashFactor();
             engine.logger().info("  Fini ({0}) après {1}ms",
@@ -43,9 +39,7 @@ public class EngineRuns {
                     duration);
         }
 
-        if (COUNT > 20) {
-            engine.logger().info("Temps moyen d''execution : {0} ms", durationSum / COUNT);
-        }
+        engine.logger().info("Temps moyen d''execution : {0} ms", durationSum / COUNT);
         engine.logger().info("Etalement moyen de la table de hachage : {0}", percent(hashFactorSum / COUNT));
     }
 

@@ -21,6 +21,7 @@ import util.CustomUncaughtExceptionHandler;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 
 public class GameApp extends Application {
 
@@ -31,8 +32,9 @@ public class GameApp extends Application {
 
     public GameApp() {
         this.engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.BROWN, IA.FACILE)
-                .player(PlayerColor.WHITE, IA.FACILE)
+                .logLevel(Level.FINE)
+                .player(PlayerColor.BROWN, IA.DIFFICILE)
+                .player(PlayerColor.WHITE, IA.DIFFICILE)
                 .build();
     }
 
