@@ -155,13 +155,13 @@ class EngineActions {
                 }
 
                 if (hutValid) {
-                    list.add(new PlaceBuildingAction(BuildingType.HUT, hex));
+                    list.add(new PlaceBuildingAction(false, BuildingType.HUT, hex));
                 }
                 if (templeValid) {
-                    list.add(new PlaceBuildingAction(BuildingType.TEMPLE, hex));
+                    list.add(new PlaceBuildingAction(false, BuildingType.TEMPLE, hex));
                 }
                 if (towerValid) {
-                    list.add(new PlaceBuildingAction(BuildingType.TOWER, hex));
+                    list.add(new PlaceBuildingAction(false, BuildingType.TOWER, hex));
                 }
             }
         }
@@ -185,7 +185,7 @@ class EngineActions {
                 }
 
                 if (ExpandVillageRules.validate(engine, village, fieldType).isValid()) {
-                    builder.add(new ExpandVillageAction(village, fieldType));
+                    builder.add(new ExpandVillageAction(false, village, fieldType));
                 }
             }
         }
@@ -203,10 +203,10 @@ class EngineActions {
             }
 
             if (PlaceBuildingRules.validate(engine, type, leftHex).isValid()) {
-                builder.add(new PlaceBuildingAction(type, leftHex));
+                builder.add(new PlaceBuildingAction(true, type, leftHex));
             }
             if (PlaceBuildingRules.validate(engine, type, rightHex).isValid()) {
-                builder.add(new PlaceBuildingAction(type, rightHex));
+                builder.add(new PlaceBuildingAction(true, type, rightHex));
             }
         }
 
@@ -241,7 +241,7 @@ class EngineActions {
             Village village = entry.getKey();
             FieldType fieldType = entry.getValue();
             if (ExpandVillageRules.validate(engine, village, fieldType).isValid()) {
-                builder.add(new ExpandVillageAction(village, fieldType));
+                builder.add(new ExpandVillageAction(true, village, fieldType));
             }
         }
 

@@ -80,10 +80,10 @@ public class Placement {
                     : new VolcanoTileAction(tile, hex, tileOrientation);
         }
         else if (mode == Mode.BUILDING) {
-            return new PlaceBuildingAction(buildingType, hex);
+            return new PlaceBuildingAction(false, buildingType, hex);
         }
         else if (mode == Mode.EXPAND_VILLAGE) {
-            return new ExpandVillageAction(expansionVillage, engine.getIsland().getField(hex).getType());
+            return new ExpandVillageAction(false, expansionVillage, engine.getIsland().getField(hex).getType());
         }
 
         throw new IllegalStateException();

@@ -11,13 +11,20 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public class PlaceBuildingAction implements BuildingAction {
 
+    private final boolean isNew;
     private final BuildingType type;
     private final Hex hex;
 
-    public PlaceBuildingAction(BuildingType type, Hex hex) {
+    public PlaceBuildingAction(boolean isNew, BuildingType type, Hex hex) {
         checkArgument(type != BuildingType.NONE);
+        this.isNew = isNew;
         this.type = type;
         this.hex = hex;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
     }
 
     public BuildingType getType() {
@@ -49,6 +56,6 @@ public class PlaceBuildingAction implements BuildingAction {
         int line = Integer.valueOf(reader.readLine());
         int diag = Integer.valueOf(reader.readLine());
         BuildingType type = BuildingType.valueOf(reader.readLine());
-        return new PlaceBuildingAction(type, Hex.at(line, diag));
+        return new PlaceBuildingAction(false, type, Hex.at(line, diag));
     }
 }

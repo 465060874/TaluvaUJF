@@ -11,16 +11,23 @@ import java.io.Writer;
 
 public class ExpandVillageAction implements BuildingAction {
 
+    private final boolean isNew;
     private final Hex villageHex;
     private final FieldType fieldType;
 
-    public ExpandVillageAction(Village village, FieldType fieldType) {
-        this(village.getHexes().iterator().next(), fieldType);
+    public ExpandVillageAction(boolean isNew, Village village, FieldType fieldType) {
+        this(isNew, village.getHexes().iterator().next(), fieldType);
     }
 
-    public ExpandVillageAction(Hex villageHex, FieldType fieldType) {
+    public ExpandVillageAction(boolean isNew, Hex villageHex, FieldType fieldType) {
+        this.isNew = isNew;
         this.villageHex = villageHex;
         this.fieldType = fieldType;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
     }
 
     public Hex getVillageHex() {
@@ -56,7 +63,7 @@ public class ExpandVillageAction implements BuildingAction {
         int line = Integer.valueOf(reader.readLine());
         int diag = Integer.valueOf(reader.readLine());
         FieldType fieldType = FieldType.valueOf(reader.readLine());
-        return new ExpandVillageAction(Hex.at(line, diag), fieldType);
+        return new ExpandVillageAction(false, Hex.at(line, diag), fieldType);
     }
 
 
