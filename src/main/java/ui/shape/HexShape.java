@@ -74,7 +74,6 @@ public class HexShape {
         hexagonX[5] = x - halfWidth;
         hexagonY[5] = y2 - midY;
 
-        double hexHeightInner = hexHeight * FADEDRATIO;
         double y2Faded = y - (level - 1) * hexHeight;
         double halfWidthInner = grid.getHexHalfWidth() * FADEDRATIO;
         double midYInner = (grid.getHexRadiusY() / 2) * FADEDRATIO;

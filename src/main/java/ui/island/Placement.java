@@ -12,14 +12,14 @@ import engine.rules.PlaceBuildingRules;
 import engine.rules.TileRules;
 import map.*;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkState;
 
 public class Placement {
 
+
+    public WheelOfChoice wheelOfChoice;
 
     public enum Mode {
         NONE,
@@ -205,11 +205,30 @@ public class Placement {
     private void updateValidBuilding() {
         boolean wasValid = valid;
         this.valid = PlaceBuildingRules.validate(engine, buildingType, hex).isValid();
-
         redrawWhatsNecessary(wasValid);
+
+        List<BuildingType> otherAvailableBuildings = otherAvailableBuildings(buildingType);
+        if (!otherAvailableBuildings.isEmpty()) {
+            System.out.println("!EMPTY");
+            wheelOfChoice.redraw(otherAvailableBuildings, hex);
+        }
+    }
+
+    private List<BuildingType> otherAvailableBuildings(BuildingType buildingType) {
+        List<BuildingType> others = new ArrayList<>();
+        for (BuildingType currentType : BuildingType.values()) {
+            if (currentType != buildingType
+                    && currentType != BuildingType.NONE
+                    && PlaceBuildingRules.validate(engine, currentType, hex).isValid())
+            {
+                others.add(currentType);
+            }
+        }
+        return others;
     }
 
     private void redrawWhatsNecessary(boolean wasValid) {
+        wheelOfChoice.redraw();
         if (wasValid != valid) {
             placementOverlay.redraw();
             islandCanvas.redraw();

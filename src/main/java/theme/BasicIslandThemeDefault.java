@@ -134,8 +134,8 @@ public class BasicIslandThemeDefault implements IslandTheme {
             case SOUTH_EAST:
                 return new LinearGradient(hexagonX[2], hexagonY[2], hexagonX[5], hexagonY[5], false, CycleMethod.NO_CYCLE, stops);
         }
-        stops = new Stop[]{new Stop(0, Color.BLACK), new Stop(1, Color.web("E97B33"))};
-        return new LinearGradient(hexagonX[0], hexagonY[0], hexagonX[3], hexagonY[3], false, CycleMethod.NO_CYCLE, stops);
+
+        throw new IllegalArgumentException();
     }
 
 
