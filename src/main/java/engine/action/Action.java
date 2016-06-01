@@ -15,7 +15,7 @@ import java.io.Writer;
  *             PlaceBuildingAction (Par placement)
  *             ExpandVillageAction (Par extension
  */
-public interface Action {
+public interface Action<T> extends Comparable<T> {
 
     void write(Writer writer) throws IOException;
 

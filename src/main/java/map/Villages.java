@@ -207,8 +207,7 @@ class Villages {
         public SetMultimap<FieldType, Hex> getExpandableHexes() {
             ImmutableSetMultimap.Builder<FieldType, Hex> builder = ImmutableSetMultimap.builder();
             for (Hex hex : hexes) {
-                final Iterable<Hex> neighborhood = hex.getNeighborhood();
-                for (Hex neighbor : neighborhood) {
+                for (Hex neighbor : hex.getNeighborhood()) {
                     Field field = island.getField(neighbor);
                     if (field != Field.SEA
                             && field.getType().isBuildable()

@@ -1,5 +1,6 @@
 package engine.action;
 
+import com.google.common.collect.ComparisonChain;
 import data.FieldType;
 import map.Hex;
 import map.Island;
@@ -9,7 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
 
-public class ExpandVillageAction implements BuildingAction {
+public class ExpandVillageAction implements BuildingAction<ExpandVillageAction> {
 
     private final boolean isNew;
     private final Hex villageHex;
@@ -40,6 +41,15 @@ public class ExpandVillageAction implements BuildingAction {
 
     public FieldType getFieldType() {
         return fieldType;
+    }
+
+    @Override
+    public int compareTo(ExpandVillageAction o) {
+        return ComparisonChain.start()
+                .compare(villageHex.getLine(), o.villageHex.getLine())
+                .compare(villageHex.getDiag(), o.villageHex.getDiag())
+                .compare(fieldType, o.fieldType)
+                .result();
     }
 
     @Override

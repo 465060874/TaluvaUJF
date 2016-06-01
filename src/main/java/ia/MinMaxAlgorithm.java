@@ -25,40 +25,39 @@ class MinMaxAlgorithm implements IAAlgorithm {
     private final Heuristics heuristics;
 
     // Donnees
-    private final Engine realEngine;
+    private final Engine engine;
     private final AtomicBoolean cancelled;
     private final int[] strategyPoints = new int[NB_STRATEGIES];
 
     // Constructeur
-    MinMaxAlgorithm(int branchingFactor, int totalDepth, Heuristics heuristics, Engine realEngine, AtomicBoolean cancelled) {
+    MinMaxAlgorithm(int branchingFactor, int totalDepth, Heuristics heuristics, Engine engine, AtomicBoolean cancelled) {
         this.branchingFactor = branchingFactor;
         this.totalDepth = totalDepth;
         this.heuristics = heuristics;
 
-        this.realEngine = realEngine;
+        this.engine = engine;
         this.cancelled = cancelled;
     }
 
     // Jouer un coup
     @Override
     public Move play() {
-        Engine engineCopy = realEngine.copyWithoutObservers();
-        Move m =  realEngine.getStatus().getTurn() == 0
-                ? doFirstPlay(engineCopy)
-                : doPlay(engineCopy, totalDepth);
-        realEngine.logger().info("[IA] Choosed move with {0} points ", m.points);
+        Move m =  engine.getStatus().getTurn() == 0
+                ? doFirstPlay()
+                : doPlay(totalDepth);
+        engine.logger().info("[IA] Choosed move with {0} points ", m.points);
         return m;
     }
 
-    private Move doFirstPlay(Engine engineCopy){
-        TileAction seaPlacement = engineCopy.getSeaTileActions().get(0);
-        engineCopy.action(seaPlacement);
-        BuildingAction buildAction = engineCopy.getPlaceBuildingActions().get(realEngine.getRandom().nextInt(2));
+    private Move doFirstPlay() {
+        TileAction seaPlacement = engine.getSeaTileActions().get(0);
+        engine.action(seaPlacement);
+        BuildingAction buildAction = engine.getPlaceBuildingActions().get(engine.getRandom().nextInt(2));
         return new Move(buildAction, seaPlacement, 0);
     }
 
 
-    private Move doPlay(Engine engine, int depth) {
+    private Move doPlay(int depth) {
         engine.logger().fine("PLAY : depth {0}", depth);
 
         // 0 -- Test d'un gagnant ou perdant
@@ -75,7 +74,7 @@ class MinMaxAlgorithm implements IAAlgorithm {
 
         // 2 -- Determiner un sous-ensemble pertinent de coups possibles
         Move[] branchMoves = new Move[branchingFactor];
-        int branchNb = branchSortFusion(engine, strategyPoints, branchMoves );
+        int branchNb = branchSortFusion(strategyPoints, branchMoves );
         // Test du cas où aucun coup n'est jouable !!
         if( branchMoves[0] == null){
             return new Move(null, null, Integer.MIN_VALUE);
@@ -100,7 +99,7 @@ class MinMaxAlgorithm implements IAAlgorithm {
                 else
                     return new Move( branchMoves[i].buildingAction, branchMoves[i].tileAction, Integer.MIN_VALUE + 50001 + heuristics.evaluateConfiguration(engine));
             }else */if (depth > 0) {
-                Move m = doPlay(engine, depth - 1);
+                Move m = doPlay(depth - 1);
                 // Pour inverser entre min et max
                 m.points *= -1;
                 if (m.points < bestPoints) {
@@ -203,7 +202,7 @@ class MinMaxAlgorithm implements IAAlgorithm {
 
     // Retourne le nombre de coups ajoutes dans le tableau branchMoves
     // Remplit ce tableau avec les coups qui semblent les meilleurs
-    private int branchSortFusion( Engine engine, int [] strategyPoints, Move [] branchMoves) {
+    private int branchSortFusion(int [] strategyPoints, Move [] branchMoves) {
         int comp = 0;
         // Donnees pour classer les differents coups ( placements, constructions, move complet ... )
         PriorityQueue<Move> placements = new PriorityQueue<Move>((a,b) -> Integer.compare( b.points, a.points));

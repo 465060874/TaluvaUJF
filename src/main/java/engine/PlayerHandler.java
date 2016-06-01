@@ -9,6 +9,10 @@ public interface PlayerHandler {
     static PlayerHandler dummy() {
         return DummyPlayerHandler.INSTANCE;
     }
+
+    static PlayerTurn dummyTurn() {
+        return DummyPlayerHandler.INSTANCE;
+    }
 }
 
 enum DummyPlayerHandler implements PlayerHandler, PlayerTurn {

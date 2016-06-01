@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toList;
 
 class EngineImpl implements Engine {
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private static final int TILES_PER_PLAYER = 12;
 
@@ -50,7 +50,7 @@ class EngineImpl implements Engine {
     EngineImpl(EngineBuilder<?> builder) {
         this.logger = EngineLogger.create(builder.logLevel);
         this.seed = builder.seed;
-        this.random = new Random(builder.seed);
+        this.random = new Random(this.seed);
 
         this.observers = new ArrayList<>();
 
@@ -68,8 +68,8 @@ class EngineImpl implements Engine {
 
     private EngineImpl(EngineImpl engine) {
         this.logger = engine.logger;
-        this.seed = engine.seed;
-        this.random = engine.random;
+        this.seed = engine.random.nextLong();
+        this.random = new Random(this.seed);
 
         this.observers = new ArrayList<>();
 
@@ -86,7 +86,7 @@ class EngineImpl implements Engine {
                 ? ((EngineStatus.Running) engine.status).copy()
                 : engine.status;
         this.playerIndex = engine.playerIndex;
-        this.playerTurn = PlayerHandler.dummy().startTurn(this, EngineStatus.TurnStep.TILE);
+        this.playerTurn = PlayerHandler.dummyTurn();
 
         this.actionSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
         actionSaves.addAll(engine.actionSaves);

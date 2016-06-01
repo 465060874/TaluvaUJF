@@ -10,38 +10,43 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class EasyAlgorithm implements IAAlgorithm {
 
     // Donnees
-    private final Engine realEngine;
+    private final Engine engine;
     private final AtomicBoolean cancelled;
 
-    EasyAlgorithm(Engine e, AtomicBoolean b){
-        realEngine = e;
-        cancelled = b;
+    EasyAlgorithm(Engine engine, AtomicBoolean cancelled) {
+        this.engine = engine;
+        this.cancelled = cancelled;
     }
 
     // Jouer un coup
     @Override
     public Move play() {
-        Engine engineCopy = realEngine.copyWithoutObservers();
-        Move m =  realEngine.getStatus().getTurn() == 0
-                ? doFirstPlay(engineCopy)
-                : doPlay(engineCopy);
-        realEngine.logger().info("[IA] Choosed move with {0} points ", m.points);
+        Move m =  engine.getStatus().getTurn() == 0
+                ? doFirstPlay()
+                : doPlay();
+        engine.logger().info("[IA] Choosed move with {0} points ", m.points);
         return m;
     }
 
-    private Move doFirstPlay(Engine engineCopy){
-        TileAction seaPlacement = engineCopy.getSeaTileActions().get(0);
-        engineCopy.action(seaPlacement);
-        BuildingAction buildAction = engineCopy.getPlaceBuildingActions().get(realEngine.getRandom().nextInt(2));
+    private Move doFirstPlay() {
+        TileAction seaPlacement = engine.getSeaTileActions().get(0);
+        engine.action(seaPlacement);
+        BuildingAction buildAction = engine.getPlaceBuildingActions().get(engine.getRandom().nextInt(2));
         return new Move(buildAction, seaPlacement, 0);
     }
 
 
-    private Move doPlay(Engine engine) {
+    private Move doPlay() {
+        System.out.println("Sea : " + engine.getSeaTileActions());
+        System.out.println("Vol : " + engine.getVolcanoTileActions());
+        System.out.println("Bld : " + engine.getPlaceBuildingActions());
+        System.out.println("Ext : " + engine.getExpandVillageActions());
+
 
         int n = engine.getRandom().nextInt(3);
         BuildingType type;
         Move savedMove = null;
+
         // Temple en premier
         if( n > 0 ){
             for (SeaTileAction tileAction : engine.getSeaTileActions()) {

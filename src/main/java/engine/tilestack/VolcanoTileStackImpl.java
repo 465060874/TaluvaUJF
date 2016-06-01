@@ -61,7 +61,7 @@ class VolcanoTileStackImpl implements VolcanoTileStack {
     public VolcanoTileStack copyShuffled(Random random) {
         List<VolcanoTile> copyTiles = new ArrayList<>();
         copyTiles.addAll(tiles);
-        Collections.shuffle(copyTiles.subList(index + 1, copyTiles.size()));
+        Collections.shuffle(copyTiles.subList(index + 1, copyTiles.size()), random);
         return new VolcanoTileStackImpl(ImmutableList.copyOf(copyTiles), index);
     }
 

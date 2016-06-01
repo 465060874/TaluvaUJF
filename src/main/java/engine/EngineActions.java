@@ -2,6 +2,7 @@ package engine;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Ordering;
 import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
@@ -99,7 +100,7 @@ class EngineActions {
         ImmutableList.Builder<SeaTileAction> builder = ImmutableList.builder();
         builder.addAll(seaTilesMap);
 
-        this.seaTiles = builder.build();
+        this.seaTiles = Ordering.natural().immutableSortedCopy(builder.build());
     }
 
     private void updateVolcanoTiles() {
@@ -127,7 +128,7 @@ class EngineActions {
         for (List<VolcanoTileAction> actions : volcanoTilesMap.values()) {
             builder.addAll(actions);
         }
-        this.volcanosTiles = builder.build();
+        this.volcanosTiles = Ordering.natural().immutableSortedCopy(builder.build());
     }
 
     private void updatePlaceBuildings() {
@@ -167,7 +168,7 @@ class EngineActions {
         for (List<PlaceBuildingAction> actions : buildsMap.values()) {
             builder.addAll(actions);
         }
-        this.placeBuildings = builder.build();
+        this.placeBuildings = Ordering.natural().immutableSortedCopy(builder.build());
     }
 
     private void updateExpandVillages() {
@@ -207,7 +208,7 @@ class EngineActions {
             }
         }
 
-        this.newPlaceBuildings = builder.build();
+        this.newPlaceBuildings = Ordering.natural().immutableSortedCopy(builder.build());
     }
 
     private void updateNewExpandVillages(TileAction action) {
@@ -250,6 +251,6 @@ class EngineActions {
             }
         }
 
-        this.newExpandVillages = builder.build();
+        this.newExpandVillages = Ordering.natural().immutableSortedCopy(builder.build());
     }
 }

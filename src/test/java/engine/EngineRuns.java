@@ -12,7 +12,7 @@ import java.util.logging.Level;
  */
 public class EngineRuns {
 
-    private static final int COUNT = 500;
+    private static final int COUNT = 1;
 
     public static void main(String[] args) {
         double hashFactorSum = 0;

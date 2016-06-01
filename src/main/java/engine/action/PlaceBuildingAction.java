@@ -1,5 +1,6 @@
 package engine.action;
 
+import com.google.common.collect.ComparisonChain;
 import data.BuildingType;
 import map.Hex;
 
@@ -9,7 +10,7 @@ import java.io.Writer;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class PlaceBuildingAction implements BuildingAction {
+public class PlaceBuildingAction implements BuildingAction<PlaceBuildingAction> {
 
     private final boolean isNew;
     private final BuildingType type;
@@ -33,6 +34,15 @@ public class PlaceBuildingAction implements BuildingAction {
 
     public Hex getHex() {
         return hex;
+    }
+
+    @Override
+    public int compareTo(PlaceBuildingAction o) {
+        return ComparisonChain.start()
+                .compare(type, o.type)
+                .compare(hex.getLine(), o.hex.getLine())
+                .compare(hex.getDiag(), o.hex.getDiag())
+                .result();
     }
 
     @Override

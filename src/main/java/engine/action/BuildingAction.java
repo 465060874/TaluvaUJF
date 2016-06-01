@@ -1,6 +1,6 @@
 package engine.action;
 
-public interface BuildingAction extends Action {
+public interface BuildingAction<E> extends Action<E> {
 
     boolean isNew();
 }

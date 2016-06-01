@@ -1,13 +1,10 @@
 package ia;
 
 import data.BuildingType;
-import data.VolcanoTile;
 import engine.Engine;
 import engine.EngineStatus;
 import engine.action.*;
-import engine.rules.BuildingRules;
 import engine.rules.PlaceBuildingRules;
-import engine.rules.Problems;
 import map.Hex;
 
 import java.util.Iterator;
@@ -30,40 +27,39 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
     private final Heuristics heuristics;
 
     // Donnees
-    private final Engine realEngine;
+    private final Engine engine;
     private final AtomicBoolean cancelled;
     private final int[] strategyPoints = new int[NB_STRATEGIES];
 
     // Constructeur
-    AlphaBetaAlgorithm(int branchingFactor, int totalDepth, Heuristics heuristics, Engine realEngine, AtomicBoolean cancelled) {
+    AlphaBetaAlgorithm(int branchingFactor, int totalDepth, Heuristics heuristics, Engine engine, AtomicBoolean cancelled) {
         this.branchingFactor = branchingFactor;
         this.totalDepth = totalDepth;
         this.heuristics = heuristics;
 
-        this.realEngine = realEngine;
+        this.engine = engine;
         this.cancelled = cancelled;
     }
 
     // Jouer un coup
     @Override
     public Move play() {
-        Engine engineCopy = realEngine.copyWithoutObservers();
-        Move m =  realEngine.getStatus().getTurn() == 0
-                ? doFirstPlay(engineCopy)
-                : doPlay(engineCopy, totalDepth, Integer.MAX_VALUE, AlphaBetaIntervalles.INF);
-        realEngine.logger().fine("[IA] Choosed move with {0} points ", m.points);
+        Move m =  engine.getStatus().getTurn() == 0
+                ? doFirstPlay()
+                : doPlay(totalDepth, Integer.MAX_VALUE, AlphaBetaIntervalles.INF);
+        engine.logger().fine("[IA] Choosed move with {0} points ", m.points);
         return m;
     }
 
-    private Move doFirstPlay(Engine engineCopy){
-        TileAction seaPlacement = engineCopy.getSeaTileActions().get(0);
-        engineCopy.action(seaPlacement);
-        BuildingAction buildAction = engineCopy.getPlaceBuildingActions().get(realEngine.getRandom().nextInt(2));
+    private Move doFirstPlay() {
+        TileAction seaPlacement = engine.getSeaTileActions().get(0);
+        engine.action(seaPlacement);
+        BuildingAction buildAction = engine.getPlaceBuildingActions().get(engine.getRandom().nextInt(2));
         return new Move(buildAction, seaPlacement, 0);
     }
 
 
-    private Move doPlay(Engine engine, int depth, int alpha, AlphaBetaIntervalles type) {
+    private Move doPlay(int depth, int alpha, AlphaBetaIntervalles type) {
         engine.logger().fine("PLAY : depth {0}", depth);
 
         // 0 -- Test d'un gagnant ou perdant
@@ -116,7 +112,7 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
                     bestPoints = p;
                 }
             }else if (depth > 0) {
-                Move m = doPlay(engine, depth - 1, -1*alpha, type.inverse());
+                Move m = doPlay(depth - 1, -1*alpha, type.inverse());
                 // Pour inverser entre min et max
                 m.points *= -1;
                 if (m.points < bestPoints) {

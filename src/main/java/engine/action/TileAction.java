@@ -1,5 +1,6 @@
 package engine.action;
 
+import com.google.common.collect.ComparisonChain;
 import data.FieldType;
 import data.VolcanoTile;
 import map.Hex;
@@ -9,7 +10,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Objects;
 
-public abstract class TileAction implements Action {
+public abstract class TileAction implements Action<TileAction> {
 
     private final VolcanoTile tile;
     private final Hex volcanoHex;
@@ -62,10 +63,20 @@ public abstract class TileAction implements Action {
     }
 
     @Override
+    public int compareTo(TileAction o) {
+        return ComparisonChain.start()
+                .compare(tile.getLeft(), o.tile.getLeft())
+                .compare(tile.getRight(), o.tile.getRight())
+                .compare(volcanoHex.getLine(), o.volcanoHex.getLine())
+                .compare(volcanoHex.getDiag(), o.volcanoHex.getDiag())
+                .compare(orientation, o.orientation)
+                .result();
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(tile, volcanoHex, orientation);
     }
-
 
     @Override
     public boolean equals(Object obj){
