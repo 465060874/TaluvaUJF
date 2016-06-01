@@ -4,8 +4,9 @@ import data.FieldType;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Paint;
+import map.Orientation;
 
-public class ImageIslandTheme extends BasicIslandTheme {
+public class ImageIslandTheme extends DefaultTheme {
 
     private static final ImagePattern loadImagePattern(String resourceName) {
         String resource = ImageIslandTheme.class.getResource(resourceName).toString();
@@ -20,7 +21,7 @@ public class ImageIslandTheme extends BasicIslandTheme {
     private final ImagePattern lake = loadImagePattern("fields/lake.png");
 
     @Override
-    public Paint getTileTopPaint(FieldType type, HexStyle style) {
+    public Paint getTileTopPaint(FieldType type, HexStyle style, Orientation orientation) {
         switch (type) {
             case VOLCANO:  return volcano;
             case JUNGLE:   return jungle;

@@ -198,12 +198,9 @@ public class HexShape {
 
         // Fill shape
         gc.setEffect(IslandTheme.getCurrent().getTileTopEffect(grid, style));
-        gc.setFill(IslandTheme.getCurrent().getTileTopPaint(fieldType, style));
+        gc.setFill(IslandTheme.getCurrent().getTileTopPaint(fieldType, style, orientation));
         if (hidden) {
             gc.setFill(IslandTheme.getCurrent().getTileBottomPaint(style));
-        }
-        else if (fieldType == FieldType.VOLCANO) {
-            gc.setFill(IslandTheme.getCurrent().getGradiantEffect(orientation, hexagonX, hexagonY));
         }
 
         gc.fillPolygon(hexagonX, hexagonY, HEXAGON_POINTS);

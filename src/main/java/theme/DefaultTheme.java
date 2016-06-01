@@ -9,23 +9,36 @@ import map.Building;
 import map.Orientation;
 import ui.island.Grid;
 
-public class BasicIslandThemeDefault implements IslandTheme {
+public class DefaultTheme implements IslandTheme {
 
     private final Color backgroundColor = Color.web("5E81A2");
     private final Color tileBorderColor = Color.web("303030");
     private final Color tileBottomColor = Color.web("707070");
+
     private final Color tileVolcanoColor = Color.web("E97B33");
+    private final Color redInnerStrokeColor = Color.web("EA3434");
+    private final Color volcanoDarkRed = Color.web("730C0C");
+
     private final Color tileJungleColor = Color.web("A681B6");
     private final Color tileClearingColor = Color.web("8DC435");
     private final Color tileSandColor = Color.web("EFDD6F");
     private final Color tileRockColor = Color.web("C2D0D1");
     private final Color tileLakeColor = Color.web("8BE1EB");
+
+    private final Color selectedTransparent = Color.rgb(234, 52, 52, .5);
+    private final Color translucent = Color.rgb(255, 255, 255, .5);
+
     private final Lighting lighting = new Lighting(new Light.Point(0, 0, 0, Color.WHITE));
     private final Lighting lightingHigh = new Lighting(new Light.Point(0, 0, 0, Color.WHITE));
     private final Lighting lightingFaded = new Lighting(new Light.Point(0, 0, 0, Color.GRAY));
-    private final Color selected = Color.web("ea3434");
-    private final Color selectedTransparent = Color.rgb(234, 52, 52, .5);
-    public static final Color SEMITRANSPARENT = Color.rgb(255, 255, 255, .5);
+
+    private final Stop[] stops = new Stop[]{new Stop(0, volcanoDarkRed), new Stop(0.4, redInnerStrokeColor), new Stop(1, tileVolcanoColor)};
+    private final LinearGradient NORTH_LinearGradiant = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE, stops);
+    private final LinearGradient SOUTH_LinearGradiant = new LinearGradient(0, 1, 0, 0, true, CycleMethod.NO_CYCLE, stops);
+    private final LinearGradient SOUTH_WEST_LinearGradiant = new LinearGradient(0, 1, 1, 0, true, CycleMethod.NO_CYCLE, stops);
+    private final LinearGradient NORTH_EAST_LinearGradiant = new LinearGradient(1, 0, 0, 1, true, CycleMethod.NO_CYCLE, stops);
+    private final LinearGradient NORTH_WEST_LinearGradiant = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, stops);
+    private final LinearGradient SOUTH_EAST_LinearGradiant = new LinearGradient(1, 1, 0, 0, true, CycleMethod.NO_CYCLE, stops);
 
     @Override
     public Paint getBackgroundPaint() {
@@ -38,8 +51,7 @@ public class BasicIslandThemeDefault implements IslandTheme {
     }
     @Override
     public Paint getInnerBorderPaint(HexStyle style) {
-        return selected;
-
+        return redInnerStrokeColor;
     }
 
     @Override
@@ -53,9 +65,17 @@ public class BasicIslandThemeDefault implements IslandTheme {
     }
 
     @Override
-    public Paint getTileTopPaint(FieldType type, HexStyle style) {
+    public Paint getTileTopPaint(FieldType type, HexStyle style, Orientation orientation) {
         switch (type) {
-            case VOLCANO:  return tileVolcanoColor;
+            case VOLCANO:
+                switch(orientation) {
+                    case NORTH: return NORTH_LinearGradiant;
+                    case SOUTH: return SOUTH_LinearGradiant;
+                    case NORTH_WEST: return NORTH_WEST_LinearGradiant;
+                    case NORTH_EAST: return NORTH_EAST_LinearGradiant;
+                    case SOUTH_WEST: return SOUTH_WEST_LinearGradiant;
+                    case SOUTH_EAST: return SOUTH_EAST_LinearGradiant;
+                }
             case JUNGLE:   return tileJungleColor;
             case CLEARING: return tileClearingColor;
             case SAND:     return tileSandColor;
@@ -89,7 +109,7 @@ public class BasicIslandThemeDefault implements IslandTheme {
             case WHEELVALID:
                 return  Color.WHITE;
             case WHEELINVALID:
-                return selected;
+                return redInnerStrokeColor;
             case EXPAND:
                 return Color.TRANSPARENT;
             default:
@@ -115,7 +135,7 @@ public class BasicIslandThemeDefault implements IslandTheme {
     private Color getBuildingTopColor(Building building, BuildingStyle style) {
         switch(style) {
             case WHEELVALID:
-                return SEMITRANSPARENT;
+                return translucent;
             case WHEELINVALID:
                 return selectedTransparent;
             case FLOATING:
@@ -138,27 +158,5 @@ public class BasicIslandThemeDefault implements IslandTheme {
     public Effect getBuildingTopEffect(Grid grid, Building building, BuildingStyle style) {
         return null;
     }
-
-    @Override
-    public Paint getGradiantEffect(Orientation orientation, double[] hexagonX, double[] hexagonY) {
-        Stop[] stops = new Stop[]{new Stop(0, Color.web("730c0c")), new Stop(0.4, Color.web("ea3434")), new Stop(1, Color.web("E97B33"))};
-        switch(orientation) {
-            case NORTH:
-                return new LinearGradient(hexagonX[4], hexagonY[4], hexagonX[1], hexagonY[1], false, CycleMethod.NO_CYCLE, stops);
-            case SOUTH:
-                return new LinearGradient(hexagonX[1], hexagonY[1], hexagonX[4], hexagonY[4], false, CycleMethod.NO_CYCLE, stops);
-            case SOUTH_WEST:
-                return new LinearGradient(hexagonX[0], hexagonY[0], hexagonX[3], hexagonY[3], false, CycleMethod.NO_CYCLE, stops);
-            case NORTH_EAST:
-                return new LinearGradient(hexagonX[3], hexagonY[3], hexagonX[0], hexagonY[0], false, CycleMethod.NO_CYCLE, stops);
-            case NORTH_WEST:
-                return new LinearGradient(hexagonX[5], hexagonY[5], hexagonX[2], hexagonY[2], false, CycleMethod.NO_CYCLE, stops);
-            case SOUTH_EAST:
-                return new LinearGradient(hexagonX[2], hexagonY[2], hexagonX[5], hexagonY[5], false, CycleMethod.NO_CYCLE, stops);
-        }
-
-        throw new IllegalArgumentException();
-    }
-
 
 }

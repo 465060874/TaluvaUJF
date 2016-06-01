@@ -22,10 +22,7 @@ public interface IslandTheme {
             CurrentTheme.IslandTHEME = new SphaxIslandTheme();
         }
         else if (CurrentTheme.IslandTHEME instanceof SphaxIslandTheme) {
-            CurrentTheme.IslandTHEME = new BasicIslandTheme();
-        }
-        else if (CurrentTheme.IslandTHEME instanceof BasicIslandTheme){
-            CurrentTheme.IslandTHEME = new BasicIslandThemeDefault();
+            CurrentTheme.IslandTHEME = new DefaultTheme();
         } else {
             CurrentTheme.IslandTHEME = new ImageIslandTheme();
         }
@@ -53,7 +50,7 @@ public interface IslandTheme {
 
     Effect getTileBottomEffect(Grid grid, HexStyle style);
 
-    Paint getTileTopPaint(FieldType type, HexStyle style);
+    Paint getTileTopPaint(FieldType type, HexStyle style, Orientation orientation);
 
     Effect getTileTopEffect(Grid grid, HexStyle style);
 
@@ -67,11 +64,9 @@ public interface IslandTheme {
 
     Effect getBuildingTopEffect(Grid grid, Building building, BuildingStyle style);
 
-    Paint getGradiantEffect(Orientation orientation, double[] hexagonBorderX, double[] hexagonBorderY);
-
     class CurrentTheme {
 
-        private static IslandTheme IslandTHEME = new BasicIslandThemeDefault();
+        private static IslandTheme IslandTHEME = new DefaultTheme();
         private static final List<Runnable> listeners = new ArrayList<>();
     }
 }
