@@ -29,6 +29,11 @@ public class PlaceBuildingAction implements BuildingAction {
     }
 
     @Override
+    public String toString() {
+        return "PlaceBuilding(" + hex + "," + type + ")";
+    }
+
+    @Override
     public void write(Writer writer) throws IOException {
         writer.write(getClass().getSimpleName());
         writer.write('\n');

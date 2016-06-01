@@ -36,6 +36,11 @@ public class ExpandVillageAction implements BuildingAction {
     }
 
     @Override
+    public String toString() {
+        return "ExpandVillage(" + villageHex + "," + fieldType + ")";
+    }
+
+    @Override
     public void write(Writer writer) throws IOException {
         writer.write(getClass().getSimpleName());
         writer.write('\n');

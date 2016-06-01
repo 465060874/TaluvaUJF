@@ -81,6 +81,8 @@ public abstract class TileAction implements Action {
 
     @Override
     public String toString() {
-        return "[" + tile.toString() + ", " +  volcanoHex.toString() + ", " + orientation.toString() + "]";
+        return this instanceof VolcanoTileAction
+                ? "VolcanoTile(" + tile.toString() + ", " +  volcanoHex.toString() + ", " + orientation.toString() + ")"
+                : "SeaTile(" + tile.toString() + ", " +  volcanoHex.toString() + ", " + orientation.toString() + ")";
     }
 }
