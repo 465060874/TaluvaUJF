@@ -32,7 +32,7 @@ public class IslandView extends StackPane {
         this.grid = grid;
         this.placementOverlay = new PlacementOverlay(island, grid, placement);
         this.islandCanvas = new IslandCanvas(island, grid, placement, debug);
-        this.wheelOfChoise = new WheelOfChoice(island, grid, placement);
+        this.wheelOfChoise = new WheelOfChoice(grid, placement);
         placement.islandCanvas = islandCanvas;
         placement.placementOverlay = placementOverlay;
         placement.wheelOfChoice = wheelOfChoise;
@@ -97,6 +97,7 @@ public class IslandView extends StackPane {
     private void mousePressed(MouseEvent event) {
         mousePressed = true;
         if (event.getButton() == MouseButton.PRIMARY) {
+            wheelOfChoise.redraw();
             mouseXBeforeDrag = lastMouseX = event.getX();
             mouseYBeforeDrag = lastMouseY = event.getY();
         }
@@ -153,6 +154,7 @@ public class IslandView extends StackPane {
         if (grid.scale(scaleFactor)) {
             islandCanvas.redraw();
             placementOverlay.redraw();
+            wheelOfChoise.redraw();
         }
     }
 

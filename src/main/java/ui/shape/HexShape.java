@@ -17,7 +17,7 @@ public class HexShape {
     private static final int BOTTOM_POINTS = 6;
     private static final int BOTTOM_BORDER_POINTS = 5;
     public static final float STROKE_WIDTH = 3f;
-    private static final double FADEDRATIO = 0.8f;
+    private static final double FADEDRATIO = .8f;
 
     private final double[] hexagonX;
     private final double[] hexagonY;

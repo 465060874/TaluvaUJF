@@ -25,6 +25,8 @@ public class BasicIslandTheme implements IslandTheme {
     private final Lighting lightingHigh = new Lighting(new Light.Point(0, 0, 0, Color.WHITE));
     private final Lighting lightingFaded = new Lighting(new Light.Point(0, 0, 0, Color.GRAY));
     private final Color selected = Color.web("ea3434");
+    private final Color selectedTransparent = Color.rgb(234, 52, 52, .5);
+    public static final Color SEMITRANSPARENT = Color.rgb(255, 255, 255, .5);
 
     @Override
     public Paint getBackgroundPaint() {
@@ -82,8 +84,15 @@ public class BasicIslandTheme implements IslandTheme {
     }
 
     @Override
-    public Paint getBuildingBorderPaint() {
-        return tileBorderColor;
+    public Paint getBuildingBorderPaint(BuildingStyle style) {
+        switch (style) {
+            case WHEELVALID:
+                return  Color.WHITE;
+            case WHEELINVALID:
+                return selected;
+            default:
+                return tileBorderColor;
+        }
     }
 
     @Override
@@ -98,18 +107,25 @@ public class BasicIslandTheme implements IslandTheme {
 
     @Override
     public Paint getBuildingTopPaint(Building building, BuildingStyle style) {
-        return getBuildingTopColor(building);
+        return getBuildingTopColor(building, style);
     }
 
-    private Color getBuildingTopColor(Building building) {
-        switch (building.getColor()) {
-            case RED:    return PlayerTheme.RED.color();
-            case WHITE:  return PlayerTheme.WHITE.color();
-            case BROWN:  return PlayerTheme.BROWN.color();
-            case YELLOW: return PlayerTheme.YELLOW.color();
-        }
+    private Color getBuildingTopColor(Building building, BuildingStyle style) {
+        switch(style) {
+            case WHEELVALID:
+                return SEMITRANSPARENT;
+            case WHEELINVALID:
+                return selectedTransparent;
+            default:
+                switch (building.getColor()) {
+                    case RED:    return PlayerTheme.RED.color();
+                    case WHITE:  return PlayerTheme.WHITE.color();
+                    case BROWN:  return PlayerTheme.BROWN.color();
+                    case YELLOW: return PlayerTheme.YELLOW.color();
+                }
 
-        throw new IllegalStateException();
+                throw new IllegalStateException();
+        }
     }
 
     @Override

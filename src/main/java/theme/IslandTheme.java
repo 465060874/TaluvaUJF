@@ -1,5 +1,6 @@
 package theme;
 
+import com.google.common.collect.Lists;
 import data.FieldType;
 import javafx.scene.effect.Effect;
 import javafx.scene.paint.Paint;
@@ -29,7 +30,7 @@ public interface IslandTheme {
             CurrentTheme.IslandTHEME = new ImageIslandTheme();
         }
 
-        CurrentTheme.listeners.forEach(Runnable::run);
+        Lists.reverse(CurrentTheme.listeners).forEach(Runnable::run);
 
         return CurrentTheme.IslandTHEME;
     }
@@ -56,7 +57,7 @@ public interface IslandTheme {
 
     Effect getTileTopEffect(Grid grid, HexStyle style);
 
-    Paint getBuildingBorderPaint();
+    Paint getBuildingBorderPaint(BuildingStyle style);
 
     Paint getBuildingFacePaint(Building building, BuildingStyle style);
 

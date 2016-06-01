@@ -33,4 +33,30 @@ public enum BuildingType {
     public boolean isDestructible() {
         return destructible;
     }
+
+    public BuildingType nextBuilding() {
+        switch(this) {
+            case HUT:
+                return TEMPLE;
+            case TEMPLE:
+                return TOWER;
+            case TOWER:
+                return HUT;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    public BuildingType previousBuilding() {
+        switch(this) {
+            case HUT:
+                return TOWER;
+            case TEMPLE:
+                return HUT;
+            case TOWER:
+                return TEMPLE;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
 }

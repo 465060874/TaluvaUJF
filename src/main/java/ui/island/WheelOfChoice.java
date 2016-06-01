@@ -1,62 +1,62 @@
 package ui.island;
 
 import data.BuildingType;
-import javafx.beans.Observable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
-import javafx.scene.shape.Ellipse;
-import map.Building;
 import map.Hex;
-import map.Island;
-import theme.BuildingStyle;
 import ui.shape.BuildingShape;
-import ui.shape.HexShape;
 
 import java.util.List;
 
 public class WheelOfChoice extends Canvas {
 
+    public static final Color TRANSPARENT = Color.rgb(255, 255, 255, 0.0);
+    public static final int OWIDTH_MULT = 8;
+    public static final int HALF_OWIDTH_MULT = OWIDTH_MULT / 2;
+    public static final int OWIDTH = 180;
     private final Grid grid;
-    private final Island island;
     private final Placement placement;
 
-    private final HexShape hexShape;
     private final BuildingShape buildingShape;
+    private final Color selected = Color.web("ea3434");
 
-    WheelOfChoice(Island island, Grid grid, Placement placement) {
+    WheelOfChoice(Grid grid, Placement placement) {
         super(0, 0);
-        this.island = island;
         this.grid = grid;
         this.placement = placement;
 
-        this.hexShape = new HexShape();
         this.buildingShape = new BuildingShape();
-
-        widthProperty().addListener(this::resize);
-        heightProperty().addListener(this::resize);
     }
 
-    private void resize(Observable event) {
-
-    }
-
-    public void redraw(List<BuildingType> otherAvailableBuildings, Hex hex) {
+    public void redraw(List<BuildingType> otherAvailableBuildings, Hex hex, boolean valid, BuildingType current) {
         GraphicsContext gc = getGraphicsContext2D();
         gc.clearRect(0, 0, getWidth(), getHeight());
 
-        Stop[] stops = new Stop[]{new Stop(0, Color.rgb(255, 255, 255, 0.0)), new Stop(1, Color.rgb(255, 255, 255, 0.5))};
+        Stop[] stops = new Stop[]{new Stop(0, TRANSPARENT), new Stop(1, Color.WHITE)};
         final LinearGradient linearGradient = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, stops);
 
-        gc.setLineWidth(grid.getHexHeight() * 8);
+        gc.setLineWidth(grid.getHexHeight() * OWIDTH_MULT);
         gc.setStroke(linearGradient);
-        gc.strokeOval(grid.hexToX(hex, getWidth()-grid.getHexHeight()*4),
-                grid.hexToY(hex, getHeight())-grid.getHexHeight()*4,
-                180 * grid.getScale(),
-                180 * grid.getScale());
+        double startOvalX = grid.hexToX(hex, getWidth() - grid.getHexHeight() * HALF_OWIDTH_MULT);
+        double startOvalY = grid.hexToY(hex, getHeight() - grid.getHexHeight() * HALF_OWIDTH_MULT);
+        gc.strokeOval(startOvalX,
+                startOvalY,
+                OWIDTH * grid.getScale(),
+                OWIDTH * grid.getScale());
+
+
+        double centerX = startOvalX + OWIDTH/2 * grid.getScale();
+        double centerY = startOvalY + OWIDTH/2 * grid.getScale();
+
+        buildingShape.drawWheelOfChoiseBuildings(
+                gc, grid,
+                centerX, centerY,
+                OWIDTH/2 * grid.getScale(),
+                otherAvailableBuildings, current);
 
         setTranslateX(0);
         setTranslateY(0);

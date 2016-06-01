@@ -1,16 +1,24 @@
 package ui.shape;
 
+import data.BuildingType;
+import data.PlayerColor;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.Effect;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Paint;
 import map.Building;
-import ui.island.Grid;
 import theme.BuildingStyle;
 import theme.IslandTheme;
+import ui.island.Grid;
+import ui.island.WheelOfChoiceBuilding;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BuildingShape {
 
     private static final float STROKE_WIDTH = 1.2f;
+    public static final Image EXPAND_IMAGE = new Image("ui/shape/expand.png");
 
     private void drawHut(GraphicsContext gc, Grid grid,
             double x, double y, Building building, BuildingStyle style) {
@@ -45,6 +53,7 @@ public class BuildingShape {
     private void drawTentShape(GraphicsContext gc, Grid grid,
             double x1, double x2, double x3, double y1, double y2, double y3, double y4,
             Building building, BuildingStyle style) {
+
         Paint facePaint = IslandTheme.getCurrent().getBuildingFacePaint(building, style);
         Paint topPaint = IslandTheme.getCurrent().getBuildingTopPaint(building, style);
         Effect faceEffect = IslandTheme.getCurrent().getBuildingFaceEffect(grid, building, style);
@@ -62,7 +71,7 @@ public class BuildingShape {
         gc.setFill(facePaint);
         gc.fillPolygon(xpoints, ypoints, 3);
         gc.setEffect(null);
-        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint());
+        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint(style));
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 3);
 
@@ -78,7 +87,7 @@ public class BuildingShape {
         gc.setFill(topPaint);
         gc.fillPolygon(xpoints, ypoints, 4);
         gc.setEffect(null);
-        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint());
+        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint(style));
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 4);
 
@@ -94,7 +103,7 @@ public class BuildingShape {
         gc.setFill(topPaint);
         gc.fillPolygon(xpoints, ypoints, 4);
         gc.setEffect(null);
-        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint());
+        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint(style));
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokePolygon(xpoints, ypoints, 4);
     }
@@ -120,7 +129,7 @@ public class BuildingShape {
         gc.setFill(facePaint);
         gc.fillOval(xstart, ybottom, width, height);
         gc.setEffect(null);
-        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint());
+        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint(style));
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokeOval(xstart, ybottom, width, height);
 
@@ -128,7 +137,7 @@ public class BuildingShape {
         gc.setFill(facePaint);
         gc.fillRect(xstart, ytop + height/2, width, ybottom - ytop);
         gc.setEffect(null);
-        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint());
+        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint(style));
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokeLine(xstart, ytop + height/2, xstart, ybottom + height/2);
         gc.strokeLine(xstart + width, ytop + height/2, xstart + width, ybottom + height/2);
@@ -137,7 +146,7 @@ public class BuildingShape {
         gc.setFill(topPaint);
         gc.fillOval(xstart, ytop, width, height);
         gc.setEffect(null);
-        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint());
+        gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint(style));
         gc.setLineWidth(STROKE_WIDTH);
         gc.strokeOval(xstart, ytop, width, height);
     }
@@ -181,6 +190,42 @@ public class BuildingShape {
             case TOWER:
                 drawTower(gc, grid, x, y2, building, style);
                 break;
+        }
+
+        if (style == BuildingStyle.EXPAND) {
+            gc.drawImage(EXPAND_IMAGE, x-34, y-24);
+        }
+    }
+
+    public void drawWheelOfChoiseBuildings(GraphicsContext gc, Grid grid,
+                                           double xCenter, double yCenter,
+                                           double oWidth, List<BuildingType> otherAvailableBuildings,
+                                           BuildingType current) {
+
+        ArrayList<WheelOfChoiceBuilding> wheel = new ArrayList<>(3);
+        BuildingType previous = current;
+        previous = previous.previousBuilding();
+        while (previous != current) {
+            if (otherAvailableBuildings.contains(previous)) {
+                wheel.add(new WheelOfChoiceBuilding(previous, true));
+            } else {
+                wheel.add(new WheelOfChoiceBuilding(previous, false));
+            }
+            previous = previous.previousBuilding();
+        }
+
+        double angle = -15;
+        double x = xCenter + oWidth * Math.cos(Math.toRadians(angle));
+        double y = yCenter + oWidth * Math.sin(Math.toRadians(angle));
+        for (WheelOfChoiceBuilding wheelE : wheel) {
+            if (wheelE.isValid()) {
+                draw(gc, grid, x, y, 1, Building.of(wheelE.getBuildingType(), PlayerColor.WHITE), BuildingStyle.WHEELVALID);
+            } else {
+                draw(gc, grid, x, y, 1, Building.of(wheelE.getBuildingType(), PlayerColor.RED), BuildingStyle.WHEELINVALID);
+            }
+            angle += 80;
+            x = xCenter + oWidth * Math.cos(angle);
+            y = yCenter + oWidth * Math.sin(angle);
         }
     }
 }

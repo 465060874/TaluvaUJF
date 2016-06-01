@@ -7,12 +7,13 @@ import javafx.beans.Observable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import map.Building;
+import map.Field;
 import map.Island;
 import map.Neighbor;
-import ui.shape.BuildingShape;
-import ui.shape.HexShape;
 import theme.BuildingStyle;
 import theme.HexStyle;
+import ui.shape.BuildingShape;
+import ui.shape.HexShape;
 
 class PlacementOverlay extends Canvas {
 
@@ -45,13 +46,28 @@ class PlacementOverlay extends Canvas {
         gc.clearRect(0, 0, getWidth(), getHeight());
 
         if (!placement.valid) {
+            BuildingStyle buildingStyle;
             if (placement.mode == Placement.Mode.BUILDING) {
+                if (placement.isValid()) {
+                    buildingStyle = BuildingStyle.HIGHLIGHTED;
+                }
+                else {
+                    if (island.getField(placement.getHex()) == Field.SEA) {
+                        buildingStyle = BuildingStyle.NORMAL;
+                    }
+                    else if (island.getField(placement.getHex()).hasBuilding()) {
+                        buildingStyle = BuildingStyle.EXPAND;
+                    }
+                    else {
+                        buildingStyle = BuildingStyle.WHEELINVALID;
+                    }
+                }
                 buildingShape.draw(gc, grid,
                         placement.mouseX + 5,
                         placement.mouseY,
                         1,
                         Building.of(placement.buildingType, placement.buildingColor),
-                        placement.valid ? BuildingStyle.HIGHLIGHTED : BuildingStyle.NORMAL);
+                        buildingStyle);
             }
             else if (placement.mode == Placement.Mode.TILE) {
                 for (HexToDraw info : placedHexes()) {

@@ -8,10 +8,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import map.Neighbor;
 import map.Orientation;
+import theme.HexStyle;
 import theme.IslandTheme;
 import ui.island.Grid;
 import ui.shape.HexShape;
-import theme.HexStyle;
 
 public class TileStackCanvas extends Canvas {
 

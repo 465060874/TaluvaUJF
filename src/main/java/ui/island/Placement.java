@@ -148,15 +148,7 @@ public class Placement {
             updateValidTile();
         }
         else if (mode == Mode.BUILDING) {
-            if (buildingType == BuildingType.HUT) {
-                buildingType = BuildingType.TEMPLE;
-            }
-            else if (buildingType == BuildingType.TEMPLE) {
-                buildingType = BuildingType.TOWER;
-            }
-            else if (buildingType == BuildingType.TOWER) {
-                buildingType = BuildingType.HUT;
-            }
+            buildingType = buildingType.nextBuilding();
             updateValidBuilding();
         }
         else if (mode == Mode.EXPAND_VILLAGE) {
@@ -209,8 +201,7 @@ public class Placement {
 
         List<BuildingType> otherAvailableBuildings = otherAvailableBuildings(buildingType);
         if (!otherAvailableBuildings.isEmpty()) {
-            System.out.println("!EMPTY");
-            wheelOfChoice.redraw(otherAvailableBuildings, hex);
+            wheelOfChoice.redraw(otherAvailableBuildings, hex, valid, buildingType);
         }
     }
 
