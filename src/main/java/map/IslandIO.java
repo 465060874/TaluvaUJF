@@ -5,13 +5,16 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
+import com.google.common.io.Files;
 import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 public class IslandIO {
@@ -103,5 +106,10 @@ public class IslandIO {
         String line = JOINER.join(builder.build());
         writer.write(line);
         writer.write('\n');
+    }
+
+    public static void dump(Island island) {
+        File file = new File(Long.toString(System.nanoTime()) + ".island");
+        write(Files.asCharSink(file, StandardCharsets.UTF_8), island);
     }
 }

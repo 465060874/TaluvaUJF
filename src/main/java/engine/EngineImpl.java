@@ -403,7 +403,10 @@ class EngineImpl implements Engine {
                     getVolcanoTileStack().current(),
                     action.getVolcanoHex(),
                     action.getOrientation());
-            verify(problems.isValid(), problems.toString());
+            if (!problems.isValid()) {
+                IslandIO.dump(island);
+                throw new IllegalStateException(problems.toString());
+            }
         }
 
         actionSaves.add(new ActionSave.Tile(this, action));
@@ -425,7 +428,10 @@ class EngineImpl implements Engine {
                     getVolcanoTileStack().current(),
                     action.getVolcanoHex(),
                     action.getOrientation());
-            verify(problems.isValid(), problems.toString());
+            if (!problems.isValid()) {
+                IslandIO.dump(island);
+                throw new IllegalStateException(problems.toString());
+            }
         }
 
         actionSaves.add(new ActionSave.Tile(this, action));
@@ -446,7 +452,10 @@ class EngineImpl implements Engine {
             Problems problems = PlaceBuildingRules.validate(this,
                     action.getType(),
                     action.getHex());
-            verify(problems.isValid(), problems.toString());
+            if (!problems.isValid()) {
+                IslandIO.dump(island);
+                throw new IllegalStateException(problems.toString());
+            }
         }
 
         actionSaves.add(new ActionSave.Build(this, action));
@@ -469,7 +478,10 @@ class EngineImpl implements Engine {
             Problems problems = ExpandVillageRules.validate(this,
                     action.getVillage(island),
                     action.getFieldType());
-            verify(problems.isValid(), problems.toString());
+            if (!problems.isValid()) {
+                IslandIO.dump(island);
+                throw new IllegalStateException(problems.toString());
+            }
         }
 
         actionSaves.add(new ActionSave.Build(this, action));
