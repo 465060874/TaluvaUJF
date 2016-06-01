@@ -562,6 +562,7 @@ public class Home4 extends Application {
         }
         stage.setWidth(scene.getWidth());
         stage.setHeight(scene.getHeight() + 36);
+        stage.setResizable(false);
         stage.setScene(scene);
         if (!stage.isShowing()) {
             stage.show();
