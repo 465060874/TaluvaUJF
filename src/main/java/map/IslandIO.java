@@ -110,6 +110,7 @@ public class IslandIO {
 
     public static void dump(Island island) {
         File file = new File(Long.toString(System.nanoTime()) + ".island");
+        System.out.println("Dumped island in file " + file.getName());
         write(Files.asCharSink(file, StandardCharsets.UTF_8), island);
     }
 }
