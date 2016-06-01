@@ -188,11 +188,13 @@ class EngineImpl implements Engine {
         do {
             if (running.step == EngineStatus.TurnStep.TILE) {
                 running.turn--;
-                do {
+                playerIndex--;
+                getCurrentPlayer().updateEliminated(running.turn);
+                while (getCurrentPlayer().isEliminated()) {
                     playerIndex = playerIndex == 0
                             ? players.size()
                             : playerIndex - 1;
-                } while (getCurrentPlayer().isEliminated());
+                }
 
                 ActionSave save = actionSaves.remove(actionSaves.size() - 1);
                 save.revert(this);
@@ -264,7 +266,7 @@ class EngineImpl implements Engine {
         }
 
         Player eliminated = getCurrentPlayer();
-        eliminated.setEliminated();
+        eliminated.setEliminated(getStatus().getTurn());
         observers.forEach(o -> o.onEliminated(eliminated));
 
         Predicate<Player> isEliminated = Player::isEliminated;
@@ -522,6 +524,7 @@ class EngineImpl implements Engine {
         else {
             if (remainingBuildingTypes <= 1) {
                 ImmutableList<Player> winners = ImmutableList.of(player);
+                ((EngineStatus.Running) status).step = EngineStatus.TurnStep.TILE;
                 this.status = new EngineStatus.Finished((EngineStatus.Running) status,
                         EngineStatus.FinishReason.TWO_BUILDING_TYPES,
                         winners);

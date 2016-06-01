@@ -7,6 +7,7 @@ import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
 import engine.Engine;
+import engine.Player;
 import engine.action.*;
 import engine.rules.PlaceBuildingRules;
 import engine.rules.TileRules;
@@ -80,7 +81,7 @@ public class Placement {
                     : new VolcanoTileAction(tile, hex, tileOrientation);
         }
         else if (mode == Mode.BUILDING) {
-            return new PlaceBuildingAction(false, buildingType, hex);
+            return new PlaceBuildingAction(false, PlayerColor.YELLOW, buildingType, hex);
         }
         else if (mode == Mode.EXPAND_VILLAGE) {
             return new ExpandVillageAction(false, expansionVillage, engine.getIsland().getField(hex).getType());

@@ -12,7 +12,7 @@ import java.util.logging.Level;
  */
 public class EngineRuns {
 
-    private static final int COUNT = 1;
+    private static final int COUNT = 50;
 
     public static void main(String[] args) {
         double hashFactorSum = 0;
@@ -23,6 +23,7 @@ public class EngineRuns {
                     .logLevel(Level.INFO)
                     .player(PlayerColor.RED, IA.MOYEN)
                     .player(PlayerColor.WHITE, IA.MOYEN)
+                    .seed( -8976553112098098678L )
                     .build();
 
             engine.logger().info("* Début de la partie avec la graine {0}", Long.toString(engine.getSeed()));

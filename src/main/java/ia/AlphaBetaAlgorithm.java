@@ -97,12 +97,9 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
             if( branchMoves[i].tileAction == null || branchMoves[i].buildingAction == null )
                 throw new IllegalStateException("Coup mal recombiné -> un des champs est null");
 
-            if (branchMoves[i].tileAction instanceof VolcanoTileAction) {
-                Engine.Debug.HACK = 2;
-            }
-
+            if( engine.getStatus().getTurn() == 22 && i == 1 )
+                engine.getRandom();
             engine.action(branchMoves[i].tileAction);
-            Engine.Debug.HACK = 0;
             engine.action(branchMoves[i].buildingAction);
 
             if( engine.getStatus() instanceof EngineStatus.Finished ){
@@ -275,9 +272,7 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
         for (VolcanoTileAction tileAction : engine.getVolcanoTileActions()) {
             int points = heuristics.evaluateVolcanoPlacement(engine, tileAction);
             placements.add( new Move(null, tileAction, points));
-            Engine.Debug.HACK = 1;
             engine.placeOnVolcano(tileAction);
-            Engine.Debug.HACK = 0;
             comp++;
 
             for (PlaceBuildingAction buildingaction : engine.getNewPlaceBuildingActions()) {

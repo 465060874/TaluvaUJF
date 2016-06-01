@@ -26,6 +26,14 @@ public class PlaceBuildingRules {
         }
 
         PlayerColor color = engine.getCurrentPlayer().getColor();
+        if( (engine.getStatus().getTurn() == 22 || engine.getStatus().getTurn() == 21)
+                && color == PlayerColor.WHITE
+                && hex.getLine() == 0
+                && hex.getDiag() == -3
+                && type == BuildingType.TEMPLE)
+            engine.getRandom();
+
+
         switch (type) {
             case TEMPLE: return validateTemple(hex, island, color);
             case TOWER: return validateTower(hex, island, color, field);

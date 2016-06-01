@@ -153,13 +153,19 @@ class EngineActions {
                 }
 
                 if (hutValid) {
-                    list.add(new PlaceBuildingAction(false, BuildingType.HUT, hex));
+                    list.add(new PlaceBuildingAction(false,
+                            engine.getCurrentPlayer().getColor(),
+                            BuildingType.HUT, hex));
                 }
                 if (templeValid) {
-                    list.add(new PlaceBuildingAction(false, BuildingType.TEMPLE, hex));
+                    list.add(new PlaceBuildingAction(false,
+                            engine.getCurrentPlayer().getColor(),
+                            BuildingType.TEMPLE, hex));
                 }
                 if (towerValid) {
-                    list.add(new PlaceBuildingAction(false, BuildingType.TOWER, hex));
+                    list.add(new PlaceBuildingAction(false,
+                            engine.getCurrentPlayer().getColor(),
+                            BuildingType.TOWER, hex));
                 }
             }
         }
@@ -201,10 +207,10 @@ class EngineActions {
             }
 
             if (PlaceBuildingRules.validate(engine, type, leftHex).isValid()) {
-                builder.add(new PlaceBuildingAction(true, type, leftHex));
+                builder.add(new PlaceBuildingAction(true, engine.getCurrentPlayer().getColor(), type, leftHex));
             }
             if (PlaceBuildingRules.validate(engine, type, rightHex).isValid()) {
-                builder.add(new PlaceBuildingAction(true, type, rightHex));
+                builder.add(new PlaceBuildingAction(true, engine.getCurrentPlayer().getColor(), type, rightHex));
             }
         }
 
@@ -239,18 +245,11 @@ class EngineActions {
             }
         }
 
-        if (!villageExpansion.isEmpty() && Engine.Debug.HACK > 0) {
-            System.out.println("### " + Engine.Debug.HACK + " " + engine.getStatus().getTurn() + " " + action);
-        }
-
         for (Map.Entry<Village, FieldType> entry : villageExpansion.entries()) {
             Village village = entry.getKey();
             FieldType fieldType = entry.getValue();
             if (ExpandVillageRules.validate(engine, village, fieldType).isValid()) {
                 ExpandVillageAction newAction = new ExpandVillageAction(true, village, fieldType);
-                if (Engine.Debug.HACK > 0) {
-                    System.out.println(newAction);
-                }
                 builder.add(newAction);
             }
         }
