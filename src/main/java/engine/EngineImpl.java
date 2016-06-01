@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toList;
 
 class EngineImpl implements Engine {
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static final int TILES_PER_PLAYER = 12;
 
@@ -435,6 +435,10 @@ class EngineImpl implements Engine {
         }
 
         actionSaves.add(new ActionSave.Tile(this, action));
+        if( getStatus().getTurn() == 22
+                && action.getVolcanoHex().getLine() == 0
+                && action.getVolcanoHex().getDiag() == -1)
+            getGamemode();
         island.putTile(volcanoTileStack.current(), action.getVolcanoHex(), action.getOrientation());
 
         actions.updateWithNewTile(action);

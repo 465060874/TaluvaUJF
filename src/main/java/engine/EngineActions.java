@@ -217,10 +217,14 @@ class EngineActions {
         Island island = engine.getIsland();
         PlayerColor color = engine.getCurrentPlayer().getColor();
         Hex leftHex = action.getLeftHex();
-        Hex rightHex = action.getLeftHex();
+        Hex rightHex = action.getRightHex();
         FieldType leftFieldType = action.getLeftFieldType();
         FieldType rightFieldType = action.getRightFieldType();
 
+        if( engine.getStatus().getTurn() == 23
+                && action.getVolcanoHex().getLine() == -4
+                && action.getVolcanoHex().getDiag() == -1)
+            engine.getGamemode();
         // NB: Village do not implements hashCode/equals
         // This store them by identity instead of equality, which is what we want
         HashMultimap<Village, FieldType> villageExpansion = HashMultimap.create();

@@ -89,7 +89,7 @@ class IslandImpl implements Island {
 
         int level = getField(hex).getLevel() + 1;
 
-        putField(hex, Field.create(level, FieldType.VOLCANO, orientation));
+        doPutField(hex, Field.create(level, FieldType.VOLCANO, orientation));
         Field leftBefore = doPutField(leftHex, Field.create(level, tile.getLeft(), orientation.leftRotation()));
         Field rightBefore = doPutField(rightHex, Field.create(level, tile.getRight(), orientation.rightRotation()));
 

@@ -100,6 +100,7 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
             if (branchMoves[i].tileAction instanceof VolcanoTileAction) {
                 Engine.Debug.HACK = 2;
             }
+
             engine.action(branchMoves[i].tileAction);
             Engine.Debug.HACK = 0;
             engine.action(branchMoves[i].buildingAction);

@@ -36,7 +36,14 @@ class Villages {
     Villages(Villages villages, Island island) {
         this.island = island;
         this.map = new HashMap<>();
-        map.putAll(villages.map);
+        for (Map.Entry<Hex, Object> entry : villages.map.entrySet()) {
+            if (entry.getValue() instanceof VillageImpl2) {
+                map.put(entry.getKey(), new VillageImpl2(island, (VillageImpl2) entry.getValue()));
+            }
+            else {
+                map.put(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     private Hex find(Hex hex) {
@@ -191,6 +198,14 @@ class Villages {
                     .build();
             this.hasTemple = village1.hasTemple || village2.hasTemple;
             this.hasTower = village1.hasTower || village2.hasTower;
+        }
+
+        VillageImpl2(Island island, VillageImpl2 other) {
+            this.island = island;
+            this.color = other.color;
+            this.hexes = ImmutableSet.copyOf(other.hexes);
+            this.hasTemple = other.hasTemple;
+            this.hasTower = other.hasTower;
         }
 
         @Override

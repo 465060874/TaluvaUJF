@@ -32,9 +32,13 @@ public class GameApp extends Application {
 
     public GameApp() {
         this.engine = EngineBuilder.allVsAll()
-                .logLevel(Level.FINE)
-                .player(PlayerColor.BROWN, IA.DIFFICILE)
-                .player(PlayerColor.WHITE, IA.DIFFICILE)
+                .logLevel(Level.INFO)
+                .player(PlayerColor.BROWN, IA.MOYEN)
+                .player(PlayerColor.WHITE, IA.MOYEN)
+                //.seed( -4156273375135801088L ) SEED DE LA MORT
+                //.seed( 1595874041069403893L ) NOT_ENOUGH_BUILDING
+                //.seed( -3665913443725538171L ) NOT_ENOUGH_BUILDING
+                .seed ( -8748791506537546780L )
                 .build();
     }
 

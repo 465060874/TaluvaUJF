@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 class BotPlayerTurnFx implements PlayerTurn {
 
-    private static long DELAY = 800;
+    private static long DELAY = 1;
 
     private final Engine engine;
     private final AtomicBoolean cancelled;
