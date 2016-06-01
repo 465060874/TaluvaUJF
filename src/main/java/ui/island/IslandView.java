@@ -14,7 +14,6 @@ public class IslandView extends StackPane {
 
     private final IslandCanvas islandCanvas;
     private final PlacementOverlay placementOverlay;
-    private final WheelOfChoice wheelOfChoise;
 
     private boolean mousePressed;
     private double mouseXBeforeDrag;
@@ -32,10 +31,8 @@ public class IslandView extends StackPane {
         this.grid = grid;
         this.placementOverlay = new PlacementOverlay(island, grid, placement);
         this.islandCanvas = new IslandCanvas(island, grid, placement, debug);
-        this.wheelOfChoise = new WheelOfChoice(grid, placement);
         placement.islandCanvas = islandCanvas;
         placement.placementOverlay = placementOverlay;
-        placement.wheelOfChoice = wheelOfChoise;
 
         this.mousePressed = false;
         this.lastMouseX = 0;
@@ -45,7 +42,6 @@ public class IslandView extends StackPane {
 
         getChildren().add(islandCanvas);
         getChildren().add(placementOverlay);
-        getChildren().add(wheelOfChoise);
 
         IslandTheme.addListener(this::updateTheme);
         updateTheme();
@@ -85,19 +81,11 @@ public class IslandView extends StackPane {
             placementOverlay.setHeight(h);
             placementOverlay.redraw();
         }
-
-        wheelOfChoise.setLayoutX(left);
-        wheelOfChoise.setLayoutY(top);
-        if (w != wheelOfChoise.getWidth() || h != wheelOfChoise.getHeight()) {
-            wheelOfChoise.setWidth(w);
-            wheelOfChoise.setHeight(h);
-        }
     }
 
     private void mousePressed(MouseEvent event) {
         mousePressed = true;
         if (event.getButton() == MouseButton.PRIMARY) {
-            wheelOfChoise.redraw();
             mouseXBeforeDrag = lastMouseX = event.getX();
             mouseYBeforeDrag = lastMouseY = event.getY();
         }
@@ -154,7 +142,6 @@ public class IslandView extends StackPane {
         if (grid.scale(scaleFactor)) {
             islandCanvas.redraw();
             placementOverlay.redraw();
-            wheelOfChoise.redraw();
         }
     }
 

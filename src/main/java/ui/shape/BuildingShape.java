@@ -196,36 +196,4 @@ public class BuildingShape {
             gc.drawImage(EXPAND_IMAGE, x-34, y-24);
         }
     }
-
-    public void drawWheelOfChoiseBuildings(GraphicsContext gc, Grid grid,
-                                           double xCenter, double yCenter,
-                                           double oWidth, List<BuildingType> otherAvailableBuildings,
-                                           BuildingType current) {
-
-        ArrayList<WheelOfChoiceBuilding> wheel = new ArrayList<>(3);
-        BuildingType previous = current;
-        previous = previous.previousBuilding();
-        while (previous != current) {
-            if (otherAvailableBuildings.contains(previous)) {
-                wheel.add(new WheelOfChoiceBuilding(previous, true));
-            } else {
-                wheel.add(new WheelOfChoiceBuilding(previous, false));
-            }
-            previous = previous.previousBuilding();
-        }
-
-        double angle = -15;
-        double x = xCenter + oWidth * Math.cos(Math.toRadians(angle));
-        double y = yCenter + oWidth * Math.sin(Math.toRadians(angle));
-        for (WheelOfChoiceBuilding wheelE : wheel) {
-            if (wheelE.isValid()) {
-                draw(gc, grid, x, y, 1, Building.of(wheelE.getBuildingType(), PlayerColor.WHITE), BuildingStyle.WHEELVALID);
-            } else {
-                draw(gc, grid, x, y, 1, Building.of(wheelE.getBuildingType(), PlayerColor.RED), BuildingStyle.WHEELINVALID);
-            }
-            angle += 80;
-            x = xCenter + oWidth * Math.cos(angle);
-            y = yCenter + oWidth * Math.sin(angle);
-        }
-    }
 }

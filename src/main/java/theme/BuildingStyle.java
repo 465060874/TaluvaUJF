@@ -8,11 +8,7 @@ public enum BuildingStyle {
 
     DESTROYED,
 
-    WHEELVALID,
-
-    WHEELINVALID,
-
     EXPAND,
 
-    FLOATING
+    INVALID, FLOATING
 }

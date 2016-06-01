@@ -6,10 +6,7 @@ import data.FieldType;
 import javafx.beans.Observable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import map.Building;
-import map.Field;
-import map.Island;
-import map.Neighbor;
+import map.*;
 import theme.BuildingStyle;
 import theme.HexStyle;
 import ui.shape.BuildingShape;
@@ -52,14 +49,15 @@ class PlacementOverlay extends Canvas {
                     buildingStyle = BuildingStyle.HIGHLIGHTED;
                 }
                 else {
-                    if (island.getField(placement.getHex()) == Field.SEA) {
-                        buildingStyle = BuildingStyle.NORMAL;
-                    }
-                    else if (island.getField(placement.getHex()).hasBuilding()) {
+                    final Hex hex = placement.getHex();
+                    final Field field = island.getField(hex);
+                    if (field.hasBuilding()
+                            && (placement.getActivePlayerColor() == field.getBuilding().getColor())) {
                         buildingStyle = BuildingStyle.EXPAND;
-                    }
-                    else {
-                        buildingStyle = BuildingStyle.WHEELINVALID;
+                    } else if (field == Field.SEA){
+                        buildingStyle = BuildingStyle.NORMAL;
+                    } else {
+                        buildingStyle = BuildingStyle.INVALID;
                     }
                 }
                 buildingShape.draw(gc, grid,

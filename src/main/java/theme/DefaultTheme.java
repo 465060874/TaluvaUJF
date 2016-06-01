@@ -106,12 +106,10 @@ public class DefaultTheme implements IslandTheme {
     @Override
     public Paint getBuildingBorderPaint(BuildingStyle style) {
         switch (style) {
-            case WHEELVALID:
-                return  Color.WHITE;
-            case WHEELINVALID:
-                return redInnerStrokeColor;
             case EXPAND:
                 return Color.TRANSPARENT;
+            case INVALID:
+                return Color.RED;
             default:
             return tileBorderColor;
         }
@@ -134,10 +132,6 @@ public class DefaultTheme implements IslandTheme {
 
     private Color getBuildingTopColor(Building building, BuildingStyle style) {
         switch(style) {
-            case WHEELVALID:
-                return translucent;
-            case WHEELINVALID:
-                return selectedTransparent;
             case FLOATING:
                 return Color.TRANSPARENT;
             case EXPAND:

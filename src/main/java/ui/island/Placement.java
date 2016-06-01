@@ -19,9 +19,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 public class Placement {
 
-
-    public WheelOfChoice wheelOfChoice;
-
     public enum Mode {
         NONE,
         TILE,
@@ -63,6 +60,10 @@ public class Placement {
         this.saveMode = Mode.NONE;
         this.valid = false;
         this.hex = Hex.at(0, 0);
+    }
+
+    public PlayerColor getActivePlayerColor() {
+        return engine.getCurrentPlayer().getColor();
     }
 
     public boolean isValid() {
@@ -199,11 +200,12 @@ public class Placement {
         boolean wasValid = valid;
         this.valid = PlaceBuildingRules.validate(engine, buildingType, hex).isValid();
         redrawWhatsNecessary(wasValid);
-
+        /*
         List<BuildingType> otherAvailableBuildings = otherAvailableBuildings(buildingType);
         if (!otherAvailableBuildings.isEmpty()) {
             wheelOfChoice.redraw(otherAvailableBuildings, hex, valid, buildingType);
         }
+        */
     }
 
     private List<BuildingType> otherAvailableBuildings(BuildingType buildingType) {
@@ -220,7 +222,6 @@ public class Placement {
     }
 
     private void redrawWhatsNecessary(boolean wasValid) {
-        wheelOfChoice.redraw();
         if (wasValid != valid) {
             placementOverlay.redraw();
             islandCanvas.redraw();
