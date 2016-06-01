@@ -1,6 +1,7 @@
 
 package ui;
 
+import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import engine.Engine;
 import javafx.application.Application;
@@ -12,6 +13,7 @@ import map.Island;
 import map.IslandIO;
 import ui.island.IslandView;
 
+import java.io.File;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
@@ -19,8 +21,8 @@ public class IslandVisu extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        URL rsc = Engine.class.getResource("EngineTest7.island");
-        Island island = IslandIO.read(Resources.asCharSource(rsc, StandardCharsets.UTF_8));
+        File file = new File("9947498794069.island");
+        Island island = IslandIO.read(Files.asCharSource(file, StandardCharsets.UTF_8));
 
         IslandView islandView = new IslandView(island, true);
         BorderPane mainPane = new BorderPane();

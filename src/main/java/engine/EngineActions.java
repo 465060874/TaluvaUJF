@@ -13,10 +13,7 @@ import engine.rules.SeaTileRules;
 import engine.rules.VolcanoTileRules;
 import map.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Cette classe s'occupe d'analyser tous les coups jouables à un instant donné
@@ -237,11 +234,19 @@ class EngineActions {
             }
         }
 
+        if (!villageExpansion.isEmpty() && Engine.Debug.HACK > 0) {
+            System.out.println("### " + Engine.Debug.HACK + " " + engine.getStatus().getTurn() + " " + action);
+        }
+
         for (Map.Entry<Village, FieldType> entry : villageExpansion.entries()) {
             Village village = entry.getKey();
             FieldType fieldType = entry.getValue();
             if (ExpandVillageRules.validate(engine, village, fieldType).isValid()) {
-                builder.add(new ExpandVillageAction(true, village, fieldType));
+                ExpandVillageAction newAction = new ExpandVillageAction(true, village, fieldType);
+                if (Engine.Debug.HACK > 0) {
+                    System.out.println(newAction);
+                }
+                builder.add(newAction);
             }
         }
 

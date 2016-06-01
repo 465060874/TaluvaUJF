@@ -1,10 +1,14 @@
 package ia;
 
+import data.BuildingType;
+import data.VolcanoTile;
 import engine.Engine;
 import engine.EngineStatus;
 import engine.action.*;
 import engine.rules.BuildingRules;
+import engine.rules.PlaceBuildingRules;
 import engine.rules.Problems;
+import map.Hex;
 
 import java.util.Iterator;
 import java.util.PriorityQueue;
@@ -97,7 +101,11 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
             if( branchMoves[i].tileAction == null || branchMoves[i].buildingAction == null )
                 throw new IllegalStateException("Coup mal recombiné -> un des champs est null");
 
+            if (branchMoves[i].tileAction instanceof VolcanoTileAction) {
+                Engine.Debug.HACK = 2;
+            }
             engine.action(branchMoves[i].tileAction);
+            Engine.Debug.HACK = 0;
             engine.action(branchMoves[i].buildingAction);
 
             if( engine.getStatus() instanceof EngineStatus.Finished ){
@@ -270,7 +278,9 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
         for (VolcanoTileAction tileAction : engine.getVolcanoTileActions()) {
             int points = heuristics.evaluateVolcanoPlacement(engine, tileAction);
             placements.add( new Move(null, tileAction, points));
+            Engine.Debug.HACK = 1;
             engine.placeOnVolcano(tileAction);
+            Engine.Debug.HACK = 0;
             comp++;
 
             for (PlaceBuildingAction buildingaction : engine.getNewPlaceBuildingActions()) {
@@ -386,13 +396,14 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
     // Teste la compatibilité entre un placement et une construction/extension
     private boolean compatible( Engine engine, TileAction placement, BuildingAction build ) {
         engine.logger().fine("Checking compatibility : " + placement + " " + build);
-        engine.action(placement);
+        /* engine.action(placement);
         Problems problems = BuildingRules.validate(engine, build);
         engine.cancelLastStep();
 
         return problems.isValid();
+        */
 
-        /*if( placement instanceof SeaTileAction ){
+        if( placement instanceof SeaTileAction ){
             // Construction + placement mer ne pose jamais de problème
             if( build instanceof PlaceBuildingAction )
                 return true;
@@ -421,7 +432,7 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
                 engine.action(placement);
                 BuildingType buildingType = ((PlaceBuildingAction) build).getType();
                 Hex buildingHex = ((PlaceBuildingAction) build).getHex();
-                if (!validate(engine, buildingType, buildingHex).isValid()) {
+                if (!PlaceBuildingRules.validate(engine, buildingType, buildingHex).isValid()) {
                     engine.cancelLastStep();
                     return false;
                 }
@@ -446,16 +457,20 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
                                 return false;
                 }
 
-                // On vérifie qu'on écrase pas le village
+                // On vérifie qu'on écrase pas le village OU le champ sur lequel on s'étend
                 if( engine.getIsland().getField(placement.getLeftHex()).hasBuilding())
                     if( engine.getIsland().getVillage( placement.getLeftHex()).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
+                        return false;
+                if( engine.getIsland().getField( placement.getLeftHex()).getType() == ( ((ExpandVillageAction) build).getFieldType()))
                         return false;
                 if( engine.getIsland().getField(placement.getRightHex()).hasBuilding())
                     if( engine.getIsland().getVillage( placement.getRightHex()).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
                         return false;
+                if( engine.getIsland().getField( placement.getRightHex()).getType() == ( ((ExpandVillageAction) build).getFieldType()))
+                        return false;
                 return true;
             }
-        }*/
+        }
     }
 
     // Tente d'ajouter un Move dans branchMoves à l'indice ind :

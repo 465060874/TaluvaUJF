@@ -128,4 +128,9 @@ public interface Engine {
     void placeOnVolcano(VolcanoTileAction placement);
     void build(PlaceBuildingAction action);
     void expand(ExpandVillageAction action);
+
+    class Debug {
+
+        public static int HACK = 0;
+    }
 }
