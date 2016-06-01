@@ -2,8 +2,9 @@ package ia;
 
 import engine.Engine;
 import engine.action.*;
+
+import java.util.Collection;
 import java.util.Random;
-import java.util.PriorityQueue;
 
 class RandomHeuristics implements Heuristics {
 
@@ -36,7 +37,7 @@ class RandomHeuristics implements Heuristics {
         return r.nextInt(40) - 20;
     }
 
-    public int evaluateBuildAction(Engine e, TileAction tileAction, PlaceBuildingAction move, int pointsPlacement, PriorityQueue<Move>[] strategiesQueues){
+    public int evaluateBuildAction(Engine e, TileAction tileAction, PlaceBuildingAction move, int pointsPlacement, Collection<Move>[] strategiesQueues){
         Move m;
         for (int i = 0; i < nbStrategies; i++) {
             m = new Move( move, tileAction, r.nextInt(40) + pointsPlacement - 20 );
@@ -45,7 +46,7 @@ class RandomHeuristics implements Heuristics {
         return 0;
     }
 
-    public int evaluateExpandAction(Engine e, TileAction tileAction, ExpandVillageAction move, int pointsPlacement, PriorityQueue<Move>[] strategiesQueues){
+    public int evaluateExpandAction(Engine e, TileAction tileAction, ExpandVillageAction move, int pointsPlacement, Collection<Move>[] strategiesQueues){
         Move m;
         for (int i = 0; i < nbStrategies; i++) {
             m = new Move( move, tileAction, r.nextInt(40) + pointsPlacement - 20 );

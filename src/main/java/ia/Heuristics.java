@@ -1,7 +1,9 @@
 package ia;
-import engine.*;
+
+import engine.Engine;
 import engine.action.*;
-import java.util.PriorityQueue;
+
+import java.util.Collection;
 
 interface Heuristics {
 
@@ -9,8 +11,8 @@ interface Heuristics {
 
     int evaluateSeaPlacement(Engine e, SeaTileAction move);
     int evaluateVolcanoPlacement(Engine e, VolcanoTileAction move);
-    int evaluateBuildAction(Engine e, TileAction tileAction, PlaceBuildingAction move, int pointsPlacement, PriorityQueue<Move>[] strategiesQueues);
-    int evaluateExpandAction(Engine e, TileAction tileAction, ExpandVillageAction move, int pointsPlacement, PriorityQueue<Move>[] strategiesQueues);
+    int evaluateBuildAction(Engine e, TileAction tileAction, PlaceBuildingAction move, int pointsPlacement, Collection<Move>[] strategiesQueues);
+    int evaluateExpandAction(Engine e, TileAction tileAction, ExpandVillageAction move, int pointsPlacement, Collection<Move>[] strategiesQueues);
 
     int evaluateConfiguration(Engine engine);
 }

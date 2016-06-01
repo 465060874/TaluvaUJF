@@ -1,4 +1,5 @@
 package ia;
+
 import com.google.common.collect.SetMultimap;
 import data.BuildingType;
 import data.FieldType;
@@ -8,8 +9,8 @@ import engine.Player;
 import engine.action.*;
 import map.*;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.PriorityQueue;
 
 class BasicHeuristics implements Heuristics {
     // Critères d'évaluation pondérés
@@ -324,7 +325,7 @@ class BasicHeuristics implements Heuristics {
         return points*scale;
     }
 
-    public int evaluateBuildAction(Engine e, TileAction tileAction, PlaceBuildingAction move, int pointsPlacement, PriorityQueue<Move>[] strategiesQueues){
+    public int evaluateBuildAction(Engine e, TileAction tileAction, PlaceBuildingAction move, int pointsPlacement, Collection<Move>[] strategiesQueues){
         int temple = 0, tower = 0, huts = 0, counter = 0;
         int general = 0;
         int scale = 2;
@@ -361,7 +362,7 @@ class BasicHeuristics implements Heuristics {
         return 0;
     }
 
-    public int evaluateExpandAction(Engine e, TileAction tileAction, ExpandVillageAction move, int pointsPlacement, PriorityQueue<Move>[] strategiesQueues){
+    public int evaluateExpandAction(Engine e, TileAction tileAction, ExpandVillageAction move, int pointsPlacement, Collection<Move>[] strategiesQueues){
         int temple = 0, tower = 0, huts = 0, counter = 0;
         int general = 0;
         int scale = 2;
