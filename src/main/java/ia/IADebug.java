@@ -31,7 +31,8 @@ public class IADebug implements PlayerHandler {
 
     @Override
     public PlayerTurn startTurn(Engine engine, EngineStatus.TurnStep step) {
-        IAAlgorithm algorithm = new MinMaxAlgorithm(branchingFactor, depth, heuristics, engine, new AtomicBoolean(false));
+        AtomicBoolean cancelled = new AtomicBoolean(false);
+        IAAlgorithm algorithm = new AlphaBetaAlgorithm(branchingFactor, depth, heuristics, engine, cancelled);
         return Platform.isFxApplicationThread()
                 ? new BotPlayerTurnFx(engine, algorithm, step)
                 : new BotPlayerTurn(engine, algorithm, step);
