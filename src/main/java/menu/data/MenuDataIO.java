@@ -45,18 +45,23 @@ class MenuDataIO {
 
         ImmutableList.Builder<SavedGame> savedGamesBuilder = ImmutableList.builder();
         File savesDir = new File("Saves");
-        for (File file : firstNonNull(savesDir.listFiles((dir, name) -> name.endsWith(".png")), new File[0])) {
-            long millis = Long.parseLong(file.getName().split("\\.")[0]);
+        File[] saveFiles = firstNonNull(
+                savesDir.listFiles((dir, name) -> name.endsWith(".taluva")),
+                new File[0]);
+        for (File file : saveFiles) {
+            String basename = file.getName().split("\\.")[0];
+            long millis = Long.parseLong(basename);
             String date = DATE_FORMATTER.format(new Date(millis));
+            File imageFile = new File(file.getParent(), basename + ".png");
             try {
-                Image image = new Image(new FileInputStream(file));
-                savedGamesBuilder.add(new SavedGame(date, image));
+                Image image = new Image(new FileInputStream(imageFile));
+                savedGamesBuilder.add(new SavedGame(date, file, image));
             }
             catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
-
         }
+
         ImmutableList<SavedGame> savedGames = Ordering.natural()
                 .onResultOf(SavedGame::getDate)
                 .reverse()

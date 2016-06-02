@@ -8,6 +8,7 @@ import data.VolcanoTile;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -28,6 +29,8 @@ public interface VolcanoTileStack {
     }
 
     void saveAll(CharSink sink);
+
+    List<VolcanoTile> asList();
 
     int size();
 

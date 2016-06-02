@@ -1,12 +1,16 @@
 package menu.data;
 
-import ia.IA;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.io.CharSource;
+import com.google.common.io.Files;
 import data.PlayerColor;
 import engine.EngineBuilder;
 import engine.PlayerHandler;
+import engine.record.EngineRecord;
+import ia.IA;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.Random;
 
@@ -90,7 +94,7 @@ public class MenuData {
         switch (mode) {
             case SOLO: return soloEngineBuilder(uiPlayerHandler);
             case MULTIJOUEUR: return multiEngineBuilder(uiPlayerHandler);
-            case CHARGER: throw new UnsupportedOperationException("Not implemented yet");
+            case CHARGER: return chargerEngineBuilder(uiPlayerHandler);
         }
 
         throw new IllegalStateException();
@@ -137,5 +141,11 @@ public class MenuData {
         }
 
         throw new IllegalStateException();
+    }
+
+    private EngineBuilder chargerEngineBuilder(PlayerHandler uiPlayerHandler) {
+        CharSource source = Files.asCharSource(selectedSavedGame.getFile(), StandardCharsets.UTF_8);
+        EngineRecord record = EngineRecord.load(source);
+        return record.replay(uiPlayerHandler);
     }
 }

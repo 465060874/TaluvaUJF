@@ -16,7 +16,6 @@ import ia.IA;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Iterator;
 import java.util.List;
 
 public class EngineRecord {
@@ -132,58 +131,17 @@ public class EngineRecord {
         }
     }
 
-    public Engine replay() {
+    public EngineBuilder replay(PlayerHandler humanPlayerHandler) {
         UnmodifiableIterator<Action> actionsIt = ImmutableList.copyOf(actions).iterator();
         ImmutableMap.Builder<PlayerColor, PlayerHandler> playersBuilder = ImmutableMap.builder();
-        PlayerHandler playerHandlerFactory = new RecordPlayerHandler(actionsIt);
-        for (PlayerColor color : colors) {
-            playersBuilder.put(color, playerHandlerFactory);
+        for (int i = 0; i < colors.size(); i++) {
+            PlayerColor color = colors.get(i);
+            PlayerHandler handler = playerHandlerTypes.get(i).getHandler(humanPlayerHandler);
+            PlayerHandler wrappedHandler = new RecordPlayerHandler(actionsIt, handler);
+            playersBuilder.put(color, wrappedHandler);
         }
 
         return EngineBuilder.withPredefinedPlayers(gamemode, playersBuilder.build())
-                .tileStack(VolcanoTileStack.predefinedFactory(tiles))
-                .build();
-    }
-
-    private static class RecordPlayerHandler implements PlayerHandler {
-
-        private final Iterator<Action> actions;
-
-        private RecordPlayerHandler(Iterator<Action> actions) {
-            this.actions = actions;
-        }
-
-        @Override
-        public boolean isHuman() {
-            return false;
-        }
-
-        @Override
-        public PlayerTurn startTurn(Engine engine, EngineStatus.TurnStep step) {
-            Action nextAction = actions.next();
-            return step == EngineStatus.TurnStep.TILE
-                ? new RecordPlayerTurn(engine, nextAction, actions.next())
-                : new RecordPlayerTurn(engine, nextAction);
-        }
-    }
-
-    private static class RecordPlayerTurn implements PlayerTurn {
-
-        private final Engine engine;
-        private final Action[] actions;
-
-        public RecordPlayerTurn(Engine engine, Action... actions) {
-            this.engine = engine;
-            this.actions = actions;
-
-            for (Action action : actions) {
-                engine.action(action);
-            }
-        }
-
-        @Override
-        public void cancel() {
-            throw new IllegalStateException();
-        }
+                .tileStack(VolcanoTileStack.predefinedFactory(tiles));
     }
 }

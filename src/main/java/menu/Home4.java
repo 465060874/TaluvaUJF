@@ -1,7 +1,7 @@
 package menu;
 
-import ia.IA;
 import data.PlayerColor;
+import ia.IA;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
@@ -14,7 +14,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -491,12 +490,13 @@ public class Home4 extends Application {
                 ToggleButton savedButton = new ToggleButton(savedGame.getDate());
                 savedButton.setPrefWidth(120);
                 savedButton.setToggleGroup(reprendreToggle);
+                savedButton.setUserData(savedGame);
                 reprendreButtons.add(savedButton);
             }
             if (!reprendreButtons.isEmpty()) {
                 reprendreToggle.selectToggle(reprendreButtons.get(0));
             }
-            reprendreToggle.selectedToggleProperty().addListener(e -> updateReprendreSnapshot());
+            reprendreToggle.selectedToggleProperty().addListener(e -> updateSelectedSavedGame());
 
             vBoxoptionsCharger.getChildren().addAll(reprendreButtons);
 
@@ -562,7 +562,7 @@ public class Home4 extends Application {
 
 
         updateMode();
-        updateReprendreSnapshot();
+        updateSelectedSavedGame();
         updateLevel();
         updatemultimode();
         updateButtonPlay();
@@ -672,12 +672,13 @@ public class Home4 extends Application {
         updateButtonPlay();
     }
 
-    private void updateReprendreSnapshot() {
+    private void updateSelectedSavedGame() {
         Toggle selected = reprendreToggle.getSelectedToggle();
         for (int i = 0; i < reprendreButtons.size(); i++) {
-            if (selected == reprendreButtons.get(i)) {
-                //reprendreSnapshotBox.
+            ToggleButton toggleButton = reprendreButtons.get(i);
+            if (selected == toggleButton) {
                 reprendreSnapshotBox.getChildren().setAll(reprendreSnapshots.get(i));
+                menuData.setSelectedSavedGame((SavedGame) toggleButton.getUserData());
             }
         }
     }

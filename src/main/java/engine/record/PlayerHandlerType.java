@@ -5,16 +5,39 @@ import ia.IA;
 
 enum PlayerHandlerType {
 
-    IA_FACILE,
+    IA_FACILE {
+        @Override
+        public PlayerHandler getHandler(PlayerHandler humanPlayerHandler) {
+            return IA.FACILE;
+        }
+    },
 
-    IA_MOYEN,
+    IA_MOYEN {
+        @Override
+        public PlayerHandler getHandler(PlayerHandler humanPlayerHandler) {
+            return IA.MOYEN;
+        }
+    },
 
-    IA_DIFFICILE,
+    IA_DIFFICILE {
+        @Override
+        public PlayerHandler getHandler(PlayerHandler humanPlayerHandler) {
+            return IA.DIFFICILE;
+        }
+    },
 
-    HUMAIN;
+    HUMAIN {
+        @Override
+        public PlayerHandler getHandler(PlayerHandler humanPlayerHandler) {
+            return humanPlayerHandler;
+        }
+    };
 
     public static PlayerHandlerType valueOf(PlayerHandler handler) {
-        if (handler instanceof IA) {
+        if (handler instanceof RecordPlayerHandler) {
+            return valueOf(((RecordPlayerHandler) handler).wrapped);
+        }
+        else if (handler instanceof IA) {
             switch ((IA) handler) {
                 case FACILE: return IA_FACILE;
                 case MOYEN: return IA_MOYEN;
@@ -32,4 +55,6 @@ enum PlayerHandlerType {
                     + handler.getClass().getCanonicalName());
         }
     }
+
+    public abstract PlayerHandler getHandler(PlayerHandler humanPlayerHandler);
 }

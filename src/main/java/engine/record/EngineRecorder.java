@@ -28,43 +28,29 @@ public class EngineRecorder {
 
         this.gamemode = engine.getGamemode();
         this.colors = new ArrayList<>();
-        this.handlers = new ArrayList<>();
         this.tiles = new ArrayList<>();
+        this.handlers = new ArrayList<>();
         this.actions = new ArrayList<>();
     }
 
-    private class Observer implements EngineObserver {
+    private class Observer extends EngineObserver.Dummy {
 
         public void onStart() {
             for (Player player : engine.getPlayers()) {
                 colors.add(player.getColor());
                 handlers.add(PlayerHandlerType.valueOf(player.getHandler()));
             }
-            engine.getPlayers().stream()
-                    .map(Player::getColor)
-                    .forEach(colors::add);
+            tiles.addAll(engine.getVolcanoTileStack().asList());
         }
 
         @Override
         public void onCancelTileStep() {
-            tiles.remove(tiles.size() - 1);
             actions.remove(actions.size() - 1);
         }
 
         @Override
         public void onCancelBuildStep() {
-            tiles.remove(tiles.size() - 1);
             actions.remove(actions.size() - 1);
-        }
-
-        public void onTileStackChange() {
-            tiles.add(engine.getVolcanoTileStack().current());
-        }
-
-        public void onTileStepStart() {
-        }
-
-        public void onBuildStepStart() {
         }
 
         public void onTilePlacementOnSea(SeaTileAction action) {

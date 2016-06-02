@@ -26,9 +26,6 @@ public class IslandSnapshot {
         WritableImage image = new WritableImage(170, 170);
         WritableImage snapshot = canvas.snapshot(parameters, image);
 
-        if (!outputDir.exists() && !outputDir.mkdirs()) {
-            throw new IOException("Unable to create Saves directory");
-        }
         File output = new File(outputDir, basename + ".png");
         ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", output);
     }

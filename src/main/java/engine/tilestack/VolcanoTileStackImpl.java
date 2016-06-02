@@ -33,6 +33,11 @@ class VolcanoTileStackImpl implements VolcanoTileStack {
     }
 
     @Override
+    public List<VolcanoTile> asList() {
+        return tiles;
+    }
+
+    @Override
     public int size() {
         return tiles.size() - index;
     }

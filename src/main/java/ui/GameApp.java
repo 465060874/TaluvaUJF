@@ -1,10 +1,12 @@
 package ui;
 
+import com.google.common.io.Files;
 import data.BuildingType;
 import data.PlayerColor;
 import engine.*;
 import engine.action.Action;
 import engine.action.SeaTileAction;
+import engine.record.EngineRecorder;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -20,11 +22,13 @@ import util.CustomUncaughtExceptionHandler;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
+import java.nio.charset.StandardCharsets;
 
 public class GameApp extends Application {
 
-    private Engine engine;
+    private final Engine engine;
+    private final EngineRecorder recorder;
+
     private GameView gameView;
     private Scene scene;
     private Stage stage;
@@ -32,17 +36,18 @@ public class GameApp extends Application {
     public GameApp() {
         FXPlayerHandler handler = new FXPlayerHandler();
         this.engine = EngineBuilder.allVsAll()
-                .logLevel(Level.INFO)
                 .player(PlayerColor.RED, handler)
                 .player(PlayerColor.WHITE, handler)
                 .player(PlayerColor.BROWN, handler)
                 .player(PlayerColor.YELLOW, handler)
                 .build();
+        this.recorder = EngineRecorder.install(engine);
     }
 
     public GameApp(MenuData menuData) {
         this.engine = menuData.engineBuilder(new FXPlayerHandler())
                 .build();
+        this.recorder = EngineRecorder.install(engine);
     }
 
     @Override
@@ -74,7 +79,15 @@ public class GameApp extends Application {
 
     private void save(ActionEvent event) {
         File outputDir = new File("Saves");
+        if (!outputDir.exists() && !outputDir.mkdirs()) {
+            throw new RuntimeException("Error while trying to save game");
+        }
+
         String basename = Long.toString(System.currentTimeMillis());
+
+        File recordFile = new File(outputDir, basename + ".taluva");
+        recorder.getRecord().save(Files.asCharSink(recordFile, StandardCharsets.UTF_8));
+
         try {
             IslandSnapshot.take(engine.getIsland(), outputDir, basename);
         }
