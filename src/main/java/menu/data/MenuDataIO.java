@@ -21,7 +21,7 @@ class MenuDataIO {
 
     private static final File FILE = new File("menu.data");
     private static final Charset CHARSET = StandardCharsets.UTF_8;
-    private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM hh:mm");
+    private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM HH:mm");
 
     static MenuData load() {
         Properties properties = new Properties();
