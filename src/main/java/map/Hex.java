@@ -1,7 +1,6 @@
 package map;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Ordering;
 
 import java.util.Set;
 
@@ -12,23 +11,28 @@ import java.util.Set;
  */
 public class Hex {
 
-    private static int count = 0;
+    private static final Hex[] HEXES = new Hex[40000];
 
     public static Hex at(int line, int diag) {
-        count++;
-        return new Hex(line, diag);
+        int index = (line + 100) * 200 + (diag + 100);
+        Hex hex = HEXES[index];
+        return hex == null
+                ? HEXES[index] = new Hex(line, diag)
+                : hex;
     }
 
     private final int line;
     private final int diag;
+    private final int hash;
 
     private Hex(int line, int diag) {
         this.line = line;
         this.diag = diag;
+        this.hash = 17*17 + 17 * line + diag;
     }
 
     public Hex getNeighbor(Neighbor neighbor) {
-        return new Hex(
+        return at(
                 line + neighbor.lineOffset,
                 diag + neighbor.diagOffset);
     }
@@ -61,18 +65,14 @@ public class Hex {
 
     @Override
     public int hashCode() {
-        return 17*17 + 17 * line + diag;
+        return hash;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Hex)) {
-            return false;
-        }
-
-        Hex other = (Hex) obj;
-        return (line == other.line && diag == other.diag);
-    }
+    // Equals is identity
+    // @Override
+    // public boolean equals(Object obj) {
+    //     return this == obj;
+    // }
 
     @Override
     public String toString() {
