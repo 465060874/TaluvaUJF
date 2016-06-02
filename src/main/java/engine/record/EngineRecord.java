@@ -11,6 +11,7 @@ import data.VolcanoTile;
 import engine.*;
 import engine.action.Action;
 import engine.tilestack.VolcanoTileStack;
+import ia.IA;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,31 +21,31 @@ import java.util.List;
 
 public class EngineRecord {
 
-    public static class Exception extends RuntimeException {
+    static class Exception extends RuntimeException {
 
-        private Exception(String message) {
+        Exception(String message) {
             super(message);
         }
 
-        private Exception(Throwable cause) {
+        Exception(Throwable cause) {
             super(cause);
         }
     }
 
     private final Gamemode gamemode;
     private final ImmutableList<PlayerColor> colors;
-    private final ImmutableList<PlayerHandler> handlers;
+    private final ImmutableList<PlayerHandlerType> playerHandlerTypes;
     private final ImmutableList<VolcanoTile> tiles;
     private final ImmutableList<Action> actions;
 
     EngineRecord(Gamemode gamemode,
                  List<PlayerColor> colors,
-                 List<PlayerHandler> handlers,
+                 List<PlayerHandlerType> playerHandlerTypes,
                  List<VolcanoTile> tiles,
                  List<Action> actions) {
         this.gamemode = gamemode;
         this.colors = ImmutableList.copyOf(colors);
-        this.handlers = ImmutableList.copyOf(handlers);
+        this.playerHandlerTypes = ImmutableList.copyOf(playerHandlerTypes);
         this.tiles = ImmutableList.copyOf(tiles);
         this.actions = ImmutableList.copyOf(actions);
     }
@@ -52,7 +53,7 @@ public class EngineRecord {
     public static EngineRecord load(CharSource source) {
         Gamemode gamemode;
         ImmutableList.Builder<PlayerColor> colorsBuilder = ImmutableList.builder();
-        ImmutableList.Builder<PlayerHandler> handlersBuilder = ImmutableList.builder();
+        ImmutableList.Builder<PlayerHandlerType> handlersBuilder = ImmutableList.builder();
         ImmutableList.Builder<VolcanoTile> tilesBuilder = ImmutableList.builder();
         ImmutableList.Builder<Action> actionsBuilder = ImmutableList.builder();
 
@@ -61,7 +62,7 @@ public class EngineRecord {
             int colorsCount = Integer.valueOf(reader.readLine());
             for (int i = 0; i < colorsCount; i++) {
                 colorsBuilder.add(PlayerColor.valueOf(reader.readLine()));
-                handlersBuilder.add(readHandler(reader.readLine()));
+                handlersBuilder.add(PlayerHandlerType.valueOf(reader.readLine()));
             }
 
             int tilesCount = Integer.valueOf(reader.readLine());
@@ -87,11 +88,6 @@ public class EngineRecord {
         }
     }
 
-    private static PlayerHandler readHandler(String handlerStr) {
-        // TODO
-        return PlayerHandler.dummy();
-    }
-
     public void save(CharSink sink) {
         try (Writer writer = sink.openBufferedStream()) {
             writer.write(gamemode.name());
@@ -99,8 +95,10 @@ public class EngineRecord {
 
             writer.write(Integer.toString(colors.size()));
             writer.write('\n');
-            for (PlayerColor color : colors) {
-                writer.write(color.name());
+            for (int i = 0; i < colors.size(); i++) {
+                writer.write(colors.get(i).name());
+                writer.write('\n');
+                writer.write(playerHandlerTypes.get(i).name());
                 writer.write('\n');
             }
 
@@ -121,6 +119,16 @@ public class EngineRecord {
         }
         catch (IOException e) {
             throw new Exception(e);
+        }
+    }
+
+    private void writeHandler(PlayerHandler handler, Writer writer) throws IOException {
+        if (handler instanceof IA) {
+            writer.write("IA.");
+            writer.write(((IA) handler).name());
+        }
+        else if (handler.isHuman()) {
+            writer.write("Human");
         }
     }
 

@@ -14,7 +14,7 @@ public class EngineRecorder {
 
     private final Gamemode gamemode;
     private final List<PlayerColor> colors;
-    private final List<PlayerHandler> handlers;
+    private final List<PlayerHandlerType> handlers;
     private final List<VolcanoTile> tiles;
     private final List<Action> actions;
 
@@ -38,7 +38,7 @@ public class EngineRecorder {
         public void onStart() {
             for (Player player : engine.getPlayers()) {
                 colors.add(player.getColor());
-                handlers.add(player.getHandler());
+                handlers.add(PlayerHandlerType.valueOf(player.getHandler()));
             }
             engine.getPlayers().stream()
                     .map(Player::getColor)
