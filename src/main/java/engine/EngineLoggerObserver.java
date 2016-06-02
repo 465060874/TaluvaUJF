@@ -14,7 +14,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * Un EngineObserver qui s'occupe d'afficher les évenements du jeu
  */
-public class EngineLoggerObserver implements EngineObserver {
+public class EngineLoggerObserver extends EngineObserver.Dummy {
 
     private final Engine engine;
     private final String prefix;

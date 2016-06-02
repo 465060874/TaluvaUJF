@@ -143,14 +143,29 @@ public class Hud extends AnchorPane implements EngineObserver {
     public void onStart() {
     }
 
-    @Override
-    public void onCancelTileStep() {
+    private void updateUndoRedo() {
+        undoButton.setDisable(!engine.canUndo());
         redoButton.setDisable(!engine.canRedo());
     }
 
     @Override
+    public void onCancelTileStep() {
+        updateUndoRedo();
+    }
+
+    @Override
     public void onCancelBuildStep() {
-        redoButton.setDisable(!engine.canRedo());
+        updateUndoRedo();
+    }
+
+    @Override
+    public void onRedoTileStep() {
+        updateUndoRedo();
+    }
+
+    @Override
+    public void onRedoBuildStep() {
+        updateUndoRedo();
     }
 
     @Override
@@ -161,8 +176,7 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     @Override
     public void onTileStepStart() {
-        undoButton.setDisable(!engine.canUndo());
-        redoButton.setDisable(!engine.canRedo());
+        updateUndoRedo();
         for (PlayerView playerView : playerViews) {
             playerView.updateTurn();
         }
@@ -170,8 +184,7 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     @Override
     public void onBuildStepStart() {
-        undoButton.setDisable(!engine.canUndo());
-        redoButton.setDisable(!engine.canRedo());
+        updateUndoRedo();
         tileStackCanvas.redraw();
         tileStackSize.setText(Integer.toString(engine.getVolcanoTileStack().size() - 1));
     }

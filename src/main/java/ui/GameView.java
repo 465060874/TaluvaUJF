@@ -88,6 +88,14 @@ public class GameView extends StackPane implements EngineObserver {
     }
 
     @Override
+    public void onRedoTileStep() {
+    }
+
+    @Override
+    public void onRedoBuildStep() {
+    }
+
+    @Override
     public void onTileStackChange() {
     }
 

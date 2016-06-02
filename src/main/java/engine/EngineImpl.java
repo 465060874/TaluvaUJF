@@ -220,6 +220,10 @@ class EngineImpl implements Engine {
             if (status.getStep() == EngineStatus.TurnStep.TILE) {
                 volcanoTileStackChanged = true;
                 volcanoTileStack.next();
+                observers.forEach(EngineObserver::onRedoTileStep);
+            }
+            else {
+                observers.forEach(EngineObserver::onRedoBuildStep);
             }
 
             ActionSave save = redoList.remove(redoList.size() - 1);
@@ -238,7 +242,16 @@ class EngineImpl implements Engine {
         observers.forEach(status.getStep() == EngineStatus.TurnStep.TILE
                 ? EngineObserver::onTileStepStart
                 : EngineObserver::onBuildStepStart);
-        this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, status.getStep());
+
+        if (status instanceof EngineStatus.Running
+                && status.getStep() == EngineStatus.TurnStep.BUILD
+                && !getCurrentPlayer().isHuman()) {
+            // Hack, let's the IA starts from the tileStep
+            cancelLastStep();
+        }
+        else {
+            this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, status.getStep());
+        }
     }
 
     private void nextStep() {

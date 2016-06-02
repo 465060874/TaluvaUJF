@@ -17,6 +17,7 @@ public class EngineRecorder {
     private final List<PlayerHandlerType> handlers;
     private final List<VolcanoTile> tiles;
     private final List<Action> actions;
+    private int actionsIndex;
 
     public static EngineRecorder install(Engine engine) {
         return new EngineRecorder(engine);
@@ -31,6 +32,7 @@ public class EngineRecorder {
         this.tiles = new ArrayList<>();
         this.handlers = new ArrayList<>();
         this.actions = new ArrayList<>();
+        this.actionsIndex = 0;
     }
 
     private class Observer extends EngineObserver.Dummy {
@@ -45,28 +47,42 @@ public class EngineRecorder {
 
         @Override
         public void onCancelTileStep() {
-            actions.remove(actions.size() - 1);
+            actionsIndex--;
         }
 
         @Override
         public void onCancelBuildStep() {
-            actions.remove(actions.size() - 1);
+            actionsIndex--;
+        }
+
+        @Override
+        public void onRedoTileStep() {
+            actionsIndex++;
+        }
+
+        @Override
+        public void onRedoBuildStep() {
+            actionsIndex++;
         }
 
         public void onTilePlacementOnSea(SeaTileAction action) {
             actions.add(action);
+            actionsIndex++;
         }
 
         public void onTilePlacementOnVolcano(VolcanoTileAction action) {
             actions.add(action);
+            actionsIndex++;
         }
 
         public void onBuild(PlaceBuildingAction action) {
             actions.add(action);
+            actionsIndex++;
         }
 
         public void onExpand(ExpandVillageAction action) {
             actions.add(action);
+            actionsIndex++;
         }
 
         public void onEliminated(Player eliminated) {
@@ -77,6 +93,6 @@ public class EngineRecorder {
     }
 
     public EngineRecord getRecord() {
-        return new EngineRecord(gamemode, colors, handlers, tiles, actions);
+        return new EngineRecord(gamemode, colors, handlers, tiles, actions.subList(0, actionsIndex));
     }
 }

@@ -25,6 +25,16 @@ public interface EngineObserver {
     void onCancelBuildStep();
 
     /**
+     * Appelé quand une étape de placement de tuile est refaite
+     */
+    void onRedoTileStep();
+
+    /**
+     * Appelé quand une étape de placement de bâtiment est refaite
+     */
+    void onRedoBuildStep();
+
+    /**
      * Appelé à chaque fois que la pioche change
      */
     void onTileStackChange();
@@ -83,6 +93,14 @@ public interface EngineObserver {
 
         @Override
         public void onCancelBuildStep() {
+        }
+
+        @Override
+        public void onRedoTileStep() {
+        }
+
+        @Override
+        public void onRedoBuildStep() {
         }
 
         @Override
