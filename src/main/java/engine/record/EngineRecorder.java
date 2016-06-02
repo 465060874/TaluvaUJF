@@ -45,25 +45,26 @@ public class EngineRecorder {
                     .forEach(colors::add);
         }
 
-        public void onTileStackChange(boolean cancelled) {
-            if (cancelled) {
-                tiles.remove(tiles.size() - 1);
-            }
-            else {
-                tiles.add(engine.getVolcanoTileStack().current());
-            }
+        @Override
+        public void onCancelTileStep() {
+            tiles.remove(tiles.size() - 1);
+            actions.remove(actions.size() - 1);
         }
 
-        public void onTileStepStart(boolean cancelled) {
-            if (cancelled) {
-                actions.remove(actions.size() - 1);
-            }
+        @Override
+        public void onCancelBuildStep() {
+            tiles.remove(tiles.size() - 1);
+            actions.remove(actions.size() - 1);
         }
 
-        public void onBuildStepStart(boolean cancelled) {
-            if (cancelled) {
-                actions.remove(actions.size() - 1);
-            }
+        public void onTileStackChange() {
+            tiles.add(engine.getVolcanoTileStack().current());
+        }
+
+        public void onTileStepStart() {
+        }
+
+        public void onBuildStepStart() {
         }
 
         public void onTilePlacementOnSea(SeaTileAction action) {

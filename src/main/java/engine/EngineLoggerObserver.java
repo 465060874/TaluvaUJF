@@ -34,11 +34,19 @@ public class EngineLoggerObserver implements EngineObserver {
     }
 
     @Override
-    public void onTileStackChange(boolean cancelled) {
+    public void onCancelTileStep() {
     }
 
     @Override
-    public void onTileStepStart(boolean cancelled) {
+    public void onCancelBuildStep() {
+    }
+
+    @Override
+    public void onTileStackChange() {
+    }
+
+    @Override
+    public void onTileStepStart() {
         engine.logger().info("{0}* Turn {1} {2} {3}-{4} ({5} tiles remaining)",
                 prefix,
                 engine.getStatus().getTurn(),
@@ -49,7 +57,7 @@ public class EngineLoggerObserver implements EngineObserver {
     }
 
     @Override
-    public void onBuildStepStart(boolean cancelled) {
+    public void onBuildStepStart() {
     }
 
     @Override

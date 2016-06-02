@@ -37,14 +37,7 @@ class EasyAlgorithm implements IAAlgorithm {
 
 
     private Move doPlay() {
-        System.out.println("Sea : " + engine.getSeaTileActions());
-        System.out.println("Vol : " + engine.getVolcanoTileActions());
-        System.out.println("Bld : " + engine.getPlaceBuildingActions());
-        System.out.println("Ext : " + engine.getExpandVillageActions());
-
-
         int n = engine.getRandom().nextInt(3);
-        BuildingType type;
         Move savedMove = null;
 
         // Temple en premier

@@ -15,21 +15,31 @@ public interface EngineObserver {
     void onStart();
 
     /**
+     * Appelé quand une étape de placement de tuile est annulée
+     */
+    void onCancelTileStep();
+
+    /**
+     * Appelé quand une étape de placement de bâtiment est annulée
+     */
+    void onCancelBuildStep();
+
+    /**
      * Appelé à chaque fois que la pioche change
      */
-    void onTileStackChange(boolean cancelled);
+    void onTileStackChange();
 
     /**
      * Appelé à chaque fois qu'un joueur commence la phase
      * de placement de tuile de son tour
      */
-    void onTileStepStart(boolean cancelled);
+    void onTileStepStart();
 
     /**
      * Appelé à chaque fois qu'un joueur commence la phase
      * de construction de son tour
      */
-    void onBuildStepStart(boolean cancelled);
+    void onBuildStepStart();
 
     /**
      * Appelé quand une tuile est placé sur la mer
@@ -61,4 +71,54 @@ public interface EngineObserver {
      */
     void onWin(EngineStatus.FinishReason reason, List<Player> winners);
 
+    abstract class Dummy implements EngineObserver {
+
+        @Override
+        public void onStart() {
+        }
+
+        @Override
+        public void onCancelTileStep() {
+        }
+
+        @Override
+        public void onCancelBuildStep() {
+        }
+
+        @Override
+        public void onTileStackChange() {
+        }
+
+        @Override
+        public void onTileStepStart() {
+        }
+
+        @Override
+        public void onBuildStepStart() {
+        }
+
+        @Override
+        public void onTilePlacementOnSea(SeaTileAction action) {
+        }
+
+        @Override
+        public void onTilePlacementOnVolcano(VolcanoTileAction action) {
+        }
+
+        @Override
+        public void onBuild(PlaceBuildingAction action) {
+        }
+
+        @Override
+        public void onExpand(ExpandVillageAction action) {
+        }
+
+        @Override
+        public void onEliminated(Player eliminated) {
+        }
+
+        @Override
+        public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
+        }
+    }
 }

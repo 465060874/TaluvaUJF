@@ -147,11 +147,11 @@ class EngineImpl implements Engine {
         observers.forEach(EngineObserver::onStart);
 
         volcanoTileStack.next();
-        observers.forEach(o -> o.onTileStackChange(false));
+        observers.forEach(o -> o.onTileStackChange());
 
         actions.updateAll();
 
-        observers.forEach(o -> o.onTileStepStart(false));
+        observers.forEach(o -> o.onTileStepStart());
         this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, EngineStatus.TurnStep.TILE);
     }
 
@@ -174,6 +174,10 @@ class EngineImpl implements Engine {
             if (status.getStep() == EngineStatus.TurnStep.TILE) {
                 volcanoTileStackChanged = true;
                 volcanoTileStack.previous();
+                observers.forEach(EngineObserver::onCancelTileStep);
+            }
+            else {
+                observers.forEach(EngineObserver::onCancelBuildStep);
             }
 
             ActionSave save = actionSaves.remove(actionSaves.size() - 1);
@@ -182,13 +186,13 @@ class EngineImpl implements Engine {
 
 
         if (volcanoTileStackChanged) {
-            observers.forEach(o -> o.onTileStackChange(true));
+            observers.forEach(EngineObserver::onTileStackChange);
         }
 
         actions.updateAll();
         observers.forEach(status.getStep() == EngineStatus.TurnStep.TILE
-                ? o -> o.onTileStepStart(true)
-                : o -> o.onBuildStepStart(true));
+                ? EngineObserver::onTileStepStart
+                : EngineObserver::onBuildStepStart);
         this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, status.getStep());
     }
 
@@ -200,14 +204,14 @@ class EngineImpl implements Engine {
             do { playerIndex++; } while (getCurrentPlayer().isEliminated());
 
             volcanoTileStack.next();
-            observers.forEach(o -> o.onTileStackChange(true));
+            observers.forEach(o -> o.onTileStackChange());
             if (checkTileStackEmpty()) {
                 return;
             }
 
             actions.updateAll();
 
-            observers.forEach(o -> o.onTileStepStart(true));
+            observers.forEach(o -> o.onTileStepStart());
             this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, EngineStatus.TurnStep.TILE);
         }
         else {
@@ -216,7 +220,7 @@ class EngineImpl implements Engine {
                 return;
             }
 
-            observers.forEach(o -> o.onBuildStepStart(true));
+            observers.forEach(o -> o.onBuildStepStart());
         }
     }
 
@@ -398,10 +402,6 @@ class EngineImpl implements Engine {
         }
 
         actionSaves.add(new ActionSave.Tile(this, action));
-        if( getStatus().getTurn() == 22
-                && action.getVolcanoHex().getLine() == 0
-                && action.getVolcanoHex().getDiag() == -1)
-            getGamemode();
         island.putTile(volcanoTileStack.current(), action.getVolcanoHex(), action.getOrientation());
 
         observers.forEach(o -> o.onTilePlacementOnVolcano(action));

@@ -50,7 +50,7 @@ public interface VolcanoTileStack {
         Factory factory = VolcanoTileStack.randomFactory(StandardVolcanoTiles.LIST);
         VolcanoTileStack tileStack = factory.create(24, new Random());
 
-        File file = new File("stack");
+        File file = new File("stack3");
         tileStack.saveAll(Files.asCharSink(file, StandardCharsets.UTF_8));
     }
 }

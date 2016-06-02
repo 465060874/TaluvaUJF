@@ -43,6 +43,7 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     public Hud(Engine engine) {
         this.engine = engine;
+        IconButton redoButton = new IconButton("ui/hud/redo.png");
 
         List<Player> players = engine.getPlayers();
         this.playerViews = new PlayerView[players.size()];
@@ -67,12 +68,14 @@ public class Hud extends AnchorPane implements EngineObserver {
 
         IconButton undoButton = new IconButton("ui/hud/undo.png");
         undoButton.setOnAction(this::undo);
+        redoButton.setOnAction(this::redo);
+
         this.tileStackCanvas = new TileStackCanvas(engine);
         this.tileStackSize = new Text();
         tileStackSize.setFont(new Font(20));
         TextFlow tileStackSizeFlow = new TextFlow(tileStackSize);
         tileStackSizeFlow.setTextAlignment(TextAlignment.CENTER);
-        this.tileStackPane = new VBox(undoButton, tileStackCanvas, tileStackSizeFlow);
+        this.tileStackPane = new VBox(undoButton, redoButton, tileStackCanvas, tileStackSizeFlow);
         AnchorPane.setRightAnchor(tileStackPane, 0.0);
 
         getChildren().addAll(leftButtons, textBottom, tileStackPane);
@@ -88,6 +91,9 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     private void undo(ActionEvent event) {
         engine.cancelUntil(e -> e.getCurrentPlayer().isHuman() && e.getStatus().getStep() == EngineStatus.TurnStep.TILE);
+    }
+
+    private void redo(ActionEvent event) {
     }
 
     private void resizeWidth(Observable observable) {
@@ -113,20 +119,28 @@ public class Hud extends AnchorPane implements EngineObserver {
     }
 
     @Override
-    public void onTileStackChange(boolean cancelled) {
+    public void onCancelTileStep() {
+    }
+
+    @Override
+    public void onCancelBuildStep() {
+    }
+
+    @Override
+    public void onTileStackChange() {
         tileStackCanvas.redraw();
         tileStackSize.setText(Integer.toString(engine.getVolcanoTileStack().size()));
     }
 
     @Override
-    public void onTileStepStart(boolean cancelled) {
+    public void onTileStepStart() {
         for (PlayerView playerView : playerViews) {
             playerView.updateTurn();
         }
     }
 
     @Override
-    public void onBuildStepStart(boolean cancelled) {
+    public void onBuildStepStart() {
         tileStackCanvas.redraw();
         tileStackSize.setText(Integer.toString(engine.getVolcanoTileStack().size() - 1));
     }

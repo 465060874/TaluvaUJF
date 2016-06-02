@@ -1,5 +1,6 @@
 package ui.hud;
 
+import javafx.beans.Observable;
 import javafx.scene.control.Button;
 import javafx.scene.effect.Light;
 import javafx.scene.effect.Lighting;
@@ -14,9 +15,6 @@ public class IconButton extends Button {
 
     private final ImageView icon;
 
-    private boolean hover;
-    private boolean pressed;
-
     public IconButton(String url) {
         this.icon = new ImageView(url);
         icon.setFitWidth(60);
@@ -24,17 +22,15 @@ public class IconButton extends Button {
 
         setBackground(Background.EMPTY);
         setGraphic(icon);
-        setOnMouseEntered(e -> { hover = true; update(); });
-        setOnMouseExited(e -> { hover = false; update(); });
-        setOnMousePressed(e -> { pressed = true; update(); });
-        setOnMouseReleased(e -> { pressed = false; update(); });
+        hoverProperty().addListener(this::update);
+        pressedProperty().addListener(this::update);
     }
 
-    private void update() {
-        if (pressed) {
+    private void update(Observable observable) {
+        if (isPressed()) {
             icon.setEffect(LIGHTING_PRESSED);
         }
-        else if (hover) {
+        else if (isHover()) {
             icon.setEffect(LIGHTING_HOVER);
         }
         else {

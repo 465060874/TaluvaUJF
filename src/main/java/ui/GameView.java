@@ -80,16 +80,24 @@ public class GameView extends StackPane implements EngineObserver {
     }
 
     @Override
-    public void onTileStackChange(boolean cancelled) {
+    public void onCancelTileStep() {
     }
 
     @Override
-    public void onTileStepStart(boolean cancelled) {
+    public void onCancelBuildStep() {
+    }
+
+    @Override
+    public void onTileStackChange() {
+    }
+
+    @Override
+    public void onTileStepStart() {
         islandView.redrawIsland();
     }
 
     @Override
-    public void onBuildStepStart(boolean cancelled) {
+    public void onBuildStepStart() {
         islandView.redrawIsland();
     }
 
