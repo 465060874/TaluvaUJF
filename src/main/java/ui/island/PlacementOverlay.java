@@ -42,7 +42,7 @@ class PlacementOverlay extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         gc.clearRect(0, 0, getWidth(), getHeight());
 
-        if (!placement.valid) {
+        if (!placement.isValid()) {
             BuildingStyle buildingStyle;
             if (placement.mode == Placement.Mode.BUILDING) {
                 if (placement.isValid()) {

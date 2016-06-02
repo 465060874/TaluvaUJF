@@ -13,9 +13,8 @@ import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -29,6 +28,7 @@ import static java.util.stream.Collectors.joining;
 public class Hud extends AnchorPane implements EngineObserver {
 
     private final Engine engine;
+    private final Placement placement;
 
     private final PlayerView[] playerViews;
 
@@ -36,7 +36,8 @@ public class Hud extends AnchorPane implements EngineObserver {
     private final Button homeButton;
     private final Button saveButton;
 
-    private final Text textLine;
+    private final Text infoLine;
+    private final Text errorLine;
     private final TextFlow textBottom;
 
     private final IconButton undoButton;
@@ -47,6 +48,8 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     public Hud(Engine engine, Placement placement) {
         this.engine = engine;
+        this.placement = placement;
+        placement.initHud(this);
 
         List<Player> players = engine.getPlayers();
         this.playerViews = new PlayerView[players.size()];
@@ -62,11 +65,27 @@ public class Hud extends AnchorPane implements EngineObserver {
         AnchorPane.setLeftAnchor(leftButtons, 0.0);
 
         Font font = new Font(18);
-        this.textLine = new Text("");
-        textLine.setFont(font);
-        this.textBottom = new TextFlow(textLine);
+
+        this.infoLine = new Text("");
+        infoLine.setFont(font);
+        infoLine.setFill(Color.GREEN);
+        this.errorLine = new Text("");
+        errorLine.setFont(font);
+        errorLine.setFill(Color.RED);
+
+        this.textBottom = new TextFlow(infoLine, new Text("\n"), errorLine);
         textBottom.setTextAlignment(TextAlignment.CENTER);
         textBottom.setPadding(new Insets(0, 0, 20, 0));
+        textBottom.setBackground(new Background(new BackgroundFill(
+                Color.BEIGE,
+                CornerRadii.EMPTY,
+                Insets.EMPTY)));
+        textBottom.setBorder(new Border(new BorderStroke(
+                Color.BLACK,
+                BorderStrokeStyle.SOLID,
+                CornerRadii.EMPTY,
+                BorderWidths.FULL,
+                Insets.EMPTY)));
         AnchorPane.setBottomAnchor(textBottom, 0.0);
 
         this.undoButton = new IconButton("ui/hud/undo.png", 0.5);
@@ -114,8 +133,9 @@ public class Hud extends AnchorPane implements EngineObserver {
         layoutChildren();
     }
 
-    private void updateText(String value) {
-        textLine.setText(value);
+    private void updateText(Text line, String value) {
+        line.setText(value);
+        textBottom.setVisible(infoLine.getText().length() > 0 || errorLine.getText().length() > 0);
         resizeWidth(null);
     }
 
@@ -190,9 +210,9 @@ public class Hud extends AnchorPane implements EngineObserver {
         }
 
         if (winners.size() == 1) {
-            updateText("Le joueur " + winners.get(0).getColor() + " a gagné !");
+            updateText(infoLine, "Le joueur " + winners.get(0).getColor() + " a gagné !");
         } else {
-            updateText(winners.stream()
+            updateText(infoLine, winners.stream()
                     .map(Player::getColor)
                     .map(PlayerColor::name)
                     .collect(joining(", ", "Les joueurs ", " ont gagné !")));
@@ -207,4 +227,7 @@ public class Hud extends AnchorPane implements EngineObserver {
         return saveButton;
     }
 
+    public void updateProblems() {
+        updateText(errorLine, ProblemTrad.trad(placement.getProblems()));
+    }
 }

@@ -8,14 +8,22 @@ import data.PlayerColor;
 import data.VolcanoTile;
 import engine.Engine;
 import engine.action.*;
-import engine.rules.PlaceBuildingRules;
-import engine.rules.TileRules;
-import map.*;
+import engine.rules.*;
+import map.Field;
+import map.Hex;
+import map.Orientation;
+import map.Village;
+import ui.hud.Hud;
 
 import java.util.*;
 
 import static com.google.common.base.Preconditions.checkState;
 
+/**
+ * TODO: Retravailler pour en faire un model depuis lesquelles
+ * TODO: les differents composants grpahiques tirent leurs
+ * TODO: informations avec le système Observer/Observable
+ */
 public class Placement {
 
     public enum Mode {
@@ -30,6 +38,7 @@ public class Placement {
 
     IslandCanvas islandCanvas;
     PlacementOverlay placementOverlay;
+    Hud hud;
 
     double mouseX;
     double mouseY;
@@ -37,7 +46,7 @@ public class Placement {
     Mode mode;
     Mode saveMode;
 
-    boolean valid;
+    Problems problems;
     Set<Hex> validHexes;
     Hex hex;
 
@@ -57,8 +66,12 @@ public class Placement {
 
         this.mode = Mode.NONE;
         this.saveMode = Mode.NONE;
-        this.valid = false;
+        this.problems = Problems.of();
         this.hex = Hex.at(0, 0);
+    }
+
+    public void initHud(Hud hud) {
+        this.hud = hud;
     }
 
     public PlayerColor getActivePlayerColor() {
@@ -66,7 +79,11 @@ public class Placement {
     }
 
     public boolean isValid() {
-        return valid;
+        return problems.isValid();
+    }
+
+    public Problems getProblems() {
+        return problems;
     }
 
     public Hex getHex() {
@@ -74,7 +91,7 @@ public class Placement {
     }
 
     public Action getAction() {
-        checkState(mode != Mode.NONE && valid);
+        checkState(mode != Mode.NONE && isValid());
         if (mode == Mode.TILE) {
             return engine.getIsland().getField(hex) == Field.SEA
                     ? new SeaTileAction(tile, hex, tileOrientation)
@@ -135,7 +152,7 @@ public class Placement {
 
     public void cancel() {
         this.mode = Mode.NONE;
-        if (valid) {
+        if (problems.isValid()) {
             islandCanvas.redraw();
         }
         else {
@@ -165,7 +182,7 @@ public class Placement {
         Hex newHex = grid.xyToHex(x, y, width, height);
 
         if (newHex.equals(hex)) {
-            if (!valid) {
+            if (!problems.isValid()) {
                 placementOverlay.redraw();
             }
             return;
@@ -189,15 +206,17 @@ public class Placement {
     }
 
     private void updateValidTile() {
-        boolean wasValid = valid;
-        this.valid = TileRules.validate(engine.getIsland(), tile, hex, tileOrientation).isValid();
+        boolean wasValid = isValid();
+        problems = TileRules.validate(engine.getIsland(), tile, hex, tileOrientation);
+        hud.updateProblems();
 
         redrawWhatsNecessary(wasValid);
     }
 
     private void updateValidBuilding() {
-        boolean wasValid = valid;
-        this.valid = PlaceBuildingRules.validate(engine, buildingType, hex).isValid();
+        boolean wasValid = isValid();
+        this.problems = PlaceBuildingRules.validate(engine, buildingType, hex);
+        hud.updateProblems();
         redrawWhatsNecessary(wasValid);
         /*
         List<BuildingType> otherAvailableBuildings = otherAvailableBuildings(buildingType);
@@ -221,11 +240,11 @@ public class Placement {
     }
 
     private void redrawWhatsNecessary(boolean wasValid) {
-        if (wasValid != valid) {
+        if (wasValid != isValid()) {
             placementOverlay.redraw();
             islandCanvas.redraw();
         }
-        else if (valid) {
+        else if (isValid()) {
             islandCanvas.redraw();
         }
         else {
@@ -243,14 +262,16 @@ public class Placement {
                 expansionFieldType = entry.getKey();
                 expansionHexes = ImmutableSet.copyOf(entry.getValue());
                 islandCanvas.redraw();
-                valid = !expansionHexes.isEmpty();
+                problems = ExpandVillageRules.validate(engine, expansionVillage, expansionFieldType);
+                hud.updateProblems();
                 return;
             }
         }
 
         expansionFieldType = null;
         expansionHexes = ImmutableSet.of();
-        valid = false;
+        problems = Problems.of(Problem.EXPAND_NO_ADJACENT_TILE);
+        hud.updateProblems();
         islandCanvas.redraw();
     }
 

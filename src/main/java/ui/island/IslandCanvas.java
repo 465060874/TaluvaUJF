@@ -59,7 +59,7 @@ class IslandCanvas extends Canvas {
         List<HexToDraw> hexesToDraw = new ArrayList<>();
         islandHexes(hexesToDraw);
 
-        if (placement.valid && placement.mode == Placement.Mode.TILE) {
+        if (placement.isValid() && placement.mode == Placement.Mode.TILE) {
             placedHexes(hexesToDraw);
         }
 
@@ -120,7 +120,7 @@ class IslandCanvas extends Canvas {
                 }
             }
             else if (placement.mode == Placement.Mode.BUILDING) {
-                if (placement.valid && placement.hex.equals(hex)) {
+                if (placement.isValid() && placement.hex.equals(hex)) {
                     building = Building.of(placement.buildingType, placement.buildingColor);
                     hexStyle = HexStyle.HIGHLIGHTED;
                 }
