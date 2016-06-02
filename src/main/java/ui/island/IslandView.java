@@ -30,7 +30,7 @@ public class IslandView extends StackPane {
     public IslandView(Island island, Grid grid, Placement placement, boolean debug) {
         this.grid = grid;
         this.placementOverlay = new PlacementOverlay(island, grid, placement);
-        this.islandCanvas = new IslandCanvas(island, grid, placement, debug);
+        this.islandCanvas = new IslandCanvas(island, grid, placement, true);//debug);
         placement.islandCanvas = islandCanvas;
         placement.placementOverlay = placementOverlay;
 

@@ -11,29 +11,27 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 class BotPlayerTurnFx implements PlayerTurn {
 
-    private static long DELAY = 1;
+    private static long DELAY = 600;
 
     private final Engine engine;
     private final AtomicBoolean cancelled;
     private final IAAlgorithm algorithm;
-    private final EngineStatus.TurnStep step;
 
     private Move move;
+
+    BotPlayerTurnFx(Engine engine, IAAlgorithm player) {
+        this.engine = engine;
+        this.cancelled = new AtomicBoolean(false);
+        this.algorithm = player;
+
+        this.move = null;
+        runThread(this::doPlay);
+    }
 
     private void runThread(Runnable runnable) {
         Thread thread = new Thread(runnable);
         CustomUncaughtExceptionHandler.install(thread, engine);
         thread.start();
-    }
-
-    BotPlayerTurnFx(Engine engine, IAAlgorithm player, EngineStatus.TurnStep step) {
-        this.engine = engine;
-        this.cancelled = new AtomicBoolean(false);
-        this.algorithm = player;
-        this.step = step;
-
-        this.move = null;
-        runThread(this::doPlay);
     }
 
     @Override
@@ -48,9 +46,7 @@ class BotPlayerTurnFx implements PlayerTurn {
         long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
         engine.logger().info("[IA] {0}ms pour determiner le coup à jouer", duration);
 
-        waitAndThen(startNanos, step == EngineStatus.TurnStep.TILE
-                ? this::tileStep
-                : this::buildStep);
+        waitAndThen(startNanos, this::tileStep);
     }
 
 

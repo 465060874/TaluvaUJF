@@ -151,11 +151,11 @@ class EngineImpl implements Engine {
         observers.forEach(EngineObserver::onStart);
 
         volcanoTileStack.next();
-        observers.forEach(o -> o.onTileStackChange());
+        observers.forEach(EngineObserver::onTileStackChange);
 
         actions.updateAll();
 
-        observers.forEach(o -> o.onTileStepStart());
+        observers.forEach(EngineObserver::onTileStepStart);
         this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, EngineStatus.TurnStep.TILE);
     }
 
@@ -250,14 +250,14 @@ class EngineImpl implements Engine {
             do { playerIndex++; } while (getCurrentPlayer().isEliminated());
 
             volcanoTileStack.next();
-            observers.forEach(o -> o.onTileStackChange());
+            observers.forEach(EngineObserver::onTileStackChange);
             if (checkTileStackEmpty()) {
                 return;
             }
 
             actions.updateAll();
 
-            observers.forEach(o -> o.onTileStepStart());
+            observers.forEach(EngineObserver::onTileStepStart);
             this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, EngineStatus.TurnStep.TILE);
         }
         else {
@@ -266,7 +266,7 @@ class EngineImpl implements Engine {
                 return;
             }
 
-            observers.forEach(o -> o.onBuildStepStart());
+            observers.forEach(EngineObserver::onBuildStepStart);
         }
     }
 

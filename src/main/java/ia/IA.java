@@ -1,6 +1,5 @@
 package ia;
 
-import com.google.common.base.Preconditions;
 import engine.Engine;
 import engine.EngineStatus;
 import engine.PlayerHandler;
@@ -41,8 +40,8 @@ public enum IA implements PlayerHandler {
         checkArgument(step == EngineStatus.TurnStep.TILE, "IA does not allow starting turn for BUILD step");
         IAAlgorithm algorithm = createAlgorithm(engine.copyWithoutObservers(), new AtomicBoolean(false));
         return Platform.isFxApplicationThread()
-                ? new BotPlayerTurnFx(engine, algorithm, step)
-                : new BotPlayerTurn(engine, algorithm, step);
+                ? new BotPlayerTurnFx(engine, algorithm)
+                : new BotPlayerTurn(engine, algorithm);
     }
 
     protected abstract IAAlgorithm createAlgorithm(Engine engine, AtomicBoolean cancelled);

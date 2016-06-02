@@ -17,14 +17,14 @@ import static com.google.common.base.Verify.verify;
  * Permet de configurer la création d'une nouvelle instance d'Engine
  * Usage typique :
  *     Engine engine = EngineBuilder.allVsAll()
- *         .player(PlayerColor.RED, MonImplementationDePlayerHandler::new)
- *         .player(PlayerColor.WHITE, MonAutreImplementationDePlayerHandler::new)
+ *         .player(PlayerColor.RED, monImplementationDePlayerHandler)
+ *         .player(PlayerColor.WHITE, monAutreImplementationDePlayerHandler)
  *         .build();
  *
  * Ou encore :
  *     Engine engine = EngineBuilder.teamVsTeam()
- *         .team(PlayerColor.RED, PlayerColor.WHITE, HumanPlayerHandlerFactory::new)
- *         .team(PlayerColor.BROWN, PlayerColor.YELLOW, IAPlayerHandlerFactory::new)
+ *         .team(PlayerColor.RED, PlayerColor.WHITE, HumanPlayerHandler)
+ *         .team(PlayerColor.BROWN, PlayerColor.YELLOW, IAPlayerHandler)
  *         .build();
  */
 public abstract class EngineBuilder<B extends EngineBuilder> {
@@ -153,24 +153,24 @@ public abstract class EngineBuilder<B extends EngineBuilder> {
             return this;
         }
 
-        public TeamVsTeam team(PlayerColor color1, PlayerColor color2, PlayerHandler factory) {
+        public TeamVsTeam team(PlayerColor color1, PlayerColor color2, PlayerHandler playerHandler) {
             checkNotNull(color1);
             checkNotNull(color2);
-            checkNotNull(factory);
+            checkNotNull(playerHandler);
             checkArgument(color1 != color2, "Can't use the same color");
             checkState(playerHandler2 == null, "Can't add more than 2 team");
 
             if (playerHandler1 == null) {
                 color11 = color1;
                 color12 = color2;
-                playerHandler1 = factory;
+                playerHandler1 = playerHandler;
             }
             else {
                 checkArgument(color1 != color12 && color1 != color21, "Color already taken");
                 checkArgument(color2 != color12 && color2 != color21, "Color already taken");
                 color21 = color1;
                 color22 = color2;
-                playerHandler2 = factory;
+                playerHandler2 = playerHandler;
             }
 
             return this;

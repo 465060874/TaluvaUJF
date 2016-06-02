@@ -38,7 +38,7 @@ public class IADebug implements PlayerHandler {
         IAAlgorithm algorithm = new AlphaBetaAlgorithm(branchingFactor, depth, heuristics,
                 engine.copyWithoutObservers(), cancelled);
         return Platform.isFxApplicationThread()
-                ? new BotPlayerTurnFx(engine, algorithm, step)
-                : new BotPlayerTurn(engine, algorithm, step);
+                ? new BotPlayerTurnFx(engine, algorithm)
+                : new BotPlayerTurn(engine, algorithm);
     }
 }
