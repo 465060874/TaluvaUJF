@@ -50,10 +50,8 @@ public class Hud extends AnchorPane implements EngineObserver {
     private final TextFlow textBottom;
     private final VBox rightPane;
 
-    private final Text tileStackSize;
-    private final VBox tileStackPane;
-    private final IconButton showForbidenHex;
-    private final IconButton showForbiddenBuildings;
+    private final IconButton showForbidenHexButton;
+    private final IconButton showForbiddenBuildingsButton;
 
     public Hud(Engine engine, Placement placement) {
         this.engine = engine;
@@ -130,32 +128,22 @@ public class Hud extends AnchorPane implements EngineObserver {
         redoButton.setOnAction(this::redo);
         HBox undoRedoPane = new HBox(undoButton, redoButton);
 
-        this.tileStackCanvas = new TileStackCanvas(engine);
-
-        this.rightPane = new VBox(undoRedoPane, tileStackCanvas);
-        AnchorPane.setRightAnchor(rightPane, 0.0);
-
-        this.tileStackSize = new Text();
-        tileStackSize.setFont(new Font(20));
-        TextFlow tileStackSizeFlow = new TextFlow(tileStackSize);
-        tileStackSizeFlow.setTextAlignment(TextAlignment.CENTER);
-
-        this.showForbidenHex = new IconButton("ui/hud/forbidenHexagon.png");
+        this.showForbidenHexButton = new IconButton("ui/hud/forbidenHexagon.png");
         final Tooltip showForbiddenHexToolTip = new Tooltip();
         showForbiddenHexToolTip.setText("Afficher les placements de tuiles interdits");
-        showForbidenHex.setTooltip(showForbiddenHexToolTip);
-        showForbidenHex.setOnAction(this::drawForbiddenPlacement);
+        showForbidenHexButton.setTooltip(showForbiddenHexToolTip);
+        showForbidenHexButton.setOnAction(this::drawForbiddenPlacement);
 
 
-        this.showForbiddenBuildings = new IconButton("ui/hud/forbiddenHut.png");
+        this.showForbiddenBuildingsButton = new IconButton("ui/hud/forbiddenHut.png");
         final Tooltip showForbiddenBuildingsToolTip = new Tooltip();
         showForbiddenBuildingsToolTip.setText("Afficher les placements de Batiments interdits");
-        showForbiddenBuildings.setTooltip(showForbiddenBuildingsToolTip);
-        showForbiddenBuildings.setOnAction(this::drawForbiddenBuildings);
+        showForbiddenBuildingsButton.setTooltip(showForbiddenBuildingsToolTip);
+        showForbiddenBuildingsButton.setOnAction(this::drawForbiddenBuildings);
 
-
-        this.tileStackPane = new VBox(showForbiddenBuildings, showForbidenHex, undoRedoPane, tileStackCanvas, tileStackSizeFlow);
-        AnchorPane.setRightAnchor(tileStackPane, 0.0);
+        this.tileStackCanvas = new TileStackCanvas(engine);
+        this.rightPane = new VBox(showForbiddenBuildingsButton, showForbidenHexButton, undoRedoPane, tileStackCanvas);
+        AnchorPane.setRightAnchor(rightPane, 0.0);
 
         getChildren().addAll(leftButtons, textBottom, rightPane);
 
