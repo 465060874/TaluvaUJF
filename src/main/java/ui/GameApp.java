@@ -5,7 +5,6 @@ import data.PlayerColor;
 import engine.*;
 import engine.action.Action;
 import engine.action.SeaTileAction;
-import ia.IA;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -31,10 +30,13 @@ public class GameApp extends Application {
     private Stage stage;
 
     public GameApp() {
+        FXPlayerHandler handler = new FXPlayerHandler();
         this.engine = EngineBuilder.allVsAll()
                 .logLevel(Level.INFO)
-                .player(PlayerColor.RED, new FXPlayerHandler())
-                .player(PlayerColor.WHITE, IA.FACILE)
+                .player(PlayerColor.RED, handler)
+                .player(PlayerColor.WHITE, handler)
+                .player(PlayerColor.BROWN, handler)
+                .player(PlayerColor.YELLOW, handler)
                 .build();
     }
 

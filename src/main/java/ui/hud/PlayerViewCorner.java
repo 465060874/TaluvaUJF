@@ -2,7 +2,6 @@ package ui.hud;
 
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.CornerRadii;
 
 public enum PlayerViewCorner {
 
@@ -14,13 +13,23 @@ public enum PlayerViewCorner {
         }
 
         @Override
-        CornerRadii faceRadii() {
-            return new CornerRadii(0, 100, 100, 100, true);
+        public double imageX(double width) {
+            return 0;
         }
 
         @Override
-        CornerRadii buildingsRadii() {
-            return new CornerRadii(0, 0, 20, 0, false);
+        public double imageY(double height) {
+            return 0;
+        }
+
+        @Override
+        public double arcX(double radius) {
+            return -radius;
+        }
+
+        @Override
+        public double arcY(double radius) {
+            return -radius;
         }
     },
 
@@ -32,13 +41,23 @@ public enum PlayerViewCorner {
         }
 
         @Override
-        CornerRadii faceRadii() {
-            return new CornerRadii(100, 0, 100, 100, true);
+        public double imageX(double width) {
+            return width / 2;
         }
 
         @Override
-        CornerRadii buildingsRadii() {
-            return new CornerRadii(0, 0, 0, 20, false);
+        public double imageY(double height) {
+            return 0;
+        }
+
+        @Override
+        public double arcX(double radius) {
+            return 0;
+        }
+
+        @Override
+        public double arcY(double radius) {
+            return -radius;
         }
     },
 
@@ -50,13 +69,23 @@ public enum PlayerViewCorner {
         }
 
         @Override
-        CornerRadii faceRadii() {
-            return new CornerRadii(100, 100, 0, 100, true);
+        public double imageX(double width) {
+            return width  / 2;
         }
 
         @Override
-        CornerRadii buildingsRadii() {
-            return new CornerRadii(20, 0, 0, 0, false);
+        public double imageY(double height) {
+            return height / 2;
+        }
+
+        @Override
+        public double arcX(double radius) {
+            return 0;
+        }
+
+        @Override
+        public double arcY(double radius) {
+            return 0;
         }
     },
 
@@ -68,13 +97,23 @@ public enum PlayerViewCorner {
         }
 
         @Override
-        CornerRadii faceRadii() {
-            return new CornerRadii(100, 100, 100, 0, true);
+        public double imageX(double width) {
+            return 0;
         }
 
         @Override
-        CornerRadii buildingsRadii() {
-            return new CornerRadii(0, 20, 0, 0, false);
+        public double imageY(double height) {
+            return height / 2;
+        }
+
+        @Override
+        public double arcX(double radius) {
+            return -radius;
+        }
+
+        @Override
+        public double arcY(double radius) {
+            return 0;
         }
     };
 
@@ -84,8 +123,11 @@ public enum PlayerViewCorner {
 
     abstract void anchor(Node node, double horizontalOffset);
 
+    abstract double imageX(double width);
 
-    abstract CornerRadii faceRadii();
+    abstract double imageY(double height);
 
-    abstract CornerRadii buildingsRadii();
+    abstract double arcX(double radius);
+
+    abstract double arcY(double radius);
 }

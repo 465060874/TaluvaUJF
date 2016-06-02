@@ -20,6 +20,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
+import ui.island.Placement;
 
 import java.util.List;
 
@@ -44,13 +45,13 @@ public class Hud extends AnchorPane implements EngineObserver {
     private final Text tileStackSize;
     private final VBox tileStackPane;
 
-    public Hud(Engine engine) {
+    public Hud(Engine engine, Placement placement) {
         this.engine = engine;
 
         List<Player> players = engine.getPlayers();
         this.playerViews = new PlayerView[players.size()];
         for (int i = 0; i < players.size(); i++) {
-            playerViews[i] = new PlayerView(engine, i);
+            playerViews[i] = new PlayerView(engine, i, placement);
             getChildren().add(playerViews[i]);
         }
 

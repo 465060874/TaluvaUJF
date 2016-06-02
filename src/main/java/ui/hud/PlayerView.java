@@ -1,47 +1,40 @@
 package ui.hud;
 
 import data.BuildingType;
-import theme.PlayerTheme;
 import engine.Engine;
 import engine.Player;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import map.Building;
+import theme.PlayerTheme;
+import ui.island.Placement;
 
-public class PlayerView extends AnchorPane {
+public class PlayerView extends Canvas {
 
-    private static final int WIDTH_TURN = 172;
-    private static final int HEIGHT_TURN = 172;
-    private static final int WIDTH_NOT_TURN = WIDTH_TURN / 2;
-    private static final int HEIGHT_NOT_TURN = HEIGHT_TURN / 2;
+    static final int WIDTH_TURN = 172;
+    static final int HEIGHT_TURN = 172;
+    static final int WIDTH_NOT_TURN = WIDTH_TURN / 2;
+    static final int HEIGHT_NOT_TURN = HEIGHT_TURN / 2;
     private static final Color BORDER_COLOR = Color.web("303030");
 
     private final Engine engine;
     private final int index;
-    private final ImageView faceView;
-    private final BorderPane facePane;
-    private final Text[] buildingTexts;
-    private final HBox buildingsPane;
+    private final Placement placement;
+    private final Image faceImage;
 
-    public PlayerView(Engine engine, int index) {
+    public PlayerView(Engine engine, int index, Placement placement) {
+        super(WIDTH_NOT_TURN, HEIGHT_NOT_TURN);
         this.engine = engine;
         this.index = index;
+        this.placement = placement;
 
-        this.faceView = new ImageView(PlayerTheme.of(player().getColor()).getImage());
+        this.faceImage = PlayerTheme.of(player().getColor()).getImage();
         corner().anchor(this);
-        this.facePane = new BorderPane();
-        facePane.setBackground(createBackground(corner().faceRadii()));
-        facePane.setBorder(createBorder(corner().faceRadii()));
-        corner().anchor(facePane);
 
-        this.buildingsPane = new HBox(20);
-        buildingsPane.setAlignment(Pos.CENTER);
+        /*this.buildingsCanvas = new HBox(20);
+        buildingsCanvas.setAlignment(Pos.CENTER);
         this.buildingTexts = new Text[BuildingType.values().length];
         for (BuildingType type : BuildingType.values()) {
             if (type == BuildingType.NONE) {
@@ -51,30 +44,14 @@ public class PlayerView extends AnchorPane {
             buildingTexts[type.ordinal()] = new Text(String.valueOf(player().getBuildingCount(type)));
             buildingTexts[type.ordinal()].setFont(new Font(14));
             BuildingCanvas buildingCanvas = new BuildingCanvas(Building.of(type, player().getColor()));
-            buildingsPane.getChildren().addAll(
+            buildingsCanvas.getChildren().addAll(
                     buildingCanvas,
                     buildingTexts[type.ordinal()]);
         }
-        buildingsPane.setBackground(createBackground(corner().buildingsRadii()));
-        buildingsPane.setBorder(createBorder(corner().buildingsRadii()));
+        buildingsCanvas.setBackground(createBackground(corner().buildingsRadii()));
+        buildingsCanvas.setBorder(createBorder(corner().buildingsRadii()));*/
 
         updateTurn();
-
-        facePane.getChildren().add(faceView);
-        getChildren().addAll(buildingsPane, facePane);
-    }
-
-    private Background createBackground(CornerRadii cornerRadii) {
-        return new Background(new BackgroundFill(color(), cornerRadii, Insets.EMPTY));
-    }
-
-    private Border createBorder(CornerRadii cornerRadii) {
-        return new Border(new BorderStroke(
-                BORDER_COLOR,
-                BorderStrokeStyle.SOLID,
-                cornerRadii,
-                new BorderWidths(3.),
-                Insets.EMPTY));
     }
 
     private PlayerViewCorner corner() {
@@ -82,20 +59,35 @@ public class PlayerView extends AnchorPane {
     }
 
     void updateTurn() {
+        GraphicsContext gc = getGraphicsContext2D();
+        gc.clearRect(0, 0, getWidth(), getHeight());
+
         boolean turn = engine.getCurrentPlayer() == player();
+        PlayerViewCorner corner = corner();
         int width = turn ? WIDTH_TURN : WIDTH_NOT_TURN;
         int height = turn ? HEIGHT_TURN : HEIGHT_NOT_TURN;
-        faceView.setFitWidth(width);
-        faceView.setFitHeight(height);
-        facePane.setPrefSize(width, height);
-        corner().anchor(buildingsPane, width);
+        setWidth(width);
+        setHeight(height);
+
+        gc.setFill(color());
+        gc.fillOval(
+                corner.arcX(getWidth()), corner.arcY(getHeight()),
+                getWidth() * 2, getHeight() * 2);
+        gc.strokeOval(
+                corner.arcX(getWidth()), corner.arcY(getHeight()),
+                getWidth() * 2, getHeight() * 2);
+        gc.drawImage(faceImage,
+                corner.imageX(width), corner.imageY(height),
+                width / 2, height / 2);
+
 
         for (BuildingType type : BuildingType.values()) {
             if (type == BuildingType.NONE) {
                 continue;
             }
 
-            buildingTexts[type.ordinal()].setText(String.valueOf(player().getBuildingCount(type)));
+            // drawBuilding at the right position
+            // drawCount at the right position
         }
     }
 
@@ -113,4 +105,5 @@ public class PlayerView extends AnchorPane {
 
         throw new IllegalStateException();
     }
+
 }
