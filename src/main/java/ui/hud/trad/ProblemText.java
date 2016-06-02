@@ -1,11 +1,11 @@
-package ui.hud;
+package ui.hud.trad;
 
 import engine.rules.Problem;
 import engine.rules.Problems;
 
-class ProblemTrad {
+public class ProblemText {
 
-    static String trad(Problems problems) {
+    public static String trad(Problems problems) {
         for (Problem problem : problems) {
             switch (problem) {
                 case NOT_ON_SEA_OR_VOLCANO:

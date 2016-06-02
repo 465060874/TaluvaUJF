@@ -19,6 +19,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
+import ui.hud.trad.PlayerText;
+import ui.hud.trad.ProblemText;
 import ui.island.Placement;
 
 import java.util.List;
@@ -28,6 +30,7 @@ import static java.util.stream.Collectors.joining;
 public class Hud extends AnchorPane implements EngineObserver {
 
     private final Engine engine;
+    private final boolean versusIa;
     private final Placement placement;
 
     private final PlayerView[] playerViews;
@@ -48,6 +51,10 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     public Hud(Engine engine, Placement placement) {
         this.engine = engine;
+        this.versusIa = engine.getPlayers().size() == 2
+                && !engine.getPlayers().get(0).isHuman()
+                || !engine.getPlayers().get(1).isHuman();
+
         this.placement = placement;
         placement.initHud(this);
 
@@ -180,12 +187,39 @@ public class Hud extends AnchorPane implements EngineObserver {
         for (PlayerView playerView : playerViews) {
             playerView.updateTurn();
         }
+
+        if (versusIa) {
+            if (engine.getCurrentPlayer().isHuman()) {
+                updateText(infoLine, "C'est à votre tour de placer une tuile");
+            }
+            else {
+                updateText(infoLine, "Placement de la tuile");
+            }
+        }
+        else {
+            String playerText = PlayerText.of(engine.getCurrentPlayer().getColor());
+            updateText(infoLine, "C'est au tour du joueur " + playerText + " de placer une tuile");
+        }
     }
 
     @Override
     public void onBuildStepStart() {
         updateUndoRedo();
         tileStackCanvas.redraw();
+
+
+        if (versusIa) {
+            if (engine.getCurrentPlayer().isHuman()) {
+                updateText(infoLine, "C'est à votre tour de construire");
+            }
+            else {
+                updateText(infoLine, "Construction");
+            }
+        }
+        else {
+            String playerText = PlayerText.of(engine.getCurrentPlayer().getColor());
+            updateText(infoLine, "C'est au tour du joueur " + playerText + " de construire");
+        }
     }
 
     @Override
@@ -239,6 +273,6 @@ public class Hud extends AnchorPane implements EngineObserver {
     }
 
     public void updateProblems() {
-        updateText(errorLine, ProblemTrad.trad(placement.getProblems()));
+        updateText(errorLine, ProblemText.trad(placement.getProblems()));
     }
 }
