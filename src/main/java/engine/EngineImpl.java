@@ -41,7 +41,8 @@ class EngineImpl implements Engine {
     int playerIndex;
     private PlayerTurn playerTurn;
 
-    private final List<ActionSave> actionSaves;
+    private final List<ActionSave> undoList;
+    private final List<ActionSave> redoList;
     private final EngineActions actions;
 
     /**
@@ -62,7 +63,8 @@ class EngineImpl implements Engine {
         this.status = EngineStatus.PENDING_START;
         this.playerIndex = 0;
 
-        this.actionSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
+        this.undoList = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
+        this.redoList = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
         this.actions = new EngineActions(this);
     }
 
@@ -88,8 +90,10 @@ class EngineImpl implements Engine {
         this.playerIndex = engine.playerIndex;
         this.playerTurn = PlayerHandler.dummyTurn();
 
-        this.actionSaves = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
-        actionSaves.addAll(engine.actionSaves);
+        this.undoList = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
+        undoList.addAll(engine.undoList);
+        this.redoList = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
+        redoList.addAll(engine.undoList);
         this.actions = new EngineActions(this, engine.actions);
     }
 
@@ -165,6 +169,12 @@ class EngineImpl implements Engine {
         cancelUntil(e -> true);
     }
 
+    @Override
+    public boolean canUndo() {
+        return !(status.getTurn() == 0 || status.getTurn() == 1 && status.getStep() == EngineStatus.TurnStep.TILE);
+    }
+
+    @Override
     public synchronized void cancelUntil(Predicate<Engine> predicate) {
         checkState(status != EngineStatus.PENDING_START);
 
@@ -180,10 +190,45 @@ class EngineImpl implements Engine {
                 observers.forEach(EngineObserver::onCancelBuildStep);
             }
 
-            ActionSave save = actionSaves.remove(actionSaves.size() - 1);
-            save.revert(this);
+            ActionSave save = undoList.remove(undoList.size() - 1);
+            redoList.add(save.revert(this));
         } while (!predicate.test(this) && !status.isFirst());
 
+        if (volcanoTileStackChanged) {
+            observers.forEach(EngineObserver::onTileStackChange);
+        }
+
+        actions.updateAll();
+        observers.forEach(status.getStep() == EngineStatus.TurnStep.TILE
+                ? EngineObserver::onTileStepStart
+                : EngineObserver::onBuildStepStart);
+        this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, status.getStep());
+    }
+
+    @Override
+    public boolean canRedo() {
+        return redoList.size() > 0;
+    }
+
+    @Override
+    public void redoUntil(Predicate<Engine> predicate) {
+        checkState(status != EngineStatus.PENDING_START);
+
+        playerTurn.cancel();
+        boolean volcanoTileStackChanged = false;
+        while (!redoList.isEmpty()) {
+            if (status.getStep() == EngineStatus.TurnStep.TILE) {
+                volcanoTileStackChanged = true;
+                volcanoTileStack.next();
+            }
+
+            ActionSave save = redoList.remove(redoList.size() - 1);
+            undoList.add(save.revert(this));
+
+            if (predicate.test(this)) {
+                break;
+            }
+        }
 
         if (volcanoTileStackChanged) {
             observers.forEach(EngineObserver::onTileStackChange);
@@ -200,6 +245,7 @@ class EngineImpl implements Engine {
         verify(status instanceof EngineStatus.Running);
 
         this.status = running().next();
+        redoList.clear();
         if (running().getStep() == EngineStatus.TurnStep.TILE) {
             do { playerIndex++; } while (getCurrentPlayer().isEliminated());
 
@@ -378,7 +424,8 @@ class EngineImpl implements Engine {
             }
         }
 
-        actionSaves.add(new ActionSave.Tile(this, action));
+        undoList.add(new ActionSave.Tile(this, action));
+
         island.putTile(volcanoTileStack.current(), action.getVolcanoHex(), action.getOrientation());
 
         observers.forEach(o -> o.onTilePlacementOnSea(action));
@@ -401,7 +448,8 @@ class EngineImpl implements Engine {
             }
         }
 
-        actionSaves.add(new ActionSave.Tile(this, action));
+        undoList.add(new ActionSave.Tile(this, action));
+
         island.putTile(volcanoTileStack.current(), action.getVolcanoHex(), action.getOrientation());
 
         observers.forEach(o -> o.onTilePlacementOnVolcano(action));
@@ -423,7 +471,8 @@ class EngineImpl implements Engine {
             }
         }
 
-        actionSaves.add(new ActionSave.Build(this, action));
+        undoList.add(new ActionSave.Build(this, action));
+
         PlayerColor color = getCurrentPlayer().getColor();
         island.putBuilding(action.getHex(), Building.of(action.getType(), color));
         int buildingCount = island.getField(action.getHex()).getBuildingCount();
@@ -447,7 +496,8 @@ class EngineImpl implements Engine {
             }
         }
 
-        actionSaves.add(new ActionSave.Build(this, action));
+        undoList.add(new ActionSave.Build(this, action));
+
         PlayerColor color = getCurrentPlayer().getColor();
         Building building = Building.of(BuildingType.HUT, color);
         int buildingCount = 0;

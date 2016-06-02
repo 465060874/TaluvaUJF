@@ -14,6 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -37,13 +38,14 @@ public class Hud extends AnchorPane implements EngineObserver {
     private final Text textLine;
     private final TextFlow textBottom;
 
+    private final IconButton undoButton;
+    private final IconButton redoButton;
     private final TileStackCanvas tileStackCanvas;
     private final Text tileStackSize;
     private final VBox tileStackPane;
 
     public Hud(Engine engine) {
         this.engine = engine;
-        IconButton redoButton = new IconButton("ui/hud/redo.png");
 
         List<Player> players = engine.getPlayers();
         this.playerViews = new PlayerView[players.size()];
@@ -66,16 +68,18 @@ public class Hud extends AnchorPane implements EngineObserver {
         textBottom.setPadding(new Insets(0, 0, 20, 0));
         AnchorPane.setBottomAnchor(textBottom, 0.0);
 
-        IconButton undoButton = new IconButton("ui/hud/undo.png");
+        this.undoButton = new IconButton("ui/hud/undo.png", 0.5);
+        this.redoButton = new IconButton("ui/hud/redo.png", 0.5);
         undoButton.setOnAction(this::undo);
         redoButton.setOnAction(this::redo);
+        HBox undoRedoPane = new HBox(undoButton, redoButton);
 
         this.tileStackCanvas = new TileStackCanvas(engine);
         this.tileStackSize = new Text();
         tileStackSize.setFont(new Font(20));
         TextFlow tileStackSizeFlow = new TextFlow(tileStackSize);
         tileStackSizeFlow.setTextAlignment(TextAlignment.CENTER);
-        this.tileStackPane = new VBox(undoButton, redoButton, tileStackCanvas, tileStackSizeFlow);
+        this.tileStackPane = new VBox(undoRedoPane, tileStackCanvas, tileStackSizeFlow);
         AnchorPane.setRightAnchor(tileStackPane, 0.0);
 
         getChildren().addAll(leftButtons, textBottom, tileStackPane);
@@ -94,6 +98,7 @@ public class Hud extends AnchorPane implements EngineObserver {
     }
 
     private void redo(ActionEvent event) {
+        engine.redoUntil(e -> e.getCurrentPlayer().isHuman() && e.getStatus().getStep() == EngineStatus.TurnStep.TILE);
     }
 
     private void resizeWidth(Observable observable) {
@@ -115,15 +120,16 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     @Override
     public void onStart() {
-
     }
 
     @Override
     public void onCancelTileStep() {
+        redoButton.setDisable(!engine.canRedo());
     }
 
     @Override
     public void onCancelBuildStep() {
+        redoButton.setDisable(!engine.canRedo());
     }
 
     @Override
@@ -134,6 +140,8 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     @Override
     public void onTileStepStart() {
+        undoButton.setDisable(!engine.canUndo());
+        redoButton.setDisable(!engine.canRedo());
         for (PlayerView playerView : playerViews) {
             playerView.updateTurn();
         }
@@ -141,6 +149,8 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     @Override
     public void onBuildStepStart() {
+        undoButton.setDisable(!engine.canUndo());
+        redoButton.setDisable(!engine.canRedo());
         tileStackCanvas.redraw();
         tileStackSize.setText(Integer.toString(engine.getVolcanoTileStack().size() - 1));
     }

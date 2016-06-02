@@ -8,8 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 class BotPlayerTurn implements PlayerTurn {
 
-    private static long DELAY = 500;
-
     private final Engine engine;
     private final IAAlgorithm algorithm;
     private final EngineStatus.TurnStep step;

@@ -1,5 +1,6 @@
 package ia;
 
+import com.google.common.base.Preconditions;
 import engine.Engine;
 import engine.EngineStatus;
 import engine.PlayerHandler;
@@ -7,6 +8,8 @@ import engine.PlayerTurn;
 import javafx.application.Platform;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 public enum IA implements PlayerHandler {
 
@@ -35,6 +38,7 @@ public enum IA implements PlayerHandler {
 
     @Override
     public PlayerTurn startTurn(Engine engine, EngineStatus.TurnStep step) {
+        checkArgument(step == EngineStatus.TurnStep.TILE, "IA does not allow starting turn for BUILD step");
         IAAlgorithm algorithm = createAlgorithm(engine.copyWithoutObservers(), new AtomicBoolean(false));
         return Platform.isFxApplicationThread()
                 ? new BotPlayerTurnFx(engine, algorithm, step)

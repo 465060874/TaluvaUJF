@@ -16,9 +16,13 @@ public class IconButton extends Button {
     private final ImageView icon;
 
     public IconButton(String url) {
+        this(url, 1);
+    }
+
+    public IconButton(String url, double ratio) {
         this.icon = new ImageView(url);
-        icon.setFitWidth(60);
-        icon.setFitHeight(60);
+        icon.setFitWidth(60 * ratio);
+        icon.setFitHeight(60 * ratio);
 
         setBackground(Background.EMPTY);
         setGraphic(icon);

@@ -71,10 +71,19 @@ public interface Engine {
      */
     void cancelLastStep();
 
+    boolean canUndo();
+
     /**
      * Annule les derniers coups jusqu'à ce que le prédicat retourne vrai
      */
     void cancelUntil(Predicate<Engine> engine);
+
+    boolean canRedo();
+
+    /**
+     * Rejoue les derniers coups annulées jusqu'à ce que le prédicat retourne vrai
+     */
+    void redoUntil(Predicate<Engine> engine);
 
     /**
      * Retourne le numéro de tour (un tour est un placement et une construction d'un joueur)

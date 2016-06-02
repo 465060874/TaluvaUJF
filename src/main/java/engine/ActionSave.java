@@ -29,7 +29,9 @@ abstract class ActionSave {
         }
     }
 
-    void revert(EngineImpl engine) {
+    abstract ActionSave revert(EngineImpl engine);
+
+    void commonRevert(EngineImpl engine) {
         engine.status = status;
         ImmutableList<Player> players = engine.players;
         for (int i = 0; i < players.size(); i++) {
@@ -50,12 +52,27 @@ abstract class ActionSave {
                     placement.getRightHex(), engine.getIsland().getField(placement.getRightHex()));
         }
 
+        public Tile(EngineImpl engine, Tile tile) {
+            super(engine);
+
+            ImmutableMap.Builder<Hex, Field> builder = ImmutableMap.builder();
+            for (Map.Entry<Hex, Field> entry : tile.islandDiff.entrySet()) {
+                Hex hex = entry.getKey();
+                builder.put(hex, engine.getIsland().getField(hex));
+            }
+            this.islandDiff = builder.build();
+        }
+
         @Override
-        public void revert(EngineImpl engine) {
-            super.revert(engine);
+        ActionSave revert(EngineImpl engine) {
+            ActionSave reverse = new Tile(engine, this);
+
+            commonRevert(engine);
             for (Map.Entry<Hex, Field> entry : islandDiff.entrySet()) {
                 engine.getIsland().putField(entry.getKey(), entry.getValue());
             }
+
+            return reverse;
         }
     }
 
@@ -92,15 +109,33 @@ abstract class ActionSave {
             this.buildingCount = player.getBuildingCount(BuildingType.HUT);
         }
 
+        public Build(EngineImpl engine, Build build) {
+            super(engine);
+            this.playerIndex = engine.playerIndex;
+            this.buildingType = build.buildingType;
+            this.buildingCount = engine.getCurrentPlayer().getBuildingCount(buildingType);
+
+            ImmutableMap.Builder<Hex, Field> builder = ImmutableMap.builder();
+            for (Map.Entry<Hex, Field> entry : build.islandDiff.entrySet()) {
+                Hex hex = entry.getKey();
+                builder.put(hex, engine.getIsland().getField(hex));
+            }
+            this.islandDiff = builder.build();
+        }
+
         @Override
-        public void revert(EngineImpl engine) {
-            super.revert(engine);
+        ActionSave revert(EngineImpl engine) {
+            ActionSave reverse = new Build(engine, this);
+
+            commonRevert(engine);
             for (Map.Entry<Hex, Field> entry : islandDiff.entrySet()) {
                 engine.getIsland().putField(entry.getKey(), entry.getValue());
             }
 
             player.updateBuildingCount(buildingType, buildingCount);
             engine.playerIndex = playerIndex;
+
+            return reverse;
         }
     }
 }
