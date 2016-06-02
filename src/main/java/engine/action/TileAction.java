@@ -2,6 +2,7 @@ package engine.action;
 
 import com.google.common.collect.ComparisonChain;
 import data.FieldType;
+import data.PlayerColor;
 import data.VolcanoTile;
 import map.Hex;
 import map.Orientation;
@@ -12,14 +13,25 @@ import java.util.Objects;
 
 public abstract class TileAction implements Action<TileAction> {
 
+    private final PlayerColor color;
     private final VolcanoTile tile;
     private final Hex volcanoHex;
     private final Orientation orientation;
 
-    public TileAction(VolcanoTile tile, Hex volcanoHex, Orientation orientation) {
+    public TileAction(PlayerColor color, VolcanoTile tile, Hex volcanoHex, Orientation orientation) {
+        this.color = color;
         this.tile = tile;
         this.volcanoHex = volcanoHex;
         this.orientation = orientation;
+    }
+
+    public VolcanoTile getTile() {
+        return tile;
+    }
+
+    @Override
+    public PlayerColor getColor() {
+        return color;
     }
 
     public Hex getVolcanoHex() {

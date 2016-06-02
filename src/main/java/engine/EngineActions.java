@@ -26,9 +26,7 @@ class EngineActions {
     List<SeaTileAction> seaTiles;
     List<VolcanoTileAction> volcanosTiles;
     List<PlaceBuildingAction> placeBuildings;
-    List<PlaceBuildingAction> newPlaceBuildings;
     List<ExpandVillageAction> expandVillages;
-    List<ExpandVillageAction> newExpandVillages;
 
     EngineActions(Engine engine) {
         this.engine = engine;
@@ -36,9 +34,7 @@ class EngineActions {
         this.seaTiles = ImmutableList.of();
         this.volcanosTiles = ImmutableList.of();
         this.placeBuildings = ImmutableList.of();
-        this.newPlaceBuildings = ImmutableList.of();
         this.expandVillages = ImmutableList.of();
-        this.newExpandVillages = ImmutableList.of();
     }
 
     EngineActions(Engine engine, EngineActions actions) {
@@ -54,7 +50,8 @@ class EngineActions {
         if (engine.getIsland().isEmpty()) {
             VolcanoTile tile = engine.getVolcanoTileStack().current();
             Hex originHex = Hex.at(0, 0);
-            this.seaTiles = ImmutableList.of(new SeaTileAction(tile, originHex, Orientation.NORTH));
+            this.seaTiles = ImmutableList.of(new SeaTileAction(
+                    engine.getCurrentPlayer().getColor(), tile, originHex, Orientation.NORTH));
             this.volcanosTiles = ImmutableList.of();
             this.placeBuildings = ImmutableList.of();
             this.expandVillages = ImmutableList.of();
@@ -65,16 +62,6 @@ class EngineActions {
             updatePlaceBuildings();
             updateExpandVillages();
         }
-
-        this.newPlaceBuildings= ImmutableList.of();
-        this.newExpandVillages = ImmutableList.of();
-    }
-
-    void updateWithNewTile(TileAction action) {
-        updatePlaceBuildings();
-        updateExpandVillages();
-        updateNewPlaceBuildings(action);
-        updateNewExpandVillages(action);
     }
 
     private void updateSeaTiles() {
@@ -90,7 +77,7 @@ class EngineActions {
                 }
 
                 for (int rotation = 0; rotation < 3; rotation++) {
-                    seaTilesMap.add(new SeaTileAction(tile, hex, orientation));
+                    seaTilesMap.add(new SeaTileAction(engine.getCurrentPlayer().getColor(), tile, hex, orientation));
                     hex = hex.getLeftNeighbor(orientation);
                     orientation = orientation.leftRotation();
                 }
@@ -120,7 +107,7 @@ class EngineActions {
                     volcanoTilesMap.put(hex, list);
                 }
 
-                list.add(new VolcanoTileAction(tile, hex, orientation));
+                list.add(new VolcanoTileAction(engine.getCurrentPlayer().getColor(), tile, hex, orientation));
             }
         }
 
@@ -134,46 +121,26 @@ class EngineActions {
     private void updatePlaceBuildings() {
         Island island = engine.getIsland();
 
-        HexMap<List<PlaceBuildingAction>> buildsMap = HexMap.create();
+        ImmutableList.Builder<PlaceBuildingAction> builder = ImmutableList.builder();
         for (Hex hex : island.getFields()) {
             Field field = island.getField(hex);
             if (!field.hasBuilding()) {
-                boolean hutValid = PlaceBuildingRules.validate(engine, BuildingType.HUT, hex).isValid();
-                boolean templeValid = PlaceBuildingRules.validate(engine, BuildingType.TEMPLE, hex).isValid();
-                boolean towerValid = PlaceBuildingRules.validate(engine, BuildingType.TOWER, hex).isValid();
 
-                if (!hutValid && !templeValid && !towerValid) {
-                    continue;
-                }
-
-                List<PlaceBuildingAction> list = buildsMap.getOrDefault(hex, null);
-                if (list == null) {
-                    list = new ArrayList<>();
-                    buildsMap.put(hex, list);
-                }
-
-                if (hutValid) {
-                    list.add(new PlaceBuildingAction(false,
-                            engine.getCurrentPlayer().getColor(),
+                if (PlaceBuildingRules.validate(engine, BuildingType.HUT, hex).isValid()) {
+                    builder.add(new PlaceBuildingAction(engine.getCurrentPlayer().getColor(), false,
                             BuildingType.HUT, hex));
                 }
-                if (templeValid) {
-                    list.add(new PlaceBuildingAction(false,
-                            engine.getCurrentPlayer().getColor(),
+                if (PlaceBuildingRules.validate(engine, BuildingType.TEMPLE, hex).isValid()) {
+                    builder.add(new PlaceBuildingAction(engine.getCurrentPlayer().getColor(), false,
                             BuildingType.TEMPLE, hex));
                 }
-                if (towerValid) {
-                    list.add(new PlaceBuildingAction(false,
-                            engine.getCurrentPlayer().getColor(),
+                if (PlaceBuildingRules.validate(engine, BuildingType.TOWER, hex).isValid()) {
+                    builder.add(new PlaceBuildingAction(engine.getCurrentPlayer().getColor(), false,
                             BuildingType.TOWER, hex));
                 }
             }
         }
 
-        ImmutableList.Builder<PlaceBuildingAction> builder = ImmutableList.builder();
-        for (List<PlaceBuildingAction> actions : buildsMap.values()) {
-            builder.addAll(actions);
-        }
         this.placeBuildings = Ordering.natural().immutableSortedCopy(builder.build());
     }
 
@@ -189,7 +156,7 @@ class EngineActions {
                 }
 
                 if (ExpandVillageRules.validate(engine, village, fieldType).isValid()) {
-                    builder.add(new ExpandVillageAction(false, village, fieldType));
+                    builder.add(new ExpandVillageAction(engine.getCurrentPlayer().getColor(), false, village, fieldType));
                 }
             }
         }
@@ -197,7 +164,7 @@ class EngineActions {
         this.expandVillages = builder.build();
     }
 
-    private void updateNewPlaceBuildings(TileAction action) {
+    List<PlaceBuildingAction> getNewPlaceBuildingActions(TileAction action) {
         ImmutableList.Builder<PlaceBuildingAction> builder = ImmutableList.builder();
         Hex leftHex = action.getLeftHex();
         Hex rightHex = action.getLeftHex();
@@ -207,17 +174,17 @@ class EngineActions {
             }
 
             if (PlaceBuildingRules.validate(engine, type, leftHex).isValid()) {
-                builder.add(new PlaceBuildingAction(true, engine.getCurrentPlayer().getColor(), type, leftHex));
+                builder.add(new PlaceBuildingAction(engine.getCurrentPlayer().getColor(), true, type, leftHex));
             }
             if (PlaceBuildingRules.validate(engine, type, rightHex).isValid()) {
-                builder.add(new PlaceBuildingAction(true, engine.getCurrentPlayer().getColor(), type, rightHex));
+                builder.add(new PlaceBuildingAction(engine.getCurrentPlayer().getColor(), true, type, rightHex));
             }
         }
 
-        this.newPlaceBuildings = Ordering.natural().immutableSortedCopy(builder.build());
+        return builder.build();
     }
 
-    private void updateNewExpandVillages(TileAction action) {
+    List<ExpandVillageAction> getNewExpandVillageActions(TileAction action) {
         ImmutableList.Builder<ExpandVillageAction> builder = ImmutableList.builder();
 
         Island island = engine.getIsland();
@@ -249,11 +216,11 @@ class EngineActions {
             Village village = entry.getKey();
             FieldType fieldType = entry.getValue();
             if (ExpandVillageRules.validate(engine, village, fieldType).isValid()) {
-                ExpandVillageAction newAction = new ExpandVillageAction(true, village, fieldType);
+                ExpandVillageAction newAction = new ExpandVillageAction(engine.getCurrentPlayer().getColor(), true, village, fieldType);
                 builder.add(newAction);
             }
         }
 
-        this.newExpandVillages = Ordering.natural().immutableSortedCopy(builder.build());
+        return Ordering.natural().immutableSortedCopy(builder.build());
     }
 }

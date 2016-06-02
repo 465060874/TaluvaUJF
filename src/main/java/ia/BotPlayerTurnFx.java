@@ -82,6 +82,10 @@ class BotPlayerTurnFx implements PlayerTurn {
     private void tileStep() {
         if (!cancelled.get()) {
             engine.action(move.tileAction);
+            if (engine.getStatus() instanceof EngineStatus.Finished) {
+                return;
+            }
+
             waitAndThen(System.nanoTime(), this::buildStep);
         }
     }

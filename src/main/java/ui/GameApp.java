@@ -35,7 +35,6 @@ public class GameApp extends Application {
                 .logLevel(Level.INFO)
                 .player(PlayerColor.RED, IA.MOYEN)
                 .player(PlayerColor.WHITE, IA.MOYEN)
-                .seed( -8976553112098098678L )
                 .build();
     }
 

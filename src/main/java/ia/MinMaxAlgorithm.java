@@ -223,11 +223,11 @@ class MinMaxAlgorithm implements IAAlgorithm {
             engine.placeOnSea(tileAction);
             comp++;
             // Pour chaque construction et extension correlee
-            for (PlaceBuildingAction action : engine.getNewPlaceBuildingActions()) {
+            for (PlaceBuildingAction action : engine.getNewPlaceBuildingActions(tileAction)) {
                 heuristics.evaluateBuildAction(engine, tileAction, action, points, moves);
                 comp++;
             }
-            for (ExpandVillageAction action : engine.getNewExpandVillageActions()) {
+            for (ExpandVillageAction action : engine.getNewExpandVillageActions(tileAction)) {
                 heuristics.evaluateExpandAction(engine, tileAction, action, points, moves);
                 comp++;
             }
@@ -242,11 +242,11 @@ class MinMaxAlgorithm implements IAAlgorithm {
             engine.placeOnVolcano(tileAction);
             comp++;
 
-            for (PlaceBuildingAction buildingaction : engine.getNewPlaceBuildingActions()) {
+            for (PlaceBuildingAction buildingaction : engine.getNewPlaceBuildingActions(tileAction)) {
                 heuristics.evaluateBuildAction(engine, tileAction, buildingaction, points, moves);
                 comp++;
             }
-            for (ExpandVillageAction action : engine.getNewExpandVillageActions()) {
+            for (ExpandVillageAction action : engine.getNewExpandVillageActions(tileAction)) {
                 heuristics.evaluateExpandAction(engine, tileAction, action, points, moves);
                 comp++;
             }

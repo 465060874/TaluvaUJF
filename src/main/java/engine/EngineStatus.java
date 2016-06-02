@@ -19,6 +19,10 @@ public abstract class EngineStatus {
     private EngineStatus() {
     }
 
+    public boolean isFirst() {
+        return getTurn() == 0 && getStep() == TurnStep.TILE;
+    }
+
     public abstract int getTurn();
 
     public abstract TurnStep getStep();
@@ -29,6 +33,11 @@ public abstract class EngineStatus {
     }
 
     public static final EngineStatus PENDING_START = new EngineStatus() {
+        @Override
+        public boolean isFirst() {
+            return false;
+        }
+
         @Override
         public int getTurn() {
             throw new UnsupportedOperationException();
@@ -42,8 +51,8 @@ public abstract class EngineStatus {
 
     public static final class Running extends EngineStatus {
 
-        int turn;
-        TurnStep step;
+        private final int turn;
+        private final TurnStep step;
 
         Running() {
             this.turn = 0;
@@ -65,6 +74,16 @@ public abstract class EngineStatus {
             return step;
         }
 
+        Running next() {
+            return step == TurnStep.TILE
+                    ? new Running(turn, TurnStep.BUILD)
+                    : new Running(turn + 1, TurnStep.TILE);
+        }
+
+        Finished finished(FinishReason reason, List<Player> winners) {
+            return new Finished(this, reason, winners);
+        }
+
         Running copy() {
             return new Running(turn, step);
         }
@@ -84,7 +103,7 @@ public abstract class EngineStatus {
         private final FinishReason reason;
         private final List<Player> winners;
 
-        Finished(Running running, FinishReason reason, List<Player> winners) {
+        private Finished(Running running, FinishReason reason, List<Player> winners) {
             this.turn = running.turn;
             this.step = running.step;
             this.reason = reason;

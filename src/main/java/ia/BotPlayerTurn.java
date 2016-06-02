@@ -37,6 +37,10 @@ class BotPlayerTurn implements PlayerTurn {
         if (step == EngineStatus.TurnStep.TILE) {
             engine.action(move.tileAction);
         }
+        if (engine.getStatus() instanceof EngineStatus.Finished) {
+            return;
+        }
+
         engine.action(move.buildingAction);
     }
 }

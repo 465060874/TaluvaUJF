@@ -13,7 +13,7 @@ public class Player {
     private final PlayerColor color;
     private final int[] buildings;
     private final PlayerHandler playerHandler;
-    private int eliminated;
+    boolean eliminated;
 
     Player(PlayerColor color, PlayerHandler playerHandler) {
         this.playerHandler = playerHandler;
@@ -24,7 +24,7 @@ public class Player {
             }
         }
         this.color = color;
-        this.eliminated = -1;
+        this.eliminated = false;
     }
 
     private Player(Player player, PlayerHandler playerHandler) {
@@ -32,7 +32,7 @@ public class Player {
         this.buildings = new int[player.buildings.length];
         System.arraycopy(player.buildings, 0, buildings, 0, buildings.length);
         this.playerHandler = playerHandler;
-        this.eliminated = -1;
+        this.eliminated = false;
     }
 
     public PlayerColor getColor() {
@@ -44,7 +44,7 @@ public class Player {
     }
 
     public boolean isEliminated() {
-        return eliminated >= 0;
+        return eliminated;
     }
 
     void updateBuildingCount(BuildingType type, int count) {
@@ -69,13 +69,7 @@ public class Player {
         return new Player(this, PlayerHandler.dummy());
     }
 
-    void setEliminated(int turn) {
-        this.eliminated = turn;
-    }
-
-    void updateEliminated(int turn) {
-        if (turn <= eliminated) {
-            eliminated = -1;
-        }
+    void setEliminated() {
+        this.eliminated = true;
     }
 }

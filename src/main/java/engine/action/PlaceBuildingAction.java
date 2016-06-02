@@ -13,17 +13,22 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public class PlaceBuildingAction implements BuildingAction<PlaceBuildingAction> {
 
-    private final boolean isNew;
     private final PlayerColor color;
+    private final boolean isNew;
     private final BuildingType type;
     private final Hex hex;
 
-    public PlaceBuildingAction(boolean isNew, PlayerColor color, BuildingType type, Hex hex) {
+    public PlaceBuildingAction(PlayerColor color, boolean isNew, BuildingType type, Hex hex) {
         checkArgument(type != BuildingType.NONE);
         this.isNew = isNew;
         this.color = color;
         this.type = type;
         this.hex = hex;
+    }
+
+    @Override
+    public PlayerColor getColor() {
+        return color;
     }
 
     @Override
@@ -69,6 +74,6 @@ public class PlaceBuildingAction implements BuildingAction<PlaceBuildingAction> 
         int line = Integer.valueOf(reader.readLine());
         int diag = Integer.valueOf(reader.readLine());
         BuildingType type = BuildingType.valueOf(reader.readLine());
-        return new PlaceBuildingAction(false, PlayerColor.YELLOW, type, Hex.at(line, diag));
+        return new PlaceBuildingAction(PlayerColor.YELLOW, false, type, Hex.at(line, diag));
     }
 }

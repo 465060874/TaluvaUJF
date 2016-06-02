@@ -1,18 +1,18 @@
 package engine.action;
 
 import data.FieldType;
+import data.PlayerColor;
 import data.VolcanoTile;
 import map.Hex;
 import map.Orientation;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Writer;
 
 public class VolcanoTileAction extends TileAction {
 
-    public VolcanoTileAction(VolcanoTile tile, Hex volcanoHex, Orientation orientation) {
-        super(tile, volcanoHex, orientation);
+    public VolcanoTileAction(PlayerColor color, VolcanoTile tile, Hex volcanoHex, Orientation orientation) {
+        super(color, tile, volcanoHex, orientation);
     }
 
     static Action doRead(BufferedReader reader) throws IOException {
@@ -22,6 +22,6 @@ public class VolcanoTileAction extends TileAction {
         FieldType rightFieldType = FieldType.valueOf(reader.readLine());
         VolcanoTile tile = new VolcanoTile(leftFieldType, rightFieldType);
         Orientation orientation = Orientation.valueOf(reader.readLine());
-        return new VolcanoTileAction(tile, Hex.at(line, diag), orientation);
+        return new VolcanoTileAction(PlayerColor.YELLOW, tile, Hex.at(line, diag), orientation);
     }
 }

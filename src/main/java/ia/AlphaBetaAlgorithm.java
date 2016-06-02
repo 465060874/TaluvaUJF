@@ -1,6 +1,7 @@
 package ia;
 
 import data.BuildingType;
+import data.PlayerColor;
 import engine.Engine;
 import engine.EngineStatus;
 import engine.action.*;
@@ -78,9 +79,18 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
         Move[] branchMoves = new Move[branchingFactor];
         int branchNb = branchSortFusion(engine, strategyPoints, branchMoves );
         // Test du cas où aucun coup n'est jouable !!
-        if( branchMoves[0] == null){
-            engine.logger().info("[!!!!] AUCUN COUP POSSIBLE APRES LE PLACEMENT");
-            return new Move(null, null, Integer.MAX_VALUE);
+        if( branchMoves[0] == null) {
+            // If we reached this point, it means the current player got no more building to place,
+            // just give up and return one of the available tile action
+            int actionIndex = engine.getRandom()
+                    .nextInt(engine.getSeaTileActions().size() + engine.getVolcanoTileActions().size());
+            if (actionIndex < engine.getSeaTileActions().size()) {
+                return new Move(null, engine.getSeaTileActions().get(actionIndex), Integer.MAX_VALUE);
+            }
+            else {
+                actionIndex -= engine.getSeaTileActions().size();
+                return new Move(null, engine.getVolcanoTileActions().get(actionIndex), Integer.MAX_VALUE);
+            }
         }
 
         engine.logger().fine("-> Branch Chosen");
@@ -93,12 +103,13 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
         int bestPoints = Integer.MAX_VALUE;
         int bestConfigPoints = Integer.MAX_VALUE;
         int p;
+
+        PlayerColor c1 = engine.getCurrentPlayer().getColor();
+
         for (int i = 0; i < branchNb; i++) {
-            if( branchMoves[i].tileAction == null || branchMoves[i].buildingAction == null )
+            if (i > 0 && branchMoves[i].tileAction == null || branchMoves[i].buildingAction == null)
                 throw new IllegalStateException("Coup mal recombiné -> un des champs est null");
 
-            if( engine.getStatus().getTurn() == 22 && i == 1 )
-                engine.getRandom();
             engine.action(branchMoves[i].tileAction);
             engine.action(branchMoves[i].buildingAction);
 
@@ -109,7 +120,8 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
                     bestConfigPoints = p;
                     bestPoints = p;
                 }
-            }else if (depth > 0) {
+            }
+            else if (depth > 0) {
                 Move m = doPlay(depth - 1, -1*alpha, type.inverse());
                 // Pour inverser entre min et max
                 m.points *= -1;
@@ -256,11 +268,11 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
             engine.placeOnSea(tileAction);
             comp++;
             // Pour chaque construction et extension correlee
-            for (PlaceBuildingAction action : engine.getNewPlaceBuildingActions()) {
+            for (PlaceBuildingAction action : engine.getNewPlaceBuildingActions(tileAction)) {
                 heuristics.evaluateBuildAction(engine, tileAction, action, points, moves);
                 comp++;
             }
-            for (ExpandVillageAction action : engine.getNewExpandVillageActions()) {
+            for (ExpandVillageAction action : engine.getNewExpandVillageActions(tileAction)) {
                 heuristics.evaluateExpandAction(engine, tileAction, action, points, moves);
                 comp++;
             }
@@ -275,11 +287,11 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
             engine.placeOnVolcano(tileAction);
             comp++;
 
-            for (PlaceBuildingAction buildingaction : engine.getNewPlaceBuildingActions()) {
+            for (PlaceBuildingAction buildingaction : engine.getNewPlaceBuildingActions(tileAction)) {
                 heuristics.evaluateBuildAction(engine, tileAction, buildingaction, points, moves);
                 comp++;
             }
-            for (ExpandVillageAction action : engine.getNewExpandVillageActions()) {
+            for (ExpandVillageAction action : engine.getNewExpandVillageActions(tileAction)) {
                 heuristics.evaluateExpandAction(engine, tileAction, action, points, moves);
                 comp++;
             }

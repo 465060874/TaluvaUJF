@@ -7,7 +7,6 @@ import data.FieldType;
 import data.PlayerColor;
 import data.VolcanoTile;
 import engine.Engine;
-import engine.Player;
 import engine.action.*;
 import engine.rules.PlaceBuildingRules;
 import engine.rules.TileRules;
@@ -78,14 +77,14 @@ public class Placement {
         checkState(mode != Mode.NONE && valid);
         if (mode == Mode.TILE) {
             return engine.getIsland().getField(hex) == Field.SEA
-                    ? new SeaTileAction(tile, hex, tileOrientation)
-                    : new VolcanoTileAction(tile, hex, tileOrientation);
+                    ? new SeaTileAction(PlayerColor.YELLOW, tile, hex, tileOrientation)
+                    : new VolcanoTileAction(PlayerColor.YELLOW, tile, hex, tileOrientation);
         }
         else if (mode == Mode.BUILDING) {
-            return new PlaceBuildingAction(false, PlayerColor.YELLOW, buildingType, hex);
+            return new PlaceBuildingAction(PlayerColor.YELLOW, false, buildingType, hex);
         }
         else if (mode == Mode.EXPAND_VILLAGE) {
-            return new ExpandVillageAction(false, expansionVillage, engine.getIsland().getField(hex).getType());
+            return new ExpandVillageAction(PlayerColor.YELLOW, false, expansionVillage, engine.getIsland().getField(hex).getType());
         }
 
         throw new IllegalStateException();
