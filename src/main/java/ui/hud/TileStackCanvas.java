@@ -4,8 +4,12 @@ import data.FieldType;
 import data.VolcanoTile;
 import engine.Engine;
 import engine.EngineStatus;
+import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import map.Neighbor;
 import map.Orientation;
 import theme.HexStyle;
@@ -14,6 +18,8 @@ import ui.island.Grid;
 import ui.shape.HexShape;
 
 public class TileStackCanvas extends Canvas {
+
+    public static final int MAX_DISPLAYED_STACK_SIZE = 10;
 
     private final Engine engine;
     private final Grid grid;
@@ -39,7 +45,8 @@ public class TileStackCanvas extends Canvas {
         if (build) {
             stackSize--;
         }
-        stackSize = Math.min(10, stackSize);
+        String stackSizeStr = Integer.toString(stackSize);
+        stackSize = Math.min(MAX_DISPLAYED_STACK_SIZE, stackSize);
 
         double width = 4 * grid.getHexHalfWidth();
         double height = 6 * grid.getHexRadiusY() + grid.getHexHeight() * stackSize;
@@ -71,5 +78,11 @@ public class TileStackCanvas extends Canvas {
                 tile.getLeft(), Orientation.SOUTH_WEST, HexStyle.NORMAL, build);
         hexShape.draw(gc, grid, rightX, rightY, stackSize,
                 tile.getRight(), Orientation.SOUTH_EAST, HexStyle.NORMAL, build);
+
+        gc.setFill(Color.BLACK);
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setTextBaseline(VPos.BOTTOM);
+        gc.setFont(new Font(16));
+        gc.fillText(stackSizeStr, volcanoX, volcanoY - 10);
     }
 }

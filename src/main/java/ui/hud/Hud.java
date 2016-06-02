@@ -32,19 +32,19 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     private final PlayerView[] playerViews;
 
-    private final VBox leftButtons;
     private final Button homeButton;
     private final Button saveButton;
 
     private final Text infoLine;
     private final Text errorLine;
-    private final TextFlow textBottom;
 
     private final IconButton undoButton;
     private final IconButton redoButton;
     private final TileStackCanvas tileStackCanvas;
-    private final Text tileStackSize;
-    private final VBox tileStackPane;
+
+    private final VBox leftButtons;
+    private final TextFlow textBottom;
+    private final VBox rightPane;
 
     public Hud(Engine engine, Placement placement) {
         this.engine = engine;
@@ -66,7 +66,7 @@ public class Hud extends AnchorPane implements EngineObserver {
 
         Font font = new Font(18);
 
-        this.infoLine = new Text("");
+        this.infoLine = new Text("Info");
         infoLine.setFont(font);
         infoLine.setFill(Color.GREEN);
         this.errorLine = new Text("");
@@ -75,17 +75,22 @@ public class Hud extends AnchorPane implements EngineObserver {
 
         this.textBottom = new TextFlow(infoLine, new Text("\n"), errorLine);
         textBottom.setTextAlignment(TextAlignment.CENTER);
-        textBottom.setPadding(new Insets(0, 0, 20, 0));
         textBottom.setBackground(new Background(new BackgroundFill(
                 Color.BEIGE,
-                CornerRadii.EMPTY,
+                new CornerRadii(0.2, 0.2, 0, 0, true),
                 Insets.EMPTY)));
         textBottom.setBorder(new Border(new BorderStroke(
                 Color.BLACK,
                 BorderStrokeStyle.SOLID,
-                CornerRadii.EMPTY,
-                BorderWidths.FULL,
+                new CornerRadii(0.2, 0.2, 0, 0, true),
+                BorderWidths.DEFAULT,
                 Insets.EMPTY)));
+        textBottom.setMinWidth(500);
+        textBottom.setPrefWidth(500);
+        textBottom.setMaxWidth(500);
+        textBottom.setMinHeight(70);
+        textBottom.setPrefHeight(70);
+        textBottom.setMaxHeight(70);
         AnchorPane.setBottomAnchor(textBottom, 0.0);
 
         this.undoButton = new IconButton("ui/hud/undo.png", 0.5);
@@ -95,14 +100,10 @@ public class Hud extends AnchorPane implements EngineObserver {
         HBox undoRedoPane = new HBox(undoButton, redoButton);
 
         this.tileStackCanvas = new TileStackCanvas(engine);
-        this.tileStackSize = new Text();
-        tileStackSize.setFont(new Font(20));
-        TextFlow tileStackSizeFlow = new TextFlow(tileStackSize);
-        tileStackSizeFlow.setTextAlignment(TextAlignment.CENTER);
-        this.tileStackPane = new VBox(undoRedoPane, tileStackCanvas, tileStackSizeFlow);
-        AnchorPane.setRightAnchor(tileStackPane, 0.0);
+        this.rightPane = new VBox(undoRedoPane, tileStackCanvas);
+        AnchorPane.setRightAnchor(rightPane, 0.0);
 
-        getChildren().addAll(leftButtons, textBottom, tileStackPane);
+        getChildren().addAll(leftButtons, textBottom, rightPane);
 
         widthProperty().addListener(this::resizeWidth);
         heightProperty().addListener(this::resizeHeight);
@@ -129,13 +130,13 @@ public class Hud extends AnchorPane implements EngineObserver {
     private void resizeHeight(Observable observable) {
         double y = (getHeight() - leftButtons.getHeight()) / 2;
         AnchorPane.setTopAnchor(leftButtons, y);
-        AnchorPane.setTopAnchor(tileStackPane, y);
+        AnchorPane.setTopAnchor(rightPane, y);
         layoutChildren();
     }
 
     private void updateText(Text line, String value) {
         line.setText(value);
-        textBottom.setVisible(infoLine.getText().length() > 0 || errorLine.getText().length() > 0);
+        //textBottom.setVisible(infoLine.getText().length() > 0 || errorLine.getText().length() > 0);
         resizeWidth(null);
     }
 
@@ -171,7 +172,6 @@ public class Hud extends AnchorPane implements EngineObserver {
     @Override
     public void onTileStackChange() {
         tileStackCanvas.redraw();
-        tileStackSize.setText(Integer.toString(engine.getVolcanoTileStack().size()));
     }
 
     @Override
@@ -186,7 +186,6 @@ public class Hud extends AnchorPane implements EngineObserver {
     public void onBuildStepStart() {
         updateUndoRedo();
         tileStackCanvas.redraw();
-        tileStackSize.setText(Integer.toString(engine.getVolcanoTileStack().size() - 1));
     }
 
     @Override
@@ -217,7 +216,6 @@ public class Hud extends AnchorPane implements EngineObserver {
     @Override
     public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
         tileStackCanvas.redraw();
-        tileStackSize.setText(Integer.toString(engine.getVolcanoTileStack().size()));
         for (PlayerView playerView : playerViews) {
             playerView.updateTurn();
         }
