@@ -6,13 +6,16 @@ import java.util.List;
 
 /**
  * Indique le statut de l'engine
- *   L'équivalent en caml avec des types algébriques :
+ *   L'équivalent en pseudo-caml avec des types algébriques :
+ *     type Turn = int;;
  *     type TurnStep = ...;;
  *     type FinishReason = ...;;
+ *     type Winners = (Player list);;
  *     type EngineStatus =
  *          | PENDING_START
- *          | Running of int * TurnStep
- *          | Finished of int * FinishReason * (Player list)
+ *          | Running of Turn * TurnStep
+ *          | Finished of Turn * TurnStep * FinishReason * Winners
+ *     ;;
  */
 public abstract class EngineStatus {
 

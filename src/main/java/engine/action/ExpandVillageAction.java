@@ -2,7 +2,6 @@ package engine.action;
 
 import com.google.common.collect.ComparisonChain;
 import data.FieldType;
-import data.PlayerColor;
 import map.Hex;
 import map.Island;
 import map.Village;
@@ -13,30 +12,16 @@ import java.io.Writer;
 
 public class ExpandVillageAction implements BuildingAction<ExpandVillageAction> {
 
-    private final PlayerColor color;
-    private final boolean isNew;
     private final Hex villageHex;
     private final FieldType fieldType;
 
-    public ExpandVillageAction(PlayerColor color, boolean isNew, Village village, FieldType fieldType) {
-        this(color, isNew, village.getHexes().iterator().next(), fieldType);
+    public ExpandVillageAction(Village village, FieldType fieldType) {
+        this(village.getHexes().iterator().next(), fieldType);
     }
 
-    public ExpandVillageAction(PlayerColor color, boolean isNew, Hex villageHex, FieldType fieldType) {
-        this.color = color;
-        this.isNew = isNew;
+    public ExpandVillageAction(Hex villageHex, FieldType fieldType) {
         this.villageHex = villageHex;
         this.fieldType = fieldType;
-    }
-
-    @Override
-    public PlayerColor getColor() {
-        return color;
-    }
-
-    @Override
-    public boolean isNew() {
-        return isNew;
     }
 
     public Hex getVillageHex() {
@@ -81,7 +66,7 @@ public class ExpandVillageAction implements BuildingAction<ExpandVillageAction> 
         int line = Integer.valueOf(reader.readLine());
         int diag = Integer.valueOf(reader.readLine());
         FieldType fieldType = FieldType.valueOf(reader.readLine());
-        return new ExpandVillageAction(PlayerColor.YELLOW, false, Hex.at(line, diag), fieldType);
+        return new ExpandVillageAction(Hex.at(line, diag), fieldType);
     }
 
 

@@ -1,7 +1,5 @@
 package engine.action;
 
-import data.PlayerColor;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
@@ -18,8 +16,6 @@ import java.io.Writer;
  *             ExpandVillageAction (Par extension
  */
 public interface Action<T> extends Comparable<T> {
-
-    PlayerColor getColor();
 
     void write(Writer writer) throws IOException;
 

@@ -1,12 +1,13 @@
 package ia;
 
+import com.google.common.collect.ImmutableList;
 import data.BuildingType;
-import data.PlayerColor;
 import engine.Engine;
 import engine.EngineStatus;
 import engine.action.*;
 import engine.rules.PlaceBuildingRules;
 import map.Hex;
+import util.Randoms;
 
 import java.util.Iterator;
 import java.util.PriorityQueue;
@@ -80,17 +81,11 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
         int branchNb = branchSortFusion(engine, strategyPoints, branchMoves );
         // Test du cas où aucun coup n'est jouable !!
         if( branchMoves[0] == null) {
-            // If we reached this point, it means the current player got no more building to place,
-            // just give up and return one of the available tile action
-            int actionIndex = engine.getRandom()
-                    .nextInt(engine.getSeaTileActions().size() + engine.getVolcanoTileActions().size());
-            if (actionIndex < engine.getSeaTileActions().size()) {
-                return new Move(null, engine.getSeaTileActions().get(actionIndex), Integer.MAX_VALUE);
-            }
-            else {
-                actionIndex -= engine.getSeaTileActions().size();
-                return new Move(null, engine.getVolcanoTileActions().get(actionIndex), Integer.MAX_VALUE);
-            }
+            // Si l'on atteint ce point, c'est que le joueur courant ne peut plus placer de batiment,
+            // on choisit donc un placement de tuile au hasard
+            TileAction tileAction = Randoms.pickRandom(engine.getRandom(),
+                    ImmutableList.of(engine.getSeaTileActions(), engine.getVolcanoTileActions()));
+            return new Move(null, tileAction, Integer.MAX_VALUE);
         }
 
         engine.logger().fine("-> Branch Chosen");
@@ -103,8 +98,6 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
         int bestPoints = Integer.MAX_VALUE;
         int bestConfigPoints = Integer.MAX_VALUE;
         int p;
-
-        PlayerColor c1 = engine.getCurrentPlayer().getColor();
 
         for (int i = 0; i < branchNb; i++) {
             if (i > 0 && branchMoves[i].tileAction == null || branchMoves[i].buildingAction == null)
@@ -166,83 +159,6 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
         if( depth > 0 )
             engine.logger().fine("[Choice] Best move choosen, opponent best branch was {0}", bestMove.points);
         return bestMove;
-    }
-
-    // Fonction qui classe les coups selon la stratégie choisie
-    // !!! NE PLUS UTILISER + PAS OPTIMISEE
-    private int branchSort(Engine engine, int[] strategyPoints, Move[] branchMoves) {
-        int comp = 0;
-        // POUR GERER LE CAS OU LE JOUEUR NE PEUT PLUS JOUER AUCUN COUP
-        branchMoves[0] = null;
-
-        @SuppressWarnings("unchecked")
-        PriorityQueue<Move>[] strategiesQueues = new PriorityQueue[NB_STRATEGIES];
-        for (int i = 0; i < NB_STRATEGIES; i++)
-            strategiesQueues[i] = new PriorityQueue<>((a,b) -> Integer.compare( b.points, a.points));
-
-        // Pour tout tileAction dans la mer
-        engine.logger().finer("[Sort] Begin seaPlacements : {0}", engine.getSeaTileActions().size());
-        for (SeaTileAction tileAction : engine.getSeaTileActions()) {
-            int points = heuristics.evaluateSeaPlacement(engine, tileAction);
-            engine.placeOnSea(tileAction);
-
-            // Pour toute construction :
-            engine.logger().finest("    [Sort] Begin buildActions : {0}", engine.getPlaceBuildingActions().size());
-            for (PlaceBuildingAction buildingAction : engine.getPlaceBuildingActions()) {
-                heuristics.evaluateBuildAction(engine, tileAction, buildingAction, points, strategiesQueues);
-                comp++;
-            }
-
-            engine.logger().finest("    [Sort] Begin expandActions : {0}", engine.getExpandVillageActions().size());
-            for (ExpandVillageAction buildingAction : engine.getExpandVillageActions()) {
-                heuristics.evaluateExpandAction(engine, tileAction, buildingAction, points, strategiesQueues);
-                comp++;
-            }
-            engine.cancelLastStep();
-        }
-
-        engine.logger().finer("[Sort] Begin volcanoPlacements : {0}", engine.getVolcanoTileActions().size());
-        // Pour tout tileAction sur la terre
-        for (VolcanoTileAction tileActions  : engine.getVolcanoTileActions()) {
-            int points = heuristics.evaluateVolcanoPlacement(engine, tileActions);
-            engine.placeOnVolcano(tileActions);
-
-            // Pour toute construction :
-            for (PlaceBuildingAction buildingAction : engine.getPlaceBuildingActions()) {
-                heuristics.evaluateBuildAction(engine, tileActions, buildingAction, points, strategiesQueues);
-                comp++;
-            }
-
-            for (ExpandVillageAction bulidingAction : engine.getExpandVillageActions()) {
-                heuristics.evaluateExpandAction(engine, tileActions, bulidingAction, points, strategiesQueues);
-                comp++;
-            }
-            engine.cancelLastStep();
-        }
-        engine.logger().fine("[Sort] {0} evaluations made", comp);
-
-        // On choisit les meilleurs coups
-        int ind = 0;
-        for(int i = 0; i < NB_STRATEGIES; i++ ) {
-            for (int j = strategyPoints[i]; j > 0; j--) {
-                boolean found;
-                Move m;
-                // Check if not already chosen
-                do {
-                    m = strategiesQueues[i].poll();
-                    found = false;
-                    for (int k = 0; k < ind; k++) {
-                        if (branchMoves[k].equals(m)) {
-                            found = true;
-                            break;
-                        }
-                    }
-                } while (found);
-                // Add to player moves
-                branchMoves[ind++] = m;
-            }
-        }
-        return branchingFactor;
     }
 
     // Retourne le nombre de coups ajoutes dans le tableau branchMoves

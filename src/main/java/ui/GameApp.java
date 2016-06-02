@@ -33,8 +33,8 @@ public class GameApp extends Application {
     public GameApp() {
         this.engine = EngineBuilder.allVsAll()
                 .logLevel(Level.INFO)
-                .player(PlayerColor.RED, IA.MOYEN)
-                .player(PlayerColor.WHITE, IA.MOYEN)
+                .player(PlayerColor.RED, IA.DIFFICILE)
+                .player(PlayerColor.WHITE, IA.DIFFICILE)
                 .build();
     }
 

@@ -77,14 +77,14 @@ public class Placement {
         checkState(mode != Mode.NONE && valid);
         if (mode == Mode.TILE) {
             return engine.getIsland().getField(hex) == Field.SEA
-                    ? new SeaTileAction(PlayerColor.YELLOW, tile, hex, tileOrientation)
-                    : new VolcanoTileAction(PlayerColor.YELLOW, tile, hex, tileOrientation);
+                    ? new SeaTileAction(tile, hex, tileOrientation)
+                    : new VolcanoTileAction(tile, hex, tileOrientation);
         }
         else if (mode == Mode.BUILDING) {
-            return new PlaceBuildingAction(PlayerColor.YELLOW, false, buildingType, hex);
+            return new PlaceBuildingAction(buildingType, hex);
         }
         else if (mode == Mode.EXPAND_VILLAGE) {
-            return new ExpandVillageAction(PlayerColor.YELLOW, false, expansionVillage, engine.getIsland().getField(hex).getType());
+            return new ExpandVillageAction(expansionVillage, engine.getIsland().getField(hex).getType());
         }
 
         throw new IllegalStateException();

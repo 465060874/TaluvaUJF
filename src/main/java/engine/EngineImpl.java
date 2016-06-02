@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toList;
 
 class EngineImpl implements Engine {
 
-    private static final boolean DEBUG = true;
+    static final boolean DEBUG = false;
 
     private static final int TILES_PER_PLAYER = 12;
 
@@ -331,12 +331,6 @@ class EngineImpl implements Engine {
     @Override
     public List<ExpandVillageAction> getExpandVillageActions() {
         checkState(status instanceof EngineStatus.Running, "Requesting actions while the game is not running");
-        if (!actions.expandVillages.isEmpty()) {
-            ExpandVillageAction action = actions.expandVillages.get(0);
-            if (action.getColor() != getCurrentPlayer().getColor()) {
-                System.out.println("Dbg");
-            }
-        }
         return actions.expandVillages;
     }
 
@@ -378,10 +372,6 @@ class EngineImpl implements Engine {
             if (!problems.isValid()) {
                 throw new IllegalStateException(problems.toString());
             }
-        }
-
-        if (!action.getTile().equals(volcanoTileStack.current())) {
-            throw new IllegalStateException("Hmmm");
         }
 
         actionSaves.add(new ActionSave.Tile(this, action));

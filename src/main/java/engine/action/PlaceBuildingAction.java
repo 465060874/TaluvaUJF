@@ -2,7 +2,6 @@ package engine.action;
 
 import com.google.common.collect.ComparisonChain;
 import data.BuildingType;
-import data.PlayerColor;
 import map.Hex;
 
 import java.io.BufferedReader;
@@ -13,27 +12,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public class PlaceBuildingAction implements BuildingAction<PlaceBuildingAction> {
 
-    private final PlayerColor color;
-    private final boolean isNew;
     private final BuildingType type;
     private final Hex hex;
 
-    public PlaceBuildingAction(PlayerColor color, boolean isNew, BuildingType type, Hex hex) {
+    public PlaceBuildingAction(BuildingType type, Hex hex) {
         checkArgument(type != BuildingType.NONE);
-        this.isNew = isNew;
-        this.color = color;
         this.type = type;
         this.hex = hex;
-    }
-
-    @Override
-    public PlayerColor getColor() {
-        return color;
-    }
-
-    @Override
-    public boolean isNew() {
-        return isNew;
     }
 
     public BuildingType getType() {
@@ -74,6 +59,6 @@ public class PlaceBuildingAction implements BuildingAction<PlaceBuildingAction> 
         int line = Integer.valueOf(reader.readLine());
         int diag = Integer.valueOf(reader.readLine());
         BuildingType type = BuildingType.valueOf(reader.readLine());
-        return new PlaceBuildingAction(PlayerColor.YELLOW, false, type, Hex.at(line, diag));
+        return new PlaceBuildingAction(type, Hex.at(line, diag));
     }
 }

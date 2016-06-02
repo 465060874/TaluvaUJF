@@ -50,8 +50,8 @@ class EngineActions {
         if (engine.getIsland().isEmpty()) {
             VolcanoTile tile = engine.getVolcanoTileStack().current();
             Hex originHex = Hex.at(0, 0);
-            this.seaTiles = ImmutableList.of(new SeaTileAction(
-                    engine.getCurrentPlayer().getColor(), tile, originHex, Orientation.NORTH));
+            this.seaTiles = ImmutableList.of(new SeaTileAction(tile,
+                    originHex, Orientation.NORTH));
             this.volcanosTiles = ImmutableList.of();
             this.placeBuildings = ImmutableList.of();
             this.expandVillages = ImmutableList.of();
@@ -77,7 +77,7 @@ class EngineActions {
                 }
 
                 for (int rotation = 0; rotation < 3; rotation++) {
-                    seaTilesMap.add(new SeaTileAction(engine.getCurrentPlayer().getColor(), tile, hex, orientation));
+                    seaTilesMap.add(new SeaTileAction(tile, hex, orientation));
                     hex = hex.getLeftNeighbor(orientation);
                     orientation = orientation.leftRotation();
                 }
@@ -87,7 +87,9 @@ class EngineActions {
         ImmutableList.Builder<SeaTileAction> builder = ImmutableList.builder();
         builder.addAll(seaTilesMap);
 
-        this.seaTiles = Ordering.natural().immutableSortedCopy(builder.build());
+        this.seaTiles = EngineImpl.DEBUG
+                ? Ordering.natural().immutableSortedCopy(builder.build())
+                : builder.build();
     }
 
     private void updateVolcanoTiles() {
@@ -107,7 +109,7 @@ class EngineActions {
                     volcanoTilesMap.put(hex, list);
                 }
 
-                list.add(new VolcanoTileAction(engine.getCurrentPlayer().getColor(), tile, hex, orientation));
+                list.add(new VolcanoTileAction(tile, hex, orientation));
             }
         }
 
@@ -115,7 +117,9 @@ class EngineActions {
         for (List<VolcanoTileAction> actions : volcanoTilesMap.values()) {
             builder.addAll(actions);
         }
-        this.volcanosTiles = Ordering.natural().immutableSortedCopy(builder.build());
+        this.volcanosTiles = EngineImpl.DEBUG
+                ? Ordering.natural().immutableSortedCopy(builder.build())
+                : builder.build();
     }
 
     private void updatePlaceBuildings() {
@@ -127,21 +131,23 @@ class EngineActions {
             if (!field.hasBuilding()) {
 
                 if (PlaceBuildingRules.validate(engine, BuildingType.HUT, hex).isValid()) {
-                    builder.add(new PlaceBuildingAction(engine.getCurrentPlayer().getColor(), false,
+                    builder.add(new PlaceBuildingAction(
                             BuildingType.HUT, hex));
                 }
                 if (PlaceBuildingRules.validate(engine, BuildingType.TEMPLE, hex).isValid()) {
-                    builder.add(new PlaceBuildingAction(engine.getCurrentPlayer().getColor(), false,
+                    builder.add(new PlaceBuildingAction(
                             BuildingType.TEMPLE, hex));
                 }
                 if (PlaceBuildingRules.validate(engine, BuildingType.TOWER, hex).isValid()) {
-                    builder.add(new PlaceBuildingAction(engine.getCurrentPlayer().getColor(), false,
+                    builder.add(new PlaceBuildingAction(
                             BuildingType.TOWER, hex));
                 }
             }
         }
 
-        this.placeBuildings = Ordering.natural().immutableSortedCopy(builder.build());
+        this.placeBuildings = EngineImpl.DEBUG
+                ? Ordering.natural().immutableSortedCopy(builder.build())
+                : builder.build();
     }
 
     private void updateExpandVillages() {
@@ -156,7 +162,7 @@ class EngineActions {
                 }
 
                 if (ExpandVillageRules.validate(engine, village, fieldType).isValid()) {
-                    builder.add(new ExpandVillageAction(engine.getCurrentPlayer().getColor(), false, village, fieldType));
+                    builder.add(new ExpandVillageAction(village, fieldType));
                 }
             }
         }
@@ -174,10 +180,10 @@ class EngineActions {
             }
 
             if (PlaceBuildingRules.validate(engine, type, leftHex).isValid()) {
-                builder.add(new PlaceBuildingAction(engine.getCurrentPlayer().getColor(), true, type, leftHex));
+                builder.add(new PlaceBuildingAction(type, leftHex));
             }
             if (PlaceBuildingRules.validate(engine, type, rightHex).isValid()) {
-                builder.add(new PlaceBuildingAction(engine.getCurrentPlayer().getColor(), true, type, rightHex));
+                builder.add(new PlaceBuildingAction(type, rightHex));
             }
         }
 
@@ -216,11 +222,13 @@ class EngineActions {
             Village village = entry.getKey();
             FieldType fieldType = entry.getValue();
             if (ExpandVillageRules.validate(engine, village, fieldType).isValid()) {
-                ExpandVillageAction newAction = new ExpandVillageAction(engine.getCurrentPlayer().getColor(), true, village, fieldType);
+                ExpandVillageAction newAction = new ExpandVillageAction(village, fieldType);
                 builder.add(newAction);
             }
         }
 
-        return Ordering.natural().immutableSortedCopy(builder.build());
+        return EngineImpl.DEBUG
+                ? Ordering.natural().immutableSortedCopy(builder.build())
+                : builder.build();
     }
 }

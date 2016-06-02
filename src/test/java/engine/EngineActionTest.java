@@ -54,7 +54,7 @@ public class EngineActionTest {
                         continue;
                     }
 
-                    builder.add(new SeaTileAction(PlayerColor.YELLOW, tile, hex, orientation));
+                    builder.add(new SeaTileAction(tile, hex, orientation));
                 }
             }
         }
@@ -93,7 +93,7 @@ public class EngineActionTest {
                         continue;
                     }
 
-                    builder.add(new VolcanoTileAction(PlayerColor.YELLOW, tile, hex, orientation));
+                    builder.add(new VolcanoTileAction(tile, hex, orientation));
                 }
             }
         }
