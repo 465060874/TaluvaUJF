@@ -31,6 +31,16 @@ public enum PlayerViewCorner {
         public double arcY(double radius) {
             return -radius;
         }
+
+        @Override
+        public double hutX(int width) {
+            return 100;
+        }
+
+        @Override
+        public double hutY(int height) {
+            return 100;
+        }
     },
 
     TOP_RIGHT {
@@ -59,6 +69,16 @@ public enum PlayerViewCorner {
         public double arcY(double radius) {
             return -radius;
         }
+
+        @Override
+        public double hutX(int width) {
+            return 0;
+        }
+
+        @Override
+        public double hutY(int height) {
+            return 0;
+        }
     },
 
     BOTTOM_RIGHT {
@@ -85,6 +105,16 @@ public enum PlayerViewCorner {
 
         @Override
         public double arcY(double radius) {
+            return 0;
+        }
+
+        @Override
+        public double hutX(int width) {
+            return 0;
+        }
+
+        @Override
+        public double hutY(int height) {
             return 0;
         }
     },
@@ -115,6 +145,16 @@ public enum PlayerViewCorner {
         public double arcY(double radius) {
             return 0;
         }
+
+        @Override
+        public double hutX(int width) {
+            return 0;
+        }
+
+        @Override
+        public double hutY(int height) {
+            return 0;
+        }
     };
 
     final void anchor(Node node) {
@@ -130,4 +170,10 @@ public enum PlayerViewCorner {
     abstract double arcX(double radius);
 
     abstract double arcY(double radius);
+
+    public abstract double hutX(int width);
+
+    public abstract double hutY(int height);
+
+
 }

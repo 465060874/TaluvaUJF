@@ -152,5 +152,4 @@ public class DefaultTheme implements IslandTheme {
     public Effect getBuildingTopEffect(Grid grid, Building building, BuildingStyle style) {
         return null;
     }
-
 }

@@ -275,6 +275,24 @@ public class Placement {
         islandCanvas.redraw();
     }
 
+    public void changeForbiddenPlacementDraw() {
+        if (islandCanvas.hasForbiddenPlacementVisible()) {
+            islandCanvas.setForbiddenPlacementInvisible();
+        } else {
+            islandCanvas.setForbiddenPlacementVisible();
+        }
+        islandCanvas.redraw();
+    }
+
+    public void changeForbiddenBuildingsDraw() {
+        if (islandCanvas.hasForbiddenBuildingsVisible()) {
+            islandCanvas.setForbiddenBuildingsInvisible();
+        } else {
+            islandCanvas.setForbiddenBuildingsVisible();
+        }
+        islandCanvas.redraw();
+    }
+
     public void saveMode() {
         /*saveMode = mode;
         mode = Mode.NONE;

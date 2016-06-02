@@ -13,6 +13,7 @@ import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -49,6 +50,11 @@ public class Hud extends AnchorPane implements EngineObserver {
     private final TextFlow textBottom;
     private final VBox rightPane;
 
+    private final Text tileStackSize;
+    private final VBox tileStackPane;
+    private final IconButton showForbidenHex;
+    private final IconButton showForbiddenBuildings;
+
     public Hud(Engine engine, Placement placement) {
         this.engine = engine;
         this.versusIa = engine.getPlayers().size() == 2
@@ -68,6 +74,15 @@ public class Hud extends AnchorPane implements EngineObserver {
         this.leftButtons = new VBox();
         this.homeButton = new IconButton("ui/hud/home.png");
         this.saveButton = new IconButton("ui/hud/save.png");
+
+        final Tooltip saveToolTip = new Tooltip();
+        saveToolTip.setText("Sauvegarder");
+        saveButton.setTooltip(saveToolTip);
+
+        final Tooltip homeToolTip = new Tooltip();
+        homeToolTip.setText("Retour au menu");
+        homeButton.setTooltip(homeToolTip);
+
         leftButtons.getChildren().addAll(homeButton, saveButton);
         AnchorPane.setLeftAnchor(leftButtons, 0.0);
 
@@ -102,13 +117,45 @@ public class Hud extends AnchorPane implements EngineObserver {
 
         this.undoButton = new IconButton("ui/hud/undo.png", 0.5);
         this.redoButton = new IconButton("ui/hud/redo.png", 0.5);
+
+        final Tooltip cancelTooltip = new Tooltip();
+        cancelTooltip.setText("Annuler");
+        undoButton.setTooltip(cancelTooltip);
+
+        final Tooltip redoTooltip = new Tooltip();
+        redoTooltip.setText("Refaire");
+        redoButton.setTooltip(redoTooltip);
+
         undoButton.setOnAction(this::undo);
         redoButton.setOnAction(this::redo);
         HBox undoRedoPane = new HBox(undoButton, redoButton);
 
         this.tileStackCanvas = new TileStackCanvas(engine);
+
         this.rightPane = new VBox(undoRedoPane, tileStackCanvas);
         AnchorPane.setRightAnchor(rightPane, 0.0);
+
+        this.tileStackSize = new Text();
+        tileStackSize.setFont(new Font(20));
+        TextFlow tileStackSizeFlow = new TextFlow(tileStackSize);
+        tileStackSizeFlow.setTextAlignment(TextAlignment.CENTER);
+
+        this.showForbidenHex = new IconButton("ui/hud/forbidenHexagon.png");
+        final Tooltip showForbiddenHexToolTip = new Tooltip();
+        showForbiddenHexToolTip.setText("Afficher les placements de tuiles interdits");
+        showForbidenHex.setTooltip(showForbiddenHexToolTip);
+        showForbidenHex.setOnAction(this::drawForbiddenPlacement);
+
+
+        this.showForbiddenBuildings = new IconButton("ui/hud/forbiddenHut.png");
+        final Tooltip showForbiddenBuildingsToolTip = new Tooltip();
+        showForbiddenBuildingsToolTip.setText("Afficher les placements de Batiments interdits");
+        showForbiddenBuildings.setTooltip(showForbiddenBuildingsToolTip);
+        showForbiddenBuildings.setOnAction(this::drawForbiddenBuildings);
+
+
+        this.tileStackPane = new VBox(showForbiddenBuildings, showForbidenHex, undoRedoPane, tileStackCanvas, tileStackSizeFlow);
+        AnchorPane.setRightAnchor(tileStackPane, 0.0);
 
         getChildren().addAll(leftButtons, textBottom, rightPane);
 
@@ -119,6 +166,14 @@ public class Hud extends AnchorPane implements EngineObserver {
 
         engine.registerObserver(this);
 
+    }
+
+    private void drawForbiddenBuildings(ActionEvent actionEvent) {
+        placement.changeForbiddenBuildingsDraw();
+    }
+
+    private void drawForbiddenPlacement(ActionEvent actionEvent) {
+        placement.changeForbiddenPlacementDraw();
     }
 
     private void undo(ActionEvent event) {

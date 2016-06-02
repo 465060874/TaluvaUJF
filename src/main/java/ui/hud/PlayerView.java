@@ -73,9 +73,7 @@ public class PlayerView extends Canvas {
         gc.fillOval(
                 corner.arcX(getWidth()), corner.arcY(getHeight()),
                 getWidth() * 2, getHeight() * 2);
-        gc.strokeOval(
-                corner.arcX(getWidth()), corner.arcY(getHeight()),
-                getWidth() * 2, getHeight() * 2);
+
         gc.drawImage(faceImage,
                 corner.imageX(width), corner.imageY(height),
                 width / 2, height / 2);
@@ -86,6 +84,7 @@ public class PlayerView extends Canvas {
                 continue;
             }
 
+            //gc.fillOval(corner.hutX(width), corner.hutY(height), 100, 100);
             // drawBuilding at the right position
             // drawCount at the right position
         }

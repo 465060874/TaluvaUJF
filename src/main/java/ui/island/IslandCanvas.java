@@ -29,6 +29,8 @@ class IslandCanvas extends Canvas {
 
     private final HexShape hexShape;
     private final BuildingShape buildingShape;
+    private boolean forbiddenPlacementVisible;
+    private boolean forbiddenBuildingsVisible;
 
     IslandCanvas(Island island, Grid grid, Placement placement, boolean debug) {
         super(0, 0);
@@ -36,6 +38,8 @@ class IslandCanvas extends Canvas {
         this.grid = grid;
         this.placement = placement;
         this.debug = debug;
+        this.forbiddenPlacementVisible = false;
+        this.forbiddenBuildingsVisible = false;
 
         this.hexShape = new HexShape();
         this.buildingShape = new BuildingShape();
@@ -100,9 +104,13 @@ class IslandCanvas extends Canvas {
             HexStyle hexStyle;
             if (placement.mode == Placement.Mode.TILE) {
                 building = field.getBuilding();
-                hexStyle = placement.validHexes.contains(hex)
-                        ? HexStyle.NORMAL
-                        : HexStyle.FADED;
+                if (forbiddenPlacementVisible) {
+                    hexStyle = placement.validHexes.contains(hex)
+                            ? HexStyle.NORMAL
+                            : HexStyle.FADED;
+                } else {
+                    hexStyle = HexStyle.NORMAL;
+                }
             }
             else if (placement.mode == Placement.Mode.EXPAND_VILLAGE) {
                 if (placement.expansionHexes.contains(hex)) {
@@ -141,7 +149,11 @@ class IslandCanvas extends Canvas {
                 }
                 else {
                     building = field.getBuilding();
-                    hexStyle = HexStyle.FADED;
+                    if (forbiddenBuildingsVisible) {
+                        hexStyle = HexStyle.FADED;
+                    } else {
+                        hexStyle = HexStyle.NORMAL;
+                    }
                 }
             }
             else {
@@ -236,5 +248,29 @@ class IslandCanvas extends Canvas {
                 gc.fillText(hexStr, x, y);
             }
         }
+    }
+
+    boolean hasForbiddenPlacementVisible() {
+        return forbiddenPlacementVisible;
+    }
+
+    void setForbiddenPlacementVisible() {
+        forbiddenPlacementVisible = true;
+    }
+
+    void setForbiddenPlacementInvisible() {
+        forbiddenPlacementVisible = false;
+    }
+
+    public boolean hasForbiddenBuildingsVisible() {
+        return forbiddenBuildingsVisible;
+    }
+
+    public void setForbiddenBuildingsInvisible() {
+        forbiddenBuildingsVisible = false;
+    }
+
+    public void setForbiddenBuildingsVisible() {
+        forbiddenBuildingsVisible = true;
     }
 }
