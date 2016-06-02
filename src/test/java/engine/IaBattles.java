@@ -1,9 +1,8 @@
 package engine;
 
+import data.PlayerColor;
 import ia.IA;
 import ia.IADebug;
-import data.PlayerColor;
-import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -13,7 +12,7 @@ public class IaBattles {
     private static final int COUNT = 100;
     private static final int COUNT10 = 10;
 
-    @Test
+    //@Test
     public void facileVsDifficile() {
         double durationSum = 0;
         Engine engine = null;
@@ -53,7 +52,7 @@ public class IaBattles {
         System.out.println("Nombre de Victoires : IA.FACILE : " + winCount[0] + " IA.MOYEN " + winCount[1]);
     }
 
-    @Test
+    //@Test
     public void debugVsDebug() {
         long durationSum = 0;
         Engine engine = null;

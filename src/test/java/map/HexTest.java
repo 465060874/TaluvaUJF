@@ -9,7 +9,7 @@ import static org.junit.Assert.assertEquals;
 
 public class HexTest {
 
-    private static final int ORIGIN = 100;
+    private static final int ORIGIN = 50;
 
     /*
     Neighbors           Orientations
