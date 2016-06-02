@@ -132,8 +132,8 @@ public class MenuData {
                         .player(PlayerColor.BROWN, uiPlayerHandler);
             case TEAM_VS_TEAM:
                 return EngineBuilder.teamVsTeam()
-                        .team(PlayerColor.BROWN, PlayerColor.WHITE, uiPlayerHandler)
-                        .team(PlayerColor.RED, PlayerColor.YELLOW, uiPlayerHandler);
+                        .team(PlayerColor.RED, PlayerColor.WHITE, uiPlayerHandler)
+                        .team(PlayerColor.BROWN, PlayerColor.YELLOW, uiPlayerHandler);
         }
 
         throw new IllegalStateException();
