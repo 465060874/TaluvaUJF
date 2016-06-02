@@ -28,6 +28,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class Field {
 
+    // Instance unique de la classe Field répresentant les Field de type MER
+    // Agis comme l'élément null de la classe (cf. Null Object Pattern)
     public static Field SEA = new Field(0, null, Orientation.NORTH);
 
     public static Field create(int level, FieldType type, Orientation orientation) {

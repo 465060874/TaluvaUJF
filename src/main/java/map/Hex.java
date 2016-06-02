@@ -11,6 +11,10 @@ import java.util.Set;
  */
 public class Hex {
 
+    // On conserver les instances allouées (à la demande)
+    // dans ce tableau, le différence en terme de vitesse
+    // d'éxecution est infime, mais celle de la consommation
+    // mémoire est notable.
     private static final Hex[] HEXES = new Hex[40000];
 
     public static Hex at(int line, int diag) {
