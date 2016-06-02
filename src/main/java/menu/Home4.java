@@ -66,6 +66,28 @@ public class Home4 extends Application {
     private List<Node> reprendreSnapshots;
     private VBox reprendreSnapshotBox = new VBox();
 
+
+    private VBox vmultimage = new VBox();
+
+
+    private Image multimage[] = new Image[]{
+            new Image(getClass().getResourceAsStream("dj.png")),
+            new Image(getClass().getResourceAsStream("3t.png")),
+            new Image(getClass().getResourceAsStream("qj1.png")),
+            new Image(getClass().getResourceAsStream("qj2.png")),
+            };
+/*
+
+    private ImageView multi[] = new ImageView[]{
+            ImageView ivm1 = new ImageView(),
+            ImageView ivm2 = new ImageView(),
+            ImageView ivm3 = new ImageView(),
+            ImageView ivm4 = new ImageView(),
+            };
+*/
+
+
+
     public Home4() {
         this.menuData = MenuData.load();
     }
@@ -186,7 +208,7 @@ public class Home4 extends Application {
 
         VBox soloOptions = new VBox(5);
         soloOptions.setAlignment(Pos.CENTER);
-        VBox multiOptions = new VBox(20);
+        HBox multiOptions = new HBox(30);
         multiOptions.setAlignment(Pos.CENTER);
         multiOptions.setPrefWidth(largeurScene);
         HBox chargerList = new HBox(30);
@@ -273,14 +295,29 @@ public class Home4 extends Application {
 
         //pane button multijoueurs
 
-        /*
+
+        VBox vmultibutton = new VBox(10);
+
+        vmultimage.setAlignment(Pos.CENTER);
+        vmultibutton.setAlignment(Pos.CENTER);
+        //multiimage.setPrefSize(170,150);
+
+
+
+
+
+
+
+
+
         ToggleButton md = new ToggleButton("2 JOUEURS");
         ToggleButton mt = new ToggleButton("3 JOUEURS");
         ToggleButton mq1 = new ToggleButton("4 JOUEURS");
-        ToggleButton mq2 = new ToggleButton("2 JOUEURS   VS   2 JOUEURS");
+        ToggleButton mq2 = new ToggleButton("2  VS 2  ");
 
 
-
+        vmultibutton.getChildren().addAll(md,mt,mq1,mq2);
+        multiOptions.getChildren().addAll(vmultimage,vmultibutton);
 
         this.multiModeButtons = new ToggleButton[] { md,mt,mq1,mq2 };
         this.multiModeToggle = new ToggleGroup();
@@ -292,13 +329,13 @@ public class Home4 extends Application {
         multiModeToggle.selectedToggleProperty().addListener(e -> updatemultimode());
 
 
-        md.setPrefWidth(largeurScene/2);
-        mt.setPrefWidth(largeurScene/2);
-        mq1.setPrefWidth(largeurScene/2);
-        mq2.setPrefWidth(largeurScene/2);
-*/
+        md.setPrefWidth(largeurScene/4);
+        mt.setPrefWidth(largeurScene/4);
+        mq1.setPrefWidth(largeurScene/4);
+        mq2.setPrefWidth(largeurScene/4);
 
 
+/*
         HBox hhaut = new HBox(20);
         HBox hbas  = new HBox(20);
         VBox vg1   = new VBox(10);
@@ -419,9 +456,9 @@ public class Home4 extends Application {
         hhaut.getChildren().addAll(vg1,vd1);
         hbas.getChildren().addAll(vg2,vd2);
 
+*/
 
-        //multiOptions.getChildren().addAll(md,mt,mq1,mq2);
-        multiOptions.getChildren().addAll(hhaut,hbas);
+        //multiOptions.getChildren().addAll(hhaut,hbas);
 
 
         this.reprendreButtons = new ArrayList<>();
@@ -596,6 +633,8 @@ public class Home4 extends Application {
         return masque1;
     }
 
+
+
     private void updateButtonPlay() {
         bplay.setVisible(menuData.getMode() != null);
     }
@@ -648,6 +687,7 @@ public class Home4 extends Application {
         for(int i = 0; i < levelButtons.length; i++){
             if(selected == levelButtons[i]){
                 menuData.setSoloDifficulty(IA.values()[i]);
+
             }
         }
     }
@@ -658,6 +698,11 @@ public class Home4 extends Application {
         for(int i = 0; i < multiModeButtons.length; i++){
             if(selected == multiModeButtons[i]){
                 menuData.setMultiMode(MultiMode.values()[i]);
+                ImageView imageView = new ImageView(multimage[i]);
+                imageView.setFitWidth(160);
+                imageView.setPreserveRatio(true);
+                vmultimage.getChildren().setAll(imageView);
+                vmultimage.getChildren().setAll(imageView);
             }
         }
     }
