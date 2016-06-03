@@ -46,7 +46,7 @@ public interface IslandTheme {
 
     Paint getInnerBorderPaint(HexStyle style);
 
-    Paint getTileBottomPaint(HexStyle style);
+    Paint getTileBottomPaint(HexStyle style, int level);
 
     Effect getTileBottomEffect(Grid grid, HexStyle style);
 

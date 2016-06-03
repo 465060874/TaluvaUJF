@@ -12,6 +12,7 @@ public class DefaultTheme implements IslandTheme {
     private final Color backgroundColor = Color.web("5E81A2");
     private final Color tileBorderColor = Color.web("303030");
     private final Color tileBottomColor = Color.web("707070");
+    private final Color darkerTileBottomColor = tileBottomColor.darker();
 
     private final Color tileVolcanoColor = Color.web("E97B33");
     private final Color redInnerStrokeColor = Color.web("EA3434");
@@ -41,6 +42,9 @@ public class DefaultTheme implements IslandTheme {
     private final Stop[] stopsBuildings = new Stop[]{new Stop(0, Color.BLACK), new Stop(1, volcanoDarkRed)};
     private final LinearGradient buildingLinearGradiant = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE, stopsBuildings);
 
+    private final Stop[] stopsBottom = new Stop[]{new Stop(0, tileBottomColor.brighter()), new Stop(0.5, tileBottomColor)};
+    private final LinearGradient bottomLinearGradiant = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE, stopsBottom);
+
 
     @Override
     public Paint getBackgroundPaint() {
@@ -57,8 +61,8 @@ public class DefaultTheme implements IslandTheme {
     }
 
     @Override
-    public Paint getTileBottomPaint(HexStyle style) {
-        return tileBottomColor;
+    public Paint getTileBottomPaint(HexStyle style, int level) {
+        return darkerTileBottomColor;
     }
 
     @Override
