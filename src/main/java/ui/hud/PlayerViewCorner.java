@@ -52,7 +52,7 @@ public enum PlayerViewCorner {
 
         @Override
         public double templeY(int height) {
-            return height / 2 + (10.0 * height) / HEIGHT_TURN;
+            return height / 2 + (1.0 * height) / HEIGHT_TURN;
         }
 
         @Override
@@ -95,7 +95,7 @@ public enum PlayerViewCorner {
 
         @Override
         public double imageX(double width) {
-            return width / 2;
+            return width / 2 + 20;
         }
 
         @Override
@@ -173,12 +173,12 @@ public enum PlayerViewCorner {
 
         @Override
         public double imageX(double width) {
-            return width  / 2;
+            return width  / 2 + 20;
         }
 
         @Override
         public double imageY(double height) {
-            return height / 2;
+            return height / 2 + 20;
         }
 
         @Override
@@ -256,7 +256,7 @@ public enum PlayerViewCorner {
 
         @Override
         public double imageY(double height) {
-            return height / 2;
+            return height / 2 + 20;
         }
 
         @Override
@@ -286,7 +286,7 @@ public enum PlayerViewCorner {
 
         @Override
         public double templeY(int height) {
-            return height / 2 - (5.0 * height) / HEIGHT_TURN;
+            return height / 2 - (1.0 * height) / HEIGHT_TURN;
         }
 
         @Override

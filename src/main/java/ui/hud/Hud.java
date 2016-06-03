@@ -16,6 +16,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.*;
@@ -87,8 +88,8 @@ public class Hud extends AnchorPane implements EngineObserver {
         }
 
         this.leftButtons = new VBox();
-        this.homeButton = new IconButton("ui/hud/home.png");
-        this.saveButton = new IconButton("ui/hud/save.png");
+        this.homeButton = new IconButton("ui/hud/home.png", 0.7);
+        this.saveButton = new IconButton("ui/hud/save.png", 0.7);
 
         final Tooltip saveToolTip = new Tooltip();
         saveToolTip.setText("Sauvegarder");
@@ -203,18 +204,11 @@ public class Hud extends AnchorPane implements EngineObserver {
     }
 
     private void rules(ActionEvent event) {
-        throw new RuntimeException("NotImplementedYet !");
-        /*try {
-            File target = new File("rules.pdf");
-            InputStream inputStream = getClass().getResourceAsStream("rules.pdf");
-            FileOutputStream outputStream = new FileOutputStream(target);
-            ByteStreams.copy(inputStream, outputStream);
-            inputStream.close();
-            outputStream.close();
-            Desktop.getDesktop().open(target);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }*/
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Règles");
+        alert.setHeaderText("Règles du jeu");
+        alert.setContentText("Ici devrait s'afficher les régles du jeu");
+        alert.showAndWait();
     }
 
     private void textUpDown(ActionEvent actionEvent) {

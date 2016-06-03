@@ -40,8 +40,8 @@ public class GameApp extends Application {
                 //.player(PlayerColor.WHITE, handler)
                 .player(PlayerColor.WHITE, IA.DIFFICILE)
                 .player(PlayerColor.RED, IA.DIFFICILE)
-                //.player(PlayerColor.BROWN, handler)
-                //.player(PlayerColor.YELLOW, handler)
+                .player(PlayerColor.BROWN, IA.DIFFICILE)
+                .player(PlayerColor.YELLOW, IA.DIFFICILE)
                 .build();
         this.recorder = EngineRecorder.install(engine);
     }

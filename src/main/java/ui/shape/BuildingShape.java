@@ -37,6 +37,13 @@ public class BuildingShape {
 
     private void drawTemple(GraphicsContext gc, Grid grid,
             double x, double y, Building building, BuildingStyle style) {
+        y -= 10;
+        Image templeImage = PlayerTheme.of(building.getColor()).getTempleImage();
+        double width = 1.5 * grid.getHexRadiusX();
+        double height = templeImage.getHeight() / (templeImage.getWidth() / width);
+        gc.drawImage(templeImage, x - width / 2, y - height / 2, width, height);
+
+        /*
         double hexRadiusX = grid.getHexRadiusX();
         double hexRadiusY = grid.getHexRadiusY();
         double x1 = x - hexRadiusX / 4;
@@ -47,7 +54,7 @@ public class BuildingShape {
         double y3 = y + hexRadiusY / 1.6 - hexRadiusY / 2;
         double y4 = y + hexRadiusY / 1.6;
 
-        drawTentShape(gc, grid, x1, x2, x3, y1, y2, y3, y4, building, style);
+        drawTentShape(gc, grid, x1, x2, x3, y1, y2, y3, y4, building, style);*/
     }
 
     private void drawTentShape(GraphicsContext gc, Grid grid,
@@ -122,6 +129,7 @@ public class BuildingShape {
 
     private void drawTower(GraphicsContext gc, Grid grid,
             double x, double y, Building building, BuildingStyle style) {
+        y -= 30;
         Image towerImage = PlayerTheme.of(building.getColor()).getTowerImage();
         double width = 4 * grid.getHexRadiusX() / 5;
         double height = towerImage.getHeight() / (towerImage.getWidth() / width);

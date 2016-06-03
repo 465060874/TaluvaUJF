@@ -21,8 +21,8 @@ import ui.shape.BuildingShape;
 
 public class PlayerView extends Canvas {
 
-    static final int WIDTH_TURN = 200;
-    static final int HEIGHT_TURN = 200;
+    static final int WIDTH_TURN = 250;
+    static final int HEIGHT_TURN = 250;
     static final int WIDTH_NOT_TURN = (int) (2.0 * WIDTH_TURN / 3.0);
     static final int HEIGHT_NOT_TURN = (int) (2.0 * HEIGHT_TURN / 3.0);
 
@@ -92,7 +92,7 @@ public class PlayerView extends Canvas {
 
         gc.drawImage(faceImage,
                 corner.imageX(width), corner.imageY(height),
-                width / 2, height / 2);
+                width / 2 - 20, height / 2 - 20);
 
         for (BuildingType type : BuildingType.values()) {
             double x;
@@ -104,7 +104,7 @@ public class PlayerView extends Canvas {
                     x = corner.templeX(width);
                     y = corner.templeY(height);
                     yCountOffset = -(2 * height) / HEIGHT_TURN;
-                    scale = 0.5;
+                    scale = 0.6;
                     break;
                 case TOWER:
                     x = corner.towerX(width);
