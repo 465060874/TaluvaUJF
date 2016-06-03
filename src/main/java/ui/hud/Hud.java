@@ -208,7 +208,8 @@ public class Hud extends AnchorPane implements EngineObserver {
     }
 
     private void rules(ActionEvent event) {
-        try {
+        throw new RuntimeException("NotImplementedYet !");
+        /*try {
             File target = new File("rules.pdf");
             InputStream inputStream = getClass().getResourceAsStream("rules.pdf");
             FileOutputStream outputStream = new FileOutputStream(target);
@@ -218,7 +219,7 @@ public class Hud extends AnchorPane implements EngineObserver {
             Desktop.getDesktop().open(target);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
+        }*/
     }
 
     private void textUpDown(ActionEvent actionEvent) {
