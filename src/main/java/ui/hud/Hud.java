@@ -17,6 +17,7 @@ import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.*;
@@ -57,6 +58,7 @@ public class Hud extends AnchorPane implements EngineObserver {
     private final Text infoLine;
     private final Text errorLine;
     private final IconButton textUpDownButton;
+    private final IconButton rulesButton;
     private boolean textUp;
     private final TextFlow textBottom;
 
@@ -94,7 +96,6 @@ public class Hud extends AnchorPane implements EngineObserver {
         this.leftButtons = new VBox();
         this.homeButton = new IconButton("ui/hud/home.png");
         this.saveButton = new IconButton("ui/hud/save.png");
-        IconButton rulesButton = new IconButton("ui/hud/rules.png");
 
         final Tooltip saveToolTip = new Tooltip();
         saveToolTip.setText("Sauvegarder");
@@ -104,14 +105,7 @@ public class Hud extends AnchorPane implements EngineObserver {
         homeToolTip.setText("Retour au menu");
         homeButton.setTooltip(homeToolTip);
 
-        final Tooltip rulesToolTip = new Tooltip();
-        rulesToolTip.setText("Règles du jeu");
-        rulesButton.setTooltip(rulesToolTip);
-
-        rulesButton.setOnAction(this::rules);
-
-
-        leftButtons.getChildren().addAll(homeButton, saveButton, rulesButton);
+        leftButtons.getChildren().addAll(homeButton, saveButton);
         AnchorPane.setLeftAnchor(leftButtons, 0.0);
 
         Font font = new Font(18);
@@ -155,11 +149,18 @@ public class Hud extends AnchorPane implements EngineObserver {
         showForbiddenBuildingsButton.setTooltip(showForbiddenBuildingsToolTip);
         showForbiddenBuildingsButton.setOnAction(this::drawForbiddenBuildings);
 
+        this.rulesButton = new IconButton("ui/hud/rules.png", 0.5);
+        final Tooltip rulesToolTip = new Tooltip();
+        rulesToolTip.setText("Règles du jeu");
+        rulesButton.setTooltip(rulesToolTip);
+        rulesButton.setOnAction(this::rules);
+
         this.textUpDownButton = new IconButton("ui/hud/down.png", 0.5);
         textUpDownButton.setOnAction(this::textUpDown);
         textUp = true;
         VBox forbiddenBox = new VBox(showForbiddenBuildingsButton, showForbidenHexButton);
-        this.textBox = new HBox(forbiddenBox, textBottom, textUpDownButton);
+        Node rulesTextUpDownBox = new VBox(rulesButton, textUpDownButton);
+        this.textBox = new HBox(forbiddenBox, textBottom, rulesTextUpDownBox);
         textBox.setAlignment(Pos.BOTTOM_LEFT);
         AnchorPane.setBottomAnchor(textBox, 0.0);
 
@@ -224,6 +225,11 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     private void textUpDown(ActionEvent actionEvent) {
         this.textUp = !textUp;
+
+        rulesButton.setVisible(textUp);
+        showForbidenHexButton.setVisible(textUp);
+        showForbiddenBuildingsButton.setVisible(textUp);
+
         if (textUp) {
             textUpDownButton.updateImage("ui/hud/down.png", 0.5);
             textBottom.getChildren().setAll(infoLine, new Text("\n"), errorLine);
