@@ -3,6 +3,9 @@ package ui.hud;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 
+import static ui.hud.PlayerView.*;
+import static ui.hud.PlayerView.WIDTH_TURN;
+
 public enum PlayerViewCorner {
 
     TOP_LEFT {
@@ -33,13 +36,43 @@ public enum PlayerViewCorner {
         }
 
         @Override
+        public double templeX(int width) {
+            return width / 2;
+        }
+
+        @Override
+        public double templeY(int height) {
+            return height / 2 + (10.0 * height) / HEIGHT_TURN;
+        }
+
+        @Override
+        public double towerX(int width) {
+            return width - (60.0 * width) / WIDTH_TURN;
+        }
+
+        @Override
+        public double towerY(int height) {
+            return (40.0 * height) / HEIGHT_TURN;
+        }
+
+        @Override
         public double hutX(int width) {
-            return 100;
+            return (20.0 * width) / WIDTH_TURN;
         }
 
         @Override
         public double hutY(int height) {
-            return 100;
+            return height - (40.0 * height) / HEIGHT_TURN;
+        }
+
+        @Override
+        public double buildingCountOffsetX(double width) {
+            return (20 * width) / WIDTH_TURN;
+        }
+
+        @Override
+        public double buildingCountOffsetY(double height) {
+            return (10 * height) / HEIGHT_TURN;
         }
     },
 
@@ -71,12 +104,42 @@ public enum PlayerViewCorner {
         }
 
         @Override
+        public double templeX(int width) {
+            return width / 2;
+        }
+
+        @Override
+        public double templeY(int height) {
+            return height / 2 + (10.0 * height) / HEIGHT_TURN;
+        }
+
+        @Override
+        public double towerX(int width) {
+            return (60.0 * width) / WIDTH_TURN;
+        }
+
+        @Override
+        public double towerY(int height) {
+            return (40.0 * height) / HEIGHT_TURN;
+        }
+
+        @Override
         public double hutX(int width) {
-            return 0;
+            return width - (20.0 * width) / WIDTH_TURN;
         }
 
         @Override
         public double hutY(int height) {
+            return height - (40.0 * height) / HEIGHT_TURN;
+        }
+
+        @Override
+        public double buildingCountOffsetX(double width) {
+            return -(20 * width) / WIDTH_TURN;
+        }
+
+        @Override
+        public double buildingCountOffsetY(double height) {
             return 0;
         }
     },
@@ -109,12 +172,42 @@ public enum PlayerViewCorner {
         }
 
         @Override
+        public double templeX(int width) {
+            return width / 2;
+        }
+
+        @Override
+        public double templeY(int height) {
+            return height / 2 - (5.0 * height) / HEIGHT_TURN;
+        }
+
+        @Override
+        public double towerX(int width) {
+            return (60.0 * width) / WIDTH_TURN;
+        }
+
+        @Override
+        public double towerY(int height) {
+            return height - (20.0 * height) / HEIGHT_TURN;
+        }
+
+        @Override
         public double hutX(int width) {
-            return 0;
+            return width - (20.0 * width) / WIDTH_TURN;
         }
 
         @Override
         public double hutY(int height) {
+            return (40.0 * height) / HEIGHT_TURN;
+        }
+
+        @Override
+        public double buildingCountOffsetX(double width) {
+            return -(20 * width) / WIDTH_TURN;
+        }
+
+        @Override
+        public double buildingCountOffsetY(double height) {
             return 0;
         }
     },
@@ -147,12 +240,42 @@ public enum PlayerViewCorner {
         }
 
         @Override
+        public double templeX(int width) {
+            return width / 2;
+        }
+
+        @Override
+        public double templeY(int height) {
+            return height / 2 - (5.0 * height) / HEIGHT_TURN;
+        }
+
+        @Override
+        public double towerX(int width) {
+            return width - (60.0 * width) / WIDTH_TURN;
+        }
+
+        @Override
+        public double towerY(int height) {
+            return height - (20.0 * height) / HEIGHT_TURN;
+        }
+
+        @Override
         public double hutX(int width) {
-            return 0;
+            return (20.0 * width) / WIDTH_TURN;
         }
 
         @Override
         public double hutY(int height) {
+            return (40.0 * height) / HEIGHT_TURN;
+        }
+
+        @Override
+        public double buildingCountOffsetX(double width) {
+            return (20 * width) / WIDTH_TURN;
+        }
+
+        @Override
+        public double buildingCountOffsetY(double height) {
             return 0;
         }
     };
@@ -171,9 +294,19 @@ public enum PlayerViewCorner {
 
     abstract double arcY(double radius);
 
+    public abstract double templeX(int width);
+
+    public abstract double templeY(int height);
+
+    public abstract double towerX(int width);
+
+    public abstract double towerY(int height);
+
     public abstract double hutX(int width);
 
     public abstract double hutY(int height);
 
+    public abstract double buildingCountOffsetX(double width);
 
+    public abstract double buildingCountOffsetY(double height);
 }

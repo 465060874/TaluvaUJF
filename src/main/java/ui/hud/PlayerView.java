@@ -10,16 +10,20 @@ import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
+import map.Building;
+import theme.BuildingStyle;
 import theme.PlayerTheme;
+import ui.island.Grid;
 import ui.island.Placement;
+import ui.shape.BuildingShape;
 
 public class PlayerView extends Canvas {
 
-    static final int WIDTH_TURN = 172;
-    static final int HEIGHT_TURN = 172;
-    static final int WIDTH_NOT_TURN = WIDTH_TURN / 2;
-    static final int HEIGHT_NOT_TURN = HEIGHT_TURN / 2;
-    private static final Color BORDER_COLOR = Color.web("303030");
+    static final int WIDTH_TURN = 200;
+    static final int HEIGHT_TURN = 200;
+    static final int WIDTH_NOT_TURN = (int) (2.0 * WIDTH_TURN / 3.0);
+    static final int HEIGHT_NOT_TURN = (int) (2.0 * HEIGHT_TURN / 3.0);
 
     private static final int LIGHT_MIN_Z = 200;
     private static final int LIGHT_MAX_Z = 300;
@@ -28,8 +32,10 @@ public class PlayerView extends Canvas {
     private final Engine engine;
     private final int index;
     private final Placement placement;
+    private final Grid grid;
 
     private final Image faceImage;
+    private final BuildingShape shape;
 
     private final Light.Point light;
     private double lightDiff;
@@ -39,9 +45,11 @@ public class PlayerView extends Canvas {
         this.engine = engine;
         this.index = index;
         this.placement = placement;
+        this.grid = new Grid();
 
         this.faceImage = PlayerTheme.of(player().getColor()).getImage();
         corner().anchor(this);
+        this.shape = new BuildingShape();
 
         this.light = new Light.Point(0, 0, 60, Color.WHITE);
         this.lightDiff = LIGHT_DIFF_Z;
@@ -103,10 +111,48 @@ public class PlayerView extends Canvas {
 
 
         for (BuildingType type : BuildingType.values()) {
-            if (type == BuildingType.NONE) {
-                continue;
+            double x;
+            double y;
+            double yCountOffset;
+            double scale;
+            switch (type) {
+                case TEMPLE:
+                    x = corner.templeX(width);
+                    y = corner.templeY(height);
+                    yCountOffset = -(2 * height) / HEIGHT_TURN;
+                    scale = 0.5;
+                    break;
+                case TOWER:
+                    x = corner.towerX(width);
+                    y = corner.towerY(height);
+                    yCountOffset = -(8 * height) / HEIGHT_TURN;
+                    scale = 0.5;
+                    break;
+                case HUT:
+                    x = corner.hutX(width);
+                    y = corner.hutY(height);
+                    yCountOffset = (4 * height) / HEIGHT_TURN;
+                    scale = 0.5;
+                    break;
+                default:
+                    continue;
             }
 
+            if (!turn) scale /= 2;
+            grid.setAbsoluteScale(scale);
+            Building building = Building.of(type, player().getColor());
+            shape.draw(gc, grid,
+                    x, y, 1,
+                    building, BuildingStyle.NORMAL);
+
+            x += corner.buildingCountOffsetX(width) * 1.5;
+            y += yCountOffset;
+
+            gc.save();
+            gc.setFill(Color.BLACK);
+            gc.setFont(new Font(turn ? 12 : 8));
+            gc.fillText(Integer.toString(player().getBuildingCount(type)), x, y);
+            gc.restore();
             //gc.fillOval(corner.hutX(width), corner.hutY(height), 100, 100);
             // drawBuilding at the right position
             // drawCount at the right position

@@ -121,6 +121,7 @@ public class Hud extends AnchorPane implements EngineObserver {
         errorLine.setFill(Color.RED);
 
         this.textBottom = new TextFlow(infoLine, new Text("\n"), errorLine);
+        textBottom.setPadding(new Insets(10, 0, 0, 0));
         textBottom.setTextAlignment(TextAlignment.CENTER);
         textBottom.setBackground(new Background(new BackgroundFill(
                 Color.BEIGE,
@@ -135,9 +136,9 @@ public class Hud extends AnchorPane implements EngineObserver {
         textBottom.setMinWidth(500);
         textBottom.setPrefWidth(500);
         textBottom.setMaxWidth(500);
-        textBottom.setMinHeight(70);
-        textBottom.setPrefHeight(70);
-        textBottom.setMaxHeight(70);
+        textBottom.setMinHeight(80);
+        textBottom.setPrefHeight(80);
+        textBottom.setMaxHeight(80);
 
         this.showForbidenHexButton = new IconButton("ui/hud/forbidenHexagon.png", 0.5);
         final Tooltip showForbiddenHexToolTip = new Tooltip();

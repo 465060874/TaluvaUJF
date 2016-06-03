@@ -37,6 +37,10 @@ public class Grid {
         return scale;
     }
 
+    public void setAbsoluteScale(double scale) {
+        this.scale = scale;
+    }
+
     public boolean scale(double factor) {
         double newScale = scale * factor;
         if (newScale > 8) {
