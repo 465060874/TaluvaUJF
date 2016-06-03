@@ -281,22 +281,30 @@ public class Placement {
         islandCanvas.redraw();
     }
 
-    public void changeForbiddenPlacementDraw() {
+    public boolean changeForbiddenPlacementDraw() {
+        boolean active;
         if (islandCanvas.hasForbiddenPlacementVisible()) {
             islandCanvas.setForbiddenPlacementInvisible();
+            active = false;
         } else {
             islandCanvas.setForbiddenPlacementVisible();
+            active = true;
         }
         islandCanvas.redraw();
+        return active;
     }
 
-    public void changeForbiddenBuildingsDraw() {
+    public boolean changeForbiddenBuildingsDraw() {
+        boolean active;
         if (islandCanvas.hasForbiddenBuildingsVisible()) {
             islandCanvas.setForbiddenBuildingsInvisible();
+            active = false;
         } else {
             islandCanvas.setForbiddenBuildingsVisible();
+            active = true;
         }
         islandCanvas.redraw();
+        return active;
     }
 
     public boolean isLastPlaced(Hex hex) {
