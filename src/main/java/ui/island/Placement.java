@@ -224,25 +224,6 @@ public class Placement {
         this.problem = PlaceBuildingRules.validate(engine, buildingType, hex);
         hud.updateProblems();
         redrawWhatsNecessary(wasValid);
-        /*
-        List<BuildingType> otherAvailableBuildings = otherAvailableBuildings(buildingType);
-        if (!otherAvailableBuildings.isEmpty()) {
-            wheelOfChoice.redraw(otherAvailableBuildings, hex, valid, buildingType);
-        }
-        */
-    }
-
-    private List<BuildingType> otherAvailableBuildings(BuildingType buildingType) {
-        List<BuildingType> others = new ArrayList<>();
-        for (BuildingType currentType : BuildingType.values()) {
-            if (currentType != buildingType
-                    && currentType != BuildingType.NONE
-                    && PlaceBuildingRules.validate(engine, currentType, hex).isValid())
-            {
-                others.add(currentType);
-            }
-        }
-        return others;
     }
 
     private void redrawWhatsNecessary(boolean wasValid) {
