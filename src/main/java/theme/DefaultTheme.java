@@ -54,6 +54,7 @@ public class DefaultTheme implements IslandTheme {
     @Override
     public Paint getTileBorderPaint(HexStyle style) {
         return tileBorderColor;
+
     }
     @Override
     public Paint getInnerBorderPaint(HexStyle style) {

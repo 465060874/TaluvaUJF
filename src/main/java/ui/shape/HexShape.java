@@ -17,7 +17,7 @@ public class HexShape {
     private static final int BOTTOM_POINTS = 6;
     private static final int BOTTOM_BORDER_POINTS = 5;
     public static final float STROKE_WIDTH = 3f;
-    private static final float LASTPLAYED_STROKE_WIDTH = STROKE_WIDTH * 2;
+    private static final float LASTPLAYED_STROKE_WIDTH = STROKE_WIDTH * 2f;
     private static final double FADEDRATIO = .8f;
 
     private final double[] hexagonX;
@@ -222,6 +222,7 @@ public class HexShape {
         gc.setLineJoin(StrokeLineJoin.ROUND);
 
         gc.strokePolyline(hexagonBorderX, hexagonBorderY, HEXAGON_BORDER_POINTS);
+        gc.setLineWidth(STROKE_WIDTH * grid.getScale());
         for (int i = 1; i <= level; i++) {
             bottomBorderLevel(grid, i, level);
             gc.strokePolyline(bottomBorderX, bottomBorderY, BOTTOM_BORDER_POINTS);
