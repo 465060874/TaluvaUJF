@@ -139,10 +139,23 @@ public class Hud extends AnchorPane implements EngineObserver {
         textBottom.setPrefHeight(70);
         textBottom.setMaxHeight(70);
 
+        this.showForbidenHexButton = new IconButton("ui/hud/forbidenHexagon.png", 0.5);
+        final Tooltip showForbiddenHexToolTip = new Tooltip();
+        showForbiddenHexToolTip.setText("Afficher les placements de tuiles interdits");
+        showForbidenHexButton.setTooltip(showForbiddenHexToolTip);
+        showForbidenHexButton.setOnAction(this::drawForbiddenPlacement);
+
+        this.showForbiddenBuildingsButton = new IconButton("ui/hud/forbiddenHut.png", 0.5);
+        final Tooltip showForbiddenBuildingsToolTip = new Tooltip();
+        showForbiddenBuildingsToolTip.setText("Afficher les placements de Batiments interdits");
+        showForbiddenBuildingsButton.setTooltip(showForbiddenBuildingsToolTip);
+        showForbiddenBuildingsButton.setOnAction(this::drawForbiddenBuildings);
+
         this.textUpDownButton = new IconButton("ui/hud/down.png", 0.5);
         textUpDownButton.setOnAction(this::textUpDown);
         textUp = true;
-        this.textBox = new HBox(textBottom, textUpDownButton);
+        VBox forbiddenBox = new VBox(showForbiddenBuildingsButton, showForbidenHexButton);
+        this.textBox = new HBox(forbiddenBox, textBottom, textUpDownButton);
         textBox.setAlignment(Pos.BOTTOM_LEFT);
         AnchorPane.setBottomAnchor(textBox, 0.0);
 
@@ -161,20 +174,8 @@ public class Hud extends AnchorPane implements EngineObserver {
         redoButton.setOnAction(this::redo);
         HBox undoRedoPane = new HBox(undoButton, redoButton);
 
-        this.showForbidenHexButton = new IconButton("ui/hud/forbidenHexagon.png");
-        final Tooltip showForbiddenHexToolTip = new Tooltip();
-        showForbiddenHexToolTip.setText("Afficher les placements de tuiles interdits");
-        showForbidenHexButton.setTooltip(showForbiddenHexToolTip);
-        showForbidenHexButton.setOnAction(this::drawForbiddenPlacement);
-
-        this.showForbiddenBuildingsButton = new IconButton("ui/hud/forbiddenHut.png");
-        final Tooltip showForbiddenBuildingsToolTip = new Tooltip();
-        showForbiddenBuildingsToolTip.setText("Afficher les placements de Batiments interdits");
-        showForbiddenBuildingsButton.setTooltip(showForbiddenBuildingsToolTip);
-        showForbiddenBuildingsButton.setOnAction(this::drawForbiddenBuildings);
-
         this.tileStackCanvas = new TileStackCanvas(engine);
-        this.rightPane = new VBox(showForbiddenBuildingsButton, showForbidenHexButton, undoRedoPane, tileStackCanvas);
+        this.rightPane = new VBox(undoRedoPane, tileStackCanvas);
         AnchorPane.setRightAnchor(rightPane, 0.0);
 
         getChildren().addAll(leftButtons, textBox, rightPane);
