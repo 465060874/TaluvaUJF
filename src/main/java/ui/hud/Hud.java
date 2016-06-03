@@ -204,9 +204,9 @@ public class Hud extends AnchorPane implements EngineObserver {
     }
 
     private void rules(ActionEvent event) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Règles");
-        alert.setHeaderText("Règles du jeu");
+        alert.setHeaderText("Pas encore implementé");
         alert.setContentText("Ici devrait s'afficher les régles du jeu");
         alert.showAndWait();
     }
