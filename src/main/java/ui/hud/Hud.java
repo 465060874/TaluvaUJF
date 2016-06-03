@@ -131,13 +131,13 @@ public class Hud extends AnchorPane implements EngineObserver {
         textBottom.setPrefHeight(TEXT_VISIBLE_HEIGHT);
         textBottom.setMaxHeight(TEXT_VISIBLE_HEIGHT);
 
-        this.showForbidenHexButton = new IconButton("ui/hud/forbidenHexagon.png", 0.5);
+        this.showForbidenHexButton = new IconButton("ui/hud/forbiddenHexagonDisabled.png", 0.5);
         final Tooltip showForbiddenHexToolTip = new Tooltip();
         showForbiddenHexToolTip.setText("Afficher les placements de tuiles interdits");
         showForbidenHexButton.setTooltip(showForbiddenHexToolTip);
         showForbidenHexButton.setOnAction(this::drawForbiddenPlacement);
 
-        this.showForbiddenBuildingsButton = new IconButton("ui/hud/forbiddenHut.png", 0.5);
+        this.showForbiddenBuildingsButton = new IconButton("ui/hud/forbiddenHutDisabled.png", 0.5);
         final Tooltip showForbiddenBuildingsToolTip = new Tooltip();
         showForbiddenBuildingsToolTip.setText("Afficher les placements de Batiments interdits");
         showForbiddenBuildingsButton.setTooltip(showForbiddenBuildingsToolTip);
@@ -195,12 +195,20 @@ public class Hud extends AnchorPane implements EngineObserver {
         }
     }
 
-    private void drawForbiddenBuildings(ActionEvent actionEvent) {
-        placement.changeForbiddenBuildingsDraw();
+    private void drawForbiddenBuildings(ActionEvent actionEvent){
+        if (placement.changeForbiddenBuildingsDraw()) {
+            showForbiddenBuildingsButton.updateImage("ui/hud/forbiddenHut.png", 0.5);
+        } else {
+            showForbiddenBuildingsButton.updateImage("ui/hud/forbiddenHutDisabled.png", 0.5);
+        }
     }
 
     private void drawForbiddenPlacement(ActionEvent actionEvent) {
-        placement.changeForbiddenPlacementDraw();
+        if (placement.changeForbiddenPlacementDraw()) {
+            showForbidenHexButton.updateImage("ui/hud/forbiddenHexagon.png", 0.5);
+        } else {
+            showForbidenHexButton.updateImage("ui/hud/forbiddenHexagonDisabled.png", 0.5);
+        }
     }
 
     private void rules(ActionEvent event) {
