@@ -27,9 +27,14 @@ class RecordPlayerHandler implements PlayerHandler {
     public PlayerTurn startTurn(Engine engine, EngineStatus.TurnStep step) {
         if (actions.hasNext()) {
             Action nextAction = actions.next();
-            return step == EngineStatus.TurnStep.TILE
-                    ? new RecordPlayerTurn(engine, nextAction, actions.next())
-                    : new RecordPlayerTurn(engine, nextAction);
+            if (actions.hasNext()) {
+                return step == EngineStatus.TurnStep.TILE
+                        ? new RecordPlayerTurn(engine, nextAction, actions.next())
+                        : new RecordPlayerTurn(engine, nextAction);
+            }
+            else {
+                return wrapped.startTurn(engine, step);
+            }
         }
         else {
             return wrapped.startTurn(engine, step);
