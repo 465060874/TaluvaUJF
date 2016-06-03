@@ -81,6 +81,8 @@ public interface EngineObserver {
      */
     void onWin(EngineStatus.FinishReason reason, List<Player> winners);
 
+    void onBeforeExpand(ExpandVillageAction action);
+
     abstract class Dummy implements EngineObserver {
 
         @Override

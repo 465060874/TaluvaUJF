@@ -515,6 +515,9 @@ class EngineImpl implements Engine {
         Building building = Building.of(BuildingType.HUT, color);
         int buildingCount = 0;
         Village village = getIsland().getVillage(action.getVillageHex());
+
+        observers.forEach(o -> o.onBeforeExpand(action));
+
         for (Hex hex : village.getExpandableHexes().get(action.getFieldType())) {
             island.putBuilding(hex, building);
             buildingCount += island.getField(hex).getBuildingCount();

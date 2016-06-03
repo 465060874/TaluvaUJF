@@ -113,4 +113,9 @@ public class EngineLoggerObserver extends EngineObserver.Dummy {
                 winners.stream().map(Player::getColor).collect(toList()),
                 reason);
     }
+
+    @Override
+    public void onBeforeExpand(ExpandVillageAction action) {
+        return;
+    }
 }

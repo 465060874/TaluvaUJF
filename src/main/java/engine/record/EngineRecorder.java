@@ -90,6 +90,10 @@ public class EngineRecorder {
 
         public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
         }
+
+        public void onBeforeExpand(ExpandVillageAction action) {
+            return;
+        }
     }
 
     public EngineRecord getRecord() {

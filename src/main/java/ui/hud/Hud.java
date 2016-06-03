@@ -380,6 +380,11 @@ public class Hud extends AnchorPane implements EngineObserver {
         }
     }
 
+    @Override
+    public void onBeforeExpand(ExpandVillageAction action) {
+        return;
+    }
+
     public Button getHomeButton() {
         return homeButton;
     }

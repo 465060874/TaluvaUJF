@@ -99,17 +99,14 @@ public class Placement {
         checkState(mode != Mode.NONE && isValid());
         if (mode == Mode.TILE) {
 
-            setLastPlacedHexes(hex, hex.getLeftNeighbor(tileOrientation), hex.getRightNeighbor(tileOrientation));
             return engine.getIsland().getField(hex) == Field.SEA
                     ? new SeaTileAction(tile, hex, tileOrientation)
                     : new VolcanoTileAction(tile, hex, tileOrientation);
         }
         else if (mode == Mode.BUILDING) {
-            setLastPlacedBuildings(hex);
             return new PlaceBuildingAction(buildingType, hex);
         }
         else if (mode == Mode.EXPAND_VILLAGE) {
-            setLastPlacedBuildings(expansionVillage.getExpandableHexes().get(expansionFieldType));
             return new ExpandVillageAction(expansionVillage, engine.getIsland().getField(hex).getType());
         }
 
@@ -302,6 +299,10 @@ public class Placement {
         islandCanvas.redraw();
     }
 
+    public boolean isLastPlaced(Hex hex) {
+        return lastPlacedHexes.contains(hex);
+    }
+
     public void setLastPlacedHexes(Hex volcanoHex, Hex leftHex, Hex rightHex) {
         lastPlacedHexes = new ArrayList<>(3);
         lastPlacedHexes.add(volcanoHex);
@@ -311,10 +312,6 @@ public class Placement {
 
     public void deleteLastPlacedHexes() {
         lastPlacedHexes = new ArrayList<>(3);
-    }
-
-    public boolean isLastPlaced(Hex hex) {
-        return lastPlacedHexes.contains(hex);
     }
 
     public boolean isLastPlacedBuildings(Hex hex) {
