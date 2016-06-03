@@ -26,9 +26,9 @@ public class PlayerView extends Canvas {
     static final int WIDTH_NOT_TURN = (int) (2.0 * WIDTH_TURN / 3.0);
     static final int HEIGHT_NOT_TURN = (int) (2.0 * HEIGHT_TURN / 3.0);
 
-    private static final int LIGHT_MIN_Z = 200;
-    private static final int LIGHT_MAX_Z = 300;
-    private static final int LIGHT_DIFF_Z = 10;
+    private static final int LIGHT_MIN_Z = 300;
+    private static final int LIGHT_MAX_Z = 700;
+    private static final int LIGHT_DIFF_Z = 20;
 
     private final Engine engine;
     private final int index;
@@ -84,7 +84,7 @@ public class PlayerView extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         gc.clearRect(0, 0, getWidth(), getHeight());
 
-        light.setZ(250);
+        light.setZ(LIGHT_MAX_Z);
         lightDiff = LIGHT_DIFF_Z;
         redraw(gc);
     }
@@ -133,7 +133,7 @@ public class PlayerView extends Canvas {
                     x = corner.hutX(width);
                     y = corner.hutY(height);
                     yCountOffset = (4 * height) / HEIGHT_TURN;
-                    scale = 0.5;
+                    scale = 1;
                     break;
                 default:
                     continue;
@@ -194,6 +194,7 @@ public class PlayerView extends Canvas {
         }
 
         double newLightZ = (light.getZ() - LIGHT_MIN_Z + lightDiff) + LIGHT_MIN_Z;
+        System.out.println(newLightZ);
         light.setZ(newLightZ);
         redraw(getGraphicsContext2D());
     }
