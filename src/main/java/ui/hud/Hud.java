@@ -1,5 +1,6 @@
 package ui.hud;
 
+import com.google.common.io.ByteStreams;
 import data.PlayerColor;
 import engine.Engine;
 import engine.EngineObserver;
@@ -9,9 +10,13 @@ import engine.action.ExpandVillageAction;
 import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.*;
@@ -20,10 +25,16 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
+import javafx.util.Duration;
 import ui.hud.trad.PlayerText;
 import ui.hud.trad.ProblemText;
 import ui.island.Placement;
 
+import java.awt.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import static java.util.stream.Collectors.joining;
@@ -34,6 +45,7 @@ public class Hud extends AnchorPane implements EngineObserver {
     private final boolean versusIa;
     private final Placement placement;
 
+    private final Timeline playerTimeline;
     private final PlayerView[] playerViews;
 
     private final Button homeButton;
@@ -41,13 +53,16 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     private final Text infoLine;
     private final Text errorLine;
+    private final IconButton textUpDownButton;
+    private boolean textUp;
+    private final TextFlow textBottom;
 
     private final IconButton undoButton;
     private final IconButton redoButton;
     private final TileStackCanvas tileStackCanvas;
 
     private final VBox leftButtons;
-    private final TextFlow textBottom;
+    private final HBox textBox;
     private final VBox rightPane;
 
     private final IconButton showForbidenHexButton;
@@ -62,6 +77,10 @@ public class Hud extends AnchorPane implements EngineObserver {
         this.placement = placement;
         placement.initHud(this);
 
+        this.playerTimeline = new Timeline(new KeyFrame(Duration.millis(50), this::playerTick));
+        playerTimeline.setCycleCount(Animation.INDEFINITE);
+        playerTimeline.play();
+
         List<Player> players = engine.getPlayers();
         this.playerViews = new PlayerView[players.size()];
         for (int i = 0; i < players.size(); i++) {
@@ -72,6 +91,7 @@ public class Hud extends AnchorPane implements EngineObserver {
         this.leftButtons = new VBox();
         this.homeButton = new IconButton("ui/hud/home.png");
         this.saveButton = new IconButton("ui/hud/save.png");
+        IconButton rulesButton = new IconButton("ui/hud/rules.png");
 
         final Tooltip saveToolTip = new Tooltip();
         saveToolTip.setText("Sauvegarder");
@@ -81,7 +101,14 @@ public class Hud extends AnchorPane implements EngineObserver {
         homeToolTip.setText("Retour au menu");
         homeButton.setTooltip(homeToolTip);
 
-        leftButtons.getChildren().addAll(homeButton, saveButton);
+        final Tooltip rulesToolTip = new Tooltip();
+        rulesToolTip.setText("Règles du jeu");
+        rulesButton.setTooltip(rulesToolTip);
+
+        rulesButton.setOnAction(this::rules);
+
+
+        leftButtons.getChildren().addAll(homeButton, saveButton, rulesButton);
         AnchorPane.setLeftAnchor(leftButtons, 0.0);
 
         Font font = new Font(18);
@@ -111,7 +138,13 @@ public class Hud extends AnchorPane implements EngineObserver {
         textBottom.setMinHeight(70);
         textBottom.setPrefHeight(70);
         textBottom.setMaxHeight(70);
-        AnchorPane.setBottomAnchor(textBottom, 0.0);
+
+        this.textUpDownButton = new IconButton("ui/hud/down.png", 0.5);
+        textUpDownButton.setOnAction(this::textUpDown);
+        textUp = true;
+        this.textBox = new HBox(textBottom, textUpDownButton);
+        textBox.setAlignment(Pos.BOTTOM_LEFT);
+        AnchorPane.setBottomAnchor(textBox, 0.0);
 
         this.undoButton = new IconButton("ui/hud/undo.png", 0.5);
         this.redoButton = new IconButton("ui/hud/redo.png", 0.5);
@@ -134,7 +167,6 @@ public class Hud extends AnchorPane implements EngineObserver {
         showForbidenHexButton.setTooltip(showForbiddenHexToolTip);
         showForbidenHexButton.setOnAction(this::drawForbiddenPlacement);
 
-
         this.showForbiddenBuildingsButton = new IconButton("ui/hud/forbiddenHut.png");
         final Tooltip showForbiddenBuildingsToolTip = new Tooltip();
         showForbiddenBuildingsToolTip.setText("Afficher les placements de Batiments interdits");
@@ -145,7 +177,7 @@ public class Hud extends AnchorPane implements EngineObserver {
         this.rightPane = new VBox(showForbiddenBuildingsButton, showForbidenHexButton, undoRedoPane, tileStackCanvas);
         AnchorPane.setRightAnchor(rightPane, 0.0);
 
-        getChildren().addAll(leftButtons, textBottom, rightPane);
+        getChildren().addAll(leftButtons, textBox, rightPane);
 
         widthProperty().addListener(this::resizeWidth);
         heightProperty().addListener(this::resizeHeight);
@@ -156,12 +188,52 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     }
 
+    private void playerTick(ActionEvent event) {
+        for (PlayerView playerView : playerViews) {
+            playerView.tick();
+        }
+    }
+
     private void drawForbiddenBuildings(ActionEvent actionEvent) {
         placement.changeForbiddenBuildingsDraw();
     }
 
     private void drawForbiddenPlacement(ActionEvent actionEvent) {
         placement.changeForbiddenPlacementDraw();
+    }
+
+    private void rules(ActionEvent event) {
+        try {
+            File target = new File("rules.pdf");
+            InputStream inputStream = getClass().getResourceAsStream("rules.pdf");
+            FileOutputStream outputStream = new FileOutputStream(target);
+            ByteStreams.copy(inputStream, outputStream);
+            inputStream.close();
+            outputStream.close();
+            Desktop.getDesktop().open(target);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void textUpDown(ActionEvent actionEvent) {
+        this.textUp = !textUp;
+        if (textUp) {
+            textUpDownButton.updateImage("ui/hud/down.png", 0.5);
+            textBottom.getChildren().setAll(infoLine, new Text("\n"), errorLine);
+            textBottom.setMinHeight(70);
+            textBottom.setPrefHeight(70);
+            textBottom.setMaxHeight(70);
+            AnchorPane.setBottomAnchor(textBox, 0.0);
+        }
+        else {
+            textUpDownButton.updateImage("ui/hud/up.png", 0.5);
+            textBottom.getChildren().setAll();
+            textBottom.setMinHeight(10);
+            textBottom.setPrefHeight(10);
+            textBottom.setMaxHeight(10);
+            AnchorPane.setBottomAnchor(textBox, 0.0);
+        }
     }
 
     private void undo(ActionEvent event) {
@@ -173,7 +245,7 @@ public class Hud extends AnchorPane implements EngineObserver {
     }
 
     private void resizeWidth(Observable observable) {
-        AnchorPane.setLeftAnchor(textBottom, (getWidth() - textBottom.getWidth()) / 2);
+        AnchorPane.setLeftAnchor(textBox, (getWidth() - textBottom.getWidth()) / 2);
         layoutChildren();
     }
 
@@ -186,7 +258,6 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     private void updateText(Text line, String value) {
         line.setText(value);
-        //textBottom.setVisible(infoLine.getText().length() > 0 || errorLine.getText().length() > 0);
         resizeWidth(null);
     }
 

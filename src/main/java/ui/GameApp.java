@@ -38,7 +38,7 @@ public class GameApp extends Application {
         FXPlayerHandler handler = new FXPlayerHandler();
         this.engine = EngineBuilder.allVsAll()
                 .player(PlayerColor.RED, handler)
-                .player(PlayerColor.WHITE, IA.FACILE)
+                .player(PlayerColor.WHITE, IA.DIFFICILE)
                 .build();
         this.recorder = EngineRecorder.install(engine);
     }

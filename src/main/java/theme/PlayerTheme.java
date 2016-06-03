@@ -36,4 +36,6 @@ public enum PlayerTheme {
     public static PlayerTheme of(PlayerColor color) {
         return values()[color.ordinal()];
     }
+
+    public static Color ELIMINATED = Color.web("707070");
 }

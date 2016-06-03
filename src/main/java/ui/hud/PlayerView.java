@@ -5,6 +5,8 @@ import engine.Engine;
 import engine.Player;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.Light;
+import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -19,10 +21,18 @@ public class PlayerView extends Canvas {
     static final int HEIGHT_NOT_TURN = HEIGHT_TURN / 2;
     private static final Color BORDER_COLOR = Color.web("303030");
 
+    private static final int LIGHT_MIN_Z = 200;
+    private static final int LIGHT_MAX_Z = 300;
+    private static final int LIGHT_DIFF_Z = 10;
+
     private final Engine engine;
     private final int index;
     private final Placement placement;
+
     private final Image faceImage;
+
+    private final Light.Point light;
+    private double lightDiff;
 
     public PlayerView(Engine engine, int index, Placement placement) {
         super(WIDTH_NOT_TURN, HEIGHT_NOT_TURN);
@@ -32,6 +42,9 @@ public class PlayerView extends Canvas {
 
         this.faceImage = PlayerTheme.of(player().getColor()).getImage();
         corner().anchor(this);
+
+        this.light = new Light.Point(0, 0, 60, Color.WHITE);
+        this.lightDiff = LIGHT_DIFF_Z;
 
         /*this.buildingsCanvas = new HBox(20);
         buildingsCanvas.setAlignment(Pos.CENTER);
@@ -62,6 +75,12 @@ public class PlayerView extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         gc.clearRect(0, 0, getWidth(), getHeight());
 
+        light.setZ(250);
+        lightDiff = LIGHT_DIFF_Z;
+        redraw(gc);
+    }
+
+    private void redraw(GraphicsContext gc) {
         boolean turn = engine.getCurrentPlayer() == player();
         PlayerViewCorner corner = corner();
         int width = turn ? WIDTH_TURN : WIDTH_NOT_TURN;
@@ -70,9 +89,13 @@ public class PlayerView extends Canvas {
         setHeight(height);
 
         gc.setFill(color());
+        if (turn && !player().isHuman()) {
+            gc.setEffect(new Lighting(light));
+        }
         gc.fillOval(
                 corner.arcX(getWidth()), corner.arcY(getHeight()),
                 getWidth() * 2, getHeight() * 2);
+        gc.setEffect(null);
 
         gc.drawImage(faceImage,
                 corner.imageX(width), corner.imageY(height),
@@ -95,6 +118,9 @@ public class PlayerView extends Canvas {
     }
 
     private Paint color() {
+        if (player().isEliminated()) {
+            return PlayerTheme.ELIMINATED;
+        }
         switch (player().getColor()) {
             case BROWN:  return PlayerTheme.BROWN.color();
             case YELLOW: return PlayerTheme.YELLOW.color();
@@ -105,4 +131,18 @@ public class PlayerView extends Canvas {
         throw new IllegalStateException();
     }
 
+    public void tick() {
+        if (player() != engine.getCurrentPlayer() || player().isHuman()) {
+            return;
+        }
+
+        if (lightDiff > 0 && light.getZ() >= LIGHT_MAX_Z
+                || lightDiff < 0 && light.getZ() <= LIGHT_MIN_Z) {
+            lightDiff *= -1;
+        }
+
+        double newLightZ = (light.getZ() - LIGHT_MIN_Z + lightDiff) + LIGHT_MIN_Z;
+        light.setZ(newLightZ);
+        redraw(getGraphicsContext2D());
+    }
 }
