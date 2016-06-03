@@ -334,131 +334,6 @@ public class Home4 extends Application {
         mq2.setPrefWidth(largeurScene/4);
 
 
-/*
-        HBox hhaut = new HBox(20);
-        HBox hbas  = new HBox(20);
-        VBox vg1   = new VBox(10);
-        VBox vd1   = new VBox(10);
-        VBox vg2   = new VBox(10);
-        VBox vd2   = new VBox(10);
-
-        hhaut.setAlignment(Pos.CENTER);
-        hbas.setAlignment(Pos.CENTER);
-        vg1.setAlignment(Pos.CENTER_RIGHT);
-        vd1.setAlignment(Pos.CENTER_LEFT);
-        vg2.setAlignment(Pos.CENTER_RIGHT);
-        vd2.setAlignment(Pos.CENTER_LEFT);
-
-        hhaut.setPrefWidth(largeurScene);
-        hbas.setPrefWidth(largeurScene);
-        vg1.setPrefWidth(largeurScene/2);
-        vg2.setPrefWidth(largeurScene/2);
-        vd1.setPrefWidth(largeurScene/2);
-        vd2.setPrefWidth(largeurScene/2);
-
-        //Image masque1 = new Image(getClass().getResourceAsStream(PlayerTheme.WHITE.getImage()));
-
-
-
-        //Button button1 = new Button("", new ImageView(PlayerTheme.WHITE.getImage()));
-        //Image masque = new Image(PlayerTheme.WHITE.getImage());
-        ImageView masque11 = createPlayerImageView(PlayerTheme.WHITE.getImage());
-        ImageView masque12 = createPlayerImageView(PlayerTheme.WHITE.getImage());
-        ImageView masque13 = createPlayerImageView(PlayerTheme.WHITE.getImage());
-        ImageView masque14 = createPlayerImageView(PlayerTheme.WHITE.getImage());
-
-        ImageView masque21 = createPlayerImageView(PlayerTheme.RED.getImage());
-        ImageView masque22 = createPlayerImageView(PlayerTheme.RED.getImage());
-        ImageView masque23 = createPlayerImageView(PlayerTheme.RED.getImage());
-        ImageView masque24 = createPlayerImageView(PlayerTheme.RED.getImage());
-
-        //ImageView masque31 = createPlayerImageView(PlayerTheme.YELLOW.getImage());
-        ImageView masque32 = createPlayerImageView(PlayerTheme.YELLOW.getImage());
-        ImageView masque33 = createPlayerImageView(PlayerTheme.YELLOW.getImage());
-        ImageView masque34 = createPlayerImageView(PlayerTheme.YELLOW.getImage());
-
-        //ImageView masque41 = createPlayerImageView(PlayerTheme.BROWN.getImage());
-        //ImageView masque42 = createPlayerImageView(PlayerTheme.BROWN.getImage());
-        ImageView masque43 = createPlayerImageView(PlayerTheme.BROWN.getImage());
-        ImageView masque44 = createPlayerImageView(PlayerTheme.BROWN.getImage());
-
-
-        Image vvss = new Image(getClass().getResourceAsStream("vs.png"));
-        ImageView  vvssi = new ImageView(vvss);
-        vvssi.setFitWidth(15);
-        vvssi.setFitWidth(15);
-
-       // Label labelVS  = new Label("VS");
-        GridPane b1 = new GridPane();
-        b1.setAlignment(Pos.CENTER);
-        b1.setVgap(3);
-        b1.add(masque11,1,0);
-        b1.add(new Label("VS"),2,0);
-        b1.add(masque21,3,0);
-        ToggleButton md = new ToggleButton("",b1);
-        GridPane b2 = new GridPane();
-        b2.setAlignment(Pos.CENTER);
-        b2.setVgap(5);
-        b2.add(masque12,1,0);
-        b2.add(new Label("VS"),2,0);
-        b2.add(masque22,3,0);
-        b2.add(new Label("VS"),4,0);
-        b2.add(masque32,5,0);
-        ToggleButton mt = new ToggleButton("",b2);
-        GridPane b3 = new GridPane();
-        b3.setAlignment(Pos.CENTER);
-        b3.setVgap(7);
-        b3.add(masque13,1,0);
-        b3.add(new Label("vs"),2,0);
-        b3.add(masque23,3,0);
-        b3.add(new Label("vs"),4,0);
-        b3.add(masque33,5,0);
-        b3.add(new Label("vs"),6,0);
-        b3.add(masque43,7,0);
-        ToggleButton mq1 = new ToggleButton("",b3);
-        GridPane b4 = new GridPane();
-        b4.setAlignment(Pos.CENTER);
-        b4.setVgap(5);
-        b4.add(masque14,1,0);
-        b4.add(masque24,2,0);
-        //b4.add(vvssi,3,0);
-        b4.add(new Label("vs"),3,0);
-        b4.add(masque34,4,0);
-        b4.add(masque44,5,0);
-        ToggleButton mq2 = new ToggleButton("",b4);
-        this.multiModeButtons = new ToggleButton[] { md,mt,mq1,mq2 };
-        this.multiModeToggle = new PersistentToggleGroup();
-        md.setToggleGroup(multiModeToggle);
-        mt.setToggleGroup(multiModeToggle);
-        mq1.setToggleGroup(multiModeToggle);
-        mq2.setToggleGroup(multiModeToggle);
-        multiModeToggle.selectToggle(multiModeButtons[menuData.getMultiMode().ordinal()]);
-        multiModeToggle.selectedToggleProperty().addListener(e -> updatemultimode());
-
-        //md.setPrefWidth(largeurScene*1/2);
-        //mt.setPrefWidth(largeurScene*1/2);
-        //mq1.setPrefWidth(largeurScene*1/2);
-        //mq2.setPrefWidth(largeurScene*1/2);
-
-        md.setPrefHeight(50);
-        mt.setPrefHeight(50);
-        mq1.setPrefHeight(50);
-        mq2.setPrefHeight(50);
-        md.setAlignment(Pos.CENTER);
-        mt.setAlignment(Pos.CENTER);
-
-        vg1.getChildren().add(md);
-        vd1.getChildren().add(mt);
-        vg2.getChildren().add(mq1);
-        vd2.getChildren().add(mq2);
-
-        hhaut.getChildren().addAll(vg1,vd1);
-        hbas.getChildren().addAll(vg2,vd2);
-
-*/
-
-        //multiOptions.getChildren().addAll(hhaut,hbas);
-
 
         this.reprendreButtons = new ArrayList<>();
         this.reprendreToggle = new PersistentToggleGroup();
@@ -531,11 +406,11 @@ public class Home4 extends Application {
         //css
 
         vBoxScene.getStyleClass().add("svBoxScene");
-        bsolo.getStyleClass().add("buttonniveaux4");
-        bmulti.getStyleClass().add("buttonniveaux4");
-        bcharger.getStyleClass().add("buttonniveaux4");
-        bplay.getStyleClass().add("buttonniveaux5");
-        bquit.getStyleClass().add("buttonniveaux6");
+        bsolo.getStyleClass().add("buttonhexa");
+        bmulti.getStyleClass().add("buttonhexa");
+        bcharger.getStyleClass().add("buttonhexa");
+        bplay.getStyleClass().add("buttonplay");
+        bquit.getStyleClass().add("buttonquit");
 
         icone.getStyleClass().add("bin");
         niveaux.getStyleClass().add("bin");
@@ -551,7 +426,7 @@ public class Home4 extends Application {
         //vBoxoptionsCharger.getStyleClass().add("s2");
 
         for(int i = 0; i < reprendreButtons.size(); i++){
-            reprendreButtons.get(i).getStyleClass().add("buttonniveaux7");
+            reprendreButtons.get(i).getStyleClass().add("buttonreprendre");
         }
 
 /*

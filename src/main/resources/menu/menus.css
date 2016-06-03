@@ -134,7 +134,7 @@
     -fx-text-fill: white;
 }
 
-.buttonniveaux4{
+.buttonhexa{
     -fx-font-family: 'f1';
     -fx-font-weight: bold;
     -fx-background-color: #EFB068;
@@ -143,13 +143,13 @@
     -fx-outer-border: #EFB068;
 }
 
-.buttonniveaux4:hover{
+.buttonhexa:hover{
     -fx-background-color: #AB8152;
     -fx-color: white;
     -fx-text-fill: white;
 }
 
-.buttonniveaux4:disabled {
+.buttonhexa:disabled {
     -fx-color: white;
     -fx-background-color: #D4B78F;
     -fx-background-radius: 0;
@@ -157,22 +157,13 @@
     -fx-opacity:1.0;
 }
 
-
-/*
-
-    private final Color tileJungleColor = Color.web("A681B6");
-    private final Color tileClearingColor = Color.web("8DC435");
-    private final Color tileSandColor = Color.web("EFDD6F");
-    private final Color tileRockColor = Color.web("C2D0D1");
-    private final Color tileLakeColor = Color.web("8BE1EB");
-    */
-.buttonniveaux4:selected {
+.buttonhexa:selected {
     -fx-color: white;
     -fx-background-color: #E97B33;
     -fx-text-fill: white;
 }
 
-.buttonniveaux5{
+.buttonplay{
     -fx-font-size:11pt;
     -fx-font-weight: bold;
     -fx-background-color: #00D507;
@@ -181,20 +172,20 @@
     -fx-outer-border: #00D507;
 }
 
-.buttonniveaux5:hover{
+.buttonplay:hover{
     -fx-background-color: #00B506;
     -fx-color: white;
     -fx-text-fill: white;
 }
 
-.buttonniveaux5:focused {
+.buttonplay:focused {
     -fx-color: white;
     -fx-background-color: #00B506;
     -fx-text-fill: white;
 }
 
 
-.buttonniveaux6{
+.buttonquit{
     -fx-font-size:11pt;
     -fx-font-weight: bold;
     -fx-background-color: red;
@@ -203,19 +194,19 @@
     -fx-outer-border: red;
 }
 
-.buttonniveaux6:hover{
+.buttonquit:hover{
     -fx-background-color: #C00105;
     -fx-color: white;
     -fx-text-fill: white;
 }
 
-.buttonniveaux6:focused {
+.buttonquit:focused {
     -fx-color: white;
     -fx-background-color: #C00105;
     -fx-text-fill: white;
 }
 
-.buttonniveaux7{
+.buttonreprendre{
     -fx-background-color:white;
     /*-fx-color: white;*/
     -fx-text-fill: green;
@@ -227,102 +218,28 @@
     -fx-border-width:1;
 }
 
-.buttonniveaux7:hover{
+.buttonreprendre:hover{
     -fx-background-color: #00D507;
     -fx-color: white;
     -fx-text-fill: white;
 }
 
-.buttonniveaux7:armed {
+.buttonreprendre:armed {
     -fx-color: white;
     -fx-background-color: #4CAF50;
     -fx-text-fill: white;
 }
 
-.buttonniveaux7:selected {
+.buttonreprendre:selected {
     -fx-color: white;
     -fx-background-color: #4CAF50;
     -fx-text-fill: white;
 }
 
-/*
-.buttonniveaux4{
-    -fx-background-color: #F337A8;
-    -fx-color: white;
-    -fx-text-fill: white;
-    -fx-outer-border: #F337A8;
-    -fx-background-radius: 0 0 0 0;
-}
 
-.buttonniveaux4:hover{
-    -fx-background-color: #CB2D8C;
-    -fx-color: white;
-    -fx-text-fill: white;
-    -fx-background-radius: 0 0 0 0;
-}
-
-.buttonniveaux4:focused {
-    -fx-color: white;
-    -fx-background-color: #CB2D8C;
-    -fx-background-radius: 0;
-    -fx-text-fill: white;
-}
-*/
 .bin{
     -fx-background-color:#E97B33;
     -fx-text-fill: white;
-}
-
-.tp{
-    -fx-text-fill: #33691e;
-    -fx-background-color: #aed581;
-    -fx-color:#aed581;
-}
-
-.tp:hover{
- -fx-text-fill: #33691e;
-    -fx-background-color: #aed581;
-    -fx-color:#aed581;
- }
-
-.tab-pane > .tab-header-area > .headers-region {
-    -fx-background: black;
-    -fx-alignment:center;
-}
-.tab-pane > .tab-header-area > .tab-header-background {
-   /* -fx-border-color: #a3a7a8;
-    -fx-border-radius: 5 5 0 0;*/
-    -fx-background-color: null;
-    /*-fx-background_color: transparent;*/
-}
-
-.tab-pane > .tab-header-area > .headers-region > .tab {
-    /*-fx-border-color: #2381E9 #a3a7a8 #a3a7a8 #a3a7a8;*/
-    /*-fx-border-width: 5 1 1 1;*/
-    /*-fx-border-radius: 10 10 0 0;*/
-    /*-fx-background-color: white;*/
-    /*-fx-pref-width: 100px;*/
-
-    /*-fx-background-insets: 0;*/
-}
-
-.tab-pane > .tab-header-area > .headers-region > .tab:selected > .tab-container > .tab-label{
-    -fx-alignment: CENTER;
-    -fx-text-fill: white;
-    /*-fx-background-color: black;*/
-    /*-fx-pref-width: 100px;*/
-}
-
-.tab-pane > .tab-header-area > .headers-region > .tab:top > .tab-container > .tab-label {
-    -fx-alignment: CENTER;
-}
-
-.tab-pane > .tab-header-area > .headers-region > .tab:top {
-    -fx-border-radius: 20 20 20 20;
-    -fx-background-color: blue;
-    -fx-shape: "M 50,30 m 0,25 a 1,1 0 0,0 0,-20 a 1,1 0 1,0 0,20"
-    /*-fx-pref-height: 40px;
-    -fx-background-insets: 0;*/
 }
 
 .b1{
@@ -341,9 +258,6 @@
     -fx-border-width: 1;
 }
 .b4{
-    /*-fx-border-color: ;*/
-    /*-fx-border-style: solid;*/
-    /*-fx-border-width: 1;*/
     -fx-background-color: white;
     -fx-opacity: 0.3;
     -fx-background-radius: 30 30 30 30;
