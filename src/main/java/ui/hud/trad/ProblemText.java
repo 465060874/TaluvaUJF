@@ -24,8 +24,12 @@ public class ProblemText {
                     return "Impossible de détruire un temple ou une tour en placant une tuile";
                 case CANT_DESTROY_VILLAGE:
                     return "Impossible de détruire un village entierement en placant une tuile";
-                case NOT_BUILDABLE:
+                case CANT_BUILD_ON_SEA:
+                    return "Impossible de construire sur la mer";
+                case CANT_BUILD_ON_VOLCANO:
                     return "Impossible de construire sur une case volcan";
+                case CANT_BUILD_ON_EXISTING_BUILDING:
+                    return "Impossible de construire sur un batiment existant";
                 case PLACE_BUILDING_NOT_ENOUGH_BUILDINGS:
                     return "Vous n'avez pas de batiment restants à construire de ce type";
                 case HUT_TOO_HIGH:

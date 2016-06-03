@@ -17,8 +17,14 @@ public class PlaceBuildingRules {
         checkArgument(type != BuildingType.NONE);
 
         final Field field = island.getField(hex);
-        if (!isBuildable(field)) {
-            return Problems.of(Problem.NOT_BUILDABLE);
+        if (field == Field.SEA) {
+            return Problems.of(Problem.CANT_BUILD_ON_SEA);
+        }
+        if (!field.getType().isBuildable()) {
+            return Problems.of(Problem.CANT_BUILD_ON_VOLCANO);
+        }
+        if (field.hasBuilding()) {
+            return Problems.of(Problem.CANT_BUILD_ON_EXISTING_BUILDING);
         }
 
         if (!hasEnoughBuilding(engine, type)) {

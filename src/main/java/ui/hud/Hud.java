@@ -41,6 +41,9 @@ import static java.util.stream.Collectors.joining;
 
 public class Hud extends AnchorPane implements EngineObserver {
 
+    private static final double TEXT_VISIBLE_HEIGHT = 80;
+    private static final double TEXT_HIDDEN_HEIGHT = 10;
+
     private final Engine engine;
     private final boolean versusIa;
     private final Placement placement;
@@ -136,9 +139,9 @@ public class Hud extends AnchorPane implements EngineObserver {
         textBottom.setMinWidth(500);
         textBottom.setPrefWidth(500);
         textBottom.setMaxWidth(500);
-        textBottom.setMinHeight(80);
-        textBottom.setPrefHeight(80);
-        textBottom.setMaxHeight(80);
+        textBottom.setMinHeight(TEXT_VISIBLE_HEIGHT);
+        textBottom.setPrefHeight(TEXT_VISIBLE_HEIGHT);
+        textBottom.setMaxHeight(TEXT_VISIBLE_HEIGHT);
 
         this.showForbidenHexButton = new IconButton("ui/hud/forbidenHexagon.png", 0.5);
         final Tooltip showForbiddenHexToolTip = new Tooltip();
@@ -223,17 +226,17 @@ public class Hud extends AnchorPane implements EngineObserver {
         if (textUp) {
             textUpDownButton.updateImage("ui/hud/down.png", 0.5);
             textBottom.getChildren().setAll(infoLine, new Text("\n"), errorLine);
-            textBottom.setMinHeight(70);
-            textBottom.setPrefHeight(70);
-            textBottom.setMaxHeight(70);
+            textBottom.setMinHeight(TEXT_VISIBLE_HEIGHT);
+            textBottom.setPrefHeight(TEXT_VISIBLE_HEIGHT);
+            textBottom.setMaxHeight(TEXT_VISIBLE_HEIGHT);
             AnchorPane.setBottomAnchor(textBox, 0.0);
         }
         else {
             textUpDownButton.updateImage("ui/hud/up.png", 0.5);
             textBottom.getChildren().setAll();
-            textBottom.setMinHeight(10);
-            textBottom.setPrefHeight(10);
-            textBottom.setMaxHeight(10);
+            textBottom.setMinHeight(TEXT_HIDDEN_HEIGHT);
+            textBottom.setPrefHeight(TEXT_HIDDEN_HEIGHT);
+            textBottom.setMaxHeight(TEXT_HIDDEN_HEIGHT);
             AnchorPane.setBottomAnchor(textBox, 0.0);
         }
     }
