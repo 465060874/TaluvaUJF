@@ -1,9 +1,7 @@
 package theme;
 
 import data.FieldType;
-import javafx.scene.effect.Effect;
-import javafx.scene.effect.Light;
-import javafx.scene.effect.Lighting;
+import javafx.scene.effect.*;
 import javafx.scene.paint.*;
 import map.Building;
 import map.Orientation;
@@ -39,6 +37,10 @@ public class DefaultTheme implements IslandTheme {
     private final LinearGradient NORTH_EAST_LinearGradiant = new LinearGradient(1, 0, 0, 1, true, CycleMethod.NO_CYCLE, stops);
     private final LinearGradient NORTH_WEST_LinearGradiant = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, stops);
     private final LinearGradient SOUTH_EAST_LinearGradiant = new LinearGradient(1, 1, 0, 0, true, CycleMethod.NO_CYCLE, stops);
+
+    private final Stop[] stopsBuildings = new Stop[]{new Stop(0, Color.BLACK), new Stop(1, volcanoDarkRed)};
+    private final LinearGradient buildingLinearGradiant = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE, stopsBuildings);
+
 
     @Override
     public Paint getBackgroundPaint() {
@@ -98,6 +100,8 @@ public class DefaultTheme implements IslandTheme {
             case FADED:       return lighting;
             case TRULYFADED:  return lightingFaded;
             case HIGHLIGHTED: return lightingHigh;
+            case LASTPLAYED: return lightingHigh;
+            case FADEDLASTPLAYED: return lightingHigh;
         }
 
         throw new IllegalStateException();
@@ -110,6 +114,8 @@ public class DefaultTheme implements IslandTheme {
                 return Color.TRANSPARENT;
             case INVALID:
                 return Color.RED;
+            case LASTPLACED:
+                return buildingLinearGradiant;
             default:
             return tileBorderColor;
         }

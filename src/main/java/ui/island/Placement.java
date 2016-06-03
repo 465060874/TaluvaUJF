@@ -60,6 +60,9 @@ public class Placement {
     FieldType expansionFieldType;
     Set<Hex> expansionHexes;
 
+    private ArrayList<Hex> lastPlacedHexes;
+    private ArrayList<Hex> lastPlacedBuildings;
+
     public Placement(Engine engine, Grid grid) {
         this.engine = engine;
         this.grid = grid;
@@ -68,6 +71,8 @@ public class Placement {
         this.saveMode = Mode.NONE;
         this.problems = Problems.of();
         this.hex = Hex.at(0, 0);
+        this.lastPlacedHexes = new ArrayList<>(3);
+        this.lastPlacedBuildings = new ArrayList<>();
     }
 
     public void initHud(Hud hud) {
@@ -93,14 +98,18 @@ public class Placement {
     public Action getAction() {
         checkState(mode != Mode.NONE && isValid());
         if (mode == Mode.TILE) {
+
+            setLastPlacedHexes(hex, hex.getLeftNeighbor(tileOrientation), hex.getRightNeighbor(tileOrientation));
             return engine.getIsland().getField(hex) == Field.SEA
                     ? new SeaTileAction(tile, hex, tileOrientation)
                     : new VolcanoTileAction(tile, hex, tileOrientation);
         }
         else if (mode == Mode.BUILDING) {
+            setLastPlacedBuildings(hex);
             return new PlaceBuildingAction(buildingType, hex);
         }
         else if (mode == Mode.EXPAND_VILLAGE) {
+            setLastPlacedBuildings(expansionVillage.getExpandableHexes().get(expansionFieldType));
             return new ExpandVillageAction(expansionVillage, engine.getIsland().getField(hex).getType());
         }
 
@@ -291,6 +300,39 @@ public class Placement {
             islandCanvas.setForbiddenBuildingsVisible();
         }
         islandCanvas.redraw();
+    }
+
+    public void setLastPlacedHexes(Hex volcanoHex, Hex leftHex, Hex rightHex) {
+        lastPlacedHexes = new ArrayList<>(3);
+        lastPlacedHexes.add(volcanoHex);
+        lastPlacedHexes.add(leftHex);
+        lastPlacedHexes.add(rightHex);
+    }
+
+    public void deleteLastPlacedHexes() {
+        lastPlacedHexes = new ArrayList<>(3);
+    }
+
+    public boolean isLastPlaced(Hex hex) {
+        return lastPlacedHexes.contains(hex);
+    }
+
+    public boolean isLastPlacedBuildings(Hex hex) {
+        return lastPlacedBuildings.contains(hex);
+    }
+
+    public void setLastPlacedBuildings(Hex hex) {
+        lastPlacedBuildings = new ArrayList<>();
+        lastPlacedBuildings.add(hex);
+    }
+
+    public void setLastPlacedBuildings(Set<Hex> hices) {
+        lastPlacedBuildings = new ArrayList<>();
+        lastPlacedBuildings.addAll(hices);
+    }
+
+    public void deleteLastPlacedBuildings() {
+        lastPlacedBuildings = new ArrayList<>();
     }
 
     public void saveMode() {

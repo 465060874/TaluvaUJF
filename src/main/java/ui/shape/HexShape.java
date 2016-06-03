@@ -5,6 +5,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import map.Orientation;
+import theme.BuildingStyle;
 import theme.HexStyle;
 import theme.IslandTheme;
 import ui.island.Grid;
@@ -223,7 +224,7 @@ public class HexShape {
         }
 
         // Ajout des cases non jouable en contour rouge
-        if (style == HexStyle.FADED) {
+        if (style == HexStyle.FADED || style == HexStyle.FADEDLASTPLAYED) {
             gc.setStroke(IslandTheme.getCurrent().getInnerBorderPaint(style));
             gc.strokePolyline(fadedBorderX, fadedBorderY, HEXAGON_POINTS + 1);
         }

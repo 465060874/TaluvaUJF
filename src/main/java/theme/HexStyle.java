@@ -10,5 +10,9 @@ public enum HexStyle {
 
     TRULYFADED,
 
-    FLOATING;
+    FLOATING,
+
+    LASTPLAYED,
+
+    FADEDLASTPLAYED;
 }

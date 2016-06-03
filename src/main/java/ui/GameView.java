@@ -13,6 +13,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
+import map.Hex;
 import ui.hud.Hud;
 import ui.island.Grid;
 import ui.island.IslandView;
@@ -20,6 +21,7 @@ import ui.island.Placement;
 import theme.IslandTheme;
 
 import java.util.List;
+import java.util.Set;
 
 public class GameView extends StackPane implements EngineObserver {
 
@@ -81,10 +83,12 @@ public class GameView extends StackPane implements EngineObserver {
 
     @Override
     public void onCancelTileStep() {
+        placement.deleteLastPlacedHexes();
     }
 
     @Override
     public void onCancelBuildStep() {
+        placement.deleteLastPlacedBuildings();
     }
 
     @Override
@@ -111,21 +115,25 @@ public class GameView extends StackPane implements EngineObserver {
 
     @Override
     public void onTilePlacementOnSea(SeaTileAction action) {
+        placement.setLastPlacedHexes(action.getVolcanoHex(), action.getLeftHex(), action.getRightHex());
         islandView.redrawIsland();
     }
 
     @Override
     public void onTilePlacementOnVolcano(VolcanoTileAction action) {
+        placement.setLastPlacedHexes(action.getVolcanoHex(), action.getLeftHex(), action.getRightHex());
         islandView.redrawIsland();
     }
 
     @Override
     public void onBuild(PlaceBuildingAction action) {
+        placement.setLastPlacedBuildings(action.getHex());
         islandView.redrawIsland();
     }
 
     @Override
     public void onExpand(ExpandVillageAction action) {
+        placement.setLastPlacedBuildings(action.getVillage(engine.getIsland()).getExpandableHexes().get(action.getFieldType()));
         islandView.redrawIsland();
     }
 

@@ -10,5 +10,9 @@ public enum BuildingStyle {
 
     EXPAND,
 
-    INVALID, FLOATING
+    INVALID,
+
+    LASTPLACED,
+
+    FLOATING
 }

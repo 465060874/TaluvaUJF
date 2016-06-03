@@ -72,7 +72,11 @@ public class BuildingShape {
         gc.fillPolygon(xpoints, ypoints, 3);
         gc.setEffect(null);
         gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint(style));
-        gc.setLineWidth(STROKE_WIDTH);
+        if (style == BuildingStyle.LASTPLACED) {
+            gc.setLineWidth(STROKE_WIDTH * 3);
+        } else {
+            gc.setLineWidth(STROKE_WIDTH);
+        }
         gc.strokePolygon(xpoints, ypoints, 3);
 
         xpoints[0] = x1;
@@ -88,7 +92,11 @@ public class BuildingShape {
         gc.fillPolygon(xpoints, ypoints, 4);
         gc.setEffect(null);
         gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint(style));
-        gc.setLineWidth(STROKE_WIDTH);
+        if (style == BuildingStyle.LASTPLACED) {
+            gc.setLineWidth(STROKE_WIDTH * 3);
+        } else {
+            gc.setLineWidth(STROKE_WIDTH);
+        }
         gc.strokePolygon(xpoints, ypoints, 4);
 
         xpoints[0] = x3;
@@ -104,7 +112,11 @@ public class BuildingShape {
         gc.fillPolygon(xpoints, ypoints, 4);
         gc.setEffect(null);
         gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint(style));
-        gc.setLineWidth(STROKE_WIDTH);
+        if (style == BuildingStyle.LASTPLACED) {
+            gc.setLineWidth(STROKE_WIDTH * 3);
+        } else {
+            gc.setLineWidth(STROKE_WIDTH);
+        }
         gc.strokePolygon(xpoints, ypoints, 4);
     }
 
@@ -130,7 +142,11 @@ public class BuildingShape {
         gc.fillOval(xstart, ybottom, width, height);
         gc.setEffect(null);
         gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint(style));
-        gc.setLineWidth(STROKE_WIDTH);
+        if (style == BuildingStyle.LASTPLACED) {
+            gc.setLineWidth(STROKE_WIDTH * 3);
+        } else {
+            gc.setLineWidth(STROKE_WIDTH);
+        }
         gc.strokeOval(xstart, ybottom, width, height);
 
         gc.setEffect(faceEffect);
@@ -138,7 +154,11 @@ public class BuildingShape {
         gc.fillRect(xstart, ytop + height/2, width, ybottom - ytop);
         gc.setEffect(null);
         gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint(style));
-        gc.setLineWidth(STROKE_WIDTH);
+        if (style == BuildingStyle.LASTPLACED) {
+            gc.setLineWidth(STROKE_WIDTH * 3);
+        } else {
+            gc.setLineWidth(STROKE_WIDTH);
+        }
         gc.strokeLine(xstart, ytop + height/2, xstart, ybottom + height/2);
         gc.strokeLine(xstart + width, ytop + height/2, xstart + width, ybottom + height/2);
 
@@ -147,7 +167,11 @@ public class BuildingShape {
         gc.fillOval(xstart, ytop, width, height);
         gc.setEffect(null);
         gc.setStroke(IslandTheme.getCurrent().getBuildingBorderPaint(style));
-        gc.setLineWidth(STROKE_WIDTH);
+        if (style == BuildingStyle.LASTPLACED) {
+            gc.setLineWidth(STROKE_WIDTH * 3);
+        } else {
+            gc.setLineWidth(STROKE_WIDTH);
+        }
         gc.strokeOval(xstart, ytop, width, height);
     }
 

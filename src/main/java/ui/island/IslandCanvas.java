@@ -104,12 +104,17 @@ class IslandCanvas extends Canvas {
             HexStyle hexStyle;
             if (placement.mode == Placement.Mode.TILE) {
                 building = field.getBuilding();
+                boolean isLastPlaced = placement.isLastPlaced(hex);
                 if (forbiddenPlacementVisible) {
                     hexStyle = placement.validHexes.contains(hex)
-                            ? HexStyle.NORMAL
-                            : HexStyle.FADED;
+                            ? isLastPlaced ? HexStyle.LASTPLAYED : HexStyle.NORMAL
+                            : isLastPlaced ? HexStyle.FADEDLASTPLAYED : HexStyle.FADED;
                 } else {
-                    hexStyle = HexStyle.NORMAL;
+                    if (isLastPlaced) {
+                        hexStyle = HexStyle.LASTPLAYED;
+                    } else {
+                        hexStyle = HexStyle.NORMAL;
+                    }
                 }
             }
             else if (placement.mode == Placement.Mode.EXPAND_VILLAGE) {
@@ -161,9 +166,16 @@ class IslandCanvas extends Canvas {
                 hexStyle = HexStyle.NORMAL;
             }
 
+            BuildingStyle buildingStyle;
+            if (placement.isLastPlacedBuildings(hex)) {
+                buildingStyle = BuildingStyle.LASTPLACED;
+            } else {
+                buildingStyle = BuildingStyle.NORMAL;
+            }
+
             hexesToDraw.add(new HexToDraw(x, y, level,
                     fieldType, orientation, hexStyle,
-                    building, BuildingStyle.NORMAL));
+                    building, buildingStyle));
         }
     }
 
