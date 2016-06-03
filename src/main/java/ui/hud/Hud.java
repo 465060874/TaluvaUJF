@@ -374,11 +374,11 @@ public class Hud extends AnchorPane implements EngineObserver {
         }
 
         if (winners.size() == 1) {
-            updateText(infoLine, "Le joueur " + winners.get(0).getColor() + " a gagné !");
+            updateText(infoLine, "Le joueur " + PlayerText.of(winners.get(0).getColor()) + " a gagné !");
         } else {
             updateText(infoLine, winners.stream()
                     .map(Player::getColor)
-                    .map(PlayerColor::name)
+                    .map(PlayerText::of)
                     .collect(joining(", ", "Les joueurs ", " ont gagné !")));
         }
     }
