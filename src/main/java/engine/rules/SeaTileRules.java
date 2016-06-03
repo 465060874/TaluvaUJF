@@ -7,14 +7,15 @@ import map.Hex;
 import map.Island;
 import map.Orientation;
 
-import static engine.rules.Problem.NOT_ADJACENT_TO_COAST;
+import static engine.rules.Problem.*;
+import static engine.rules.Problem.NONE;
 import static engine.rules.Problem.NOT_ALL_ON_SEA;
 
 public class SeaTileRules {
 
-    public static Problems validate(Island island, VolcanoTile tile, Hex volcanoHex, Orientation orientation) {
+    public static Problem validate(Island island, VolcanoTile tile, Hex volcanoHex, Orientation orientation) {
         if (island.isEmpty()) {
-            return Problems.of();
+            return NONE;
         }
 
         ImmutableSet<Hex> hexes = ImmutableSet.of(
@@ -24,28 +25,28 @@ public class SeaTileRules {
         return validate(island, tile, hexes);
     }
 
-    public static Problems validate(Island island, VolcanoTile tile, ImmutableSet<Hex> hexes) {
-        Problems problems = Problems.of();
-        checkOnSea(island, hexes, problems);
-        checkAdjacentToCoast(island, hexes, problems);
-        return problems;
+    public static Problem validate(Island island, VolcanoTile tile, ImmutableSet<Hex> hexes) {
+        return checkOnSea(island, hexes)
+                .and(() -> checkAdjacentToCoast(island, hexes));
     }
 
-    private static void checkOnSea(Island island, ImmutableSet<Hex> hexes, Problems problems) {
+    private static Problem checkOnSea(Island island, ImmutableSet<Hex> hexes) {
         if (hexes.stream().map(island::getField).anyMatch(f -> f != Field.SEA)) {
-            problems.add(NOT_ALL_ON_SEA);
+            return NOT_ALL_ON_SEA;
         }
+
+        return NONE;
     }
 
-    private static void checkAdjacentToCoast(Island island, ImmutableSet<Hex> hexes, Problems problems) {
+    private static Problem checkAdjacentToCoast(Island island, ImmutableSet<Hex> hexes) {
         for (Hex hex : hexes) {
             for (Hex neighbor : hex.getNeighborhood()) {
                 if (!hexes.contains(neighbor) && island.getField(neighbor) != Field.SEA) {
-                    return;
+                    return NONE;
                 }
             }
         }
 
-        problems.add(NOT_ADJACENT_TO_COAST);
+        return NOT_ADJACENT_TO_COAST;
     }
 }

@@ -26,12 +26,22 @@ public enum PlayerViewCorner {
         }
 
         @Override
-        public double arcX(double radius) {
+        public double ovalX(double radius) {
             return -radius;
         }
 
         @Override
-        public double arcY(double radius) {
+        public double ovalX2(double radius) {
+            return -radius;
+        }
+
+        @Override
+        public double ovalY(double radius) {
+            return -radius;
+        }
+
+        @Override
+        public double ovalY2(double radius) {
             return -radius;
         }
 
@@ -94,12 +104,22 @@ public enum PlayerViewCorner {
         }
 
         @Override
-        public double arcX(double radius) {
+        public double ovalX(double radius) {
             return 0;
         }
 
         @Override
-        public double arcY(double radius) {
+        public double ovalX2(double radius) {
+            return radius;
+        }
+
+        @Override
+        public double ovalY(double radius) {
+            return -radius;
+        }
+
+        @Override
+        public double ovalY2(double radius) {
             return -radius;
         }
 
@@ -162,13 +182,23 @@ public enum PlayerViewCorner {
         }
 
         @Override
-        public double arcX(double radius) {
+        public double ovalX(double radius) {
             return 0;
         }
 
         @Override
-        public double arcY(double radius) {
+        public double ovalX2(double radius) {
+            return radius;
+        }
+
+        @Override
+        public double ovalY(double radius) {
             return 0;
+        }
+
+        @Override
+        public double ovalY2(double radius) {
+            return radius;
         }
 
         @Override
@@ -230,13 +260,23 @@ public enum PlayerViewCorner {
         }
 
         @Override
-        public double arcX(double radius) {
+        public double ovalX(double radius) {
             return -radius;
         }
 
         @Override
-        public double arcY(double radius) {
+        public double ovalX2(double radius) {
+            return -radius;
+        }
+
+        @Override
+        public double ovalY(double radius) {
             return 0;
+        }
+
+        @Override
+        public double ovalY2(double radius) {
+            return radius;
         }
 
         @Override
@@ -290,9 +330,13 @@ public enum PlayerViewCorner {
 
     abstract double imageY(double height);
 
-    abstract double arcX(double radius);
+    abstract double ovalX(double radius);
 
-    abstract double arcY(double radius);
+    abstract double ovalX2(double radius);
+
+    abstract double ovalY(double radius);
+
+    abstract double ovalY2(double radius);
 
     public abstract double templeX(int width);
 

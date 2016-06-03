@@ -1,7 +1,5 @@
 package ui.shape;
 
-import data.BuildingType;
-import data.PlayerColor;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
@@ -9,11 +7,8 @@ import javafx.scene.paint.Paint;
 import map.Building;
 import theme.BuildingStyle;
 import theme.IslandTheme;
+import theme.PlayerTheme;
 import ui.island.Grid;
-import ui.island.WheelOfChoiceBuilding;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BuildingShape {
 
@@ -21,8 +16,13 @@ public class BuildingShape {
     public static final Image EXPAND_IMAGE = new Image("ui/shape/expand.png");
 
     private void drawHut(GraphicsContext gc, Grid grid,
-            double x, double y, Building building, BuildingStyle style) {
-        double hexRadiusX = grid.getHexRadiusX();
+                         double x, double y, Building building, BuildingStyle style) {
+        Image hutImage = PlayerTheme.of(building.getColor()).getHutImage();
+        double width = grid.getHexRadiusX() / 2;
+        double height = hutImage.getHeight() / (hutImage.getWidth() / width);
+        gc.drawImage(hutImage, x - width / 2, y - height / 2, width, height);
+
+        /*double hexRadiusX = grid.getHexRadiusX();
         double hexRadiusY = grid.getHexRadiusY();
         double x1 = x - hexRadiusX / 7;
         double x2 = x;
@@ -32,7 +32,7 @@ public class BuildingShape {
         double y3 = y + hexRadiusY / 10;
         double y4 = y + hexRadiusY / 4;
 
-        drawTentShape(gc, grid, x1, x2, x3, y1, y2, y3, y4, building, style);
+        drawTentShape(gc, grid, x1, x2, x3, y1, y2, y3, y4, building, style);*/
     }
 
     private void drawTemple(GraphicsContext gc, Grid grid,
@@ -122,7 +122,12 @@ public class BuildingShape {
 
     private void drawTower(GraphicsContext gc, Grid grid,
             double x, double y, Building building, BuildingStyle style) {
-        Paint facePaint = IslandTheme.getCurrent().getBuildingFacePaint(building, style);
+        Image towerImage = PlayerTheme.of(building.getColor()).getTowerImage();
+        double width = 4 * grid.getHexRadiusX() / 5;
+        double height = towerImage.getHeight() / (towerImage.getWidth() / width);
+        gc.drawImage(towerImage, x - width / 2, y - height / 2, width, height);
+
+        /*Paint facePaint = IslandTheme.getCurrent().getBuildingFacePaint(building, style);
         Paint topPaint = IslandTheme.getCurrent().getBuildingTopPaint(building, style);
         Effect faceEffect = IslandTheme.getCurrent().getBuildingFaceEffect(grid, building, style);
         Effect topEffect = IslandTheme.getCurrent().getBuildingTopEffect(grid, building, style);
@@ -172,7 +177,7 @@ public class BuildingShape {
         } else {
             gc.setLineWidth(STROKE_WIDTH);
         }
-        gc.strokeOval(xstart, ytop, width, height);
+        gc.strokeOval(xstart, ytop, width, height);*/
     }
 
     public void draw(GraphicsContext gc, Grid grid,

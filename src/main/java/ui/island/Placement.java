@@ -46,7 +46,7 @@ public class Placement {
     Mode mode;
     Mode saveMode;
 
-    Problems problems;
+    Problem problem;
     Set<Hex> validHexes;
     Hex hex;
 
@@ -69,7 +69,7 @@ public class Placement {
 
         this.mode = Mode.NONE;
         this.saveMode = Mode.NONE;
-        this.problems = Problems.of();
+        this.problem = Problem.NONE;
         this.hex = Hex.at(0, 0);
         this.lastPlacedHexes = new ArrayList<>(3);
         this.lastPlacedBuildings = new ArrayList<>();
@@ -84,11 +84,11 @@ public class Placement {
     }
 
     public boolean isValid() {
-        return problems.isValid();
+        return problem.isValid();
     }
 
-    public Problems getProblems() {
-        return problems;
+    public Problem getProblem() {
+        return problem;
     }
 
     public Hex getHex() {
@@ -158,7 +158,7 @@ public class Placement {
 
     public void cancel() {
         this.mode = Mode.NONE;
-        if (problems.isValid()) {
+        if (problem.isValid()) {
             islandCanvas.redraw();
         }
         else {
@@ -188,7 +188,7 @@ public class Placement {
         Hex newHex = grid.xyToHex(x, y, width, height);
 
         if (newHex.equals(hex)) {
-            if (!problems.isValid()) {
+            if (!problem.isValid()) {
                 placementOverlay.redraw();
             }
             return;
@@ -213,7 +213,7 @@ public class Placement {
 
     private void updateValidTile() {
         boolean wasValid = isValid();
-        problems = TileRules.validate(engine.getIsland(), tile, hex, tileOrientation);
+        problem = TileRules.validate(engine.getIsland(), tile, hex, tileOrientation);
         hud.updateProblems();
 
         redrawWhatsNecessary(wasValid);
@@ -221,7 +221,7 @@ public class Placement {
 
     private void updateValidBuilding() {
         boolean wasValid = isValid();
-        this.problems = PlaceBuildingRules.validate(engine, buildingType, hex);
+        this.problem = PlaceBuildingRules.validate(engine, buildingType, hex);
         hud.updateProblems();
         redrawWhatsNecessary(wasValid);
         /*
@@ -268,7 +268,7 @@ public class Placement {
                 expansionFieldType = entry.getKey();
                 expansionHexes = ImmutableSet.copyOf(entry.getValue());
                 islandCanvas.redraw();
-                problems = ExpandVillageRules.validate(engine, expansionVillage, expansionFieldType);
+                problem = ExpandVillageRules.validate(engine, expansionVillage, expansionFieldType);
                 hud.updateProblems();
                 return;
             }
@@ -276,7 +276,7 @@ public class Placement {
 
         expansionFieldType = null;
         expansionHexes = ImmutableSet.of();
-        problems = Problems.of(Problem.EXPAND_NO_ADJACENT_TILE);
+        problem = Problem.EXPAND_NO_ADJACENT_TILE;
         hud.updateProblems();
         islandCanvas.redraw();
     }

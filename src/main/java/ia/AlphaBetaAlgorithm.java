@@ -316,12 +316,6 @@ public class AlphaBetaAlgorithm implements IAAlgorithm {
     // Teste la compatibilité entre un placement et une construction/extension
     private boolean compatible( Engine engine, TileAction placement, BuildingAction build ) {
         engine.logger().fine("Checking compatibility : " + placement + " " + build);
-        /* engine.action(placement);
-        Problems problems = BuildingRules.validate(engine, build);
-        engine.cancelLastStep();
-
-        return problems.isValid();
-        */
 
         if( placement instanceof SeaTileAction ){
             // Construction + placement mer ne pose jamais de problème

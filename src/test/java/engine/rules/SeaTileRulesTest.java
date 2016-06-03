@@ -21,16 +21,15 @@ public class SeaTileRulesTest {
     private static final VolcanoTile TILE = new VolcanoTile(FieldType.JUNGLE, FieldType.JUNGLE);
 
     private void assertValid(Island island, Hex hex, Orientation orientation) {
-        Problems actual = SeaTileRules.validate(island, TILE, hex, orientation);
+        Problem actual = SeaTileRules.validate(island, TILE, hex, orientation);
         assertTrue("TileAction on sea at " + hex
                         + " with orientation " + orientation
                         + " expected to be valid, but has problems " + actual,
                 actual.isValid());
     }
 
-    private void assertProblems(Island island, Hex hex, Orientation orientation, Problem... problems) {
-        Problems expected = Problems.of(problems);
-        Problems actual = SeaTileRules.validate(island, TILE, hex, orientation);
+    private void assertProblems(Island island, Hex hex, Orientation orientation, Problem expected) {
+        Problem actual = SeaTileRules.validate(island, TILE, hex, orientation);
         assertEquals("TileAction on sea at " + hex
                         + " with orientation " + orientation
                         + " expected to have problems " + expected

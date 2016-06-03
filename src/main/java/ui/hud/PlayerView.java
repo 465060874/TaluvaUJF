@@ -55,24 +55,6 @@ public class PlayerView extends Canvas {
         this.light = new Light.Point(0, 0, 60, Color.WHITE);
         this.lightDiff = LIGHT_DIFF_Z;
 
-        /*this.buildingsCanvas = new HBox(20);
-        buildingsCanvas.setAlignment(Pos.CENTER);
-        this.buildingTexts = new Text[BuildingType.values().length];
-        for (BuildingType type : BuildingType.values()) {
-            if (type == BuildingType.NONE) {
-                continue;
-            }
-
-            buildingTexts[type.ordinal()] = new Text(String.valueOf(player().getBuildingCount(type)));
-            buildingTexts[type.ordinal()].setFont(new Font(14));
-            BuildingCanvas buildingCanvas = new BuildingCanvas(Building.of(type, player().getColor()));
-            buildingsCanvas.getChildren().addAll(
-                    buildingCanvas,
-                    buildingTexts[type.ordinal()]);
-        }
-        buildingsCanvas.setBackground(createBackground(corner().buildingsRadii()));
-        buildingsCanvas.setBorder(createBorder(corner().buildingsRadii()));*/
-
         updateTurn();
     }
 
@@ -97,19 +79,20 @@ public class PlayerView extends Canvas {
         setWidth(width);
         setHeight(height);
 
-        gc.setFill(color());
-        if (turn && !player().isHuman()) {
-            gc.setEffect(new Lighting(light));
-        }
+        gc.setEffect(new Lighting(light));
+        gc.setFill(Color.BLACK);
         gc.fillOval(
-                corner.arcX(getWidth()), corner.arcY(getHeight()),
+                corner.ovalX(getWidth()), corner.ovalY(getHeight()),
                 getWidth() * 2, getHeight() * 2);
+        gc.setFill(color());
+        gc.fillOval(
+                corner.ovalX2(getWidth() / 2), corner.ovalY2(getHeight() / 2),
+                getWidth(), getHeight());
         gc.setEffect(null);
 
         gc.drawImage(faceImage,
                 corner.imageX(width), corner.imageY(height),
                 width / 2, height / 2);
-
 
         for (BuildingType type : BuildingType.values()) {
             double x;
@@ -127,7 +110,7 @@ public class PlayerView extends Canvas {
                     x = corner.towerX(width);
                     y = corner.towerY(height);
                     yCountOffset = -(8 * height) / HEIGHT_TURN;
-                    scale = 0.5;
+                    scale = 0.6;
                     break;
                 case HUT:
                     x = corner.hutX(width);
@@ -150,13 +133,10 @@ public class PlayerView extends Canvas {
             y += yCountOffset;
 
             gc.save();
-            gc.setFill(Color.BLACK);
+            gc.setFill(Color.WHITE);
             gc.setFont(new Font(turn ? 12 : 8));
             gc.fillText(Integer.toString(player().getBuildingCount(type)), x, y);
             gc.restore();
-            //gc.fillOval(corner.hutX(width), corner.hutY(height), 100, 100);
-            // drawBuilding at the right position
-            // drawCount at the right position
         }
     }
 
@@ -194,7 +174,6 @@ public class PlayerView extends Canvas {
         }
 
         double newLightZ = (light.getZ() - LIGHT_MIN_Z + lightDiff) + LIGHT_MIN_Z;
-        System.out.println(newLightZ);
         light.setZ(newLightZ);
         redraw(getGraphicsContext2D());
     }

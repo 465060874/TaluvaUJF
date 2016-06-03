@@ -1,7 +1,5 @@
 package ui.hud;
 
-import com.google.common.io.ByteStreams;
-import data.PlayerColor;
 import engine.Engine;
 import engine.EngineObserver;
 import engine.EngineStatus;
@@ -31,11 +29,6 @@ import ui.hud.trad.PlayerText;
 import ui.hud.trad.ProblemText;
 import ui.island.Placement;
 
-import java.awt.*;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import static java.util.stream.Collectors.joining;
@@ -178,6 +171,7 @@ public class Hud extends AnchorPane implements EngineObserver {
         undoButton.setOnAction(this::undo);
         redoButton.setOnAction(this::redo);
         HBox undoRedoPane = new HBox(undoButton, redoButton);
+        undoRedoPane.setAlignment(Pos.CENTER);
 
         this.tileStackCanvas = new TileStackCanvas(engine);
         this.rightPane = new VBox(undoRedoPane, tileStackCanvas);
@@ -404,6 +398,6 @@ public class Hud extends AnchorPane implements EngineObserver {
     }
 
     public void updateProblems() {
-        updateText(errorLine, ProblemText.trad(placement.getProblems()));
+        updateText(errorLine, ProblemText.trad(placement.getProblem()));
     }
 }

@@ -12,23 +12,23 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class PlaceBuildingRules {
 
-    public static Problems validate(Engine engine, BuildingType type, Hex hex) {
+    public static Problem validate(Engine engine, BuildingType type, Hex hex) {
         Island island = engine.getIsland();
         checkArgument(type != BuildingType.NONE);
 
         final Field field = island.getField(hex);
         if (field == Field.SEA) {
-            return Problems.of(Problem.CANT_BUILD_ON_SEA);
+            return Problem.CANT_BUILD_ON_SEA;
         }
         if (!field.getType().isBuildable()) {
-            return Problems.of(Problem.CANT_BUILD_ON_VOLCANO);
+            return Problem.CANT_BUILD_ON_VOLCANO;
         }
         if (field.hasBuilding()) {
-            return Problems.of(Problem.CANT_BUILD_ON_EXISTING_BUILDING);
+            return Problem.CANT_BUILD_ON_EXISTING_BUILDING;
         }
 
         if (!hasEnoughBuilding(engine, type)) {
-            return Problems.of(Problem.PLACE_BUILDING_NOT_ENOUGH_BUILDINGS);
+            return Problem.PLACE_BUILDING_NOT_ENOUGH_BUILDINGS;
         }
 
         PlayerColor color = engine.getCurrentPlayer().getColor();
@@ -46,29 +46,23 @@ public class PlaceBuildingRules {
         return engine.getCurrentPlayer().getBuildingCount(type) > 0;
     }
 
-    static boolean isBuildable(Field field) {
-        return field != Field.SEA
-                && field.getType().isBuildable()
-                && !field.hasBuilding();
-    }
-
-    static Problems validateTemple(Hex hex, Island island, PlayerColor color) {
+    static Problem validateTemple(Hex hex, Island island, PlayerColor color) {
         for (Hex neighbor : hex.getNeighborhood()) {
             Field neighborField = island.getField(neighbor);
             if (neighborField.hasBuilding(color)) {
                 final Village village = island.getVillage(neighbor);
                 if (!village.hasTemple() && village.getHexes().size() > 2) {
-                    return Problems.of();
+                    return Problem.NONE;
                 }
             }
         }
 
-        return Problems.of(Problem.TEMPLE_NOT_IN_VILLAGE_OF_3);
+        return Problem.TEMPLE_NOT_IN_VILLAGE_OF_3;
     }
 
-    static Problems validateTower(Hex hex, Island island, PlayerColor color, Field field) {
+    static Problem validateTower(Hex hex, Island island, PlayerColor color, Field field) {
         if (field.getLevel() < 3) {
-            return Problems.of(Problem.TOWER_NOT_HIGH_ENOUGH);
+            return Problem.TOWER_NOT_HIGH_ENOUGH;
         }
 
         for (Hex neighbor : hex.getNeighborhood()) {
@@ -76,17 +70,17 @@ public class PlaceBuildingRules {
             if (neighborField.hasBuilding(color)) {
                 final Village village = island.getVillage(neighbor);
                 if (!village.hasTower()) {
-                    return Problems.of();
+                    return Problem.NONE;
                 }
             }
         }
 
-        return Problems.of(Problem.TOWER_NOT_IN_VILLAGE);
+        return Problem.TOWER_NOT_IN_VILLAGE;
     }
 
-    static Problems validateHut(Field field) {
+    static Problem validateHut(Field field) {
         return field.getLevel() == 1
-                ? Problems.of()
-                : Problems.of(Problem.HUT_TOO_HIGH);
+                ? Problem.NONE
+                : Problem.HUT_TOO_HIGH;
     }
 }

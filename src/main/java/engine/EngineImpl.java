@@ -428,12 +428,12 @@ class EngineImpl implements Engine {
         checkState(status.getStep() == EngineStatus.TurnStep.TILE, "Can't place a tile during building step");
 
         if (DEBUG) {
-            Problems problems = SeaTileRules.validate(island,
+            Problem problem = SeaTileRules.validate(island,
                     volcanoTileStack.current(),
                     action.getVolcanoHex(),
                     action.getOrientation());
-            if (!problems.isValid()) {
-                throw new IllegalStateException(problems.toString());
+            if (!problem.isValid()) {
+                throw new IllegalStateException(problem.toString());
             }
         }
 
@@ -452,12 +452,12 @@ class EngineImpl implements Engine {
                 "Can't place a tile during building step");
 
         if (DEBUG) {
-            Problems problems = VolcanoTileRules.validate(island,
+            Problem problem = VolcanoTileRules.validate(island,
                     volcanoTileStack.current(),
                     action.getVolcanoHex(),
                     action.getOrientation());
-            if (!problems.isValid()) {
-                throw new IllegalStateException(problems.toString());
+            if (!problem.isValid()) {
+                throw new IllegalStateException(problem.toString());
             }
         }
 
@@ -476,11 +476,11 @@ class EngineImpl implements Engine {
                 "Can't build during tile placement step");
 
         if (DEBUG) {
-            Problems problems = PlaceBuildingRules.validate(this,
+            Problem problem = PlaceBuildingRules.validate(this,
                     action.getType(),
                     action.getHex());
-            if (!problems.isValid()) {
-                throw new IllegalStateException(problems.toString());
+            if (!problem.isValid()) {
+                throw new IllegalStateException(problem.toString());
             }
         }
 
@@ -501,11 +501,11 @@ class EngineImpl implements Engine {
         checkState(status.getStep() == EngineStatus.TurnStep.BUILD, "Can't expand during tile placement step");
 
         if (DEBUG) {
-            Problems problems = ExpandVillageRules.validate(this,
+            Problem problem = ExpandVillageRules.validate(this,
                     action.getVillage(island),
                     action.getFieldType());
-            if (!problems.isValid()) {
-                throw new IllegalStateException(problems.toString());
+            if (!problem.isValid()) {
+                throw new IllegalStateException(problem.toString());
             }
         }
 

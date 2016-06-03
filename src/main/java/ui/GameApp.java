@@ -7,6 +7,7 @@ import engine.*;
 import engine.action.Action;
 import engine.action.SeaTileAction;
 import engine.record.EngineRecorder;
+import ia.IA;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -36,10 +37,11 @@ public class GameApp extends Application {
     public GameApp() {
         FXPlayerHandler handler = new FXPlayerHandler();
         this.engine = EngineBuilder.allVsAll()
-                .player(PlayerColor.RED, handler)
-                .player(PlayerColor.WHITE, handler)
-                .player(PlayerColor.BROWN, handler)
-                .player(PlayerColor.YELLOW, handler)
+                //.player(PlayerColor.WHITE, handler)
+                .player(PlayerColor.WHITE, IA.DIFFICILE)
+                .player(PlayerColor.RED, IA.DIFFICILE)
+                //.player(PlayerColor.BROWN, handler)
+                //.player(PlayerColor.YELLOW, handler)
                 .build();
         this.recorder = EngineRecorder.install(engine);
     }
