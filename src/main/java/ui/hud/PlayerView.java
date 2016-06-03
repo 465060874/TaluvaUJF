@@ -2,6 +2,7 @@ package ui.hud;
 
 import data.BuildingType;
 import engine.Engine;
+import engine.EngineStatus;
 import engine.Player;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -89,7 +90,7 @@ public class PlayerView extends Canvas {
     }
 
     private void redraw(GraphicsContext gc) {
-        boolean turn = engine.getCurrentPlayer() == player();
+        boolean turn = turn();
         PlayerViewCorner corner = corner();
         int width = turn ? WIDTH_TURN : WIDTH_NOT_TURN;
         int height = turn ? HEIGHT_TURN : HEIGHT_NOT_TURN;
@@ -177,8 +178,13 @@ public class PlayerView extends Canvas {
         throw new IllegalStateException();
     }
 
+    private boolean turn() {
+        return engine.getStatus() instanceof EngineStatus.Running
+                && player() == engine.getCurrentPlayer();
+    }
+
     public void tick() {
-        if (player() != engine.getCurrentPlayer() || player().isHuman()) {
+        if (!turn() || player().isHuman()) {
             return;
         }
 
