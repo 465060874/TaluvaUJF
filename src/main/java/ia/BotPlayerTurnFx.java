@@ -4,7 +4,7 @@ import engine.Engine;
 import engine.EngineStatus;
 import engine.PlayerTurn;
 import javafx.application.Platform;
-import util.CustomUncaughtExceptionHandler;
+import util.FxUncaughtExceptionHandler;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -19,9 +19,9 @@ class BotPlayerTurnFx implements PlayerTurn {
 
     private Move move;
 
-    BotPlayerTurnFx(Engine engine, IAAlgorithm player) {
+    BotPlayerTurnFx(Engine engine, IAAlgorithm player, AtomicBoolean cancelled) {
         this.engine = engine;
-        this.cancelled = new AtomicBoolean(false);
+        this.cancelled = cancelled;
         this.algorithm = player;
 
         this.move = null;
@@ -30,7 +30,7 @@ class BotPlayerTurnFx implements PlayerTurn {
 
     private void runThread(Runnable runnable) {
         Thread thread = new Thread(runnable);
-        CustomUncaughtExceptionHandler.install(thread, engine);
+        FxUncaughtExceptionHandler.install(thread, engine);
         thread.start();
     }
 

@@ -8,7 +8,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Random;
 
-public class CustomUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
+public class FxUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private static final String HEADER = "The game ran into a problem";
     private static final String[] ERROR_CODES = new String[] {
@@ -33,18 +33,18 @@ public class CustomUncaughtExceptionHandler implements Thread.UncaughtExceptionH
     }
 
     public static void install(Thread thread, Engine engine) {
-        CustomUncaughtExceptionHandler handler = new CustomUncaughtExceptionHandler(engine);
+        FxUncaughtExceptionHandler handler = new FxUncaughtExceptionHandler(engine);
         handler.doInstall(thread);
     }
 
     private final Engine engine;
 
-    private CustomUncaughtExceptionHandler(Engine engine) {
+    private FxUncaughtExceptionHandler(Engine engine) {
         this.engine = engine;
     }
 
     private void doInstall(Thread thread) {
-        thread.setUncaughtExceptionHandler(new CustomUncaughtExceptionHandler(engine));
+        thread.setUncaughtExceptionHandler(new FxUncaughtExceptionHandler(engine));
     }
 
     @Override

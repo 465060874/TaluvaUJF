@@ -19,7 +19,7 @@ import map.Building;
 import menu.Home4;
 import menu.data.MenuData;
 import ui.island.IslandSnapshot;
-import util.CustomUncaughtExceptionHandler;
+import util.FxUncaughtExceptionHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class GameApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        CustomUncaughtExceptionHandler.install(engine);
+        FxUncaughtExceptionHandler.install(engine);
 
         this.stage = stage;
         this.gameView = new GameView(engine);

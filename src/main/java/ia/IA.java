@@ -38,9 +38,10 @@ public enum IA implements PlayerHandler {
     @Override
     public PlayerTurn startTurn(Engine engine, EngineStatus.TurnStep step) {
         checkArgument(step == EngineStatus.TurnStep.TILE, "IA does not allow starting turn for BUILD step");
-        IAAlgorithm algorithm = createAlgorithm(engine.copyWithoutObservers(), new AtomicBoolean(false));
+        AtomicBoolean cancelled = new AtomicBoolean(false);
+        IAAlgorithm algorithm = createAlgorithm(engine.copyWithoutObservers(), cancelled);
         return Platform.isFxApplicationThread()
-                ? new BotPlayerTurnFx(engine, algorithm)
+                ? new BotPlayerTurnFx(engine, algorithm, cancelled)
                 : new BotPlayerTurn(engine, algorithm);
     }
 
