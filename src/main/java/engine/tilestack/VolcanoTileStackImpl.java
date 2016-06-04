@@ -2,34 +2,26 @@ package engine.tilestack;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.io.CharSink;
 import data.VolcanoTile;
+import engine.Engine;
+import engine.EngineStatus;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import static com.google.common.base.Preconditions.checkState;
 
 class VolcanoTileStackImpl implements VolcanoTileStack {
 
+    private static final int TILES_PER_PLAYER = 12;
+
+    private final Engine engine;
     private final ImmutableList<VolcanoTile> tiles;
-    private int index;
 
-    private VolcanoTileStackImpl(ImmutableList<VolcanoTile> tiles) {
+    VolcanoTileStackImpl(Engine engine, ImmutableList<VolcanoTile> tiles) {
+        this.engine = engine;
         this.tiles = tiles;
-        this.index = -1;
-    }
-
-    private VolcanoTileStackImpl(ImmutableList<VolcanoTile> tiles, int index) {
-        this.tiles = tiles;
-        this.index = index;
-    }
-
-    @Override
-    public void saveAll(CharSink sink) {
-        VolcanoTileStackIO.write(sink, tiles);
     }
 
     @Override
@@ -37,37 +29,37 @@ class VolcanoTileStackImpl implements VolcanoTileStack {
         return tiles;
     }
 
+    private int index() {
+        if (engine.getStatus() == EngineStatus.PENDING_START) {
+            return 0;
+        }
+
+        return engine.getStatus().getStep() == EngineStatus.TurnStep.TILE
+                ? engine.getStatus().getTurn()
+                : engine.getStatus().getTurn() + 1;
+    }
+
     @Override
     public int size() {
-        return tiles.size() - index;
+        return tiles.size() - index();
     }
 
     @Override
     public boolean isEmpty() {
-        return index >= tiles.size();
+        return size() == 0;
     }
 
     @Override
     public VolcanoTile current() {
-        return index >= 0 ? tiles.get(index) : null;
+        return tiles.get(index());
     }
 
     @Override
-    public void next() {
-        index++;
-    }
-
-    @Override
-    public void previous() {
-        index--;
-    }
-
-    @Override
-    public VolcanoTileStack copyShuffled(Random random) {
+    public VolcanoTileStack copyShuffled(Engine engine) {
         List<VolcanoTile> copyTiles = new ArrayList<>();
         copyTiles.addAll(tiles);
-        Collections.shuffle(copyTiles.subList(index + 1, copyTiles.size()), random);
-        return new VolcanoTileStackImpl(ImmutableList.copyOf(copyTiles), index);
+        Collections.shuffle(copyTiles.subList(index() + 1, copyTiles.size()), engine.getRandom());
+        return new VolcanoTileStackImpl(engine, ImmutableList.copyOf(copyTiles));
     }
 
     static class RandomFactory implements Factory {
@@ -80,30 +72,14 @@ class VolcanoTileStackImpl implements VolcanoTileStack {
         }
 
         @Override
-        public VolcanoTileStack create(int count, Random random) {
+        public VolcanoTileStack create(Engine engine) {
+            int count = engine.getPlayers().size() * TILES_PER_PLAYER;
             checkState(count <= roulette.size(),
                     "Insufficient number of tiles (" + roulette.size() +
                             "), expected " + count + " at least");
-            Collections.shuffle(roulette, random);
+            Collections.shuffle(roulette, engine.getRandom());
 
-            return new VolcanoTileStackImpl(ImmutableList.copyOf(roulette.subList(0, count)));
-        }
-    }
-
-    static class PredefinedFactory implements Factory {
-
-        private final ImmutableList<VolcanoTile> tiles;
-
-        PredefinedFactory(Iterable<VolcanoTile> tiles) {
-            this.tiles = ImmutableList.copyOf(tiles);
-        }
-
-        @Override
-        public VolcanoTileStack create(int count, Random random) {
-            checkState(count <= tiles.size(),
-                    "Insufficient number of tiles (" + tiles.size() +
-                            "), expected " + count + " at least");
-            return new VolcanoTileStackImpl(tiles.subList(0, count));
+            return new VolcanoTileStackImpl(engine, ImmutableList.copyOf(roulette.subList(0, count)));
         }
     }
 }

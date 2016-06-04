@@ -242,12 +242,16 @@ public class Hud extends AnchorPane {
         }
     }
 
+    private boolean undoRedoPredicate(Engine engine) {
+        return engine.getCurrentPlayer().isHuman() && engine.getStatus().getStep() == EngineStatus.TurnStep.TILE;
+    }
+
     private void undo(ActionEvent event) {
-        engine.cancelUntil(e -> e.getCurrentPlayer().isHuman() && e.getStatus().getStep() == EngineStatus.TurnStep.TILE);
+        engine.cancelUntil(this::undoRedoPredicate);
     }
 
     private void redo(ActionEvent event) {
-        engine.redoUntil(e -> e.getCurrentPlayer().isHuman() && e.getStatus().getStep() == EngineStatus.TurnStep.TILE);
+        engine.redoUntil(this::undoRedoPredicate);
     }
 
     private void resizeWidth(Observable observable) {
@@ -313,6 +317,7 @@ public class Hud extends AnchorPane {
 
         @Override
         public void onTileStepStart() {
+            tileStackCanvas.redraw();
             updateUndoRedo();
             for (PlayerView playerView : playerViews) {
                 playerView.updateTurn();
@@ -334,7 +339,6 @@ public class Hud extends AnchorPane {
         public void onBuildStepStart() {
             updateUndoRedo();
             tileStackCanvas.redraw();
-
 
             if (versusIa) {
                 if (engine.getCurrentPlayer().isHuman()) {

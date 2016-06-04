@@ -66,6 +66,11 @@ class EngineActions {
 
     private void updateSeaTiles() {
         Island island = engine.getIsland();
+
+        if (engine.getVolcanoTileStack().isEmpty()) {
+            seaTiles = ImmutableList.of();
+            return;
+        }
         VolcanoTile tile = engine.getVolcanoTileStack().current();
 
         Set<SeaTileAction> set = new HashSet<>();
@@ -95,6 +100,10 @@ class EngineActions {
         Island island = engine.getIsland();
         ImmutableList.Builder<VolcanoTileAction> builder = ImmutableList.builder();
 
+        if (engine.getVolcanoTileStack().isEmpty()) {
+            volcanosTiles = ImmutableList.of();
+            return;
+        }
         VolcanoTile tile = engine.getVolcanoTileStack().current();
         for (Hex hex : island.getVolcanos()) {
             for (Orientation orientation : Orientation.values()) {

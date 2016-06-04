@@ -42,9 +42,6 @@ public class TileStackCanvas extends Canvas {
         boolean build = engine.getStatus() == EngineStatus.PENDING_START
                 || engine.getStatus().getStep() == EngineStatus.TurnStep.BUILD;
         int stackSize = engine.getVolcanoTileStack().size();
-        if (build) {
-            stackSize--;
-        }
         String stackSizeStr = Integer.toString(stackSize);
         stackSize = Math.min(MAX_DISPLAYED_STACK_SIZE, stackSize);
 

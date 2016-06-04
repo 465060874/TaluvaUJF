@@ -29,8 +29,6 @@ class EngineImpl implements Engine {
     //       joué
     static final boolean DEBUG = false;
 
-    private static final int TILES_PER_PLAYER = 12;
-
     private final EngineLogger logger;
     private final long seed;
     private final Random random;
@@ -63,7 +61,7 @@ class EngineImpl implements Engine {
         this.gamemode = builder.gamemode;
         this.island = builder.island;
         this.players = builder.createPlayers(this);
-        this.volcanoTileStack = builder.volcanoTileStackFactory.create(players.size() * TILES_PER_PLAYER, random);
+        this.volcanoTileStack = builder.volcanoTileStackFactory.create(this);
 
         this.status = EngineStatus.PENDING_START;
         this.playerIndex = 0;
@@ -87,7 +85,7 @@ class EngineImpl implements Engine {
             players.add(player.copyWithDummyHandler());
         }
         this.players = players.build();
-        this.volcanoTileStack = engine.volcanoTileStack.copyShuffled(random);
+        this.volcanoTileStack = engine.volcanoTileStack.copyShuffled(this);
 
         this.status = engine.status instanceof EngineStatus.Running
                 ? (engine.running()).copy()
@@ -153,9 +151,8 @@ class EngineImpl implements Engine {
 
         this.status = new EngineStatus.Running();
         this.playerIndex = 0;
-        observers.forEach(EngineObserver::onStart);
 
-        volcanoTileStack.next();
+        observers.forEach(EngineObserver::onStart);
         observers.forEach(EngineObserver::onTileStackChange);
 
         actions.updateAll();
@@ -184,11 +181,8 @@ class EngineImpl implements Engine {
         checkState(status != EngineStatus.PENDING_START);
 
         playerTurn.cancel();
-        boolean volcanoTileStackChanged = false;
         do {
             if (status.getStep() == EngineStatus.TurnStep.TILE) {
-                volcanoTileStackChanged = true;
-                volcanoTileStack.previous();
                 observers.forEach(EngineObserver::onCancelTileStep);
             }
             else {
@@ -199,10 +193,7 @@ class EngineImpl implements Engine {
             redoList.add(save.revert(this));
         } while (!predicate.test(this) && !status.isFirst());
 
-        if (volcanoTileStackChanged) {
-            observers.forEach(EngineObserver::onTileStackChange);
-        }
-
+        observers.forEach(EngineObserver::onTileStackChange);
         actions.updateAll();
         observers.forEach(status.getStep() == EngineStatus.TurnStep.TILE
                 ? EngineObserver::onTileStepStart
@@ -224,11 +215,8 @@ class EngineImpl implements Engine {
         }
 
         playerTurn.cancel();
-        boolean volcanoTileStackChanged = false;
-        while (!redoList.isEmpty()) {
+        do {
             if (status.getStep() == EngineStatus.TurnStep.TILE) {
-                volcanoTileStackChanged = true;
-                volcanoTileStack.next();
                 observers.forEach(EngineObserver::onRedoTileStep);
             }
             else {
@@ -237,15 +225,9 @@ class EngineImpl implements Engine {
 
             ActionSave save = redoList.remove(redoList.size() - 1);
             undoList.add(save.revert(this));
+        } while (!predicate.test(this) && !redoList.isEmpty());
 
-            if (predicate.test(this)) {
-                break;
-            }
-        }
-
-        if (volcanoTileStackChanged) {
-            observers.forEach(EngineObserver::onTileStackChange);
-        }
+        observers.forEach(EngineObserver::onTileStackChange);
 
         if (status instanceof EngineStatus.Running) {
             actions.updateAll();
@@ -255,7 +237,7 @@ class EngineImpl implements Engine {
 
             if (status.getStep() == EngineStatus.TurnStep.BUILD
                     && !getCurrentPlayer().isHuman()) {
-                // Hack, let's the IA starts from the tileStep
+                // Hack, let the IA starts from the tileStep
                 cancelLastStep();
             } else {
                 this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, status.getStep());
@@ -277,11 +259,11 @@ class EngineImpl implements Engine {
         if (running().getStep() == EngineStatus.TurnStep.TILE) {
             do { playerIndex++; } while (getCurrentPlayer().isEliminated());
 
-            volcanoTileStack.next();
-            observers.forEach(EngineObserver::onTileStackChange);
-            if (checkTileStackEmpty()) {
+            if (volcanoTileStack.isEmpty()) {
+                finish(EngineStatus.FinishReason.NO_MORE_TILES, winnersByScore());
                 return;
             }
+
 
             actions.updateAll();
 
@@ -289,6 +271,8 @@ class EngineImpl implements Engine {
             this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, EngineStatus.TurnStep.TILE);
         }
         else {
+            observers.forEach(EngineObserver::onTileStackChange);
+
             actions.updateAll();
             if (checkElimination()) {
                 return;
@@ -321,15 +305,6 @@ class EngineImpl implements Engine {
             nextStep();
         }
 
-        return true;
-    }
-
-    private boolean checkTileStackEmpty() {
-        if (!volcanoTileStack.isEmpty()) {
-            return false;
-        }
-
-        finish(EngineStatus.FinishReason.NO_MORE_TILES, winnersByScore());
         return true;
     }
 
@@ -456,8 +431,7 @@ class EngineImpl implements Engine {
     @Override
     public synchronized void placeOnVolcano(VolcanoTileAction action) {
         checkState(status instanceof EngineStatus.Running, "Can't do an action while the game is not running");
-        checkState(status.getStep() == EngineStatus.TurnStep.TILE,
-                "Can't place a tile during building step");
+        checkState(status.getStep() == EngineStatus.TurnStep.TILE, "Can't place a tile during building step");
 
         if (DEBUG) {
             Problem problem = VolcanoTileRules.validate(island,
@@ -480,8 +454,7 @@ class EngineImpl implements Engine {
     @Override
     public synchronized void build(PlaceBuildingAction action) {
         checkState(status instanceof EngineStatus.Running, "Can't do an action while the game is not running");
-        checkState(status.getStep() == EngineStatus.TurnStep.BUILD,
-                "Can't build during tile placement step");
+        checkState(status.getStep() == EngineStatus.TurnStep.BUILD, "Can't build during tile placement step");
 
         if (DEBUG) {
             Problem problem = PlaceBuildingRules.validate(this,
