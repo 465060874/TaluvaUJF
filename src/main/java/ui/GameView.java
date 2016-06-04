@@ -1,9 +1,6 @@
 package ui;
 
 import engine.Engine;
-import engine.EngineObserver;
-import engine.EngineStatus;
-import engine.Player;
 import engine.action.ExpandVillageAction;
 import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
@@ -19,9 +16,7 @@ import ui.island.Grid;
 import ui.island.IslandView;
 import ui.island.Placement;
 
-import java.util.List;
-
-public class GameView extends StackPane implements EngineObserver {
+public class GameView extends StackPane {
 
     private final Engine engine;
     private final Placement placement;
@@ -34,7 +29,7 @@ public class GameView extends StackPane implements EngineObserver {
         this.placement = new Placement(engine, grid);
         this.islandView = new IslandView(engine.getIsland(), grid, placement, false);
         this.hud = new Hud(engine, placement);
-        engine.registerObserver(this);
+        engine.registerObserver(new EngineObserver());
 
         hud.setPickOnBounds(false);
         getChildren().addAll(islandView, hud);
@@ -75,79 +70,58 @@ public class GameView extends StackPane implements EngineObserver {
         return hud.getSaveButton();
     }
 
-    @Override
-    public void onStart() {
-    }
-
-    @Override
-    public void onCancelTileStep() {
-        placement.deleteLastPlacedHexes();
-    }
-
-    @Override
-    public void onCancelBuildStep() {
-        placement.deleteLastPlacedBuildings();
-    }
-
-    @Override
-    public void onRedoTileStep() {
-    }
-
-    @Override
-    public void onRedoBuildStep() {
-    }
-
-    @Override
-    public void onTileStackChange() {
-    }
-
-    @Override
-    public void onTileStepStart() {
-        islandView.redrawIsland();
-    }
-
-    @Override
-    public void onBuildStepStart() {
-        islandView.redrawIsland();
-    }
-
-    @Override
-    public void onTilePlacementOnSea(SeaTileAction action) {
-        placement.setLastPlacedHexes(action.getVolcanoHex(), action.getLeftHex(), action.getRightHex());
-        islandView.redrawIsland();
-    }
-
-    @Override
-    public void onTilePlacementOnVolcano(VolcanoTileAction action) {
-        placement.setLastPlacedHexes(action.getVolcanoHex(), action.getLeftHex(), action.getRightHex());
-        islandView.redrawIsland();
-    }
-
-    @Override
-    public void onBuild(PlaceBuildingAction action) {
-        placement.setLastPlacedBuildings(action.getHex());
-        islandView.redrawIsland();
-    }
-
-    @Override
-    public void onExpand(ExpandVillageAction action) {
-        islandView.redrawIsland();
-    }
-
-    @Override
-    public void onEliminated(Player eliminated) {
-    }
-
-    @Override
-    public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
-    }
-
-    @Override
-    public void onBeforeExpand(ExpandVillageAction action) {
-        placement.setLastPlacedBuildings(action.getVillage(engine.getIsland()).getExpandableHexes().get(action.getFieldType()));
-    }
-
     public boolean isMouseDragged(){
         return islandView.isMouseDragThresholdReached();
+    }
+
+    private class EngineObserver extends engine.EngineObserver.Dummy {
+
+        @Override
+        public void onCancelTileStep() {
+            placement.deleteLastPlacedHexes();
+        }
+
+        @Override
+        public void onCancelBuildStep() {
+            placement.deleteLastPlacedBuildings();
+        }
+
+        @Override
+        public void onTileStepStart() {
+            islandView.redrawIsland();
+        }
+
+        @Override
+        public void onBuildStepStart() {
+            islandView.redrawIsland();
+        }
+
+        @Override
+        public void onSeaTileAction(SeaTileAction action) {
+            placement.setLastPlacedHexes(action.getVolcanoHex(), action.getLeftHex(), action.getRightHex());
+            islandView.redrawIsland();
+        }
+
+        @Override
+        public void onVolcanoTileAction(VolcanoTileAction action) {
+            placement.setLastPlacedHexes(action.getVolcanoHex(), action.getLeftHex(), action.getRightHex());
+            islandView.redrawIsland();
+        }
+
+        @Override
+        public void onPlaceBuildingAction(PlaceBuildingAction action) {
+            placement.setLastPlacedBuildings(action.getHex());
+            islandView.redrawIsland();
+        }
+
+        @Override
+        public void onExpandVillageAction(ExpandVillageAction action) {
+            islandView.redrawIsland();
+        }
+
+        @Override
+        public void beforeExpandVillageAction(ExpandVillageAction action) {
+            placement.setLastPlacedBuildings(action.getVillage(engine.getIsland()).getExpandableHexes().get(action.getFieldType()));
+        }
     }
 }

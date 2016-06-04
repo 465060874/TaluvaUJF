@@ -65,34 +65,24 @@ public class EngineRecorder {
             actionsIndex++;
         }
 
-        public void onTilePlacementOnSea(SeaTileAction action) {
+        public void onSeaTileAction(SeaTileAction action) {
             actions.add(action);
             actionsIndex++;
         }
 
-        public void onTilePlacementOnVolcano(VolcanoTileAction action) {
+        public void onVolcanoTileAction(VolcanoTileAction action) {
             actions.add(action);
             actionsIndex++;
         }
 
-        public void onBuild(PlaceBuildingAction action) {
+        public void onPlaceBuildingAction(PlaceBuildingAction action) {
             actions.add(action);
             actionsIndex++;
         }
 
-        public void onExpand(ExpandVillageAction action) {
+        public void onExpandVillageAction(ExpandVillageAction action) {
             actions.add(action);
             actionsIndex++;
-        }
-
-        public void onEliminated(Player eliminated) {
-        }
-
-        public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
-        }
-
-        public void onBeforeExpand(ExpandVillageAction action) {
-            return;
         }
     }
 

@@ -7,8 +7,6 @@ import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
 
-import java.util.List;
-
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -61,13 +59,13 @@ public class EngineLoggerObserver extends EngineObserver.Dummy {
     }
 
     @Override
-    public void onTilePlacementOnSea(SeaTileAction placement) {
+    public void onSeaTileAction(SeaTileAction placement) {
         engine.logger().info("{0}  Placed on sea {1} {2}", prefix,
                 placement.getVolcanoHex(), placement.getOrientation());
     }
 
     @Override
-    public void onTilePlacementOnVolcano(VolcanoTileAction placement) {
+    public void onVolcanoTileAction(VolcanoTileAction placement) {
         engine.logger().info("{0}  Placed on volcano {1} {2} at level {3}",
                 prefix,
                 placement.getVolcanoHex(),
@@ -76,13 +74,13 @@ public class EngineLoggerObserver extends EngineObserver.Dummy {
     }
 
     @Override
-    public void onBuild(PlaceBuildingAction action) {
+    public void onPlaceBuildingAction(PlaceBuildingAction action) {
         engine.logger().info("{0}  Built a {1} at {2}", prefix, action.getType(), action.getHex());
         logRemainingBuilding();
     }
 
     @Override
-    public void onExpand(ExpandVillageAction action) {
+    public void onExpandVillageAction(ExpandVillageAction action) {
         engine.logger().info("{0}  Expanded a village at {1} towards {2}",
                 prefix,
                 action.getVillageHex(),
@@ -107,15 +105,10 @@ public class EngineLoggerObserver extends EngineObserver.Dummy {
     }
 
     @Override
-    public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
+    public void onWin(EngineStatus.Finished finished) {
         engine.logger().info("{0}!!! Winner(s): {1} ({2}) !!!",
                 prefix,
-                winners.stream().map(Player::getColor).collect(toList()),
-                reason);
-    }
-
-    @Override
-    public void onBeforeExpand(ExpandVillageAction action) {
-        return;
+                finished.getWinners().stream().map(Player::getColor).collect(toList()),
+                finished.getWinReason());
     }
 }

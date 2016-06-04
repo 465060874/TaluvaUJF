@@ -1,13 +1,8 @@
 package ui.hud;
 
 import engine.Engine;
-import engine.EngineObserver;
 import engine.EngineStatus;
 import engine.Player;
-import engine.action.ExpandVillageAction;
-import engine.action.PlaceBuildingAction;
-import engine.action.SeaTileAction;
-import engine.action.VolcanoTileAction;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -34,7 +29,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.joining;
 
-public class Hud extends AnchorPane implements EngineObserver {
+public class Hud extends AnchorPane {
 
     private static final double TEXT_VISIBLE_HEIGHT = 80;
     private static final double TEXT_HIDDEN_HEIGHT = 10;
@@ -185,7 +180,7 @@ public class Hud extends AnchorPane implements EngineObserver {
         layoutBoundsProperty().addListener(this::resizeWidth);
         layoutBoundsProperty().addListener(this::resizeHeight);
 
-        engine.registerObserver(this);
+        engine.registerObserver(new EngineObserver());
 
     }
 
@@ -221,7 +216,10 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     private void textUpDown(ActionEvent actionEvent) {
         this.textUp = !textUp;
+        updateTextUpDown();
+    }
 
+    private void updateTextUpDown() {
         rulesButton.setVisible(textUp);
         showForbidenHexButton.setVisible(textUp);
         showForbiddenBuildingsButton.setVisible(textUp);
@@ -269,128 +267,6 @@ public class Hud extends AnchorPane implements EngineObserver {
         resizeWidth(null);
     }
 
-    @Override
-    public void onStart() {
-    }
-
-    private void updateUndoRedo() {
-        undoButton.setDisable(!engine.canUndo());
-        redoButton.setDisable(!engine.canRedo());
-    }
-
-    @Override
-    public void onCancelTileStep() {
-        updateUndoRedo();
-    }
-
-    @Override
-    public void onCancelBuildStep() {
-        updateUndoRedo();
-    }
-
-    @Override
-    public void onRedoTileStep() {
-        updateUndoRedo();
-    }
-
-    @Override
-    public void onRedoBuildStep() {
-        updateUndoRedo();
-    }
-
-    @Override
-    public void onTileStackChange() {
-        tileStackCanvas.redraw();
-    }
-
-    @Override
-    public void onTileStepStart() {
-        updateUndoRedo();
-        for (PlayerView playerView : playerViews) {
-            playerView.updateTurn();
-        }
-
-        if (versusIa) {
-            if (engine.getCurrentPlayer().isHuman()) {
-                updateText(infoLine, "C'est à votre tour de placer une tuile");
-            }
-            else {
-                updateText(infoLine, "Placement de la tuile");
-            }
-        }
-        else {
-            String playerText = PlayerText.of(engine.getCurrentPlayer().getColor());
-            updateText(infoLine, "C'est au tour du joueur " + playerText + " de placer une tuile");
-        }
-    }
-
-    @Override
-    public void onBuildStepStart() {
-        updateUndoRedo();
-        tileStackCanvas.redraw();
-
-
-        if (versusIa) {
-            if (engine.getCurrentPlayer().isHuman()) {
-                updateText(infoLine, "C'est à votre tour de construire");
-            }
-            else {
-                updateText(infoLine, "Construction");
-            }
-        }
-        else {
-            String playerText = PlayerText.of(engine.getCurrentPlayer().getColor());
-            updateText(infoLine, "C'est au tour du joueur " + playerText + " de construire");
-        }
-    }
-
-    @Override
-    public void onTilePlacementOnSea(SeaTileAction action) {
-
-    }
-
-    @Override
-    public void onTilePlacementOnVolcano(VolcanoTileAction action) {
-
-    }
-
-    @Override
-    public void onBuild(PlaceBuildingAction action) {
-
-    }
-
-    @Override
-    public void onExpand(ExpandVillageAction action) {
-
-    }
-
-    @Override
-    public void onEliminated(Player eliminated) {
-
-    }
-
-    @Override
-    public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
-        tileStackCanvas.redraw();
-        for (PlayerView playerView : playerViews) {
-            playerView.updateTurn();
-        }
-
-        if (winners.size() == 1) {
-            updateText(infoLine, "Le joueur " + PlayerText.of(winners.get(0).getColor()) + " a gagné !");
-        } else {
-            updateText(infoLine, winners.stream()
-                    .map(Player::getColor)
-                    .map(PlayerText::of)
-                    .collect(joining(", ", "Les joueurs ", " ont gagné !")));
-        }
-    }
-
-    @Override
-    public void onBeforeExpand(ExpandVillageAction action) {
-        return;
-    }
-
     public Button getHomeButton() {
         return homeButton;
     }
@@ -401,5 +277,96 @@ public class Hud extends AnchorPane implements EngineObserver {
 
     public void updateProblems() {
         updateText(errorLine, ProblemText.trad(placement.getProblem()));
+    }
+
+    private class EngineObserver extends engine.EngineObserver.Dummy {
+
+        private void updateUndoRedo() {
+            undoButton.setDisable(!engine.canUndo());
+            redoButton.setDisable(!engine.canRedo());
+        }
+
+        @Override
+        public void onCancelTileStep() {
+            updateUndoRedo();
+        }
+
+        @Override
+        public void onCancelBuildStep() {
+            updateUndoRedo();
+        }
+
+        @Override
+        public void onRedoTileStep() {
+            updateUndoRedo();
+        }
+
+        @Override
+        public void onRedoBuildStep() {
+            updateUndoRedo();
+        }
+
+        @Override
+        public void onTileStackChange() {
+            tileStackCanvas.redraw();
+        }
+
+        @Override
+        public void onTileStepStart() {
+            updateUndoRedo();
+            for (PlayerView playerView : playerViews) {
+                playerView.updateTurn();
+            }
+
+            if (versusIa) {
+                if (engine.getCurrentPlayer().isHuman()) {
+                    updateText(infoLine, "C'est à votre tour de placer une tuile");
+                } else {
+                    updateText(infoLine, "Placement de la tuile");
+                }
+            } else {
+                String playerText = PlayerText.of(engine.getCurrentPlayer().getColor());
+                updateText(infoLine, "C'est au tour du joueur " + playerText + " de placer une tuile");
+            }
+        }
+
+        @Override
+        public void onBuildStepStart() {
+            updateUndoRedo();
+            tileStackCanvas.redraw();
+
+
+            if (versusIa) {
+                if (engine.getCurrentPlayer().isHuman()) {
+                    updateText(infoLine, "C'est à votre tour de construire");
+                } else {
+                    updateText(infoLine, "Construction");
+                }
+            } else {
+                String playerText = PlayerText.of(engine.getCurrentPlayer().getColor());
+                updateText(infoLine, "C'est au tour du joueur " + playerText + " de construire");
+            }
+        }
+
+        @Override
+        public void onWin(EngineStatus.Finished finished) {
+            tileStackCanvas.redraw();
+            for (PlayerView playerView : playerViews) {
+                playerView.updateTurn();
+            }
+
+            List<Player> winners = finished.getWinners();
+            if (winners.size() == 1) {
+                updateText(infoLine, "Le joueur " + PlayerText.of(winners.get(0).getColor()) + " a gagné !");
+            } else {
+                updateText(infoLine, winners.stream()
+                        .map(Player::getColor)
+                        .map(PlayerText::of)
+                        .collect(joining(", ", "Les joueurs ", " ont gagné !")));
+            }
+
+            textUp = true;
+            updateTextUpDown();
+        }
     }
 }

@@ -12,6 +12,10 @@ import map.Village;
 
 import java.util.Map;
 
+/**
+ * Encapsulation de la sauvegarde des coups joués permettant
+ * l'"annuler" et le "refaire"
+ */
 abstract class ActionSave {
 
     private final EngineStatus status;
@@ -29,6 +33,11 @@ abstract class ActionSave {
         }
     }
 
+    /**
+     * Annule les effets de l'action sauvegardé par cette instance
+     * et retourne une sauvegarde inverse permettant de refaire
+     * l'action
+     */
     abstract ActionSave revert(EngineImpl engine);
 
     void commonRevert(EngineImpl engine) {

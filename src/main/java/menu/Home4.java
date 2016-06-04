@@ -578,7 +578,6 @@ public class Home4 extends Application {
                 imageView.setFitWidth(160);
                 imageView.setPreserveRatio(true);
                 vmultimage.getChildren().setAll(imageView);
-                vmultimage.getChildren().setAll(imageView);
             }
         }
     }
@@ -588,7 +587,7 @@ public class Home4 extends Application {
             return;
         }
 
-        //menuData.save();
+        menuData.save();
         GameApp gameApp = new GameApp(menuData);
         try {
             gameApp.start(stage);
@@ -605,7 +604,8 @@ class PersistentToggleGroup extends ToggleGroup {
         selectedToggleProperty().addListener(this::selectedTogglePropertyChange);
     }
 
-    private void selectedTogglePropertyChange(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+    private void selectedTogglePropertyChange(
+            ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
         if (newValue == null) {
             selectToggle(oldValue);
         }

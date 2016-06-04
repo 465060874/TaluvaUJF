@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by milanovb on 31/05/16.
  */
-public class AlphaBetaAlgorithm implements IAAlgorithm {
+class AlphaBetaAlgorithm implements IAAlgorithm {
 
     // Strategies possibles pour l'IA
     private static final int NB_STRATEGIES = 4;

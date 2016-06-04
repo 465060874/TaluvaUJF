@@ -22,6 +22,11 @@ import static java.util.stream.Collectors.toList;
 
 class EngineImpl implements Engine {
 
+    // En mode DEBUG :
+    //     - Les listes de coups jouables sont générés avec un ordre bien défini
+    //       permettant de rejouer des parties identiques avec la même seed
+    //     - Le moteur (re)vérifie la validité des coups qui lui sont données à
+    //       joué
     static final boolean DEBUG = false;
 
     private static final int TILES_PER_PLAYER = 12;
@@ -88,7 +93,7 @@ class EngineImpl implements Engine {
                 ? (engine.running()).copy()
                 : engine.status;
         this.playerIndex = engine.playerIndex;
-        this.playerTurn = PlayerHandler.dummyTurn();
+        this.playerTurn = PlayerTurn.dummy();
 
         this.undoList = new ArrayList<>(volcanoTileStack.size() * 2 + 2);
         undoList.addAll(engine.undoList);

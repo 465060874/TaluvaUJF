@@ -68,7 +68,7 @@ class EngineActions {
         Island island = engine.getIsland();
         VolcanoTile tile = engine.getVolcanoTileStack().current();
 
-        HashSet<SeaTileAction> seaTilesMap = new HashSet<>();
+        Set<SeaTileAction> set = new HashSet<>();
 
         for (Hex hex : island.getCoast()) {
             for (Orientation orientation : Orientation.values()) {
@@ -77,24 +77,23 @@ class EngineActions {
                 }
 
                 for (int rotation = 0; rotation < 3; rotation++) {
-                    seaTilesMap.add(new SeaTileAction(tile, hex, orientation));
+                    set.add(new SeaTileAction(tile, hex, orientation));
                     hex = hex.getLeftNeighbor(orientation);
                     orientation = orientation.leftRotation();
                 }
             }
         }
 
-        ImmutableList.Builder<SeaTileAction> builder = ImmutableList.builder();
-        builder.addAll(seaTilesMap);
+        ImmutableList<SeaTileAction> list = ImmutableList.copyOf(set);
 
         this.seaTiles = EngineImpl.DEBUG
-                ? Ordering.natural().immutableSortedCopy(builder.build())
-                : builder.build();
+                ? Ordering.natural().immutableSortedCopy(list)
+                : list;
     }
 
     private void updateVolcanoTiles() {
         Island island = engine.getIsland();
-        HexMap<List<VolcanoTileAction>> volcanoTilesMap = HexMap.create();
+        ImmutableList.Builder<VolcanoTileAction> builder = ImmutableList.builder();
 
         VolcanoTile tile = engine.getVolcanoTileStack().current();
         for (Hex hex : island.getVolcanos()) {
@@ -103,20 +102,10 @@ class EngineActions {
                     continue;
                 }
 
-                List<VolcanoTileAction> list = volcanoTilesMap.getOrDefault(hex, null);
-                if (list == null) {
-                    list = new ArrayList<>();
-                    volcanoTilesMap.put(hex, list);
-                }
-
-                list.add(new VolcanoTileAction(tile, hex, orientation));
+                builder.add(new VolcanoTileAction(tile, hex, orientation));
             }
         }
 
-        ImmutableList.Builder<VolcanoTileAction> builder = ImmutableList.builder();
-        for (List<VolcanoTileAction> actions : volcanoTilesMap.values()) {
-            builder.addAll(actions);
-        }
         this.volcanosTiles = EngineImpl.DEBUG
                 ? Ordering.natural().immutableSortedCopy(builder.build())
                 : builder.build();
@@ -131,16 +120,13 @@ class EngineActions {
             if (!field.hasBuilding()) {
 
                 if (PlaceBuildingRules.validate(engine, BuildingType.HUT, hex).isValid()) {
-                    builder.add(new PlaceBuildingAction(
-                            BuildingType.HUT, hex));
+                    builder.add(new PlaceBuildingAction(BuildingType.HUT, hex));
                 }
                 if (PlaceBuildingRules.validate(engine, BuildingType.TEMPLE, hex).isValid()) {
-                    builder.add(new PlaceBuildingAction(
-                            BuildingType.TEMPLE, hex));
+                    builder.add(new PlaceBuildingAction(BuildingType.TEMPLE, hex));
                 }
                 if (PlaceBuildingRules.validate(engine, BuildingType.TOWER, hex).isValid()) {
-                    builder.add(new PlaceBuildingAction(
-                            BuildingType.TOWER, hex));
+                    builder.add(new PlaceBuildingAction(BuildingType.TOWER, hex));
                 }
             }
         }
@@ -200,10 +186,6 @@ class EngineActions {
         FieldType leftFieldType = action.getLeftFieldType();
         FieldType rightFieldType = action.getRightFieldType();
 
-        if( engine.getStatus().getTurn() == 23
-                && action.getVolcanoHex().getLine() == -4
-                && action.getVolcanoHex().getDiag() == -1)
-            engine.getGamemode();
         // NB: Village do not implements hashCode/equals
         // This store them by identity instead of equality, which is what we want
         HashMultimap<Village, FieldType> villageExpansion = HashMultimap.create();

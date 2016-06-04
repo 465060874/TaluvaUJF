@@ -1,7 +1,5 @@
 package map;
 
-import com.google.common.collect.ImmutableList;
-
 /**
  * Les 6 directions possibles pour les voisins d'un hexagone (orienté pointe en haut)
  */
@@ -29,8 +27,6 @@ public enum Neighbor {
     SOUTH_WEST(1, -1),
 
     SOUTH_EAST(1, 0);
-
-    private static final ImmutableList<Neighbor> LIST = ImmutableList.copyOf(values());
 
     final int lineOffset;
     final int diagOffset;
@@ -72,9 +68,5 @@ public enum Neighbor {
         }
 
         throw new IllegalArgumentException();
-    }
-
-    public static ImmutableList<Neighbor> list() {
-        return LIST;
     }
 }

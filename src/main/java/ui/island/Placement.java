@@ -168,7 +168,7 @@ public class Placement {
 
     public void cycleTileOrientationOrBuildingType() {
         if (mode == Mode.TILE) {
-            tileOrientation = tileOrientation.clockWise();
+            tileOrientation = tileOrientation.nextClockWise();
             updateValidTile();
         }
         else if (mode == Mode.BUILDING) {

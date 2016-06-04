@@ -1,11 +1,9 @@
 package engine;
 
-import engine.action.PlaceBuildingAction;
 import engine.action.ExpandVillageAction;
+import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
-
-import java.util.List;
 
 public interface EngineObserver {
 
@@ -54,22 +52,27 @@ public interface EngineObserver {
     /**
      * Appelé quand une tuile est placé sur la mer
      */
-    void onTilePlacementOnSea(SeaTileAction action);
+    void onSeaTileAction(SeaTileAction action);
 
     /**
      * Appelé quand une tuile est placé sur un volcan
      */
-    void onTilePlacementOnVolcano(VolcanoTileAction action);
+    void onVolcanoTileAction(VolcanoTileAction action);
 
     /**
      * Appelé quand un batiment est construit
      */
-    void onBuild(PlaceBuildingAction action);
+    void onPlaceBuildingAction(PlaceBuildingAction action);
+
+    /**
+     * Appelé juste avant qu'une extension de village soit faite
+     */
+    void beforeExpandVillageAction(ExpandVillageAction action);
 
     /**
      * Appelé quand une extension de village est faite
      */
-    void onExpand(ExpandVillageAction action);
+    void onExpandVillageAction(ExpandVillageAction action);
 
     /**
      * Appelé en cas d'élimination
@@ -79,9 +82,7 @@ public interface EngineObserver {
     /**
      * Appelé en cas de victoire
      */
-    void onWin(EngineStatus.FinishReason reason, List<Player> winners);
-
-    void onBeforeExpand(ExpandVillageAction action);
+    void onWin(EngineStatus.Finished finished);
 
     abstract class Dummy implements EngineObserver {
 
@@ -118,19 +119,23 @@ public interface EngineObserver {
         }
 
         @Override
-        public void onTilePlacementOnSea(SeaTileAction action) {
+        public void onSeaTileAction(SeaTileAction action) {
         }
 
         @Override
-        public void onTilePlacementOnVolcano(VolcanoTileAction action) {
+        public void onVolcanoTileAction(VolcanoTileAction action) {
         }
 
         @Override
-        public void onBuild(PlaceBuildingAction action) {
+        public void onPlaceBuildingAction(PlaceBuildingAction action) {
         }
 
         @Override
-        public void onExpand(ExpandVillageAction action) {
+        public void beforeExpandVillageAction(ExpandVillageAction action) {
+        }
+
+        @Override
+        public void onExpandVillageAction(ExpandVillageAction action) {
         }
 
         @Override
@@ -138,7 +143,7 @@ public interface EngineObserver {
         }
 
         @Override
-        public void onWin(EngineStatus.FinishReason reason, List<Player> winners) {
+        public void onWin(EngineStatus.Finished finished) {
         }
     }
 }

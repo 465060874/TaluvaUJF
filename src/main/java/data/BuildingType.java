@@ -46,17 +46,4 @@ public enum BuildingType {
                 throw new IllegalArgumentException();
         }
     }
-
-    public BuildingType previousBuilding() {
-        switch(this) {
-            case HUT:
-                return TOWER;
-            case TEMPLE:
-                return HUT;
-            case TOWER:
-                return TEMPLE;
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
 }

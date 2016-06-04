@@ -9,7 +9,6 @@ import ui.island.Grid;
 
 public class BuildingShape {
 
-    private static final float STROKE_WIDTH = 1.2f;
     public static final Image EXPAND_IMAGE = new Image("ui/shape/expand.png");
 
     private void drawHut(GraphicsContext gc, Grid grid,
@@ -18,18 +17,6 @@ public class BuildingShape {
         double width = grid.getHexRadiusX() / 2;
         double height = hutImage.getHeight() / (hutImage.getWidth() / width);
         gc.drawImage(hutImage, x - width / 2, y - height / 2, width, height);
-
-        /*double hexRadiusX = grid.getHexRadiusX();
-        double hexRadiusY = grid.getHexRadiusY();
-        double x1 = x - hexRadiusX / 7;
-        double x2 = x;
-        double x3 = x + hexRadiusX / 7;
-        double y1 = y - hexRadiusY / 4;
-        double y2 = y - hexRadiusY / 10;
-        double y3 = y + hexRadiusY / 10;
-        double y4 = y + hexRadiusY / 4;
-
-        drawTentShape(gc, grid, x1, x2, x3, y1, y2, y3, y4, building, style);*/
     }
 
     private void drawTemple(GraphicsContext gc, Grid grid,
@@ -54,6 +41,7 @@ public class BuildingShape {
                      double x, double y, int level, Building building, BuildingStyle style) {
         if (style == BuildingStyle.EXPAND) {
             gc.drawImage(EXPAND_IMAGE, x-34, y-24);
+            return;
         }
 
         double hexHeight = grid.getHexHeight();
