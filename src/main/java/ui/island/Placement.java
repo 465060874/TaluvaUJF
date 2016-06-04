@@ -164,6 +164,9 @@ public class Placement {
         else {
             placementOverlay.redraw();
         }
+
+        this.problem = Problem.NONE;
+        hud.updateProblems();
     }
 
     public void cycleTileOrientationOrBuildingType() {

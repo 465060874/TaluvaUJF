@@ -219,6 +219,10 @@ class EngineImpl implements Engine {
     public void redoUntil(Predicate<Engine> predicate) {
         checkState(status != EngineStatus.PENDING_START);
 
+        if (redoList.isEmpty()) {
+            return;
+        }
+
         playerTurn.cancel();
         boolean volcanoTileStackChanged = false;
         while (!redoList.isEmpty()) {
@@ -243,19 +247,25 @@ class EngineImpl implements Engine {
             observers.forEach(EngineObserver::onTileStackChange);
         }
 
-        actions.updateAll();
-        observers.forEach(status.getStep() == EngineStatus.TurnStep.TILE
-                ? EngineObserver::onTileStepStart
-                : EngineObserver::onBuildStepStart);
+        if (status instanceof EngineStatus.Running) {
+            actions.updateAll();
+            observers.forEach(status.getStep() == EngineStatus.TurnStep.TILE
+                    ? EngineObserver::onTileStepStart
+                    : EngineObserver::onBuildStepStart);
 
-        if (status instanceof EngineStatus.Running
-                && status.getStep() == EngineStatus.TurnStep.BUILD
-                && !getCurrentPlayer().isHuman()) {
-            // Hack, let's the IA starts from the tileStep
-            cancelLastStep();
+            if (status.getStep() == EngineStatus.TurnStep.BUILD
+                    && !getCurrentPlayer().isHuman()) {
+                // Hack, let's the IA starts from the tileStep
+                cancelLastStep();
+            } else {
+                this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, status.getStep());
+            }
         }
         else {
-            this.playerTurn = getCurrentPlayer().getHandler().startTurn(this, status.getStep());
+            observers.forEach(status.getStep() == EngineStatus.TurnStep.TILE
+                    ? EngineObserver::onTileStepStart
+                    : EngineObserver::onBuildStepStart);
+            observers.forEach(o -> o.onWin((EngineStatus.Finished) status));
         }
     }
 
@@ -305,10 +315,7 @@ class EngineImpl implements Engine {
         verify(remainingPlayers.size() > 0);
 
         if (remainingPlayers.size() == 1) {
-            this.status = (running()).finished(
-                    EngineStatus.FinishReason.LAST_STANDING,
-                    remainingPlayers);
-            observers.forEach(o -> o.onWin(EngineStatus.FinishReason.LAST_STANDING, remainingPlayers));
+            finish(EngineStatus.FinishReason.LAST_STANDING, remainingPlayers);
         }
         else {
             nextStep();
@@ -322,11 +329,7 @@ class EngineImpl implements Engine {
             return false;
         }
 
-        List<Player> winners = winnersByScore();
-        this.status = (running()).finished(
-                EngineStatus.FinishReason.NO_MORE_TILES,
-                winners);
-        observers.forEach(o -> o.onWin(EngineStatus.FinishReason.NO_MORE_TILES, winners));
+        finish(EngineStatus.FinishReason.NO_MORE_TILES, winnersByScore());
         return true;
     }
 
@@ -446,7 +449,7 @@ class EngineImpl implements Engine {
 
         island.putTile(volcanoTileStack.current(), action.getVolcanoHex(), action.getOrientation());
 
-        observers.forEach(o -> o.onTilePlacementOnSea(action));
+        observers.forEach(o -> o.onSeaTileAction(action));
         nextStep();
     }
 
@@ -470,7 +473,7 @@ class EngineImpl implements Engine {
 
         island.putTile(volcanoTileStack.current(), action.getVolcanoHex(), action.getOrientation());
 
-        observers.forEach(o -> o.onTilePlacementOnVolcano(action));
+        observers.forEach(o -> o.onVolcanoTileAction(action));
         nextStep();
     }
 
@@ -496,7 +499,7 @@ class EngineImpl implements Engine {
         int buildingCount = island.getField(action.getHex()).getBuildingCount();
         getCurrentPlayer().decreaseBuildingCount(action.getType(), buildingCount);
 
-        observers.forEach(o -> o.onBuild(action));
+        observers.forEach(o -> o.onPlaceBuildingAction(action));
         checkBuildingCounts();
     }
 
@@ -521,7 +524,7 @@ class EngineImpl implements Engine {
         int buildingCount = 0;
         Village village = getIsland().getVillage(action.getVillageHex());
 
-        observers.forEach(o -> o.onBeforeExpand(action));
+        observers.forEach(o -> o.beforeExpandVillageAction(action));
 
         for (Hex hex : village.getExpandableHexes().get(action.getFieldType())) {
             island.putBuilding(hex, building);
@@ -529,7 +532,7 @@ class EngineImpl implements Engine {
         }
         getCurrentPlayer().decreaseBuildingCount(BuildingType.HUT, buildingCount);
 
-        observers.forEach(o -> o.onExpand(action));
+        observers.forEach(o -> o.onExpandVillageAction(action));
         checkBuildingCounts();
     }
 
@@ -541,26 +544,26 @@ class EngineImpl implements Engine {
             Player teammate = players.get((playerIndex + 2) % players.size());
             int teammateRemainingBuildingTypes = remainingBuildingTypeCount(teammate);
             if (remainingBuildingTypes + teammateRemainingBuildingTypes <= 3) {
-                ImmutableList<Player> winners = ImmutableList.of(player, teammate);
-                this.status = running().finished(
-                        EngineStatus.FinishReason.TEAM_THREE_BUILDING_TYPES,
-                        winners);
-                observers.forEach(o -> o.onWin(EngineStatus.FinishReason.TWO_BUILDING_TYPES, winners));
+                finish(EngineStatus.FinishReason.TEAM_THREE_BUILDING_TYPES, ImmutableList.of(player, teammate));
                 return;
             }
         }
         else {
             if (remainingBuildingTypes <= 1) {
-                ImmutableList<Player> winners = ImmutableList.of(player);
-                this.status = running().finished(
-                        EngineStatus.FinishReason.TWO_BUILDING_TYPES,
-                        winners);
-                observers.forEach(o -> o.onWin(EngineStatus.FinishReason.TWO_BUILDING_TYPES, winners));
+                finish(EngineStatus.FinishReason.TWO_BUILDING_TYPES, ImmutableList.of(player));
                 return;
             }
         }
 
         nextStep();
+    }
+
+    private void finish(EngineStatus.FinishReason reason, List<Player> winners) {
+        EngineStatus.Finished finished = running().finished(
+                reason,
+                winners);
+        this.status = finished;
+        observers.forEach(o -> o.onWin(finished));
     }
 
     private int remainingBuildingTypeCount(Player player) {
