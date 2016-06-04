@@ -12,11 +12,11 @@ public class Player {
 
     private final PlayerColor color;
     private final int[] buildings;
-    private final PlayerHandler playerHandler;
+    private final PlayerHandler handler;
     boolean eliminated;
 
-    Player(PlayerColor color, PlayerHandler playerHandler) {
-        this.playerHandler = playerHandler;
+    Player(PlayerColor color, PlayerHandler handler) {
+        this.handler = handler;
         this.buildings = new int[BuildingType.values().length - 1];
         for (BuildingType type : BuildingType.values()) {
             if (type != BuildingType.NONE) {
@@ -27,11 +27,11 @@ public class Player {
         this.eliminated = false;
     }
 
-    private Player(Player player, PlayerHandler playerHandler) {
+    private Player(Player player, PlayerHandler handler) {
         this.color = player.color;
         this.buildings = new int[player.buildings.length];
         System.arraycopy(player.buildings, 0, buildings, 0, buildings.length);
-        this.playerHandler = playerHandler;
+        this.handler = handler;
         this.eliminated = false;
     }
 
@@ -58,11 +58,15 @@ public class Player {
     }
 
     public boolean isHuman() {
-        return playerHandler.isHuman();
+        return handler.isHuman();
     }
 
     public PlayerHandler getHandler() {
-        return playerHandler;
+        return handler;
+    }
+
+    public Player copy() {
+        return new Player(this, handler);
     }
 
     public Player copyWithDummyHandler() {

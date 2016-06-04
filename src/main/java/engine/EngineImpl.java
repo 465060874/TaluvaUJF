@@ -37,7 +37,7 @@ class EngineImpl implements Engine {
 
     private final Gamemode gamemode;
     private final Island island;
-    final ImmutableList<Player> players;
+    ImmutableList<Player> players;
     private final VolcanoTileStack volcanoTileStack;
 
     EngineStatus status;

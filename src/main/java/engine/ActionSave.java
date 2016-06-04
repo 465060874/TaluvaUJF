@@ -19,18 +19,18 @@ import java.util.Map;
 abstract class ActionSave {
 
     private final EngineStatus status;
-    final Player player;
-    private final boolean[] eliminated;
+    private final int playerIndex;
+    private final ImmutableList<Player> players;
 
     protected ActionSave(EngineImpl engine) {
         this.status = engine.status;
-        this.player = engine.getCurrentPlayer();
+        this.playerIndex = engine.playerIndex;
 
-        this.eliminated = new boolean[engine.players.size()];
-        for (int i = 0; i < engine.players.size(); i++) {
-            Player player = engine.players.get(i);
-            eliminated[i] = player.isEliminated();
+        ImmutableList.Builder<Player> playersBuilder = ImmutableList.builder();
+        for (Player player : engine.players) {
+            playersBuilder.add(player.copy());
         }
+        this.players = playersBuilder.build();
     }
 
     /**
@@ -42,11 +42,8 @@ abstract class ActionSave {
 
     void commonRevert(EngineImpl engine) {
         engine.status = status;
-        ImmutableList<Player> players = engine.players;
-        for (int i = 0; i < players.size(); i++) {
-            Player player = players.get(i);
-            player.eliminated = eliminated[i];
-        }
+        engine.playerIndex = playerIndex;
+        engine.players = players;
     }
 
     static class Tile extends ActionSave {
@@ -87,14 +84,12 @@ abstract class ActionSave {
 
     static class Build extends ActionSave {
 
-        private final int playerIndex;
         private final ImmutableMap<Hex, Field> islandDiff;
         private final BuildingType buildingType;
         private final int buildingCount;
 
         Build(EngineImpl engine, PlaceBuildingAction action) {
             super(engine);
-            this.playerIndex = engine.playerIndex;
 
             Field field = engine.getIsland().getField(action.getHex());
             this.islandDiff = ImmutableMap.of(action.getHex(), field);
@@ -104,7 +99,6 @@ abstract class ActionSave {
 
         Build(EngineImpl engine, ExpandVillageAction action) {
             super(engine);
-            this.playerIndex = engine.playerIndex;
 
             ImmutableMap.Builder<Hex, Field> islandsDiffBuilder = ImmutableMap.builder();
             Village village = engine.getIsland().getVillage(action.getVillageHex());
@@ -115,12 +109,11 @@ abstract class ActionSave {
 
             this.islandDiff = islandsDiffBuilder.build();
             this.buildingType = BuildingType.HUT;
-            this.buildingCount = player.getBuildingCount(BuildingType.HUT);
+            this.buildingCount = engine.getCurrentPlayer().getBuildingCount(BuildingType.HUT);
         }
 
         public Build(EngineImpl engine, Build build) {
             super(engine);
-            this.playerIndex = engine.playerIndex;
             this.buildingType = build.buildingType;
             this.buildingCount = engine.getCurrentPlayer().getBuildingCount(buildingType);
 
@@ -141,8 +134,7 @@ abstract class ActionSave {
                 engine.getIsland().putField(entry.getKey(), entry.getValue());
             }
 
-            player.updateBuildingCount(buildingType, buildingCount);
-            engine.playerIndex = playerIndex;
+            engine.getCurrentPlayer().updateBuildingCount(buildingType, buildingCount);
 
             return reverse;
         }
