@@ -26,9 +26,9 @@ public class PlayerView extends Canvas {
     static final int WIDTH_NOT_TURN = (int) (2.0 * WIDTH_TURN / 3.0);
     static final int HEIGHT_NOT_TURN = (int) (2.0 * HEIGHT_TURN / 3.0);
 
-    private static final int LIGHT_MIN_Z = 300;
+    private static final int LIGHT_MIN_Z = 150;
     private static final int LIGHT_MAX_Z = 700;
-    private static final int LIGHT_DIFF_Z = 20;
+    private static final int LIGHT_DIFF_Z = 25;
 
     private final Engine engine;
     private final int index;
