@@ -16,7 +16,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import map.Building;
-import menu.Home4;
+import menu.HomeVF;
 import menu.data.MenuData;
 import ui.island.IslandSnapshot;
 import util.FxUncaughtExceptionHandler;
@@ -72,7 +72,7 @@ public class GameApp extends Application {
     }
 
     private void goHome(ActionEvent actionEvent) {
-        Home4 home = new Home4();
+        HomeVF home = new HomeVF();
         home.start(stage);
     }
 

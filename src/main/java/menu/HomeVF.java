@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * Created by zhaon on 25/05/16.
  */
-public class Home4 extends Application {
+public class HomeVF extends Application {
 
     static double size_ratio = 580.0 / 800.0;
     static int hauteurScene = 600;
@@ -87,7 +87,7 @@ public class Home4 extends Application {
 
 
 
-    public Home4() {
+    public HomeVF() {
         this.menuData = MenuData.load();
     }
 

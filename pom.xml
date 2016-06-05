@@ -47,7 +47,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>menu.Home4</mainClass>
+                            <mainClass>menu.HomeVF</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
