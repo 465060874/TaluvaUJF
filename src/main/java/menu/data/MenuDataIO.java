@@ -10,8 +10,6 @@ import javafx.scene.image.Image;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
@@ -21,7 +19,6 @@ class MenuDataIO {
 
     private static final File FILE = new File("menu.data");
     private static final Charset CHARSET = StandardCharsets.UTF_8;
-    private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM HH:mm");
 
     static MenuData load() {
         Properties properties = new Properties();
@@ -51,7 +48,7 @@ class MenuDataIO {
         for (File file : saveFiles) {
             String basename = file.getName().split("\\.")[0];
             long millis = Long.parseLong(basename);
-            String date = DATE_FORMATTER.format(new Date(millis));
+            Date date = new Date(millis);
             File imageFile = new File(file.getParent(), basename + ".png");
             try {
                 Image image = new Image(new FileInputStream(imageFile));

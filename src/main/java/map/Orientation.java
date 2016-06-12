@@ -18,45 +18,33 @@ package map;
  */
 public enum Orientation {
 
-    NORTH,
+    NORTH(Neighbor.SOUTH_WEST, Neighbor.SOUTH_EAST),
 
-    NORTH_WEST,
+    NORTH_WEST(Neighbor.SOUTH_EAST, Neighbor.EAST),
 
-    SOUTH_WEST,
+    SOUTH_WEST(Neighbor.EAST, Neighbor.NORTH_EAST),
 
-    SOUTH,
+    SOUTH(Neighbor.NORTH_EAST, Neighbor.NORTH_WEST),
 
-    SOUTH_EAST,
+    SOUTH_EAST(Neighbor.NORTH_WEST, Neighbor.WEST),
 
-    NORTH_EAST,
+    NORTH_EAST(Neighbor.WEST, Neighbor.SOUTH_WEST),
     ;
 
+    final Neighbor leftNeighbor;
+    final Neighbor rightNeighbor;
+
+    Orientation(Neighbor leftNeighbor, Neighbor rightNeighbor) {
+        this.leftNeighbor = leftNeighbor;
+        this.rightNeighbor = rightNeighbor;
+    }
+
     public Orientation leftRotation() {
-         switch (this) {
-            case NORTH:      return SOUTH_WEST;
-            case SOUTH_WEST: return SOUTH_EAST;
-            case SOUTH_EAST: return NORTH;
-
-            case SOUTH:      return NORTH_EAST;
-            case NORTH_WEST: return SOUTH;
-            case NORTH_EAST: return NORTH_WEST;
-        }
-
-        throw new IllegalArgumentException();
+        return values()[(ordinal() + 2) % values().length];
     }
 
     public Orientation rightRotation() {
-        switch (this) {
-            case NORTH:      return SOUTH_EAST;
-            case SOUTH_WEST: return NORTH;
-            case SOUTH_EAST: return SOUTH_WEST;
-
-            case SOUTH:      return NORTH_WEST;
-            case NORTH_WEST: return NORTH_EAST;
-            case NORTH_EAST: return SOUTH;
-        }
-
-        throw new IllegalArgumentException();
+        return values()[(ordinal() + values().length - 2) % values().length];
     }
 
     public Orientation nextClockWise() {

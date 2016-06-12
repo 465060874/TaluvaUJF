@@ -25,7 +25,6 @@ public class EngineRuns {
                     .player(PlayerColor.WHITE, IA.MOYEN)
                     .build();
 
-            engine.logger().info("* Début de la partie avec la graine {0}", Long.toString(engine.getSeed()));
             long startTime = System.nanoTime();
             engine.start();
 

@@ -31,8 +31,10 @@ public class SeaTileRules {
     }
 
     private static Problem checkOnSea(Island island, ImmutableSet<Hex> hexes) {
-        if (hexes.stream().map(island::getField).anyMatch(f -> f != Field.SEA)) {
-            return NOT_ALL_ON_SEA;
+        for (Hex hex : hexes) {
+            if (island.getField(hex) != Field.SEA) {
+                return NOT_ALL_ON_SEA;
+            }
         }
 
         return NONE;

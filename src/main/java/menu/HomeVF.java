@@ -1,5 +1,6 @@
 package menu;
 
+import com.sun.glass.ui.Screen;
 import data.PlayerColor;
 import ia.IA;
 import javafx.application.Application;
@@ -362,7 +363,7 @@ public class HomeVF extends Application {
             //vBoxoptionsCharger.setPrefHeight(100);
 
             for (SavedGame savedGame : menuData.getSavedGames()) {
-                ToggleButton savedButton = new ToggleButton(savedGame.getDate());
+                ToggleButton savedButton = new ToggleButton(savedGame.getFormattedDate());
                 savedButton.setPrefWidth(120);
                 savedButton.setToggleGroup(reprendreToggle);
                 savedButton.setUserData(savedGame);
@@ -468,12 +469,13 @@ public class HomeVF extends Application {
 
         root.getChildren().add(vBoxScene);
 
-        if (stage.isShowing()) {
-            stage.setX(stage.getX() - (scene.getWidth() - stage.getWidth()) / 2);
-            stage.setY(stage.getY() - (scene.getHeight() - stage.getHeight()) / 2);
-        }
         stage.setWidth(scene.getWidth());
         stage.setHeight(scene.getHeight() + 36);
+        if (stage.isShowing()) {
+            stage.setX((Screen.getMainScreen().getVisibleWidth() - stage.getWidth()) / 2);
+            stage.setY((Screen.getMainScreen().getVisibleHeight() - stage.getHeight()) / 2);
+        }
+
         stage.setResizable(false);
         stage.setScene(scene);
         if (!stage.isShowing()) {

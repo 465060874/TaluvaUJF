@@ -172,7 +172,7 @@ class Villages {
         return new Villages(this, island);
     }
 
-    class VillageImpl2 implements Village {
+    private class VillageImpl2 implements Village {
 
         private final Island island;
         private final PlayerColor color;

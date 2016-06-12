@@ -45,28 +45,10 @@ public enum Neighbor {
     }
 
     public static Neighbor leftOf(Orientation orientation) {
-        switch (orientation) {
-            case NORTH:      return Neighbor.SOUTH_WEST;
-            case NORTH_EAST: return Neighbor.WEST;
-            case SOUTH_EAST: return Neighbor.NORTH_WEST;
-            case SOUTH:      return Neighbor.NORTH_EAST;
-            case SOUTH_WEST: return Neighbor.EAST;
-            case NORTH_WEST: return Neighbor.SOUTH_EAST;
-        }
-
-        throw new IllegalArgumentException();
+        return orientation.leftNeighbor;
     }
 
     public static Neighbor rightOf(Orientation orientation) {
-        switch (orientation) {
-            case NORTH:      return Neighbor.SOUTH_EAST;
-            case NORTH_EAST: return Neighbor.SOUTH_WEST;
-            case SOUTH_EAST: return Neighbor.WEST;
-            case SOUTH:      return Neighbor.NORTH_WEST;
-            case SOUTH_WEST: return Neighbor.NORTH_EAST;
-            case NORTH_WEST: return Neighbor.EAST;
-        }
-
-        throw new IllegalArgumentException();
+        return orientation.rightNeighbor;
     }
 }

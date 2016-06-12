@@ -29,13 +29,6 @@ public class HexTest {
     public void testGetNeighbor() {
         Hex origin = Hex.at(ORIGIN,ORIGIN);
 
-        Hex hexWestExpected = Hex.at(ORIGIN, ORIGIN -1);
-        Hex hexNorthWestExpected = Hex.at(ORIGIN -1, ORIGIN);
-        Hex hexNorthEastExpected = Hex.at(ORIGIN -1, ORIGIN + 1);
-        Hex hexEastExpected = Hex.at(ORIGIN, ORIGIN + 1);
-        Hex hexSouthEastExpected = Hex.at(ORIGIN + 1, ORIGIN);
-        Hex hexSouthWestExpected = Hex.at(ORIGIN + 1, ORIGIN - 1);
-
         Hex hexWest = origin.getNeighbor(Neighbor.WEST);
         Hex hexNorthWest = origin.getNeighbor(Neighbor.NORTH_WEST);
         Hex hexNorthEast = origin.getNeighbor(Neighbor.NORTH_EAST);
@@ -43,12 +36,12 @@ public class HexTest {
         Hex hexSouthEast = origin.getNeighbor(Neighbor.SOUTH_EAST);
         Hex hexSouthWest = origin.getNeighbor(Neighbor.SOUTH_WEST);
 
-        assertEquals(hexWestExpected, hexWest);
-        assertEquals(hexNorthWestExpected, hexNorthWest);
-        assertEquals(hexNorthEastExpected, hexNorthEast);
-        assertEquals(hexEastExpected, hexEast);
-        assertEquals(hexSouthEastExpected, hexSouthEast);
-        assertEquals(hexSouthWestExpected, hexSouthWest);
+        assertEquals(Hex.at(ORIGIN, ORIGIN -1),      hexWest);
+        assertEquals(Hex.at(ORIGIN -1, ORIGIN),      hexNorthWest);
+        assertEquals(Hex.at(ORIGIN -1, ORIGIN + 1),  hexNorthEast);
+        assertEquals(Hex.at(ORIGIN, ORIGIN + 1),     hexEast);
+        assertEquals(Hex.at(ORIGIN + 1, ORIGIN),     hexSouthEast);
+        assertEquals(Hex.at(ORIGIN + 1, ORIGIN - 1), hexSouthWest);
     }
 
     @Test

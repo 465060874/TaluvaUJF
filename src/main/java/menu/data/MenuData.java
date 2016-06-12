@@ -109,12 +109,12 @@ public class MenuData {
     private PlayerColor otherColor(PlayerColor soloColor) {
         Random rand = new Random();
         PlayerColor[] colors = PlayerColor.values();
-        while (true) {
-            PlayerColor color = colors[rand.nextInt(colors.length)];
-            if (color != soloColor) {
-                return color;
-            }
+        PlayerColor otherColor = soloColor;
+        while (otherColor == soloColor) {
+            otherColor = colors[rand.nextInt(colors.length)];
         }
+
+        return otherColor;
     }
 
     private EngineBuilder multiEngineBuilder(PlayerHandler uiPlayerHandler) {

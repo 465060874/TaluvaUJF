@@ -12,6 +12,8 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
@@ -59,6 +61,7 @@ public class GameApp extends Application {
         gameView.getSaveButton().setOnAction(this::save);
 
         this.scene = new Scene(gameView, 800, 600);
+        scene.setOnKeyReleased(this::fullscreen);
         stage.setResizable(true);
         stage.setX(Math.max(0, stage.getX() - (scene.getWidth() - stage.getWidth()) / 2));
         stage.setY(Math.max(0, stage.getY() - (scene.getHeight() - stage.getHeight()) / 2));
@@ -69,6 +72,11 @@ public class GameApp extends Application {
         if (!stage.isShowing()) {
             stage.show();
         }
+    }
+
+    private void fullscreen(KeyEvent event) {
+        if (event.getCode() == KeyCode.F)
+            stage.setFullScreen(true);
     }
 
     private void goHome(ActionEvent actionEvent) {

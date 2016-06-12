@@ -11,18 +11,28 @@ import java.util.Set;
  */
 public class Hex {
 
-    // On conserver les instances allouées (à la demande)
-    // dans ce tableau, le différence en terme de vitesse
+    // On conserve certaines instances allouées (à la demande)
+    // dans ce tableau, la différence en terme de vitesse
     // d'éxecution est infime, mais celle de la consommation
     // mémoire est notable.
-    private static final Hex[] HEXES = new Hex[40000];
+    private static final int MIN_LINE = -20;
+    private static final int MAX_LINE = 20;
+    private static final int MIN_DIAG = -20;
+    private static final int MAX_DIAG = 20;
+    private static final Hex[] HEXES = new Hex[(MAX_LINE - MIN_LINE) * (MAX_DIAG - MIN_DIAG)];
 
     public static Hex at(int line, int diag) {
-        int index = (line + 100) * 200 + (diag + 100);
-        Hex hex = HEXES[index];
-        return hex == null
-                ? HEXES[index] = new Hex(line, diag)
-                : hex;
+        if (line >= MIN_LINE && line < MAX_LINE
+                && diag >= MIN_DIAG && diag < MAX_DIAG) {
+            int index = (line - MIN_LINE) * (MAX_DIAG - MIN_DIAG) + (diag + MIN_DIAG);
+            Hex hex = HEXES[index];
+            return hex == null
+                    ? HEXES[index] = new Hex(line, diag)
+                    : hex;
+        }
+        else {
+            return new Hex(line, diag);
+        }
     }
 
     private final int line;
@@ -72,11 +82,19 @@ public class Hex {
         return hash;
     }
 
-    // Equals is identity
-    // @Override
-    // public boolean equals(Object obj) {
-    //     return this == obj;
-    // }
+    @Override
+    public boolean equals(Object obj) {
+         if (this == obj) {
+             return true;
+         }
+
+        if (!(obj instanceof Hex)) {
+            return false;
+        }
+
+        Hex other = (Hex) obj;
+        return line == other.line && diag == other.diag;
+    }
 
     @Override
     public String toString() {
