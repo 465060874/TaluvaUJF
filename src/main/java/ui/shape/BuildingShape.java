@@ -13,8 +13,21 @@ public class BuildingShape {
 
     private void drawHut(GraphicsContext gc, Grid grid,
                          double x, double y, Building building, BuildingStyle style) {
-        Image hutImage = PlayerTheme.of(building.getColor()).getHutImage();
+        Image hutImage;
         double width = grid.getHexRadiusX() / 2;
+        switch (style) {
+            case INVALID:
+                width *= 1.51;
+                hutImage = PlayerTheme.of(building.getColor()).getHutImageInterdit();
+                break;
+            case FLOATING:
+                hutImage = PlayerTheme.of(building.getColor()).getHutSansOmbreImage();
+                break;
+            default:
+                hutImage = PlayerTheme.of(building.getColor()).getHutImage();
+                break;
+        }
+
         double height = hutImage.getHeight() / (hutImage.getWidth() / width);
         gc.drawImage(hutImage, x - width / 2, y - height / 2, width, height);
     }
@@ -22,7 +35,19 @@ public class BuildingShape {
     private void drawTemple(GraphicsContext gc, Grid grid,
             double x, double y, Building building, BuildingStyle style) {
         y -= 10 * grid.getScale();
-        Image templeImage = PlayerTheme.of(building.getColor()).getTempleImage();
+        Image templeImage;
+        switch (style) {
+            case INVALID:
+                templeImage = PlayerTheme.of(building.getColor()).getTempleImageInterdit();
+                break;
+            case FLOATING:
+                templeImage = PlayerTheme.of(building.getColor()).getTempleSansOmbreImage();
+                break;
+            default:
+                templeImage = PlayerTheme.of(building.getColor()).getTempleImage();
+                break;
+        }
+
         double width = 1.5 * grid.getHexRadiusX();
         double height = templeImage.getHeight() / (templeImage.getWidth() / width);
         gc.drawImage(templeImage, x - width / 2, y - height / 2, width, height);
@@ -31,7 +56,20 @@ public class BuildingShape {
     private void drawTower(GraphicsContext gc, Grid grid,
             double x, double y, Building building, BuildingStyle style) {
         y -= 30 * grid.getScale();
-        Image towerImage = PlayerTheme.of(building.getColor()).getTowerImage();
+
+        Image towerImage;
+        switch (style) {
+            case INVALID:
+                towerImage = PlayerTheme.of(building.getColor()).getTowerImageInterdit();
+                break;
+            case FLOATING:
+                towerImage = PlayerTheme.of(building.getColor()).getTowerSansOmbreImage();
+                break;
+            default:
+                towerImage = PlayerTheme.of(building.getColor()).getTowerImage();
+                break;
+        }
+
         double width = 4 * grid.getHexRadiusX() / 5;
         double height = towerImage.getHeight() / (towerImage.getWidth() / width);
         gc.drawImage(towerImage, x - width / 2, y - height / 2, width, height);
