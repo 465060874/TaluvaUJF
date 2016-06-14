@@ -1,5 +1,6 @@
 package map;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
@@ -39,7 +40,8 @@ public class Hex {
     private final int diag;
     private final int hash;
 
-    private Hex(int line, int diag) {
+    @VisibleForTesting
+    protected Hex(int line, int diag) {
         this.line = line;
         this.diag = diag;
         this.hash = 17*17 + 17 * line + diag;

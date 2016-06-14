@@ -22,8 +22,6 @@ public interface HexMap<E> {
 
     Set<Hex> hexes();
 
-    Iterable<E> values();
-
     HexMap<E> copy();
 
     double getHashFactor();

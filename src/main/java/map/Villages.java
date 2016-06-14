@@ -7,9 +7,7 @@ import data.BuildingType;
 import data.FieldType;
 import data.PlayerColor;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,22 +24,23 @@ class Villages {
     // map contains two type of objects :
     //   - An instance of Hex which is the parent of this hex in the union find
     //   - An instance of VillageImple2 (if the key Hex is a top-level parent)
-    private final Map<Hex, Object> map;
+    private final HexMap<Object> map;
 
     Villages(Island island) {
         this.island = island;
-        this.map = new HashMap<>(HexMapImpl.INITIAL_CAPACITY);
+        this.map = HexMap.create();
     }
 
     Villages(Villages villages, Island island) {
         this.island = island;
-        this.map = new HashMap<>();
-        for (Map.Entry<Hex, Object> entry : villages.map.entrySet()) {
-            if (entry.getValue() instanceof VillageImpl2) {
-                map.put(entry.getKey(), new VillageImpl2(island, (VillageImpl2) entry.getValue()));
+        this.map = HexMap.create();
+        for (Hex hex : villages.map.hexes()) {
+            Object value = villages.map.get(hex);
+            if (value instanceof VillageImpl2) {
+                map.put(hex, new VillageImpl2(island, (VillageImpl2) value));
             }
             else {
-                map.put(entry.getKey(), entry.getValue());
+                map.put(hex, value);
             }
         }
     }
@@ -94,12 +93,13 @@ class Villages {
     Village get(Hex hex) {
         checkArgument(island.getField(hex).hasBuilding(),
                 "Requesting village for a hex without a building");
-        checkState(map.containsKey(hex), "Something has gone wrong");
+        checkState(map.hexes().contains(hex), "Something has gone wrong");
         return (VillageImpl2) map.get(find(hex));
     }
 
     Iterable<Village> getAll(PlayerColor color) {
-        return map.values().stream()
+        return map.hexes().stream()
+                .map(map::get)
                 .filter(o -> o instanceof VillageImpl2)
                 .map(o -> (VillageImpl2) o)
                 .filter(v -> v.getColor() == color)
@@ -127,9 +127,9 @@ class Villages {
     void reset(Hex... hexes) {
         Set<Hex> hexesToUpdate = new HashSet<>();
         for (Hex hex : hexes) {
-            if (map.containsKey(hex)) {
+            if (map.hexes().contains(hex)) {
                 Hex root = find(hex);
-                checkState(map.containsKey(root), "Something has gone wrong");
+                checkState(map.hexes().contains(root), "Something has gone wrong");
                 Village village = (VillageImpl2) map.get(root);
 
                 if (!hexesToUpdate.contains(hex)) {
