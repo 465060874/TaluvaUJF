@@ -58,7 +58,7 @@ abstract class ActionSave {
                     placement.getRightHex(), engine.getIsland().getField(placement.getRightHex()));
         }
 
-        public Tile(EngineImpl engine, Tile tile) {
+        private Tile(EngineImpl engine, Tile tile) {
             super(engine);
 
             ImmutableMap.Builder<Hex, Field> builder = ImmutableMap.builder();
@@ -112,7 +112,7 @@ abstract class ActionSave {
             this.buildingCount = engine.getCurrentPlayer().getBuildingCount(BuildingType.HUT);
         }
 
-        public Build(EngineImpl engine, Build build) {
+        private Build(EngineImpl engine, Build build) {
             super(engine);
             this.buildingType = build.buildingType;
             this.buildingCount = engine.getCurrentPlayer().getBuildingCount(buildingType);

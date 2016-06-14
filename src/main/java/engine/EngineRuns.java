@@ -1,7 +1,7 @@
 package engine;
 
-import ia.IA;
 import data.PlayerColor;
+import ia.IA;
 
 import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
@@ -12,7 +12,7 @@ import java.util.logging.Level;
  */
 public class EngineRuns {
 
-    private static final int COUNT = 1000;
+    private static final int COUNT = 50;
 
     public static void main(String[] args) {
         double hashFactorSum = 0;

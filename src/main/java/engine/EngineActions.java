@@ -14,7 +14,10 @@ import engine.rules.SeaTileRules;
 import engine.rules.VolcanoTileRules;
 import map.*;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Cette classe s'occupe d'analyser tous les coups jouables à un instant donné
@@ -189,9 +192,8 @@ class EngineActions {
         PlayerColor color = engine.getCurrentPlayer().getColor();
         Hex leftHex = action.getLeftHex();
         Hex rightHex = action.getRightHex();
-        VolcanoTile tile = engine.getVolcanoTileStack().current();
-        FieldType leftFieldType = tile.getLeft();
-        FieldType rightFieldType = tile.getRight();
+        FieldType leftFieldType = island.getField(leftHex).getType();
+        FieldType rightFieldType = island.getField(rightHex).getType();
 
         // NB: Village do not implements hashCode/equals
         // This store them by identity instead of equality, which is what we want
