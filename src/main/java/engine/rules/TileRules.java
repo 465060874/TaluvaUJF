@@ -1,7 +1,6 @@
 package engine.rules;
 
 import data.FieldType;
-import data.VolcanoTile;
 import map.Field;
 import map.Hex;
 import map.Island;
@@ -9,13 +8,13 @@ import map.Orientation;
 
 public class TileRules {
 
-    public static Problem validate(Island island, VolcanoTile tile, Hex hex, Orientation orientation) {
+    public static Problem validate(Island island, Hex hex, Orientation orientation) {
         Field field = island.getField(hex);
         if (field == Field.SEA) {
-            return SeaTileRules.validate(island, tile, hex, orientation);
+            return SeaTileRules.validate(island, hex, orientation);
         }
         else if (field.getType() == FieldType.VOLCANO) {
-            return VolcanoTileRules.validate(island, tile, hex, orientation);
+            return VolcanoTileRules.validate(island, hex, orientation);
         }
         else {
             return Problem.NOT_ON_SEA_OR_VOLCANO;

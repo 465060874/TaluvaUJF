@@ -100,8 +100,8 @@ public class Placement {
         if (mode == Mode.TILE) {
 
             return engine.getIsland().getField(hex) == Field.SEA
-                    ? new SeaTileAction(tile, hex, tileOrientation)
-                    : new VolcanoTileAction(tile, hex, tileOrientation);
+                    ? new SeaTileAction(hex, tileOrientation)
+                    : new VolcanoTileAction(hex, tileOrientation);
         }
         else if (mode == Mode.BUILDING) {
             return new PlaceBuildingAction(buildingType, hex);
@@ -216,7 +216,7 @@ public class Placement {
 
     private void updateValidTile() {
         boolean wasValid = isValid();
-        problem = TileRules.validate(engine.getIsland(), tile, hex, tileOrientation);
+        problem = TileRules.validate(engine.getIsland(), hex, tileOrientation);
         hud.updateProblems();
 
         redrawWhatsNecessary(wasValid);

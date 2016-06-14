@@ -1,19 +1,16 @@
 package engine.rules;
 
 import com.google.common.collect.ImmutableSet;
-import data.VolcanoTile;
 import map.Field;
 import map.Hex;
 import map.Island;
 import map.Orientation;
 
 import static engine.rules.Problem.*;
-import static engine.rules.Problem.NONE;
-import static engine.rules.Problem.NOT_ALL_ON_SEA;
 
 public class SeaTileRules {
 
-    public static Problem validate(Island island, VolcanoTile tile, Hex volcanoHex, Orientation orientation) {
+    public static Problem validate(Island island, Hex volcanoHex, Orientation orientation) {
         if (island.isEmpty()) {
             return NONE;
         }
@@ -22,10 +19,10 @@ public class SeaTileRules {
                 volcanoHex,
                 volcanoHex.getLeftNeighbor(orientation),
                 volcanoHex.getRightNeighbor(orientation));
-        return validate(island, tile, hexes);
+        return validate(island, hexes);
     }
 
-    public static Problem validate(Island island, VolcanoTile tile, ImmutableSet<Hex> hexes) {
+    public static Problem validate(Island island, ImmutableSet<Hex> hexes) {
         return checkOnSea(island, hexes)
                 .and(() -> checkAdjacentToCoast(island, hexes));
     }

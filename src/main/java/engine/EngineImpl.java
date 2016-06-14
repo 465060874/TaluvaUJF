@@ -412,7 +412,6 @@ class EngineImpl implements Engine {
 
         if (DEBUG) {
             Problem problem = SeaTileRules.validate(island,
-                    volcanoTileStack.current(),
                     action.getVolcanoHex(),
                     action.getOrientation());
             if (!problem.isValid()) {
@@ -435,7 +434,6 @@ class EngineImpl implements Engine {
 
         if (DEBUG) {
             Problem problem = VolcanoTileRules.validate(island,
-                    volcanoTileStack.current(),
                     action.getVolcanoHex(),
                     action.getOrientation());
             if (!problem.isValid()) {

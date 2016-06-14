@@ -2,11 +2,13 @@ package ia;
 
 import com.google.common.collect.ImmutableList;
 import data.BuildingType;
+import data.VolcanoTile;
 import engine.Engine;
 import engine.EngineStatus;
 import engine.action.*;
 import engine.rules.PlaceBuildingRules;
 import map.Hex;
+import map.Village;
 import util.Randoms;
 
 import java.util.Iterator;
@@ -318,31 +320,34 @@ class AlphaBetaAlgorithm implements IAAlgorithm {
         engine.logger().fine("Checking compatibility : " + placement + " " + build);
 
         if( placement instanceof SeaTileAction ){
-            // Construction + placement mer ne pose jamais de problème
-            if( build instanceof PlaceBuildingAction )
+            if (build instanceof PlaceBuildingAction) {
+                // Construction + placement mer ne pose jamais de problème
                 return true;
+            }
+            else {
                 // Si extension et placement mer :
-            else{
-                ExpandVillageAction expandVillageAction = (ExpandVillageAction) build;
-                // On vérifie que le palcement ne modifie pas l'extension :
-                if (placement.getLeftFieldType() == expandVillageAction.getFieldType()) {
+                // On vérifie que le placement ne modifie pas l'extension :
+                VolcanoTile tile = engine.getVolcanoTileStack().current();
+                ExpandVillageAction expansion = (ExpandVillageAction) build;
+                Village expansionVillage = expansion.getVillage(engine.getIsland());
+                if (tile.getLeft() == expansion.getFieldType()) {
                     for(Hex neighbor : placement.getLeftHex().getNeighborhood() )
                         if (engine.getIsland().getField(neighbor).hasBuilding()
-                                && engine.getIsland().getVillage(neighbor).equals(expandVillageAction.getVillage(engine.getIsland())))
+                                && engine.getIsland().getVillage(neighbor).equals(expansionVillage))
                             return false;
                 }
-                else if (placement.getRightFieldType() == expandVillageAction.getFieldType()) {
+                else if (tile.getRight() == expansion.getFieldType()) {
                     for(Hex neighbor : placement.getRightHex().getNeighborhood() )
                         if (engine.getIsland().getField(neighbor).hasBuilding())
-                            if (engine.getIsland().getVillage(neighbor).equals(expandVillageAction.getVillage(engine.getIsland())))
+                            if (engine.getIsland().getVillage(neighbor).equals(expansionVillage))
                                 return false;
                 }
                 return true;
             }
         }
         else {
-            // Placement volcan + construction simple
-            if( build instanceof PlaceBuildingAction ) {
+            if (build instanceof PlaceBuildingAction) {
+                // Placement volcan + construction simple
                 engine.action(placement);
                 BuildingType buildingType = ((PlaceBuildingAction) build).getType();
                 Hex buildingHex = ((PlaceBuildingAction) build).getHex();
@@ -358,29 +363,34 @@ class AlphaBetaAlgorithm implements IAAlgorithm {
             }
             else {
                 // On vérifie que le placement ne modifie pas l'extension :
-                if( placement.getLeftFieldType() == ((ExpandVillageAction)build).getFieldType() ){
-                    for(Hex neighbor : placement.getLeftHex().getNeighborhood() )
-                        if( engine.getIsland().getField(neighbor).hasBuilding())
-                            if( engine.getIsland().getVillage( neighbor).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
-                                return false;
+                VolcanoTile tile = engine.getVolcanoTileStack().current();
+                ExpandVillageAction expansion = (ExpandVillageAction) build;
+                Village expansionVillage = expansion.getVillage(engine.getIsland());
+                if (tile.getLeft() == expansion.getFieldType()) {
+                    for (Hex neighbor : placement.getLeftHex().getNeighborhood())
+                        if (engine.getIsland().getField(neighbor).hasBuilding()
+                                && expansionVillage.equals(engine.getIsland().getVillage(neighbor))) {
+                            return false;
+                        }
                 }
-                else if (placement.getRightFieldType() == ((ExpandVillageAction)build).getFieldType()){
-                    for(Hex neighbor : placement.getRightHex().getNeighborhood() )
-                        if( engine.getIsland().getField(neighbor).hasBuilding())
-                            if( engine.getIsland().getVillage( neighbor).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
-                                return false;
+                else if (tile.getRight() == expansion.getFieldType()) {
+                    for (Hex neighbor : placement.getRightHex().getNeighborhood())
+                        if (engine.getIsland().getField(neighbor).hasBuilding()
+                                && expansionVillage.equals(engine.getIsland().getVillage(neighbor))) {
+                            return false;
+                        }
                 }
 
                 // On vérifie qu'on écrase pas le village OU le champ sur lequel on s'étend
                 if( engine.getIsland().getField(placement.getLeftHex()).hasBuilding())
-                    if( engine.getIsland().getVillage( placement.getLeftHex()).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
+                    if( engine.getIsland().getVillage( placement.getLeftHex()).equals(expansionVillage))
                         return false;
-                if( engine.getIsland().getField( placement.getLeftHex()).getType() == ( ((ExpandVillageAction) build).getFieldType()))
+                if( engine.getIsland().getField( placement.getLeftHex()).getType() == ( expansion.getFieldType()))
                         return false;
                 if( engine.getIsland().getField(placement.getRightHex()).hasBuilding())
-                    if( engine.getIsland().getVillage( placement.getRightHex()).equals(((ExpandVillageAction)build).getVillage(engine.getIsland())))
+                    if( engine.getIsland().getVillage( placement.getRightHex()).equals(expansionVillage))
                         return false;
-                if( engine.getIsland().getField( placement.getRightHex()).getType() == ( ((ExpandVillageAction) build).getFieldType()))
+                if( engine.getIsland().getField( placement.getRightHex()).getType() == ( expansion.getFieldType()))
                         return false;
                 return true;
             }

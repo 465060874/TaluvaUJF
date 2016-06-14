@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 class HexMapImpl<E> implements HexMap<E> {
@@ -29,7 +30,7 @@ class HexMapImpl<E> implements HexMap<E> {
     }
 
     public E get(Hex hex) {
-        E element = map.get(checkNotNull(hex));
+        E element = map.get(hex);
         if (element == null) {
             throw new IllegalStateException("Accessing unknown element at " + hex);
         }
@@ -38,12 +39,7 @@ class HexMapImpl<E> implements HexMap<E> {
     }
 
     public E getOrDefault(Hex hex, E fallbackElement) {
-        E element = map.get(checkNotNull(hex));
-        if (element == null) {
-            return fallbackElement;
-        }
-
-        return element;
+        return map.getOrDefault(hex, fallbackElement);
     }
 
     public E put(Hex hex, E element) {

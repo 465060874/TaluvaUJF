@@ -2,12 +2,11 @@ package engine.rules;
 
 import data.BuildingType;
 import data.FieldType;
-import data.VolcanoTile;
 import map.*;
 
 public class VolcanoTileRules {
 
-    public static Problem validate(Island island, VolcanoTile tile, Hex hex, Orientation orientation) {
+    public static Problem validate(Island island, Hex hex, Orientation orientation) {
         // On vérifie que la tuile sous le volcan est bien un volcan avec une orientation différente
         if (island.getField(hex).getType() != FieldType.VOLCANO) {
             return Problem.NOT_ON_VOLCANO;

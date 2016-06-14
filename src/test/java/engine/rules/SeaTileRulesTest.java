@@ -1,8 +1,6 @@
 package engine.rules;
 
 import com.google.common.io.Resources;
-import data.FieldType;
-import data.VolcanoTile;
 import map.Hex;
 import map.Island;
 import map.IslandIO;
@@ -18,10 +16,8 @@ import static org.junit.Assert.assertTrue;
 
 public class SeaTileRulesTest {
 
-    private static final VolcanoTile TILE = new VolcanoTile(FieldType.JUNGLE, FieldType.JUNGLE);
-
     private void assertValid(Island island, Hex hex, Orientation orientation) {
-        Problem actual = SeaTileRules.validate(island, TILE, hex, orientation);
+        Problem actual = SeaTileRules.validate(island, hex, orientation);
         assertTrue("TileAction on sea at " + hex
                         + " with orientation " + orientation
                         + " expected to be valid, but has problems " + actual,
@@ -29,7 +25,7 @@ public class SeaTileRulesTest {
     }
 
     private void assertProblems(Island island, Hex hex, Orientation orientation, Problem expected) {
-        Problem actual = SeaTileRules.validate(island, TILE, hex, orientation);
+        Problem actual = SeaTileRules.validate(island, hex, orientation);
         assertEquals("TileAction on sea at " + hex
                         + " with orientation " + orientation
                         + " expected to have problems " + expected

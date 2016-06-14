@@ -48,10 +48,8 @@ class EngineActions {
 
     void updateAll() {
         if (engine.getIsland().isEmpty()) {
-            VolcanoTile tile = engine.getVolcanoTileStack().current();
             Hex originHex = Hex.at(0, 0);
-            this.seaTiles = ImmutableList.of(new SeaTileAction(tile,
-                    originHex, Orientation.NORTH));
+            this.seaTiles = ImmutableList.of(new SeaTileAction(originHex, Orientation.NORTH));
             this.volcanosTiles = ImmutableList.of();
             this.placeBuildings = ImmutableList.of();
             this.expandVillages = ImmutableList.of();
@@ -71,17 +69,16 @@ class EngineActions {
         }
 
         Island island = engine.getIsland();
-        VolcanoTile tile = engine.getVolcanoTileStack().current();
 
         Set<SeaTileAction> set = new HashSet<>();
         for (Hex hex : island.getCoast()) {
             for (Orientation orientation : Orientation.values()) {
-                if (!SeaTileRules.validate(island, tile, hex, orientation).isValid()) {
+                if (!SeaTileRules.validate(island, hex, orientation).isValid()) {
                     continue;
                 }
 
                 for (int rotation = 0; rotation < 3; rotation++) {
-                    set.add(new SeaTileAction(tile, hex, orientation));
+                    set.add(new SeaTileAction(hex, orientation));
                     hex = hex.getLeftNeighbor(orientation);
                     orientation = orientation.leftRotation();
                 }
@@ -107,11 +104,11 @@ class EngineActions {
         ImmutableList.Builder<VolcanoTileAction> builder = ImmutableList.builder();
         for (Hex hex : island.getVolcanos()) {
             for (Orientation orientation : Orientation.values()) {
-                if (!VolcanoTileRules.validate(island, tile, hex, orientation).isValid()) {
+                if (!VolcanoTileRules.validate(island, hex, orientation).isValid()) {
                     continue;
                 }
 
-                builder.add(new VolcanoTileAction(tile, hex, orientation));
+                builder.add(new VolcanoTileAction(hex, orientation));
             }
         }
 
@@ -192,8 +189,9 @@ class EngineActions {
         PlayerColor color = engine.getCurrentPlayer().getColor();
         Hex leftHex = action.getLeftHex();
         Hex rightHex = action.getRightHex();
-        FieldType leftFieldType = action.getLeftFieldType();
-        FieldType rightFieldType = action.getRightFieldType();
+        VolcanoTile tile = engine.getVolcanoTileStack().current();
+        FieldType leftFieldType = tile.getLeft();
+        FieldType rightFieldType = tile.getRight();
 
         // NB: Village do not implements hashCode/equals
         // This store them by identity instead of equality, which is what we want

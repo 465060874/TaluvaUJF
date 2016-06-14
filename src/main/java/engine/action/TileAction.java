@@ -1,8 +1,6 @@
 package engine.action;
 
 import com.google.common.collect.ComparisonChain;
-import data.FieldType;
-import data.VolcanoTile;
 import map.Hex;
 import map.Orientation;
 
@@ -12,12 +10,10 @@ import java.util.Objects;
 
 public abstract class TileAction implements Action<TileAction> {
 
-    private final VolcanoTile tile;
     private final Hex volcanoHex;
     private final Orientation orientation;
 
-    public TileAction(VolcanoTile tile, Hex volcanoHex, Orientation orientation) {
-        this.tile = tile;
+    public TileAction(Hex volcanoHex, Orientation orientation) {
         this.volcanoHex = volcanoHex;
         this.orientation = orientation;
     }
@@ -30,16 +26,8 @@ public abstract class TileAction implements Action<TileAction> {
         return volcanoHex.getLeftNeighbor(orientation);
     }
 
-    public FieldType getLeftFieldType() {
-        return tile.getLeft();
-    }
-
     public Hex getRightHex() {
         return volcanoHex.getRightNeighbor(orientation);
-    }
-
-    public FieldType getRightFieldType() {
-        return tile.getRight();
     }
 
     public Orientation getOrientation() {
@@ -54,10 +42,6 @@ public abstract class TileAction implements Action<TileAction> {
         writer.write('\n');
         writer.write(Integer.toString(volcanoHex.getDiag()));
         writer.write('\n');
-        writer.write(tile.getLeft().name());
-        writer.write('\n');
-        writer.write(tile.getRight().name());
-        writer.write('\n');
         writer.write(orientation.name());
         writer.write('\n');
     }
@@ -65,8 +49,6 @@ public abstract class TileAction implements Action<TileAction> {
     @Override
     public int compareTo(TileAction o) {
         return ComparisonChain.start()
-                .compare(tile.getLeft(), o.tile.getLeft())
-                .compare(tile.getRight(), o.tile.getRight())
                 .compare(volcanoHex.getLine(), o.volcanoHex.getLine())
                 .compare(volcanoHex.getDiag(), o.volcanoHex.getDiag())
                 .compare(orientation, o.orientation)
@@ -75,7 +57,7 @@ public abstract class TileAction implements Action<TileAction> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(tile, volcanoHex, orientation);
+        return Objects.hash(volcanoHex, orientation);
     }
 
     @Override
@@ -85,15 +67,14 @@ public abstract class TileAction implements Action<TileAction> {
         }
 
         TileAction other = (TileAction) obj;
-        return this.tile.equals(other.tile)
-                && this.volcanoHex.equals(other.volcanoHex)
+        return this.volcanoHex.equals(other.volcanoHex)
                 && this.orientation == other.orientation;
     }
 
     @Override
     public String toString() {
         return this instanceof VolcanoTileAction
-                ? "VolcanoTile(" + tile.toString() + ", " +  volcanoHex.toString() + ", " + orientation.toString() + ")"
-                : "SeaTile(" + tile.toString() + ", " +  volcanoHex.toString() + ", " + orientation.toString() + ")";
+                ? "VolcanoTile(" + volcanoHex.toString() + ", " + orientation.toString() + ")"
+                : "SeaTile(" + volcanoHex.toString() + ", " + orientation.toString() + ")";
     }
 }

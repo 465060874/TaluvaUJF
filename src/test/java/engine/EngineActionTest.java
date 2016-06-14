@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import data.FieldType;
 import data.PlayerColor;
-import data.VolcanoTile;
 import engine.action.PlaceBuildingAction;
 import engine.action.SeaTileAction;
 import engine.action.VolcanoTileAction;
@@ -41,8 +40,6 @@ public class EngineActionTest {
 
         assertFalse(engine.getStatus() instanceof EngineStatus.Finished);
 
-        VolcanoTile tile = engine.getVolcanoTileStack().current();
-
         Set<SeaTileAction> actual = assertNoDuplicatesAndCreateSet(engine.getSeaTileActions());
 
         ImmutableSet.Builder<SeaTileAction> builder = ImmutableSet.builder();
@@ -50,11 +47,11 @@ public class EngineActionTest {
             for (int j = -LIMIT; j < LIMIT; j++) {
                 Hex hex = Hex.at(i, j);
                 for (Orientation orientation : Orientation.values()) {
-                    if (!SeaTileRules.validate(island, tile, hex, orientation).isValid()) {
+                    if (!SeaTileRules.validate(island, hex, orientation).isValid()) {
                         continue;
                     }
 
-                    builder.add(new SeaTileAction(tile, hex, orientation));
+                    builder.add(new SeaTileAction(hex, orientation));
                 }
             }
         }
@@ -80,8 +77,6 @@ public class EngineActionTest {
 
         assertFalse(engine.getStatus() instanceof EngineStatus.Finished);
 
-        VolcanoTile tile = engine.getVolcanoTileStack().current();
-
         Set<VolcanoTileAction> actual = assertNoDuplicatesAndCreateSet(engine.getVolcanoTileActions());
 
         ImmutableSet.Builder<VolcanoTileAction> builder = ImmutableSet.builder();
@@ -89,11 +84,11 @@ public class EngineActionTest {
             for (int j = -LIMIT; j < LIMIT; j++) {
                 Hex hex = Hex.at(i, j);
                 for (Orientation orientation : Orientation.values()) {
-                    if (!VolcanoTileRules.validate(island, tile, hex, orientation).isValid()) {
+                    if (!VolcanoTileRules.validate(island, hex, orientation).isValid()) {
                         continue;
                     }
 
-                    builder.add(new VolcanoTileAction(tile, hex, orientation));
+                    builder.add(new VolcanoTileAction(hex, orientation));
                 }
             }
         }
